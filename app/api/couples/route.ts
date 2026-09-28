@@ -1,0 +1,4 @@
+import {NextResponse} from 'next/server';import {admin} from '../../Desktop/mezhdu-nami/lib/supabase';import crypto from 'crypto';
+export async function POST(req:Request){const {a,b}=await req.json();const token=crypto.randomBytes(18).toString('hex');const {data,error}=await admin().from('couples').insert({partner_a_name:a,partner_b_name:b,invite_token:token}).select().single();if(error)return NextResponse.json({error:error.message},{status:500});return NextResponse.json(data)}
+
+export async function GET(req:Request){const u=new URL(req.url);const id=u.searchParams.get('id');const token=u.searchParams.get('token');let q=admin().from('couples').select('*');q=id?q.eq('id',id):q.eq('invite_token',token);const {data,error}=await q.single();if(error)return NextResponse.json({error:error.message},{status:404});return NextResponse.json(data)}

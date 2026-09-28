@@ -1,0 +1,20 @@
+export type Q={id:string;category:string;text:string;type:'scale'|'choice'|'text';options?:string[]};
+export const questions:Q[]=[
+{id:'fun',category:'closeness',text:'Как часто вам действительно весело вместе?',type:'scale'},
+{id:'joy',category:'understanding',text:'Насколько хорошо партнёр знает, что тебя радует?',type:'scale'},
+{id:'attention',category:'closeness',text:'Хватает ли тебе внимания партнёра?',type:'scale'},
+{id:'listen',category:'communication',text:'Чувствуешь ли ты, что партнёр действительно слушает тебя в серьёзных разговорах?',type:'scale'},
+{id:'talk',category:'communication',text:'Насколько легко тебе говорить с партнёром о том, что тебя задевает?',type:'scale'},
+{id:'repair',category:'conflict',text:'После ссоры насколько быстро между вами снова становится спокойно?',type:'scale'},
+{id:'first_step',category:'conflict',text:'Кто чаще делает первый шаг к примирению?',type:'choice',options:['Я','Партнёр','Оба примерно одинаково','Зависит от ситуации']},
+{id:'money',category:'money',text:'Насколько комфортно тебе обсуждать с партнёром деньги?',type:'scale'},
+{id:'chores',category:'daily',text:'Насколько справедливо, по твоему ощущению, распределён быт?',type:'scale'},
+{id:'space',category:'space',text:'Насколько тебе хватает личного пространства в отношениях?',type:'scale'},
+{id:'support',category:'closeness',text:'Насколько ты чувствуешь поддержку партнёра, когда тебе тяжело?',type:'scale'},
+{id:'intimacy',category:'intimacy',text:'Насколько тебя устраивает уровень физической и эмоциональной близости?',type:'scale'},
+{id:'future',category:'future',text:'Насколько ваши представления о совместном будущем совпадают?',type:'scale'},
+{id:'family',category:'future',text:'Насколько легко вам обсуждать семью, детей и долгосрочные планы?',type:'scale'},
+{id:'priority_self',category:'understanding',text:'Что для тебя сейчас важнее всего в отношениях?',type:'choice',options:['Поддержка','Совместное время','Интимность','Доверие','Финансовая стабильность','Личное пространство','Общие планы']},
+{id:'priority_partner',category:'understanding',text:'А что, как тебе кажется, сейчас важнее всего твоему партнёру?',type:'choice',options:['Поддержка','Совместное время','Интимность','Доверие','Финансовая стабильность','Личное пространство','Общие планы']},
+{id:'missing',category:'open',text:'Чего тебе сейчас больше всего не хватает в ваших отношениях?',type:'text'},
+{id:'gratitude',category:'open',text:'Что партнёр делает такого, за что ты ему особенно благодарен?',type:'text'}];
