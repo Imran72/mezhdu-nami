@@ -2,9 +2,7 @@
 
 import {
     useEffect,
-    useMemo,
     useState,
-    type ReactNode,
 } from 'react';
 
 import {
@@ -14,7 +12,6 @@ import {
 
 import {
     determineArchetype,
-    getFreeInsights,
     type Comparison,
 } from '../../../lib/archetypes';
 
@@ -27,10 +24,28 @@ type Couple = {
     paid?: boolean;
 };
 
+type Dimensions = {
+    views?: number;
+    care?: number;
+    communication?: number;
+    rhythm?: number;
+    space?: number;
+};
+
 type ResultData = {
     waiting?: boolean;
+
     couple: Couple;
+
     comparisons?: Comparison[];
+
+    scores?: {
+        overall?: number;
+        sameAnswers?: number;
+        closeAnswers?: number;
+        differentAnswers?: number;
+        dimensions?: Dimensions;
+    };
 };
 
 export default function ResultPage() {
@@ -39,21 +54,28 @@ export default function ResultPage() {
             coupleId: string;
         }>();
 
-    const router = useRouter();
+    const router =
+        useRouter();
 
     const coupleId =
         params.coupleId;
 
-    const [data, setData] =
+    const [
+        data,
+        setData,
+    ] =
         useState<ResultData | null>(
             null
         );
 
-    const [error, setError] =
+    const [
+        error,
+        setError,
+    ] =
         useState('');
 
     useEffect(() => {
-        async function loadResult() {
+        async function load() {
             try {
                 const response =
                     await fetch(
@@ -61,7 +83,8 @@ export default function ResultPage() {
                             coupleId
                         )}`,
                         {
-                            cache: 'no-store',
+                            cache:
+                                'no-store',
                         }
                     );
 
@@ -71,10 +94,13 @@ export default function ResultPage() {
                     );
                 }
 
-                const result: ResultData =
+                const result:
+                    ResultData =
                     await response.json();
 
-                if (result.waiting) {
+                if (
+                    result.waiting
+                ) {
                     router.replace(
                         `/waiting/${coupleId}`
                     );
@@ -82,9 +108,13 @@ export default function ResultPage() {
                     return;
                 }
 
-                setData(result);
+                setData(
+                    result
+                );
             } catch (err) {
-                console.error(err);
+                console.error(
+                    err
+                );
 
                 setError(
                     'Не получилось загрузить результат.'
@@ -92,92 +122,17 @@ export default function ResultPage() {
             }
         }
 
-        loadResult();
+        load();
     }, [
         coupleId,
         router,
     ]);
 
-    const comparisons =
-        useMemo(
-            () =>
-                data?.comparisons ?? [],
-            [data]
-        );
-
-    const archetype =
-        useMemo(
-            () =>
-                determineArchetype(
-                    comparisons
-                ),
-            [comparisons]
-        );
-
-    const insights =
-        useMemo(
-            () =>
-                getFreeInsights(
-                    comparisons
-                ),
-            [comparisons]
-        );
-
-    const sameCount =
-        comparisons.filter(
-            (item) =>
-                item.similarity ===
-                'same'
-        ).length;
-
-    const closeCount =
-        comparisons.filter(
-            (item) =>
-                item.similarity ===
-                'close'
-        ).length;
-
-    const differentCount =
-        comparisons.filter(
-            (item) =>
-                item.similarity ===
-                'different'
-        ).length;
-
-    const totalCount =
-        comparisons.length;
-
-    const wavePercent =
-        totalCount > 0
-            ? Math.round(
-                (
-                    sameCount +
-                    closeCount * 0.5
-                ) /
-                totalCount *
-                100
-            )
-            : 0;
-
     if (error) {
         return (
             <>
-                <main className="state-page">
-                    <div className="state-box">
-
-                        <div className="brand">
-                            между нами
-                        </div>
-
-                        <h1>
-                            Упс.
-                        </h1>
-
-                        <p>
-                            {error}
-                        </p>
-
-                    </div>
+                <main className="state">
+                    {error}
                 </main>
 
                 <style jsx global>
@@ -190,24 +145,8 @@ export default function ResultPage() {
     if (!data) {
         return (
             <>
-                <main className="loading-page">
-
-                    <div className="loading-mark">
-                        <span />
-                        <span />
-                        <b>
-                            ♥
-                        </b>
-                    </div>
-
-                    <div className="brand">
-                        между нами
-                    </div>
-
-                    <p>
-                        смотрим, что у вас там...
-                    </p>
-
+                <main className="state">
+                    считаем, что у вас там...
                 </main>
 
                 <style jsx global>
@@ -217,316 +156,277 @@ export default function ResultPage() {
         );
     }
 
+    const comparisons =
+        data.comparisons ?? [];
+
+    const archetype =
+        determineArchetype(
+            comparisons
+        );
+
     const nameA =
-        data.couple.partner_a_name;
+        data.couple
+            .partner_a_name;
 
     const nameB =
-        data.couple.partner_b_name;
+        data.couple
+            .partner_b_name;
 
-    const scorePhrase =
-        getScorePhrase(
-            wavePercent
+    const overall =
+        data.scores
+            ?.overall ??
+        calculateFallback(
+            comparisons
         );
+
+    const dimensions =
+        data.scores
+            ?.dimensions;
+
+    const dimensionItems = [
+        {
+            label:
+                'Близость взглядов',
+            value:
+                dimensions
+                    ?.views ??
+                overall,
+            face: 'happy',
+        },
+
+        {
+            label:
+                'Забота',
+            value:
+                dimensions
+                    ?.care ??
+                overall,
+            face: 'happy',
+        },
+
+        {
+            label:
+                'Общение',
+            value:
+                dimensions
+                    ?.communication ??
+                overall,
+            face: 'neutral',
+        },
+
+        {
+            label:
+                'Совместный ритм',
+            value:
+                dimensions
+                    ?.rhythm ??
+                overall,
+            face: 'happy',
+        },
+
+        {
+            label:
+                'Личное пространство',
+            value:
+                dimensions
+                    ?.space ??
+                overall,
+            face: 'neutral',
+        },
+    ];
 
     return (
         <>
             <main className="page">
 
-                {/* =====================================================
-            HERO
-        ===================================================== */}
+                {/* ===============================================
+            HEADER
+        =============================================== */}
 
-                <section className="hero">
+                <header className="header">
 
-                    <div className="hero-star hero-star-a">
-                        ✦
+                    <div className="brand">
+                        между нами
                     </div>
 
-                    <div className="hero-star hero-star-b">
-                        ✦
+                    <div className="names">
+                        {nameA}
+                        <span>
+              +
+            </span>
+                        {nameB}
                     </div>
 
-                    <div className="hero-plus">
-                        +
+                </header>
+
+                {/* ===============================================
+            OVERALL
+        =============================================== */}
+
+                <section className="overall">
+
+                    <div className="section-label">
+                        ВАША ОБЩАЯ
                     </div>
 
-                    <div className="shell">
+                    <h1>
+                        совместимость
+                    </h1>
 
-                        <header className="topbar">
+                    <div className="overall-content">
 
-                            <div className="brand">
-                                между нами
-                            </div>
-
-                            <div className="top-note">
-                                РЕЗУЛЬТАТ ДЛЯ ДВОИХ
-                                <span>
-                  ♥
-                </span>
-                            </div>
-
-                        </header>
-
-                        <div className="hero-names">
-
-              <span>
-                {nameA}
-              </span>
-
-                            <b>
-                                ×
-                            </b>
-
+                        <div className="overall-number">
+                            {overall}
                             <span>
-                {nameB}
+                %
               </span>
+                        </div>
+
+                        <div className="overall-face">
+
+                            <Face
+                                value={
+                                    overall
+                                }
+                                large
+                            />
 
                         </div>
 
-                        <div className="hero-stage">
+                        <div className="overall-copy">
 
-                            {/* SCORE */}
-
-                            <div className="score-block">
-
-                                <div className="score-number">
-                                    {wavePercent}
-                                    <sup>
-                                        %
-                                    </sup>
-                                </div>
-
-                                <div className="score-title">
-                                    НА ОДНОЙ ВОЛНЕ
-                                </div>
-
-                                <div className="score-line">
-
-                                    <div
-                                        className="score-line-fill"
-                                        style={{
-                                            width:
-                                                `${wavePercent}%`,
-                                        }}
-                                    />
-
-                                    <span
-                                        style={{
-                                            left:
-                                                `${wavePercent}%`,
-                                        }}
-                                    />
-
-                                </div>
-
-                                <p>
-                                    «{scorePhrase}»
-                                </p>
-
-                            </div>
-
-                            {/* ART */}
-
-                            <div className="art-wrap">
-
-                                <PixelScene
-                                    archetypeId={
-                                        archetype.id
-                                    }
-                                />
-
-                                <div className="art-sticker">
-                  <span>
-                    ВАШ ТИП ПАРЫ
-                  </span>
-
-                                    №
-                                    {
-                                        getArchetypeNumber(
-                                            archetype.id
-                                        )
-                                    }
-                                </div>
-
-                            </div>
-
-                            {/* ARCHETYPE */}
-
-                            <div className="archetype-block">
-
-                                <div className="archetype-kicker">
-                                    ТАК. ЭТО ВЫ.
-                                </div>
-
-                                <h1>
-                                    {archetype.title}
-                                </h1>
-
-                                <p>
-                                    {
-                                        archetype.description
-                                    }
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                        <div className="chaos-stats">
-
-                            <div className="chaos-stat stat-a">
-
-                                <strong>
-                                    {sameCount}
-                                </strong>
-
-                                <span>
-                  один
-                  <br />
-                  в один
-                </span>
-
-                            </div>
-
-                            <div className="chaos-stat stat-b">
-
-                                <strong>
-                                    {closeCount}
-                                </strong>
-
-                                <span>
-                  ну
-                  <br />
-                  почти
-                </span>
-
-                            </div>
-
-                            <div className="chaos-stat stat-c">
-
-                                <strong>
-                                    {differentCount}
-                                </strong>
-
-                                <span>
-                  тут начинается
-                  <br />
-                  сюжет
-                </span>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </section>
-
-                {/* =====================================================
-            INSIGHTS
-        ===================================================== */}
-
-                <section className="insights">
-
-                    <div className="shell">
-
-                        <div className="insights-intro">
-
-              <span>
-                ↓
-              </span>
+                            <strong>
+                                {
+                                    getOverallTitle(
+                                        overall
+                                    )
+                                }
+                            </strong>
 
                             <p>
-                                ладно.
-                                <br />
-                                теперь интересное.
+                                по вашим ответам
+                                в этом тесте
                             </p>
 
                         </div>
 
-                        <div className="insight-layout">
+                    </div>
 
-                            <Insight
-                                number="01"
-                                kicker="ВЫ ВОТ ТУТ"
-                                title="прям одинаковые"
-                                symbol="♥"
-                                text={
-                                    insights.sameInsight
-                                }
-                                variant="pink"
-                            />
+                </section>
 
-                            <Insight
-                                number="02"
-                                kicker="А ТУТ УЖЕ"
-                                title="интереснее"
-                                symbol="↯"
-                                text={
-                                    insights.differenceInsight
-                                }
-                                variant="purple"
-                                offset
-                            />
+                {/* ===============================================
+            DIMENSIONS
+        =============================================== */}
 
-                            <Insight
-                                number="03"
-                                kicker="А ЭТО ВООБЩЕ"
-                                title="ваша суперсила"
-                                symbol="✦"
-                                text={
-                                    insights.superpower
-                                }
-                                variant="yellow"
-                            />
+                <section className="dimensions">
 
-                        </div>
+                    <div className="dimensions-heading">
+
+            <span>
+              А если разобрать
+              по частям
+            </span>
+
+                        <b>
+                            ↓
+                        </b>
+
+                    </div>
+
+                    <div className="dimension-list">
+
+                        {
+                            dimensionItems.map(
+                                (
+                                    item,
+                                    index
+                                ) => (
+                                    <Dimension
+                                        key={
+                                            item.label
+                                        }
+                                        index={
+                                            index + 1
+                                        }
+                                        label={
+                                            item.label
+                                        }
+                                        value={
+                                            item.value
+                                        }
+                                    />
+                                )
+                            )
+                        }
 
                     </div>
 
                 </section>
 
-                {/* =====================================================
-            QUESTION
-        ===================================================== */}
+                {/* ===============================================
+            TYPE
+        =============================================== */}
 
-                <section className="question">
+                <section className="type-section">
 
-                    <div className="question-stars">
-                        ✦　·　✦
-                    </div>
+                    <div className="type-heading">
 
-                    <div className="question-shell">
+                        <div>
 
-                        <div className="question-art">
-
-                            <div className="pixel-moon" />
-
-                            <div className="sitting-pair">
-
-                                <span className="sitter sitter-a" />
-
-                                <span className="sitter sitter-b" />
-
-                            </div>
-
-                        </div>
-
-                        <div className="question-copy">
-
-                            <div className="question-kicker">
-                                ВОПРОС ВАМ НА ВЕЧЕР
+                            <div className="section-label">
+                                А ТЕПЕРЬ ГЛАВНОЕ
                             </div>
 
                             <h2>
-                                «{
-                                insights.eveningQuestion
-                            }»
+                                Ваш тип пары
                             </h2>
 
+                        </div>
+
+                        <div className="type-number">
+                            №
+                            {
+                                getTypeNumber(
+                                    archetype.id
+                                )
+                            }
+                        </div>
+
+                    </div>
+
+                    <div className="type-card">
+
+                        <div className="type-art">
+
+                            <PixelCouple
+                                archetypeId={
+                                    archetype.id
+                                }
+                            />
+
+                        </div>
+
+                        <div className="type-copy">
+
+                            <div className="type-small">
+                                ТИП ПАРЫ №
+                                {
+                                    getTypeNumber(
+                                        archetype.id
+                                    )
+                                }
+                            </div>
+
+                            <h3>
+                                {
+                                    archetype.title
+                                }
+                            </h3>
+
                             <p>
-                                без правильного ответа.
-                                просто поговорите.
+                                {
+                                    archetype.description
+                                }
                             </p>
 
                         </div>
@@ -535,61 +435,70 @@ export default function ResultPage() {
 
                 </section>
 
-                {/* =====================================================
+                {/* ===============================================
             PAYWALL
-        ===================================================== */}
+        =============================================== */}
 
                 <section className="paywall">
 
-                    <div className="shell paywall-layout">
+                    <div className="paywall-inner">
 
                         <div className="paywall-copy">
 
-                            <div className="paywall-note">
-                                ещё столько
-                                <br />
-                                интересного
-                                <span>
-                  ↘
-                </span>
-                            </div>
-
-                            <div className="eyebrow">
-                                ХОТИТЕ КОПНУТЬ ГЛУБЖЕ?
-                            </div>
+              <span>
+                А ЧТО МЕЖДУ СТРОК?
+              </span>
 
                             <h2>
-                                Между ответами
-                                <br />
-                                осталось кое-что.
+                                Тут начинается
+                                самое интересное.
                             </h2>
+
+                            <p>
+                                Покажем, где вы
+                                можете не понимать
+                                друг друга — и что
+                                с этим делать.
+                            </p>
 
                         </div>
 
-                        <div className="paywall-action">
+                        <div className="paywall-box">
 
-                            <div className="paywall-items">
+                            <div>
+                <span>
+                  ✦
+                </span>
 
-                                <PayItem>
-                                    чего каждому немного
-                                    не хватает
-                                </PayItem>
+                                что одному
+                                не хватает
+                            </div>
 
-                                <PayItem>
-                                    как вы воспринимаете
-                                    заботу
-                                </PayItem>
+                            <div>
+                <span>
+                  ✦
+                </span>
 
-                                <PayItem>
-                                    что можете не замечать
-                                    друг о друге
-                                </PayItem>
+                                как каждый
+                                чувствует заботу
+                            </div>
 
-                                <PayItem>
-                                    что каждый хочет
-                                    сохранить
-                                </PayItem>
+                            <div>
+                <span>
+                  ✦
+                </span>
 
+                                ваши слепые
+                                зоны
+                            </div>
+
+                            <div>
+                <span>
+                  ✦
+                </span>
+
+                                вопросы именно
+                                для вашей пары
                             </div>
 
                             <button
@@ -602,22 +511,18 @@ export default function ResultPage() {
                             >
 
                 <span>
-                  Полный разбор
+                  Открыть разбор
                 </span>
 
-                                <b>
-                                    299 ₽
-                                </b>
-
                                 <strong>
-                                    →
+                                    299 ₽
                                 </strong>
 
-                            </button>
+                                <b>
+                                    →
+                                </b>
 
-                            <div className="paywall-small">
-                                один разбор · для вас двоих
-                            </div>
+                            </button>
 
                         </div>
 
@@ -635,142 +540,252 @@ export default function ResultPage() {
 }
 
 /* ============================================================
-   SCORE COPY
+   FALLBACK
 ============================================================ */
 
-function getScorePhrase(
-    score: number
+function calculateFallback(
+    comparisons:
+    Comparison[]
 ) {
-    if (score >= 86) {
-        return 'так. кто из вас подглядывал?';
+    if (
+        comparisons.length === 0
+    ) {
+        return 0;
     }
 
-    if (score >= 71) {
-        return 'вы точно не списывали?';
+    let score = 0;
+
+    for (
+        const comparison
+        of comparisons
+        ) {
+        if (
+            comparison.similarity ===
+            'same'
+        ) {
+            score += 1;
+        }
+
+        if (
+            comparison.similarity ===
+            'close'
+        ) {
+            score += 0.5;
+        }
     }
 
-    if (score >= 51) {
-        return 'не телепатия, но уже подозрительно';
-    }
-
-    if (score >= 31) {
-        return 'два разных мира. и это уже интересно';
-    }
-
-    return 'как вы вообще нашли друг друга?';
+    return Math.round(
+        score /
+        comparisons.length *
+        100
+    );
 }
 
 /* ============================================================
-   ARCHETYPE NUMBER
+   COPY
 ============================================================ */
 
-function getArchetypeNumber(
+function getOverallTitle(
+    value: number
+) {
+    if (value >= 85) {
+        return 'подозрительно похоже';
+    }
+
+    if (value >= 70) {
+        return 'очень близко';
+    }
+
+    if (value >= 55) {
+        return 'много общего';
+    }
+
+    if (value >= 40) {
+        return 'по-разному, но интересно';
+    }
+
+    return 'два разных мира';
+}
+
+function getTypeNumber(
     id: string
 ) {
-    const numbers:
+    const map:
         Record<string, string> = {
-        knight_princess: '01',
-        wizards: '02',
-        pirates: '03',
-        astronauts: '04',
-        sun_moon: '05',
-        dragon_keeper: '06',
-        players: '07',
-        homekeepers: '08',
+        knight_princess:
+            '01',
+
+        wizards:
+            '02',
+
+        pirates:
+            '03',
+
+        astronauts:
+            '04',
+
+        sun_moon:
+            '05',
+
+        dragon_keeper:
+            '06',
+
+        players:
+            '07',
+
+        homekeepers:
+            '08',
     };
 
-    return numbers[id] ?? '00';
+    return (
+        map[id] ??
+        '00'
+    );
 }
 
 /* ============================================================
-   PIXEL HERO SCENE
+   DIMENSION
 ============================================================ */
 
-function PixelScene({
-                        archetypeId,
-                    }: {
+function Dimension({
+                       index,
+                       label,
+                       value,
+                   }: {
+    index: number;
+    label: string;
+    value: number;
+}) {
+    return (
+        <div className="dimension">
+
+            <div className="dimension-index">
+                0{index}
+            </div>
+
+            <div className="dimension-name">
+                {label}
+            </div>
+
+            <div className="dimension-bar">
+
+                <div
+                    style={{
+                        width:
+                            `${value}%`,
+                    }}
+                />
+
+            </div>
+
+            <Face
+                value={
+                    value
+                }
+            />
+
+            <div className="dimension-value">
+                {value}%
+            </div>
+
+        </div>
+    );
+}
+
+/* ============================================================
+   FACE
+============================================================ */
+
+function Face({
+                  value,
+                  large = false,
+              }: {
+    value: number;
+    large?: boolean;
+}) {
+    let mood =
+        'sad';
+
+    if (
+        value >= 70
+    ) {
+        mood =
+            'happy';
+    } else if (
+        value >= 45
+    ) {
+        mood =
+            'neutral';
+    }
+
+    return (
+        <div
+            className={
+                `face ${mood} ${
+                    large
+                        ? 'face-large'
+                        : ''
+                }`
+            }
+        >
+
+            <span className="eye eye-left" />
+            <span className="eye eye-right" />
+
+            <span className="mouth" />
+
+        </div>
+    );
+}
+
+/* ============================================================
+   PIXEL ART
+============================================================ */
+
+function PixelCouple({
+                         archetypeId,
+                     }: {
     archetypeId: string;
 }) {
     return (
-        <div className="pixel-scene">
+        <div className="pixel-art">
 
-            <div className="space-bg">
+            <div className="pixel-space">
 
-                <span className="pixel-star ps-1" />
-                <span className="pixel-star ps-2" />
-                <span className="pixel-star ps-3" />
-                <span className="pixel-star ps-4" />
-                <span className="pixel-star ps-5" />
+                <i className="star star-1" />
+                <i className="star star-2" />
+                <i className="star star-3" />
+                <i className="star star-4" />
 
-                <span className="big-pixel-star">
-          ✦
-        </span>
-
-                <div className="pixel-planet">
-
-                    <span className="planet-ring" />
-
-                </div>
-
-            </div>
-
-            <div className="asteroid">
-
-                <span className="crater crater-a" />
-                <span className="crater crater-b" />
-                <span className="crater crater-c" />
-
-            </div>
-
-            <div className="astronaut astro-a">
-
-                <div className="helmet">
+                <div className="planet">
                     <span />
                 </div>
 
-                <div className="astro-body">
+            </div>
 
-                    <span className="panel" />
+            <div className="moon-ground">
 
-                </div>
-
-                <div className="leg leg-left" />
-                <div className="leg leg-right" />
-
-                <div className="astro-arm arm-cup">
-
-                    <span className="cup" />
-
-                </div>
+                <i />
+                <i />
+                <i />
 
             </div>
 
-            <div className="astronaut astro-b">
+            <Astronaut
+                side="left"
+            />
 
-                <div className="helmet">
-                    <span />
-                </div>
-
-                <div className="astro-body">
-
-                    <span className="panel" />
-
-                </div>
-
-                <div className="leg leg-left" />
-                <div className="leg leg-right" />
-
-                <div className="astro-arm arm-reach" />
-
-            </div>
-
-            <div className="pixel-heart">
+            <div className="pixel-love">
                 ♥
             </div>
 
-            <div className="scene-caption">
+            <Astronaut
+                side="right"
+            />
+
+            <div className="pixel-caption">
                 {
-                    getSceneCaption(
+                    getPixelCaption(
                         archetypeId
                     )
                 }
@@ -780,7 +795,36 @@ function PixelScene({
     );
 }
 
-function getSceneCaption(
+function Astronaut({
+                       side,
+                   }: {
+    side:
+        | 'left'
+        | 'right';
+}) {
+    return (
+        <div
+            className={
+                `astronaut ${side}`
+            }
+        >
+
+            <div className="helmet">
+                <span />
+            </div>
+
+            <div className="suit">
+                <span />
+            </div>
+
+            <div className="boot boot-left" />
+            <div className="boot boot-right" />
+
+        </div>
+    );
+}
+
+function getPixelCaption(
     id: string
 ) {
     switch (id) {
@@ -814,90 +858,7 @@ function getSceneCaption(
 }
 
 /* ============================================================
-   INSIGHT
-============================================================ */
-
-function Insight({
-                     number,
-                     kicker,
-                     title,
-                     symbol,
-                     text,
-                     variant,
-                     offset = false,
-                 }: {
-    number: string;
-    kicker: string;
-    title: string;
-    symbol: string;
-    text: string;
-    variant:
-        | 'pink'
-        | 'purple'
-        | 'yellow';
-    offset?: boolean;
-}) {
-    return (
-        <article
-            className={
-                `insight-card ${variant} ${
-                    offset
-                        ? 'offset'
-                        : ''
-                }`
-            }
-        >
-
-            <div className="insight-number">
-                {number}
-            </div>
-
-            <div className="insight-symbol">
-                {symbol}
-            </div>
-
-            <div className="insight-kicker">
-                {kicker}
-            </div>
-
-            <h3>
-                {title}
-            </h3>
-
-            <p>
-                {text}
-            </p>
-
-        </article>
-    );
-}
-
-/* ============================================================
-   PAY ITEM
-============================================================ */
-
-function PayItem({
-                     children,
-                 }: {
-    children: ReactNode;
-}) {
-    return (
-        <div className="pay-item">
-
-      <span>
-        ✦
-      </span>
-
-            <div>
-                {children}
-            </div>
-
-        </div>
-    );
-}
-
-/* ============================================================
-   STYLES
+   CSS
 ============================================================ */
 
 const styles = `
@@ -906,16 +867,14 @@ const styles = `
     box-sizing: border-box;
   }
 
-  html {
-    scroll-behavior: smooth;
-  }
-
   body {
     margin: 0;
 
-    background: #F6F0EA;
+    background:
+      #F7F5F1;
 
-    color: #211D20;
+    color:
+      #272529;
 
     font-family:
       Arial,
@@ -923,309 +882,557 @@ const styles = `
       sans-serif;
   }
 
-  button {
-    font: inherit;
-  }
-
   .page {
-    min-height: 100svh;
+    width: 100%;
 
     overflow: hidden;
-
-    background: #F6F0EA;
   }
 
-  .shell {
+  /* ==========================================================
+     HEADER
+  ========================================================== */
+
+  .header {
     width:
       min(
         calc(100% - 48px),
-        1160px
+        1120px
       );
 
-    margin: 0 auto;
+    height: 80px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin: auto;
   }
 
   .brand {
     font-family:
       Georgia,
-      "Times New Roman",
       serif;
 
-    font-size: 25px;
+    font-size: 24px;
     font-weight: 700;
 
     letter-spacing:
       -0.05em;
   }
 
-  /* ============================================================
-     HERO
-  ============================================================ */
+  .names {
+    color:
+      #8A8589;
 
-  .hero {
-    position: relative;
-
-    min-height: 720px;
-
-    overflow: hidden;
-
-    background: #F6F0EA;
-  }
-
-  .topbar {
-    height: 76px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .top-note {
-    display: flex;
-    align-items: center;
-
-    gap: 9px;
-
-    color: #8F7E84;
-
-    font-size: 9px;
+    font-size: 11px;
     font-weight: 800;
 
-    letter-spacing: 0.25em;
+    letter-spacing:
+      0.1em;
+
+    text-transform:
+      uppercase;
   }
 
-  .top-note span {
-    color: #B8446D;
+  .names span {
+    margin:
+      0 7px;
 
-    font-size: 14px;
+    color:
+      #B3476D;
   }
 
-  .hero-names {
-    position: relative;
+  /* ==========================================================
+     OVERALL
+  ========================================================== */
 
-    z-index: 4;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    gap: 18px;
-
-    margin-top: 6px;
-
-    font-family:
-      Georgia,
-      "Times New Roman",
-      serif;
-
-    font-size:
-      clamp(
-        56px,
-        7.5vw,
-        100px
+  .overall {
+    width:
+      min(
+        calc(100% - 48px),
+        1120px
       );
 
-    font-weight: 500;
+    margin: auto;
 
-    line-height: 0.9;
-
-    letter-spacing:
-      -0.07em;
+    padding:
+      55px
+      0
+      80px;
   }
 
-  .hero-names b {
-    color: #B7466E;
+  .section-label {
+    color:
+      #A29EA0;
+
+    font-size: 10px;
+    font-weight: 900;
+
+    letter-spacing:
+      0.24em;
+  }
+
+  .overall h1 {
+    margin:
+      5px
+      0
+      35px;
 
     font-family:
       Arial,
       sans-serif;
 
-    font-size: 0.62em;
-    font-weight: 300;
+    font-size:
+      clamp(
+        58px,
+        9vw,
+        120px
+      );
+
+    font-weight: 900;
+
+    line-height: 0.9;
+
+    letter-spacing:
+      -0.075em;
+
+    text-transform:
+      uppercase;
   }
 
-  .hero-stage {
+  .overall-content {
+    display: grid;
+
+    grid-template-columns:
+      0.8fr
+      0.7fr
+      1fr;
+
+    align-items: center;
+
+    gap: 50px;
+
+    max-width: 850px;
+  }
+
+  .overall-number {
+    color:
+      #64616A;
+
+    font-size:
+      clamp(
+        80px,
+        9vw,
+        125px
+      );
+
+    font-weight: 300;
+
+    line-height: 1;
+  }
+
+  .overall-number span {
+    font-size:
+      0.55em;
+  }
+
+  .overall-copy strong {
+    display: block;
+
+    margin-bottom: 7px;
+
+    font-size: 20px;
+  }
+
+  .overall-copy p {
+    margin: 0;
+
+    color:
+      #979296;
+
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  /* ==========================================================
+     FACES
+  ========================================================== */
+
+  .face {
     position: relative;
+
+    width: 54px;
+    height: 54px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background:
+      #F5C328;
+  }
+
+  .face.happy {
+    background:
+      #93CF2A;
+  }
+
+  .face.sad {
+    background:
+      #F58B26;
+  }
+
+  .face-large {
+    width: 105px;
+    height: 105px;
+  }
+
+  .eye {
+    position: absolute;
+
+    top: 28%;
+
+    width: 10%;
+    height: 15%;
+
+    border-radius: 50%;
+
+    background:
+      #171717;
+  }
+
+  .eye-left {
+    left: 28%;
+  }
+
+  .eye-right {
+    right: 28%;
+  }
+
+  .mouth {
+    position: absolute;
+
+    left: 25%;
+    bottom: 22%;
+
+    width: 50%;
+    height: 25%;
+  }
+
+  .neutral
+  .mouth {
+    bottom: 27%;
+
+    height: 4px;
+
+    background:
+      #171717;
+  }
+
+  .happy
+  .mouth {
+    border-bottom:
+      4px solid #171717;
+
+    border-radius:
+      0 0 100px 100px;
+  }
+
+  .sad
+  .mouth {
+    bottom: 14%;
+
+    border-top:
+      4px solid #171717;
+
+    border-radius:
+      100px 100px 0 0;
+  }
+
+  .face-large
+  .happy
+  .mouth {
+    border-width: 6px;
+  }
+
+  /* ==========================================================
+     DIMENSIONS
+  ========================================================== */
+
+  .dimensions {
+    padding:
+      70px
+      max(
+        24px,
+        calc(
+          (
+            100vw - 1120px
+          ) / 2
+        )
+      );
+
+    background:
+      #FFFFFF;
+  }
+
+  .dimensions-heading {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 30px;
+
+    color:
+      #706B70;
+
+    font-family:
+      Georgia,
+      serif;
+
+    font-size: 20px;
+  }
+
+  .dimensions-heading b {
+    color:
+      #B3476D;
+  }
+
+  .dimension-list {
+    border-top:
+      1px solid
+      #E5E1DF;
+  }
+
+  .dimension {
+    min-height: 86px;
 
     display: grid;
 
     grid-template-columns:
-      0.72fr
-      1.55fr
-      0.9fr;
+      45px
+      minmax(
+        170px,
+        0.8fr
+      )
+      minmax(
+        160px,
+        1.3fr
+      )
+      60px
+      65px;
 
     align-items: center;
 
-    gap: 14px;
+    gap: 24px;
 
-    margin-top: 2px;
+    border-bottom:
+      1px solid
+      #E5E1DF;
   }
 
-  /* SCORE */
+  .dimension-index {
+    color:
+      #C2BCBF;
 
-  .score-block {
-    position: relative;
-
-    z-index: 4;
-
-    transform:
-      translateY(-6px)
-      rotate(-1.5deg);
+    font-size: 10px;
+    font-weight: 900;
   }
 
-  .score-number {
-    color: #B5446D;
+  .dimension-name {
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  .dimension-bar {
+    height: 6px;
+
+    overflow: hidden;
+
+    background:
+      #EEEAE7;
+  }
+
+  .dimension-bar div {
+    height: 100%;
+
+    background:
+      #B3476D;
+  }
+
+  .dimension-value {
+    color:
+      #68636A;
+
+    font-size: 24px;
+    font-weight: 300;
+
+    text-align: right;
+  }
+
+  /* ==========================================================
+     TYPE
+  ========================================================== */
+
+  .type-section {
+    width:
+      min(
+        calc(100% - 48px),
+        1120px
+      );
+
+    margin: auto;
+
+    padding:
+      85px
+      0;
+  }
+
+  .type-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    margin-bottom: 30px;
+  }
+
+  .type-heading h2 {
+    margin:
+      7px
+      0
+      0;
 
     font-family:
       Georgia,
-      "Times New Roman",
       serif;
 
     font-size:
       clamp(
-        82px,
-        9vw,
-        126px
+        45px,
+        6vw,
+        72px
       );
 
-    line-height: 0.8;
+    font-weight: 500;
 
-    letter-spacing:
-      -0.09em;
+    line-height: 1;
   }
 
-  .score-number sup {
-    position: relative;
-
-    top: -0.55em;
-
-    margin-left: 5px;
-
-    font-size: 0.34em;
-
-    letter-spacing: -0.04em;
-  }
-
-  .score-title {
-    margin-top: 14px;
-
-    color: #B5446D;
-
-    font-size: 10px;
-    font-weight: 900;
-
-    letter-spacing: 0.21em;
-  }
-
-  .score-line {
-    position: relative;
-
-    width: 190px;
-    height: 4px;
-
-    margin-top: 17px;
-
-    background: #D9CED1;
-  }
-
-  .score-line-fill {
-    position: absolute;
-
-    top: 0;
-    left: 0;
-
-    height: 100%;
-
-    background: #B5446D;
-  }
-
-  .score-line > span {
-    position: absolute;
-
-    top: 50%;
-
-    width: 13px;
-    height: 13px;
-
-    transform:
-      translate(
-        -50%,
-        -50%
-      );
-
-    border:
-      3px solid #F6F0EA;
-
-    border-radius: 50%;
-
-    background: #B5446D;
-
-    box-shadow:
-      0 0 0 1px
-      #B5446D;
-  }
-
-  .score-block p {
-    max-width: 230px;
-
-    margin:
-      15px
-      0
-      0;
-
-    color: #655B60;
+  .type-number {
+    color:
+      #B3476D;
 
     font-family:
       Georgia,
       serif;
 
-    font-size: 14px;
-    font-style: italic;
-
-    line-height: 1.4;
+    font-size: 38px;
   }
 
-  /* ============================================================
-     ART
-  ============================================================ */
+  .type-card {
+    display: grid;
 
-  .art-wrap {
-    position: relative;
+    grid-template-columns:
+      1.25fr
+      0.75fr;
 
-    z-index: 2;
+    border:
+      1px solid
+      #DAD4D1;
 
-    width: 100%;
-
-    transform:
-      translateY(5px);
+    background:
+      #FFFFFF;
   }
 
-  .pixel-scene {
+  .type-art {
+    padding: 25px;
+
+    background:
+      #E9E1E5;
+  }
+
+  .type-copy {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    padding:
+      45px;
+  }
+
+  .type-small {
+    margin-bottom: 13px;
+
+    color:
+      #B3476D;
+
+    font-size: 9px;
+    font-weight: 900;
+
+    letter-spacing:
+      0.18em;
+  }
+
+  .type-copy h3 {
+    margin: 0;
+
+    font-family:
+      Georgia,
+      serif;
+
+    font-size:
+      clamp(
+        40px,
+        5vw,
+        60px
+      );
+
+    font-weight: 500;
+
+    line-height: 0.95;
+
+    letter-spacing:
+      -0.05em;
+  }
+
+  .type-copy p {
+    max-width: 330px;
+
+    margin:
+      22px
+      0
+      0;
+
+    color:
+      #777075;
+
+    font-size: 15px;
+    line-height: 1.55;
+  }
+
+  /* ==========================================================
+     PIXEL
+  ========================================================== */
+
+  .pixel-art {
     position: relative;
 
-    width: 100%;
-    max-width: 510px;
-
-    aspect-ratio:
-      1.18 / 1;
-
-    margin: 0 auto;
+    min-height: 410px;
 
     overflow: hidden;
 
     border:
-      4px solid #28222B;
+      4px solid
+      #29252D;
 
-    background: #393344;
-
-    box-shadow:
-      10px 12px 0 #D7C2CD;
+    background:
+      #3A3546;
 
     image-rendering:
       pixelated;
   }
 
-  .space-bg {
+  .pixel-space {
     position: absolute;
 
     inset: 0;
@@ -1233,184 +1440,165 @@ const styles = `
     background:
       linear-gradient(
         180deg,
-        #393344 0%,
-        #4B4055 100%
+        #373342,
+        #51465D
       );
   }
 
-  .pixel-star {
+  .star {
     position: absolute;
 
     width: 6px;
     height: 6px;
 
-    background: #F6C48C;
+    background:
+      #F5C68D;
 
     box-shadow:
-      6px 0 0 #F6C48C,
-      -6px 0 0 #F6C48C,
-      0 6px 0 #F6C48C,
-      0 -6px 0 #F6C48C;
+      6px 0 #F5C68D,
+      -6px 0 #F5C68D,
+      0 6px #F5C68D,
+      0 -6px #F5C68D;
   }
 
-  .ps-1 {
-    top: 18%;
+  .star-1 {
+    top: 15%;
     left: 12%;
   }
 
-  .ps-2 {
-    top: 27%;
-    right: 17%;
+  .star-2 {
+    top: 25%;
+    left: 45%;
 
     transform:
-      scale(0.6);
+      scale(.6);
   }
 
-  .ps-3 {
-    top: 47%;
+  .star-3 {
+    top: 17%;
+    right: 13%;
+
+    transform:
+      scale(.7);
+  }
+
+  .star-4 {
+    top: 42%;
+    right: 7%;
+
+    transform:
+      scale(.5);
+  }
+
+  .planet {
+    position: absolute;
+
+    top: 13%;
+    right: 18%;
+
+    width: 72px;
+    height: 72px;
+
+    border:
+      4px solid
+      #29252D;
+
+    border-radius: 50%;
+
+    background:
+      #9485AF;
+  }
+
+  .planet span {
+    position: absolute;
+
+    top: 28px;
+    left: -15px;
+
+    width: 95px;
+    height: 15px;
+
+    border:
+      4px solid
+      #E0AE70;
+
+    border-radius: 50%;
+
+    transform:
+      rotate(-14deg);
+  }
+
+  .moon-ground {
+    position: absolute;
+
     left: 7%;
+    right: 7%;
+    bottom: -15%;
 
-    transform:
-      scale(0.55);
-  }
-
-  .ps-4 {
-    top: 14%;
-    left: 55%;
-
-    transform:
-      scale(0.45);
-  }
-
-  .ps-5 {
-    top: 39%;
-    right: 8%;
-
-    transform:
-      scale(0.45);
-  }
-
-  .big-pixel-star {
-    position: absolute;
-
-    top: 12%;
-    right: 32%;
-
-    color: #C6587C;
-
-    font-size: 30px;
-  }
-
-  .pixel-planet {
-    position: absolute;
-
-    top: 12%;
-    right: 10%;
-
-    width: 67px;
-    height: 67px;
+    height: 48%;
 
     border:
-      4px solid #28222B;
-
-    border-radius: 50%;
-
-    background: #9284AE;
-  }
-
-  .planet-ring {
-    position: absolute;
-
-    top: 26px;
-    left: -14px;
-
-    width: 90px;
-    height: 16px;
-
-    border:
-      4px solid #E2B37E;
-
-    border-radius: 50%;
-
-    transform:
-      rotate(-13deg);
-  }
-
-  .asteroid {
-    position: absolute;
-
-    left: 8%;
-    right: 8%;
-    bottom: -11%;
-
-    height: 42%;
-
-    border:
-      4px solid #28222B;
+      4px solid
+      #29252D;
 
     border-radius:
-      48% 52% 0 0;
+      50% 50% 0 0;
 
-    background: #81718F;
+    background:
+      #857590;
   }
 
-  .crater {
+  .moon-ground i {
     position: absolute;
 
+    width: 50px;
+    height: 30px;
+
     border:
-      4px solid #4B4155;
+      4px solid
+      #51485C;
 
     border-radius: 50%;
 
-    background: #62566F;
+    background:
+      #665A70;
   }
 
-  .crater-a {
-    top: 25%;
+  .moon-ground i:first-child {
+    top: 20%;
     left: 15%;
-
-    width: 44px;
-    height: 29px;
   }
 
-  .crater-b {
-    top: 14%;
-    right: 20%;
-
-    width: 33px;
-    height: 24px;
+  .moon-ground i:nth-child(2) {
+    top: 45%;
+    left: 45%;
   }
 
-  .crater-c {
-    top: 55%;
-    left: 49%;
-
-    width: 55px;
-    height: 36px;
+  .moon-ground i:nth-child(3) {
+    top: 18%;
+    right: 16%;
   }
-
-  /* ASTRONAUTS */
 
   .astronaut {
     position: absolute;
 
-    z-index: 5;
+    z-index: 4;
 
-    width: 115px;
-    height: 165px;
+    bottom: 22%;
+
+    width: 120px;
+    height: 180px;
   }
 
-  .astro-a {
-    left: 22%;
-    bottom: 24%;
+  .astronaut.left {
+    left: 24%;
 
     transform:
       rotate(3deg);
   }
 
-  .astro-b {
-    right: 19%;
-    bottom: 20%;
+  .astronaut.right {
+    right: 23%;
 
     transform:
       rotate(-3deg);
@@ -1424,52 +1612,6 @@ const styles = `
     top: 0;
     left: 50%;
 
-    width: 77px;
-    height: 72px;
-
-    transform:
-      translateX(-50%);
-
-    border:
-      4px solid #28222B;
-
-    border-radius:
-      46% 46% 43% 43%;
-
-    background: #F4E9E1;
-  }
-
-  .helmet span {
-    position: absolute;
-
-    top: 13px;
-    left: 13px;
-
-    width: 45px;
-    height: 35px;
-
-    border:
-      4px solid #28222B;
-
-    border-radius:
-      46%;
-
-    background: #5B526B;
-
-    box-shadow:
-      inset
-      8px 6px 0
-      #8D7895;
-  }
-
-  .astro-body {
-    position: absolute;
-
-    z-index: 3;
-
-    top: 61px;
-    left: 50%;
-
     width: 82px;
     height: 78px;
 
@@ -1477,516 +1619,210 @@ const styles = `
       translateX(-50%);
 
     border:
-      4px solid #28222B;
+      4px solid
+      #29252D;
+
+    border-radius: 50%;
+
+    background:
+      #F3E9E1;
+  }
+
+  .helmet span {
+    position: absolute;
+
+    top: 15px;
+    left: 15px;
+
+    width: 45px;
+    height: 38px;
+
+    border:
+      4px solid
+      #29252D;
+
+    border-radius: 50%;
+
+    background:
+      #595166;
+  }
+
+  .suit {
+    position: absolute;
+
+    top: 67px;
+    left: 50%;
+
+    width: 86px;
+    height: 86px;
+
+    transform:
+      translateX(-50%);
+
+    border:
+      4px solid
+      #29252D;
 
     border-radius:
       15px 15px 25px 25px;
 
-    background: #F4E9E1;
+    background:
+      #F3E9E1;
   }
 
-  .panel {
+  .suit span {
     position: absolute;
 
-    top: 20px;
-    left: 23px;
+    top: 22px;
+    left: 25px;
 
-    width: 32px;
-    height: 22px;
+    width: 30px;
+    height: 21px;
 
     border:
-      3px solid #28222B;
+      3px solid
+      #29252D;
 
-    background: #D68494;
-
-    box-shadow:
-      inset
-      7px 0 0
-      #E6B066;
+    background:
+      #C96382;
   }
 
-  .leg {
+  .boot {
     position: absolute;
-
-    z-index: 2;
 
     bottom: 0;
 
-    width: 36px;
-    height: 54px;
+    width: 38px;
+    height: 55px;
 
     border:
-      4px solid #28222B;
+      4px solid
+      #29252D;
 
     border-radius:
       10px 10px 17px 17px;
 
-    background: #F4E9E1;
+    background:
+      #F3E9E1;
   }
 
-  .leg-left {
-    left: 20px;
-
-    transform:
-      rotate(8deg);
-  }
-
-  .leg-right {
-    right: 20px;
-
-    transform:
-      rotate(-8deg);
-  }
-
-  .astro-arm {
-    position: absolute;
-
-    z-index: 6;
-
-    top: 79px;
-
-    width: 63px;
-    height: 25px;
-
-    border:
-      4px solid #28222B;
-
-    border-radius: 10px;
-
-    background: #F4E9E1;
-  }
-
-  .arm-cup {
-    right: -25px;
-
-    transform:
-      rotate(-7deg);
-  }
-
-  .arm-reach {
-    left: -25px;
+  .boot-left {
+    left: 19px;
 
     transform:
       rotate(7deg);
   }
 
-  .cup {
-    position: absolute;
+  .boot-right {
+    right: 19px;
 
-    top: -15px;
-    right: -10px;
-
-    width: 18px;
-    height: 23px;
-
-    border:
-      3px solid #28222B;
-
-    background: #E6B066;
+    transform:
+      rotate(-7deg);
   }
 
-  .pixel-heart {
+  .pixel-love {
     position: absolute;
 
-    z-index: 8;
+    z-index: 7;
 
-    top: 39%;
+    top: 40%;
     left: 50%;
 
-    color: #D9567F;
+    color:
+      #D9567F;
 
-    font-size: 28px;
+    font-size: 32px;
 
     transform:
       translateX(-50%);
   }
 
-  .scene-caption {
+  .pixel-caption {
     position: absolute;
 
     z-index: 10;
 
-    right: 13px;
-    bottom: 12px;
+    right: 15px;
+    bottom: 15px;
 
     padding:
-      7px 9px;
+      8px 11px;
 
     border:
-      2px solid #28222B;
+      2px solid
+      #29252D;
 
-    background: #F6F0EA;
+    background:
+      #F7F5F1;
 
-    color: #28222B;
+    font-size: 9px;
+    font-weight: 900;
+  }
+
+  /* ==========================================================
+     PAYWALL
+  ========================================================== */
+
+  .paywall {
+    padding:
+      75px
+      24px;
+
+    background:
+      #29252D;
+
+    color:
+      #FFFFFF;
+  }
+
+  .paywall-inner {
+    width:
+      min(
+        100%,
+        1040px
+      );
+
+    display: grid;
+
+    grid-template-columns:
+      1fr
+      0.9fr;
+
+    align-items: center;
+
+    gap: 80px;
+
+    margin: auto;
+  }
+
+  .paywall-copy > span {
+    color:
+      #D9819E;
 
     font-size: 9px;
     font-weight: 900;
 
-    letter-spacing: 0.08em;
-
-    transform:
-      rotate(-2deg);
+    letter-spacing:
+      0.2em;
   }
 
-  .art-sticker {
-    position: absolute;
-
-    z-index: 10;
-
-    left: -14px;
-    bottom: -17px;
-
-    padding:
-      10px 15px;
-
-    border:
-      2px solid #28222B;
-
-    background: #F6E4B7;
-
-    box-shadow:
-      4px 4px 0 #28222B;
-
-    color: #28222B;
-
-    font-size: 12px;
-    font-weight: 900;
-
-    transform:
-      rotate(-2deg);
-  }
-
-  .art-sticker span {
-    margin-right: 8px;
-
-    font-size: 8px;
-
-    letter-spacing: 0.16em;
-  }
-
-  /* ============================================================
-     ARCHETYPE
-  ============================================================ */
-
-  .archetype-block {
-    position: relative;
-
-    z-index: 4;
-
-    transform:
-      translateY(30px);
-  }
-
-  .archetype-kicker {
-    margin-bottom: 10px;
-
-    color: #B5446D;
-
-    font-size: 9px;
-    font-weight: 900;
-
-    letter-spacing: 0.19em;
-  }
-
-  .archetype-block h1 {
-    margin: 0;
+  .paywall-copy h2 {
+    margin:
+      12px
+      0
+      15px;
 
     font-family:
       Georgia,
-      "Times New Roman",
       serif;
 
     font-size:
       clamp(
-        43px,
+        40px,
         5vw,
-        66px
+        58px
       );
 
-    font-weight: 500;
-
-    line-height: 0.91;
-
-    letter-spacing:
-      -0.06em;
-  }
-
-  .archetype-block p {
-    max-width: 280px;
-
-    margin:
-      19px
-      0
-      0;
-
-    color: #655B60;
-
-    font-size: 14px;
-    line-height: 1.5;
-  }
-
-  /* ============================================================
-     CHAOS STATS
-  ============================================================ */
-
-  .chaos-stats {
-    position: relative;
-
-    z-index: 10;
-
-    width: 520px;
-    height: 80px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    gap: 48px;
-
-    margin:
-      -2px
-      auto
-      0;
-  }
-
-  .chaos-stat {
-    display: flex;
-    align-items: center;
-
-    gap: 8px;
-  }
-
-  .chaos-stat strong {
-    color: #B5446D;
-
-    font-family:
-      Georgia,
-      serif;
-
-    font-size: 34px;
-    font-weight: 500;
-  }
-
-  .chaos-stat span {
-    color: #5E5559;
-
-    font-size: 10px;
-    line-height: 1.25;
-  }
-
-  .stat-a {
-    transform:
-      rotate(-2deg);
-  }
-
-  .stat-b {
-    transform:
-      translateY(8px)
-      rotate(1deg);
-  }
-
-  .stat-c {
-    transform:
-      translateY(-5px)
-      rotate(-1deg);
-  }
-
-  .hero-star,
-  .hero-plus {
-    position: absolute;
-
-    z-index: 1;
-  }
-
-  .hero-star-a {
-    top: 155px;
-    left: 4%;
-
-    color: #D09D3C;
-
-    font-size: 27px;
-  }
-
-  .hero-star-b {
-    right: 5%;
-    bottom: 80px;
-
-    color: #B5446D;
-
-    font-size: 19px;
-  }
-
-  .hero-plus {
-    top: 250px;
-    right: 3%;
-
-    color: #8C7AA1;
-
-    font-size: 28px;
-
-    transform:
-      rotate(13deg);
-  }
-
-  /* ============================================================
-     INSIGHTS
-  ============================================================ */
-
-  .insights {
-    padding:
-      55px
-      0
-      100px;
-
-    background: #FCFAF7;
-  }
-
-  .insights-intro {
-    display: flex;
-    align-items: flex-start;
-
-    gap: 13px;
-
-    margin-bottom: 35px;
-
-    color: #B5446D;
-  }
-
-  .insights-intro span {
-    font-size: 29px;
-  }
-
-  .insights-intro p {
-    margin: 4px 0 0;
-
-    font-size: 11px;
-    font-weight: 900;
-
-    line-height: 1.4;
-
-    letter-spacing: 0.12em;
-
-    text-transform: uppercase;
-
-    transform:
-      rotate(-3deg);
-  }
-
-  .insight-layout {
-    display: grid;
-
-    grid-template-columns:
-      repeat(
-        3,
-        minmax(0, 1fr)
-      );
-
-    gap: 18px;
-
-    align-items: start;
-  }
-
-  .insight-card {
-    position: relative;
-
-    min-height: 285px;
-
-    padding:
-      27px
-      26px;
-
-    border:
-      2px solid #2B2529;
-
-    background: #FFFFFF;
-
-    box-shadow:
-      7px 8px 0
-      #D8CDD0;
-  }
-
-  .insight-card.offset {
-    margin-top: 35px;
-
-    transform:
-      rotate(1deg);
-  }
-
-  .insight-card.pink {
-    transform:
-      rotate(-0.7deg);
-  }
-
-  .insight-card.yellow {
-    transform:
-      rotate(0.5deg);
-  }
-
-  .insight-number {
-    color: #B5446D;
-
-    font-family:
-      Georgia,
-      serif;
-
-    font-size: 48px;
-
-    line-height: 1;
-  }
-
-  .purple
-  .insight-number {
-    color: #82719C;
-  }
-
-  .yellow
-  .insight-number {
-    color: #C58C2E;
-  }
-
-  .insight-symbol {
-    position: absolute;
-
-    top: 24px;
-    right: 24px;
-
-    color: #B5446D;
-
-    font-size: 29px;
-  }
-
-  .purple
-  .insight-symbol {
-    color: #82719C;
-  }
-
-  .yellow
-  .insight-symbol {
-    color: #C58C2E;
-  }
-
-  .insight-kicker {
-    margin-top: 25px;
-
-    color: #71666A;
-
-    font-size: 9px;
-    font-weight: 900;
-
-    letter-spacing: 0.14em;
-  }
-
-  .insight-card h3 {
-    margin:
-      3px
-      0
-      17px;
-
-    font-family:
-      Georgia,
-      serif;
-
-    font-size: 30px;
     font-weight: 500;
 
     line-height: 1;
@@ -1995,324 +1831,50 @@ const styles = `
       -0.04em;
   }
 
-  .insight-card p {
+  .paywall-copy p {
+    max-width: 430px;
+
     margin: 0;
 
-    color: #62595D;
+    color:
+      #BBB2B8;
 
     font-size: 14px;
-    line-height: 1.55;
+    line-height: 1.5;
   }
 
-  /* ============================================================
-     QUESTION
-  ============================================================ */
-
-  .question {
-    position: relative;
-
-    overflow: hidden;
-
-    background: #332E3D;
-
-    color: #FFFFFF;
-  }
-
-  .question-shell {
-    width:
-      min(
-        calc(100% - 48px),
-        1040px
-      );
-
-    min-height: 350px;
-
+  .paywall-box {
     display: grid;
 
     grid-template-columns:
-      310px
-      1fr;
-
-    align-items: center;
-
-    gap: 55px;
-
-    margin: 0 auto;
-  }
-
-  .question-art {
-    position: relative;
-
-    height: 260px;
-  }
-
-  .pixel-moon {
-    position: absolute;
-
-    top: 15px;
-    left: 40px;
-
-    width: 180px;
-    height: 180px;
-
-    border:
-      5px solid #201D25;
-
-    border-radius: 50%;
-
-    background: #F0D59A;
-
-    box-shadow:
-      12px 0 0 #D2A955;
-  }
-
-  .pixel-moon::after {
-    content: '';
-
-    position: absolute;
-
-    top: -8px;
-    right: -35px;
-
-    width: 145px;
-    height: 195px;
-
-    border-radius: 50%;
-
-    background: #332E3D;
-  }
-
-  .sitting-pair {
-    position: absolute;
-
-    z-index: 5;
-
-    left: 65px;
-    bottom: 12px;
-
-    display: flex;
-
-    gap: 7px;
-  }
-
-  .sitter {
-    width: 54px;
-    height: 76px;
-
-    border:
-      4px solid #201D25;
-
-    border-radius:
-      25px 25px 10px 10px;
-
-    background: #B34D70;
-  }
-
-  .sitter-b {
-    background: #88779E;
-  }
-
-  .question-kicker {
-    color: #D886A2;
-
-    font-size: 9px;
-    font-weight: 900;
-
-    letter-spacing: 0.21em;
-  }
-
-  .question-copy h2 {
-    max-width: 660px;
-
-    margin:
-      14px
-      0
-      0;
-
-    font-family:
-      Georgia,
-      serif;
-
-    font-size:
-      clamp(
-        35px,
-        4.2vw,
-        51px
-      );
-
-    font-weight: 500;
-
-    line-height: 1.08;
-
-    letter-spacing:
-      -0.035em;
-  }
-
-  .question-copy p {
-    margin:
-      20px
-      0
-      0;
-
-    color: #BBB2BE;
-
-    font-size: 12px;
-  }
-
-  .question-stars {
-    position: absolute;
-
-    top: 35px;
-    right: 8%;
-
-    color: #DDAA73;
-
-    font-size: 18px;
-  }
-
-  /* ============================================================
-     PAYWALL
-  ============================================================ */
-
-  .paywall {
-    padding:
-      75px
-      0
-      85px;
-
-    background: #F0E5E8;
-  }
-
-  .paywall-layout {
-    display: grid;
-
-    grid-template-columns:
-      1fr
-      0.85fr;
-
-    align-items: center;
-
-    gap: 75px;
-  }
-
-  .paywall-copy {
-    position: relative;
-  }
-
-  .paywall-note {
-    position: absolute;
-
-    top: -27px;
-    left: -40px;
-
-    color: #B5446D;
-
-    font-family:
-      Georgia,
-      serif;
-
-    font-size: 15px;
-    font-style: italic;
-
-    line-height: 1.15;
-
-    transform:
-      rotate(-7deg);
-  }
-
-  .paywall-note span {
-    display: inline-block;
-
-    margin-left: 7px;
-
-    font-size: 25px;
-  }
-
-  .eyebrow {
-    margin-left: 100px;
-
-    color: #B5446D;
-
-    font-size: 9px;
-    font-weight: 900;
-
-    letter-spacing: 0.2em;
-  }
-
-  .paywall-copy h2 {
-    margin:
-      13px
-      0
-      0;
-
-    font-family:
-      Georgia,
-      serif;
-
-    font-size:
-      clamp(
-        42px,
-        5vw,
-        62px
-      );
-
-    font-weight: 500;
-
-    line-height: 0.96;
-
-    letter-spacing:
-      -0.05em;
-  }
-
-  .paywall-action {
-    padding:
-      24px;
-
-    border:
-      2px solid #292329;
-
-    background: #F8F3EF;
-
-    box-shadow:
-      8px 8px 0
-      #CDB6BE;
-
-    transform:
-      rotate(0.5deg);
-  }
-
-  .paywall-items {
-    display: grid;
-
-    grid-template-columns:
-      1fr
-      1fr;
+      1fr 1fr;
 
     gap:
-      15px
+      16px
       20px;
   }
 
-  .pay-item {
-    display: grid;
+  .paywall-box > div {
+    display: flex;
 
-    grid-template-columns:
-      17px
-      1fr;
+    gap: 8px;
 
-    gap: 7px;
-
-    color: #61565A;
+    color:
+      #D4CCD1;
 
     font-size: 11px;
     line-height: 1.35;
   }
 
-  .pay-item span {
-    color: #B5446D;
+  .paywall-box > div span {
+    color:
+      #D9819E;
   }
 
-  .paywall-action button {
+  .paywall-box button {
+    grid-column:
+      1 / -1;
+
     width: 100%;
 
     display: grid;
@@ -2324,567 +1886,249 @@ const styles = `
 
     align-items: center;
 
-    gap: 13px;
+    gap: 15px;
 
-    margin-top: 23px;
+    margin-top: 10px;
 
     padding:
-      16px
-      17px;
+      17px
+      18px;
 
     border:
-      2px solid #292329;
+      1px solid
+      #E489A6;
 
-    background: #B5446D;
+    background:
+      #B3476D;
 
-    box-shadow:
-      4px 4px 0
-      #292329;
-
-    color: #FFFFFF;
+    color:
+      #FFFFFF;
 
     cursor: pointer;
-
-    font-size: 13px;
-    font-weight: 800;
 
     text-align: left;
   }
 
-  .paywall-action button:hover {
-    transform:
-      translate(
-        2px,
-        2px
-      );
-
-    box-shadow:
-      2px 2px 0
-      #292329;
-  }
-
-  .paywall-action button b {
+  .paywall-box button strong {
     font-size: 15px;
   }
 
-  .paywall-action button strong {
+  .paywall-box button b {
     font-size: 20px;
   }
 
-  .paywall-small {
-    margin-top: 11px;
+  /* ==========================================================
+     STATE
+  ========================================================== */
 
-    color: #9A8D91;
-
-    font-size: 9px;
-
-    text-align: center;
-  }
-
-  /* ============================================================
-     LOADING / ERROR
-  ============================================================ */
-
-  .loading-page,
-  .state-page {
+  .state {
     min-height: 100svh;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    background: #F6F0EA;
+    background:
+      #F7F5F1;
+
+    color:
+      #706A6E;
   }
 
-  .loading-page {
-    flex-direction: column;
-  }
-
-  .loading-mark {
-    position: relative;
-
-    width: 100px;
-    height: 65px;
-
-    margin-bottom: 23px;
-  }
-
-  .loading-mark span {
-    position: absolute;
-
-    width: 65px;
-    height: 65px;
-
-    border:
-      3px solid #28222B;
-
-    border-radius: 50%;
-  }
-
-  .loading-mark span:first-child {
-    left: 0;
-
-    background: #D17B99;
-  }
-
-  .loading-mark span:nth-child(2) {
-    right: 0;
-
-    background: #9180A7;
-  }
-
-  .loading-mark b {
-    position: absolute;
-
-    z-index: 2;
-
-    top: 50%;
-    left: 50%;
-
-    color: #F6F0EA;
-
-    transform:
-      translate(
-        -50%,
-        -50%
-      );
-  }
-
-  .loading-page p {
-    margin:
-      10px
-      0
-      0;
-
-    color: #8C7E83;
-
-    font-size: 11px;
-  }
-
-  .state-box {
-    width:
-      min(
-        calc(100% - 40px),
-        650px
-      );
-  }
-
-  .state-box h1 {
-    margin:
-      45px
-      0
-      10px;
-
-    font-family:
-      Georgia,
-      serif;
-
-    font-size: 70px;
-
-    font-weight: 500;
-  }
-
-  .state-box p {
-    color: #766A6F;
-  }
-
-  /* ============================================================
-     TABLET
-  ============================================================ */
-
-  @media (
-    max-width: 900px
-  ) {
-
-    .hero-stage {
-      grid-template-columns:
-        0.7fr
-        1.3fr;
-
-      margin-top: 25px;
-    }
-
-    .archetype-block {
-      grid-column:
-        1 / -1;
-
-      max-width: 600px;
-
-      margin:
-        15px
-        auto
-        0;
-
-      text-align: center;
-
-      transform: none;
-    }
-
-    .archetype-block p {
-      margin:
-        15px
-        auto
-        0;
-    }
-
-    .chaos-stats {
-      margin-top: 30px;
-    }
-
-    .insight-layout {
-      grid-template-columns: 1fr;
-    }
-
-    .insight-card {
-      min-height: auto;
-    }
-
-    .insight-card.offset {
-      margin-top: 0;
-    }
-
-    .question-shell {
-      grid-template-columns:
-        230px
-        1fr;
-
-      gap: 30px;
-    }
-
-    .paywall-layout {
-      gap: 35px;
-    }
-
-  }
-
-  /* ============================================================
+  /* ==========================================================
      MOBILE
-  ============================================================ */
+  ========================================================== */
 
   @media (
-    max-width: 600px
+    max-width: 700px
   ) {
 
-    .shell {
+    .header {
       width:
-        calc(100% - 30px);
-    }
+        calc(
+          100% - 32px
+        );
 
-    .hero {
-      min-height: auto;
-
-      padding-bottom: 45px;
-    }
-
-    .topbar {
-      height: 64px;
+      height: 65px;
     }
 
     .brand {
       font-size: 21px;
     }
 
-    .top-note {
-      display: none;
-    }
-
-    .hero-names {
-      gap: 8px;
-
-      margin-top: 9px;
-
-      font-size:
-        clamp(
-          44px,
-          14vw,
-          60px
-        );
-    }
-
-    .hero-stage {
-      display: flex;
-      flex-direction: column;
-
-      gap: 0;
-
-      margin-top: 22px;
-    }
-
-    .score-block {
-      order: 1;
-
-      width: 100%;
-
-      display: grid;
-
-      grid-template-columns:
-        auto
-        1fr;
-
-      align-items: center;
-
-      column-gap: 17px;
-
-      transform: none;
-    }
-
-    .score-number {
-      grid-row:
-        1 / 4;
-
-      font-size: 82px;
-    }
-
-    .score-title {
-      margin-top: 0;
-    }
-
-    .score-line {
-      width: 100%;
-      max-width: 190px;
-
-      margin-top: 10px;
-    }
-
-    .score-block p {
-      margin-top: 9px;
-
-      font-size: 12px;
-    }
-
-    .art-wrap {
-      order: 2;
-
-      margin-top: 27px;
-
-      transform: none;
-    }
-
-    .pixel-scene {
-      max-width: 390px;
-
-      border-width: 3px;
-
-      box-shadow:
-        7px 8px 0
-        #D7C2CD;
-    }
-
-    .astronaut {
-      transform:
-        scale(0.8);
-    }
-
-    .astro-a {
-      left: 17%;
-    }
-
-    .astro-b {
-      right: 14%;
-    }
-
-    .art-sticker {
-      left: 5px;
-      bottom: -16px;
-    }
-
-    .archetype-block {
-      order: 3;
-
-      margin-top: 43px;
-    }
-
-    .archetype-block h1 {
-      font-size: 48px;
-    }
-
-    .archetype-block p {
-      max-width: 330px;
-
-      font-size: 13px;
-    }
-
-    .chaos-stats {
-      width: 100%;
-      height: auto;
-
-      gap: 20px;
-
-      margin-top: 32px;
-    }
-
-    .chaos-stat {
-      gap: 5px;
-    }
-
-    .chaos-stat strong {
-      font-size: 28px;
-    }
-
-    .chaos-stat span {
+    .names {
       font-size: 9px;
     }
 
-    .insights {
-      padding:
-        47px
-        0
-        65px;
-    }
-
-    .insights-intro {
-      margin-bottom: 25px;
-    }
-
-    .insight-layout {
-      gap: 13px;
-    }
-
-    .insight-card,
-    .insight-card.offset {
-      padding: 22px;
-
-      box-shadow:
-        5px 5px 0
-        #D8CDD0;
-    }
-
-    .insight-number {
-      font-size: 40px;
-    }
-
-    .insight-kicker {
-      margin-top: 18px;
-    }
-
-    .insight-card h3 {
-      font-size: 28px;
-    }
-
-    .insight-card p {
-      font-size: 13px;
-    }
-
-    .question-shell {
+    .overall {
       width:
-        calc(100% - 30px);
-
-      min-height: auto;
-
-      grid-template-columns: 1fr;
-
-      gap: 10px;
+        calc(
+          100% - 32px
+        );
 
       padding:
         40px
         0
-        50px;
+        55px;
     }
 
-    .question-art {
-      height: 180px;
+    .overall h1 {
+      margin-bottom: 30px;
+
+      font-size:
+        clamp(
+          49px,
+          15vw,
+          72px
+        );
+
+      overflow-wrap:
+        anywhere;
     }
 
-    .pixel-moon {
-      left: 50%;
-
-      width: 140px;
-      height: 140px;
-
-      transform:
-        translateX(-50%);
-    }
-
-    .pixel-moon::after {
-      width: 110px;
-      height: 155px;
-    }
-
-    .sitting-pair {
-      left: 50%;
-
-      transform:
-        translateX(-50%);
-    }
-
-    .sitter {
-      width: 44px;
-      height: 62px;
-    }
-
-    .question-copy {
-      text-align: center;
-    }
-
-    .question-copy h2 {
-      margin:
-        11px
+    .overall-content {
+      grid-template-columns:
         auto
-        0;
+        auto;
 
-      font-size: 31px;
+      gap:
+        20px
+        25px;
+    }
+
+    .overall-number {
+      font-size: 83px;
+    }
+
+    .face-large {
+      width: 85px;
+      height: 85px;
+    }
+
+    .overall-copy {
+      grid-column:
+        1 / -1;
+    }
+
+    .dimensions {
+      padding:
+        45px
+        16px;
+    }
+
+    .dimension {
+      min-height: 92px;
+
+      grid-template-columns:
+        28px
+        1fr
+        50px
+        55px;
+
+      gap: 10px;
+    }
+
+    .dimension-name {
+      font-size: 14px;
+    }
+
+    .dimension-bar {
+      grid-column:
+        2 / -1;
+
+      grid-row: 2;
+
+      width: 100%;
+
+      margin-top: -20px;
+    }
+
+    .dimension-value {
+      font-size: 19px;
+    }
+
+    .type-section {
+      width:
+        calc(
+          100% - 32px
+        );
+
+      padding:
+        60px
+        0;
+    }
+
+    .type-heading {
+      align-items: flex-start;
+    }
+
+    .type-heading h2 {
+      font-size: 44px;
+    }
+
+    .type-number {
+      font-size: 28px;
+    }
+
+    .type-card {
+      grid-template-columns: 1fr;
+    }
+
+    .type-art {
+      padding: 12px;
+    }
+
+    .pixel-art {
+      min-height: 300px;
+    }
+
+    .astronaut {
+      transform:
+        scale(.72);
+    }
+
+    .astronaut.left {
+      left: 13%;
+    }
+
+    .astronaut.right {
+      right: 12%;
+    }
+
+    .type-copy {
+      padding:
+        30px
+        24px
+        34px;
+    }
+
+    .type-copy h3 {
+      font-size: 45px;
     }
 
     .paywall {
       padding:
-        58px
-        0
-        65px;
+        55px
+        16px;
     }
 
-    .paywall-layout {
-      grid-template-columns: 1fr;
+    .paywall-inner {
+      grid-template-columns:
+        1fr;
 
-      gap: 30px;
-    }
-
-    .paywall-note {
-      position: static;
-
-      margin-bottom: 25px;
-
-      transform:
-        rotate(-4deg);
-    }
-
-    .eyebrow {
-      margin-left: 0;
+      gap: 35px;
     }
 
     .paywall-copy h2 {
-      font-size: 43px;
+      font-size: 42px;
     }
 
-    .paywall-action {
-      padding: 20px;
-
-      box-shadow:
-        6px 6px 0
-        #CDB6BE;
-    }
-
-    .paywall-items {
+    .paywall-box {
       grid-template-columns: 1fr;
-
-      gap: 12px;
     }
 
-  }
-
-  @media (
-    prefers-reduced-motion:
-    reduce
-  ) {
-
-    * {
-      scroll-behavior:
-        auto !important;
-
-      animation-duration:
-        0.01ms !important;
-
-      transition-duration:
-        0.01ms !important;
+    .paywall-box button {
+      grid-column: auto;
     }
 
   }

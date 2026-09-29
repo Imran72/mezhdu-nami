@@ -3,12 +3,16 @@ import {
     getQuestionById,
 } from './questions';
 
-type Role = 'a' | 'b';
+type Role =
+    | 'a'
+    | 'b';
 
 type AnswerRow = {
     role: Role;
     question_id: string;
-    answer_value: string | number;
+    answer_value:
+        | string
+        | number;
 };
 
 type AnswersByRole = {
@@ -16,9 +20,13 @@ type AnswersByRole = {
     b: Record<string, string>;
 };
 
+export type Similarity =
+    | 'same'
+    | 'close'
+    | 'different';
+
 export type QuestionComparison = {
     questionId: string;
-
     question: string;
 
     answerA: string;
@@ -32,89 +40,160 @@ export type QuestionComparison = {
 
     sharedTraits: string[];
 
-    similarity:
-        | 'same'
-        | 'close'
-        | 'different';
+    similarity: Similarity;
+};
+
+export type DimensionScores = {
+    views: number;
+    care: number;
+    communication: number;
+    rhythm: number;
+    space: number;
 };
 
 export type ScoreResult = {
-    /*
-     * Оставляем scores для совместимости
-     * со старым result/API-кодом.
-     *
-     * Но теперь это НЕ "процент совместимости".
-     */
     scores: {
         overall: number;
+
         sameAnswers: number;
         closeAnswers: number;
         differentAnswers: number;
+
+        dimensions: DimensionScores;
     };
 
     by: AnswersByRole;
 
-    comparisons: QuestionComparison[];
+    comparisons:
+        QuestionComparison[];
 
     highlights: {
-        same: QuestionComparison[];
-        close: QuestionComparison[];
-        different: QuestionComparison[];
+        same:
+            QuestionComparison[];
+
+        close:
+            QuestionComparison[];
+
+        different:
+            QuestionComparison[];
     };
 };
 
-/*
- * Главная функция.
- *
- * Получает строки ответов из Supabase
- * и сравнивает ответы двух людей.
- */
+/* ============================================================
+   DIMENSIONS
+============================================================ */
+
+const DIMENSION_TRAITS = {
+    views: [
+        'values',
+        'future',
+        'stability',
+        'adventure',
+        'home',
+        'family',
+        'growth',
+        'spontaneity',
+    ],
+
+    care: [
+        'care',
+        'support',
+        'warmth',
+        'attention',
+        'affection',
+        'help',
+        'presence',
+    ],
+
+    communication: [
+        'communication',
+        'talk',
+        'honesty',
+        'openness',
+        'humor',
+        'discussion',
+        'directness',
+    ],
+
+    rhythm: [
+        'energy',
+        'activity',
+        'rest',
+        'routine',
+        'spontaneity',
+        'planning',
+        'social',
+        'home',
+    ],
+
+    space: [
+        'independence',
+        'space',
+        'freedom',
+        'privacy',
+        'togetherness',
+        'closeness',
+    ],
+} as const;
+
+/* ============================================================
+   MAIN SCORE
+============================================================ */
+
 export function score(
-    rows: AnswerRow[]
+    answers: AnswerRow[]
 ): ScoreResult {
     const by: AnswersByRole = {
         a: {},
         b: {},
     };
 
-    /*
-     * Собираем:
-     *
-     * by.a.free_saturday = "go_somewhere"
-     * by.b.free_saturday = "no_plan"
-     */
-    for (const row of rows) {
+    for (
+        const answer
+        of answers
+        ) {
         if (
-            row.role !== 'a' &&
-            row.role !== 'b'
+            answer.role !== 'a' &&
+            answer.role !== 'b'
         ) {
             continue;
         }
 
-        by[row.role][row.question_id] =
-            String(row.answer_value);
+        by[
+            answer.role
+            ][
+            answer.question_id
+            ] =
+            String(
+                answer.answer_value
+            );
     }
 
-    const allQuestionIds =
-        new Set([
-            ...Object.keys(by.a),
-            ...Object.keys(by.b),
-        ]);
+    const questionIds =
+        Array.from(
+            new Set([
+                ...Object.keys(
+                    by.a
+                ),
+                ...Object.keys(
+                    by.b
+                ),
+            ])
+        );
 
-    const comparisons: QuestionComparison[] =
-        [];
+    const comparisons:
+        QuestionComparison[] = [];
 
-    for (const questionId of allQuestionIds) {
+    for (
+        const questionId
+        of questionIds
+        ) {
         const answerA =
             by.a[questionId];
 
         const answerB =
             by.b[questionId];
 
-        /*
-         * Сравниваем только те вопросы,
-         * на которые ответили оба.
-         */
         if (
             answerA === undefined ||
             answerB === undefined
@@ -123,11 +202,19 @@ export function score(
         }
 
         const question =
-            getQuestionById(questionId);
+            getQuestionById(
+                questionId
+            );
 
         if (!question) {
             continue;
         }
+
+        /*
+         * ВАЖНО:
+         * getOptionByValue принимает
+         * questionId, а не объект question.
+         */
 
         const optionA =
             getOptionByValue(
@@ -141,14 +228,6 @@ export function score(
                 answerB
             );
 
-        /*
-         * Если ответ почему-то не найден
-         * среди новых options — просто
-         * пропускаем вопрос.
-         *
-         * Это особенно полезно для старых
-         * тестовых пар из БД.
-         */
         if (
             !optionA ||
             !optionB
@@ -165,38 +244,27 @@ export function score(
         const sharedTraits =
             traitsA.filter(
                 (trait) =>
-                    traitsB.includes(trait)
+                    traitsB.includes(
+                        trait
+                    )
             );
 
         let similarity:
-            | 'same'
-            | 'close'
-            | 'different';
+            Similarity;
 
-        /*
-         * Выбрали буквально один
-         * и тот же вариант.
-         */
-        if (answerA === answerB) {
-            similarity = 'same';
-        }
-
-        /*
-         * Ответы разные, но имеют
-         * хотя бы один общий смысловой тег.
-         */
-        else if (
+        if (
+            answerA === answerB
+        ) {
+            similarity =
+                'same';
+        } else if (
             sharedTraits.length > 0
         ) {
-            similarity = 'close';
-        }
-
-        /*
-         * Ответы показывают разные
-         * предпочтения.
-         */
-        else {
-            similarity = 'different';
+            similarity =
+                'close';
+        } else {
+            similarity =
+                'different';
         }
 
         comparisons.push({
@@ -244,35 +312,43 @@ export function score(
                 'different'
         );
 
-    /*
-     * Этот overall нужен пока только
-     * для обратной совместимости.
-     *
-     * Мы НЕ будем показывать его
-     * пользователю как:
-     *
-     * "ваша совместимость — 78%"
-     *
-     * Логика:
-     *
-     * same      = 1
-     * close     = 0.5
-     * different = 0
-     */
-    let overall = 0;
+    const overall =
+        calculateSimilarity(
+            comparisons
+        );
 
-    if (comparisons.length > 0) {
-        const points =
-            same.length +
-            close.length * 0.5;
+    const dimensions:
+        DimensionScores = {
+        views:
+            calculateDimension(
+                comparisons,
+                DIMENSION_TRAITS.views
+            ),
 
-        overall =
-            Math.round(
-                (points /
-                    comparisons.length) *
-                100
-            );
-    }
+        care:
+            calculateDimension(
+                comparisons,
+                DIMENSION_TRAITS.care
+            ),
+
+        communication:
+            calculateDimension(
+                comparisons,
+                DIMENSION_TRAITS.communication
+            ),
+
+        rhythm:
+            calculateDimension(
+                comparisons,
+                DIMENSION_TRAITS.rhythm
+            ),
+
+        space:
+            calculateDimension(
+                comparisons,
+                DIMENSION_TRAITS.space
+            ),
+    };
 
     return {
         scores: {
@@ -286,6 +362,8 @@ export function score(
 
             differentAnswers:
             different.length,
+
+            dimensions,
         },
 
         by,
@@ -298,4 +376,108 @@ export function score(
             different,
         },
     };
+}
+
+/* ============================================================
+   OVERALL SCORE
+============================================================ */
+
+function calculateSimilarity(
+    comparisons:
+    QuestionComparison[]
+): number {
+    if (
+        comparisons.length === 0
+    ) {
+        return 0;
+    }
+
+    const points =
+        comparisons.reduce(
+            (
+                total,
+                comparison
+            ) => {
+                if (
+                    comparison.similarity ===
+                    'same'
+                ) {
+                    return (
+                        total + 1
+                    );
+                }
+
+                if (
+                    comparison.similarity ===
+                    'close'
+                ) {
+                    return (
+                        total + 0.5
+                    );
+                }
+
+                return total;
+            },
+            0
+        );
+
+    return Math.round(
+        (
+            points /
+            comparisons.length
+        ) *
+        100
+    );
+}
+
+/* ============================================================
+   DIMENSION SCORE
+============================================================ */
+
+function calculateDimension(
+    comparisons:
+    QuestionComparison[],
+    dimensionTraits:
+    readonly string[]
+): number {
+    const relevant =
+        comparisons.filter(
+            (
+                comparison
+            ) => {
+                const allTraits = [
+                    ...comparison.traitsA,
+                    ...comparison.traitsB,
+                ];
+
+                return (
+                    allTraits.some(
+                        (trait) =>
+                            dimensionTraits.includes(
+                                trait
+                            )
+                    )
+                );
+            }
+        );
+
+    /*
+     * Если по этой оси пока недостаточно
+     * вопросов, используем общий score.
+     *
+     * Это временный fallback, пока не
+     * привяжем наши 16 вопросов к пяти
+     * осям напрямую.
+     */
+
+    const source =
+        relevant.length >= 2
+            ? relevant
+            : comparisons;
+
+    return (
+        calculateSimilarity(
+            source
+        )
+    );
 }
