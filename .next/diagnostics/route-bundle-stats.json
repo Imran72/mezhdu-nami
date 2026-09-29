@@ -1,10 +1,10 @@
 [
   {
     "route": "/result/[coupleId]",
-    "firstLoadUncompressedJsBytes": 503605,
+    "firstLoadUncompressedJsBytes": 510507,
     "firstLoadChunkPaths": [
       ".next/static/chunks/3fntmmi971322.js",
-      ".next/static/chunks/28a9-uur36-4f.js",
+      ".next/static/chunks/3cbpp96tl68ta.js",
       ".next/static/chunks/310vm2bl3xxpt.js",
       ".next/static/chunks/2mmpezlrfmbu5.js",
       ".next/static/chunks/0bma92pht_c97.js",

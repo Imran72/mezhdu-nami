@@ -4,6 +4,7 @@ import {
     useEffect,
     useMemo,
     useState,
+    type ReactNode,
 } from 'react';
 
 import {
@@ -14,7 +15,7 @@ import {
 import {
     determineArchetype,
     getFreeInsights,
-    Comparison,
+    type Comparison,
 } from '../../../lib/archetypes';
 
 type Couple = {
@@ -30,12 +31,6 @@ type ResultData = {
     waiting?: boolean;
     couple: Couple;
     comparisons?: Comparison[];
-
-    highlights?: {
-        same?: Comparison[];
-        close?: Comparison[];
-        different?: Comparison[];
-    };
 };
 
 export default function ResultPage() {
@@ -168,15 +163,14 @@ export default function ResultPage() {
         return (
             <>
                 <main className="state-page">
-
-                    <div className="state-shell">
+                    <div className="state-box">
 
                         <div className="brand">
                             между нами
                         </div>
 
                         <h1>
-                            Что-то пошло не так.
+                            Упс.
                         </h1>
 
                         <p>
@@ -184,7 +178,6 @@ export default function ResultPage() {
                         </p>
 
                     </div>
-
                 </main>
 
                 <style jsx global>
@@ -199,23 +192,20 @@ export default function ResultPage() {
             <>
                 <main className="loading-page">
 
-                    <div className="loading-circles">
-
+                    <div className="loading-mark">
                         <span />
                         <span />
-
                         <b>
-                            ✦
+                            ♥
                         </b>
-
                     </div>
 
-                    <div className="loading-brand">
+                    <div className="brand">
                         между нами
                     </div>
 
                     <p>
-                        сравниваем ваши ответы...
+                        смотрим, что у вас там...
                     </p>
 
                 </main>
@@ -233,6 +223,11 @@ export default function ResultPage() {
     const nameB =
         data.couple.partner_b_name;
 
+    const scorePhrase =
+        getScorePhrase(
+            wavePercent
+        );
+
     return (
         <>
             <main className="page">
@@ -243,11 +238,15 @@ export default function ResultPage() {
 
                 <section className="hero">
 
-                    <div className="hero-decoration star-one">
+                    <div className="hero-star hero-star-a">
                         ✦
                     </div>
 
-                    <div className="hero-decoration star-two">
+                    <div className="hero-star hero-star-b">
+                        ✦
+                    </div>
+
+                    <div className="hero-plus">
                         +
                     </div>
 
@@ -259,100 +258,161 @@ export default function ResultPage() {
                                 между нами
                             </div>
 
-                            <div className="result-pill">
-                                результат для двоих
+                            <div className="top-note">
+                                РЕЗУЛЬТАТ ДЛЯ ДВОИХ
+                                <span>
+                  ♥
+                </span>
                             </div>
 
                         </header>
 
-                        <div className="hero-content">
+                        <div className="hero-names">
 
-                            <div className="names">
-                                {nameA}
-                                <span>
-                  +
-                </span>
-                                {nameB}
-                            </div>
+              <span>
+                {nameA}
+              </span>
 
-                            <div className="hero-result">
+                            <b>
+                                ×
+                            </b>
 
-                                <div className="score-column">
+                            <span>
+                {nameB}
+              </span>
 
-                                    <div className="score">
-                                        {wavePercent}
-                                        <span>
-                      %
-                    </span>
-                                    </div>
+                        </div>
 
-                                    <div className="score-label">
-                                        НА ОДНОЙ ВОЛНЕ
-                                    </div>
+                        <div className="hero-stage">
 
-                                    <p className="score-description">
-                                        Похожесть ваших ответов
-                                        на ситуации из теста
-                                    </p>
+                            {/* SCORE */}
 
+                            <div className="score-block">
+
+                                <div className="score-number">
+                                    {wavePercent}
+                                    <sup>
+                                        %
+                                    </sup>
                                 </div>
 
-                                <div className="hero-art-column">
+                                <div className="score-title">
+                                    НА ОДНОЙ ВОЛНЕ
+                                </div>
 
-                                    <CoupleArt
-                                        emojiA={
-                                            archetype.emojiA
-                                        }
-                                        emojiB={
-                                            archetype.emojiB
-                                        }
-                                        archetypeId={
-                                            archetype.id
-                                        }
+                                <div className="score-line">
+
+                                    <div
+                                        className="score-line-fill"
+                                        style={{
+                                            width:
+                                                `${wavePercent}%`,
+                                        }}
+                                    />
+
+                                    <span
+                                        style={{
+                                            left:
+                                                `${wavePercent}%`,
+                                        }}
                                     />
 
                                 </div>
 
-                                <div className="type-column">
+                                <p>
+                                    «{scorePhrase}»
+                                </p>
 
-                                    <div className="type-label">
-                                        ВАШ ТИП ПАРЫ
-                                    </div>
+                            </div>
 
-                                    <h1>
-                                        {archetype.title}
-                                    </h1>
+                            {/* ART */}
 
-                                    <p>
-                                        {
-                                            archetype.description
-                                        }
-                                    </p>
+                            <div className="art-wrap">
 
+                                <PixelScene
+                                    archetypeId={
+                                        archetype.id
+                                    }
+                                />
+
+                                <div className="art-sticker">
+                  <span>
+                    ВАШ ТИП ПАРЫ
+                  </span>
+
+                                    №
+                                    {
+                                        getArchetypeNumber(
+                                            archetype.id
+                                        )
+                                    }
                                 </div>
 
                             </div>
 
-                            <div className="answer-summary">
+                            {/* ARCHETYPE */}
 
-                                <SummaryItem
-                                    value={sameCount}
-                                    label="совпали"
-                                />
+                            <div className="archetype-block">
 
-                                <div className="summary-line" />
+                                <div className="archetype-kicker">
+                                    ТАК. ЭТО ВЫ.
+                                </div>
 
-                                <SummaryItem
-                                    value={closeCount}
-                                    label="близко"
-                                />
+                                <h1>
+                                    {archetype.title}
+                                </h1>
 
-                                <div className="summary-line" />
+                                <p>
+                                    {
+                                        archetype.description
+                                    }
+                                </p>
 
-                                <SummaryItem
-                                    value={differentCount}
-                                    label="по-разному"
-                                />
+                            </div>
+
+                        </div>
+
+                        <div className="chaos-stats">
+
+                            <div className="chaos-stat stat-a">
+
+                                <strong>
+                                    {sameCount}
+                                </strong>
+
+                                <span>
+                  один
+                  <br />
+                  в один
+                </span>
+
+                            </div>
+
+                            <div className="chaos-stat stat-b">
+
+                                <strong>
+                                    {closeCount}
+                                </strong>
+
+                                <span>
+                  ну
+                  <br />
+                  почти
+                </span>
+
+                            </div>
+
+                            <div className="chaos-stat stat-c">
+
+                                <strong>
+                                    {differentCount}
+                                </strong>
+
+                                <span>
+                  тут начинается
+                  <br />
+                  сюжет
+                </span>
 
                             </div>
 
@@ -360,54 +420,64 @@ export default function ResultPage() {
 
                     </div>
 
-                    <div className="hero-bottom" />
-
                 </section>
 
                 {/* =====================================================
             INSIGHTS
         ===================================================== */}
 
-                <section className="insights-section">
+                <section className="insights">
 
                     <div className="shell">
 
-                        <div className="section-heading">
+                        <div className="insights-intro">
 
-                            <div className="eyebrow">
-                                ЧТО МЫ ЗАМЕТИЛИ
-                            </div>
+              <span>
+                ↓
+              </span>
 
-                            <h2>
-                                Три вещи про вас.
-                            </h2>
+                            <p>
+                                ладно.
+                                <br />
+                                теперь интересное.
+                            </p>
 
                         </div>
 
-                        <div className="insight-grid">
+                        <div className="insight-layout">
 
-                            <InsightCard
+                            <Insight
+                                number="01"
+                                kicker="ВЫ ВОТ ТУТ"
+                                title="прям одинаковые"
                                 symbol="♥"
-                                title="Вы совпали"
                                 text={
                                     insights.sameInsight
                                 }
+                                variant="pink"
                             />
 
-                            <InsightCard
-                                symbol="↔"
-                                title="А вот тут интересно"
+                            <Insight
+                                number="02"
+                                kicker="А ТУТ УЖЕ"
+                                title="интереснее"
+                                symbol="↯"
                                 text={
                                     insights.differenceInsight
                                 }
+                                variant="purple"
+                                offset
                             />
 
-                            <InsightCard
+                            <Insight
+                                number="03"
+                                kicker="А ЭТО ВООБЩЕ"
+                                title="ваша суперсила"
                                 symbol="✦"
-                                title="Ваша суперсила"
                                 text={
                                     insights.superpower
                                 }
+                                variant="yellow"
                             />
 
                         </div>
@@ -420,41 +490,23 @@ export default function ResultPage() {
             QUESTION
         ===================================================== */}
 
-                <section className="question-section">
+                <section className="question">
 
-                    <div className="question-star question-star-one">
-                        ✦
-                    </div>
-
-                    <div className="question-star question-star-two">
-                        ✦
+                    <div className="question-stars">
+                        ✦　·　✦
                     </div>
 
                     <div className="question-shell">
 
-                        <div className="question-visual">
+                        <div className="question-art">
 
-                            <div className="moon">
-                                ☾
-                            </div>
+                            <div className="pixel-moon" />
 
-                            <div className="tiny-couple">
+                            <div className="sitting-pair">
 
-                                <div className="tiny-person">
-                                    {
-                                        archetype.emojiA
-                                    }
-                                </div>
+                                <span className="sitter sitter-a" />
 
-                                <span>
-                  ♥
-                </span>
-
-                                <div className="tiny-person second">
-                                    {
-                                        archetype.emojiB
-                                    }
-                                </div>
+                                <span className="sitter sitter-b" />
 
                             </div>
 
@@ -462,19 +514,19 @@ export default function ResultPage() {
 
                         <div className="question-copy">
 
-                            <div className="question-label">
+                            <div className="question-kicker">
                                 ВОПРОС ВАМ НА ВЕЧЕР
                             </div>
 
                             <h2>
-                                “{
+                                «{
                                 insights.eveningQuestion
-                            }”
+                            }»
                             </h2>
 
                             <p>
-                                Без правильного ответа.
-                                Просто поговорите.
+                                без правильного ответа.
+                                просто поговорите.
                             </p>
 
                         </div>
@@ -487,11 +539,20 @@ export default function ResultPage() {
             PAYWALL
         ===================================================== */}
 
-                <section className="paywall-section">
+                <section className="paywall">
 
-                    <div className="paywall-shell">
+                    <div className="shell paywall-layout">
 
                         <div className="paywall-copy">
+
+                            <div className="paywall-note">
+                                ещё столько
+                                <br />
+                                интересного
+                                <span>
+                  ↘
+                </span>
+                            </div>
 
                             <div className="eyebrow">
                                 ХОТИТЕ КОПНУТЬ ГЛУБЖЕ?
@@ -499,40 +560,35 @@ export default function ResultPage() {
 
                             <h2>
                                 Между ответами
-                                осталось ещё кое-что.
+                                <br />
+                                осталось кое-что.
                             </h2>
-
-                            <p>
-                                В полном разборе покажем
-                                паттерны, которые сложно
-                                увидеть по одному ответу.
-                            </p>
 
                         </div>
 
-                        <div className="paywall-card">
+                        <div className="paywall-action">
 
-                            <div className="paywall-list">
+                            <div className="paywall-items">
 
-                                <PaywallItem>
-                                    Чего каждому немного
+                                <PayItem>
+                                    чего каждому немного
                                     не хватает
-                                </PaywallItem>
+                                </PayItem>
 
-                                <PaywallItem>
-                                    Как вы по-разному
-                                    воспринимаете заботу
-                                </PaywallItem>
+                                <PayItem>
+                                    как вы воспринимаете
+                                    заботу
+                                </PayItem>
 
-                                <PaywallItem>
-                                    Что один может
-                                    не замечать о другом
-                                </PaywallItem>
+                                <PayItem>
+                                    что можете не замечать
+                                    друг о друге
+                                </PayItem>
 
-                                <PaywallItem>
-                                    Что каждый хочет
+                                <PayItem>
+                                    что каждый хочет
                                     сохранить
-                                </PaywallItem>
+                                </PayItem>
 
                             </div>
 
@@ -549,13 +605,17 @@ export default function ResultPage() {
                   Полный разбор
                 </span>
 
-                                <strong>
+                                <b>
                                     299 ₽
+                                </b>
+
+                                <strong>
+                                    →
                                 </strong>
 
                             </button>
 
-                            <div className="paywall-note">
+                            <div className="paywall-small">
                                 один разбор · для вас двоих
                             </div>
 
@@ -575,98 +635,142 @@ export default function ResultPage() {
 }
 
 /* ============================================================
-   HERO ART
+   SCORE COPY
 ============================================================ */
 
-function CoupleArt({
-                       emojiA,
-                       emojiB,
-                       archetypeId,
-                   }: {
-    emojiA: string;
-    emojiB: string;
+function getScorePhrase(
+    score: number
+) {
+    if (score >= 86) {
+        return 'так. кто из вас подглядывал?';
+    }
+
+    if (score >= 71) {
+        return 'вы точно не списывали?';
+    }
+
+    if (score >= 51) {
+        return 'не телепатия, но уже подозрительно';
+    }
+
+    if (score >= 31) {
+        return 'два разных мира. и это уже интересно';
+    }
+
+    return 'как вы вообще нашли друг друга?';
+}
+
+/* ============================================================
+   ARCHETYPE NUMBER
+============================================================ */
+
+function getArchetypeNumber(
+    id: string
+) {
+    const numbers:
+        Record<string, string> = {
+        knight_princess: '01',
+        wizards: '02',
+        pirates: '03',
+        astronauts: '04',
+        sun_moon: '05',
+        dragon_keeper: '06',
+        players: '07',
+        homekeepers: '08',
+    };
+
+    return numbers[id] ?? '00';
+}
+
+/* ============================================================
+   PIXEL HERO SCENE
+============================================================ */
+
+function PixelScene({
+                        archetypeId,
+                    }: {
     archetypeId: string;
 }) {
     return (
-        <div className="couple-art">
+        <div className="pixel-scene">
 
-            <svg
-                className="blob"
-                viewBox="0 0 420 360"
-                aria-hidden="true"
-            >
-                <path
-                    d="
-            M74 103
-            C118 35 222 13 304 50
-            C379 84 414 167 383 244
-            C350 326 255 356 167 329
-            C78 302 21 238 37 166
-            C43 140 54 119 74 103Z
-          "
-                    fill="#E9D9E1"
-                />
+            <div className="space-bg">
 
-                <circle
-                    cx="64"
-                    cy="188"
-                    r="6"
-                    fill="#C49C47"
-                />
+                <span className="pixel-star ps-1" />
+                <span className="pixel-star ps-2" />
+                <span className="pixel-star ps-3" />
+                <span className="pixel-star ps-4" />
+                <span className="pixel-star ps-5" />
 
-                <circle
-                    cx="360"
-                    cy="105"
-                    r="5"
-                    fill="#A74769"
-                />
+                <span className="big-pixel-star">
+          ✦
+        </span>
 
-                <path
-                    d="
-            M335 56
-            L341 70
-            L356 76
-            L341 82
-            L335 97
-            L329 82
-            L314 76
-            L329 70Z
-          "
-                    fill="#C49C47"
-                />
-            </svg>
+                <div className="pixel-planet">
 
-            <div className="people">
-
-                <div className="person">
-
-                    <div className="head">
-                        {emojiA}
-                    </div>
-
-                    <div className="body body-one" />
-
-                </div>
-
-                <div className="heart">
-                    ♥
-                </div>
-
-                <div className="person person-two">
-
-                    <div className="head">
-                        {emojiB}
-                    </div>
-
-                    <div className="body body-two" />
+                    <span className="planet-ring" />
 
                 </div>
 
             </div>
 
-            <div className="art-tag">
+            <div className="asteroid">
+
+                <span className="crater crater-a" />
+                <span className="crater crater-b" />
+                <span className="crater crater-c" />
+
+            </div>
+
+            <div className="astronaut astro-a">
+
+                <div className="helmet">
+                    <span />
+                </div>
+
+                <div className="astro-body">
+
+                    <span className="panel" />
+
+                </div>
+
+                <div className="leg leg-left" />
+                <div className="leg leg-right" />
+
+                <div className="astro-arm arm-cup">
+
+                    <span className="cup" />
+
+                </div>
+
+            </div>
+
+            <div className="astronaut astro-b">
+
+                <div className="helmet">
+                    <span />
+                </div>
+
+                <div className="astro-body">
+
+                    <span className="panel" />
+
+                </div>
+
+                <div className="leg leg-left" />
+                <div className="leg leg-right" />
+
+                <div className="astro-arm arm-reach" />
+
+            </div>
+
+            <div className="pixel-heart">
+                ♥
+            </div>
+
+            <div className="scene-caption">
                 {
-                    getArchetypeTag(
+                    getSceneCaption(
                         archetypeId
                     )
                 }
@@ -676,7 +780,7 @@ function CoupleArt({
     );
 }
 
-function getArchetypeTag(
+function getSceneCaption(
     id: string
 ) {
     switch (id) {
@@ -710,58 +814,55 @@ function getArchetypeTag(
 }
 
 /* ============================================================
-   SUMMARY
-============================================================ */
-
-function SummaryItem({
-                         value,
-                         label,
-                     }: {
-    value: number;
-    label: string;
-}) {
-    return (
-        <div className="summary-item">
-
-            <strong>
-                {value}
-            </strong>
-
-            <span>
-        {label}
-      </span>
-
-        </div>
-    );
-}
-
-/* ============================================================
    INSIGHT
 ============================================================ */
 
-function InsightCard({
-                         symbol,
-                         title,
-                         text,
-                     }: {
-    symbol: string;
+function Insight({
+                     number,
+                     kicker,
+                     title,
+                     symbol,
+                     text,
+                     variant,
+                     offset = false,
+                 }: {
+    number: string;
+    kicker: string;
     title: string;
+    symbol: string;
     text: string;
+    variant:
+        | 'pink'
+        | 'purple'
+        | 'yellow';
+    offset?: boolean;
 }) {
     return (
-        <article className="insight-card">
+        <article
+            className={
+                `insight-card ${variant} ${
+                    offset
+                        ? 'offset'
+                        : ''
+                }`
+            }
+        >
 
-            <div className="insight-top">
-
-                <div className="insight-symbol">
-                    {symbol}
-                </div>
-
-                <div className="insight-title">
-                    {title}
-                </div>
-
+            <div className="insight-number">
+                {number}
             </div>
+
+            <div className="insight-symbol">
+                {symbol}
+            </div>
+
+            <div className="insight-kicker">
+                {kicker}
+            </div>
+
+            <h3>
+                {title}
+            </h3>
 
             <p>
                 {text}
@@ -772,20 +873,19 @@ function InsightCard({
 }
 
 /* ============================================================
-   PAYWALL ITEM
+   PAY ITEM
 ============================================================ */
 
-function PaywallItem({
-                         children,
-                     }: {
-    children:
-        React.ReactNode;
+function PayItem({
+                     children,
+                 }: {
+    children: ReactNode;
 }) {
     return (
-        <div className="paywall-item">
+        <div className="pay-item">
 
       <span>
-        ✓
+        ✦
       </span>
 
             <div>
@@ -813,16 +913,13 @@ const styles = `
   body {
     margin: 0;
 
-    background: #ffffff;
+    background: #F6F0EA;
 
-    color: #282326;
+    color: #211D20;
 
     font-family:
-      Inter,
-      ui-sans-serif,
-      -apple-system,
-      BlinkMacSystemFont,
-      "Segoe UI",
+      Arial,
+      Helvetica,
       sans-serif;
   }
 
@@ -834,40 +931,31 @@ const styles = `
     min-height: 100svh;
 
     overflow: hidden;
+
+    background: #F6F0EA;
   }
 
   .shell {
     width:
       min(
         calc(100% - 48px),
-        1180px
+        1160px
       );
 
     margin: 0 auto;
   }
 
   .brand {
-    color: #292326;
-
     font-family:
       Georgia,
       "Times New Roman",
       serif;
 
-    font-size: 26px;
-    font-weight: 600;
+    font-size: 25px;
+    font-weight: 700;
 
     letter-spacing:
-      -0.04em;
-  }
-
-  .eyebrow {
-    color: #A74669;
-
-    font-size: 11px;
-    font-weight: 850;
-
-    letter-spacing: 0.18em;
+      -0.05em;
   }
 
   /* ============================================================
@@ -877,69 +965,53 @@ const styles = `
   .hero {
     position: relative;
 
+    min-height: 720px;
+
     overflow: hidden;
 
-    background:
-      radial-gradient(
-        circle at 85% 10%,
-        rgba(
-          255,
-          255,
-          255,
-          0.72
-        ),
-        transparent 30%
-      ),
-      #F7F1F4;
-
-    padding-bottom: 58px;
+    background: #F6F0EA;
   }
 
   .topbar {
-    height: 82px;
+    height: 76px;
 
     display: flex;
     align-items: center;
     justify-content: space-between;
   }
 
-  .result-pill {
-    padding:
-      8px
-      13px;
+  .top-note {
+    display: flex;
+    align-items: center;
 
-    border:
-      1px solid
-      rgba(
-        122,
-        83,
-        98,
-        0.15
-      );
+    gap: 9px;
 
-    border-radius: 999px;
+    color: #8F7E84;
 
-    background:
-      rgba(
-        255,
-        255,
-        255,
-        0.55
-      );
+    font-size: 9px;
+    font-weight: 800;
 
-    color: #8B7C81;
-
-    font-size: 11px;
+    letter-spacing: 0.25em;
   }
 
-  .hero-content {
-    padding-top: 16px;
+  .top-note span {
+    color: #B8446D;
+
+    font-size: 14px;
   }
 
-  .names {
-    text-align: center;
+  .hero-names {
+    position: relative;
 
-    color: #282326;
+    z-index: 4;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 18px;
+
+    margin-top: 6px;
 
     font-family:
       Georgia,
@@ -948,62 +1020,12 @@ const styles = `
 
     font-size:
       clamp(
-        50px,
-        6vw,
-        76px
+        56px,
+        7.5vw,
+        100px
       );
 
     font-weight: 500;
-
-    line-height: 1;
-
-    letter-spacing:
-      -0.055em;
-  }
-
-  .names span {
-    margin:
-      0
-      12px;
-
-    color: #AF496E;
-  }
-
-  .hero-result {
-    display: grid;
-
-    grid-template-columns:
-      0.72fr
-      1.15fr
-      1fr;
-
-    align-items: center;
-
-    gap: 30px;
-
-    margin-top: 22px;
-  }
-
-  /* SCORE */
-
-  .score-column {
-    text-align: center;
-  }
-
-  .score {
-    color: #A74669;
-
-    font-family:
-      Georgia,
-      "Times New Roman",
-      serif;
-
-    font-size:
-      clamp(
-        76px,
-        8vw,
-        112px
-      );
 
     line-height: 0.9;
 
@@ -1011,54 +1033,48 @@ const styles = `
       -0.07em;
   }
 
-  .score span {
-    margin-left: 2px;
+  .hero-names b {
+    color: #B7466E;
 
-    font-size: 0.42em;
+    font-family:
+      Arial,
+      sans-serif;
+
+    font-size: 0.62em;
+    font-weight: 300;
   }
 
-  .score-label {
-    margin-top: 12px;
+  .hero-stage {
+    position: relative;
 
-    color: #A74669;
+    display: grid;
 
-    font-size: 11px;
-    font-weight: 900;
+    grid-template-columns:
+      0.72fr
+      1.55fr
+      0.9fr;
 
-    letter-spacing: 0.17em;
+    align-items: center;
+
+    gap: 14px;
+
+    margin-top: 2px;
   }
 
-  .score-description {
-    max-width: 170px;
+  /* SCORE */
 
-    margin:
-      9px
-      auto
-      0;
+  .score-block {
+    position: relative;
 
-    color: #93868B;
+    z-index: 4;
 
-    font-size: 11px;
-    line-height: 1.45;
+    transform:
+      translateY(-6px)
+      rotate(-1.5deg);
   }
 
-  /* TYPE */
-
-  .type-label {
-    margin-bottom: 10px;
-
-    color: #A74669;
-
-    font-size: 10px;
-    font-weight: 850;
-
-    letter-spacing: 0.19em;
-  }
-
-  .type-column h1 {
-    margin: 0;
-
-    color: #282326;
+  .score-number {
+    color: #B5446D;
 
     font-family:
       Georgia,
@@ -1067,348 +1083,796 @@ const styles = `
 
     font-size:
       clamp(
-        40px,
-        4.3vw,
-        59px
+        82px,
+        9vw,
+        126px
       );
 
-    font-weight: 500;
-
-    line-height: 0.98;
+    line-height: 0.8;
 
     letter-spacing:
-      -0.045em;
+      -0.09em;
   }
 
-  .type-column p {
-    max-width: 380px;
-
-    margin:
-      17px
-      0
-      0;
-
-    color: #71666A;
-
-    font-size: 15px;
-    line-height: 1.55;
-  }
-
-  /* ART */
-
-  .hero-art-column {
-    display: flex;
-    justify-content: center;
-  }
-
-  .couple-art {
+  .score-number sup {
     position: relative;
 
-    width: 100%;
-    max-width: 400px;
+    top: -0.55em;
 
-    aspect-ratio:
-      420 / 360;
+    margin-left: 5px;
+
+    font-size: 0.34em;
+
+    letter-spacing: -0.04em;
   }
 
-  .blob {
-    position: absolute;
+  .score-title {
+    margin-top: 14px;
 
-    inset: 0;
+    color: #B5446D;
 
-    width: 100%;
-    height: 100%;
+    font-size: 10px;
+    font-weight: 900;
+
+    letter-spacing: 0.21em;
   }
 
-  .people {
-    position: absolute;
-
-    z-index: 2;
-
-    left: 50%;
-    bottom: 54px;
-
-    display: flex;
-    align-items: flex-end;
-
-    gap: 6px;
-
-    transform:
-      translateX(-50%);
-  }
-
-  .person {
+  .score-line {
     position: relative;
 
-    width: 96px;
-    height: 162px;
+    width: 190px;
+    height: 4px;
+
+    margin-top: 17px;
+
+    background: #D9CED1;
   }
 
-  .person-two {
-    transform:
-      translateY(-4px);
-  }
-
-  .head {
+  .score-line-fill {
     position: absolute;
-
-    z-index: 2;
 
     top: 0;
-    left: 50%;
+    left: 0;
 
-    width: 70px;
-    height: 70px;
+    height: 100%;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: #B5446D;
+  }
+
+  .score-line > span {
+    position: absolute;
+
+    top: 50%;
+
+    width: 13px;
+    height: 13px;
 
     transform:
-      translateX(-50%);
+      translate(
+        -50%,
+        -50%
+      );
 
     border:
-      3px solid #493E42;
+      3px solid #F6F0EA;
 
     border-radius: 50%;
 
-    background: #EDC5B3;
-
-    font-size: 34px;
-  }
-
-  .body {
-    position: absolute;
-
-    left: 50%;
-    bottom: 0;
-
-    width: 92px;
-    height: 108px;
-
-    transform:
-      translateX(-50%);
-
-    border:
-      3px solid #493E42;
-
-    border-radius:
-      42px 42px 20px 20px;
-  }
-
-  .body-one {
-    background: #A84A6D;
-  }
-
-  .body-two {
-    background: #8C80A4;
-  }
-
-  .heart {
-    align-self: center;
-
-    margin-bottom: 60px;
-
-    color: #A53E64;
-
-    font-size: 22px;
-  }
-
-  .art-tag {
-    position: absolute;
-
-    z-index: 4;
-
-    right: 16px;
-    bottom: 36px;
-
-    padding:
-      8px
-      12px;
-
-    border-radius: 999px;
-
-    background: #ffffff;
+    background: #B5446D;
 
     box-shadow:
-      0 8px 25px
-      rgba(
-        72,
-        49,
-        58,
-        0.09
-      );
-
-    color: #7F6F75;
-
-    font-size: 10px;
-    font-weight: 700;
+      0 0 0 1px
+      #B5446D;
   }
 
-  /* SUMMARY */
-
-  .answer-summary {
-    width: fit-content;
-
-    display: flex;
-    align-items: center;
-
-    gap: 22px;
+  .score-block p {
+    max-width: 230px;
 
     margin:
-      18px
-      auto
+      15px
+      0
       0;
 
-    padding:
-      12px
-      22px;
-
-    border:
-      1px solid
-      rgba(
-        111,
-        77,
-        90,
-        0.12
-      );
-
-    border-radius: 999px;
-
-    background:
-      rgba(
-        255,
-        255,
-        255,
-        0.58
-      );
-  }
-
-  .summary-item {
-    display: flex;
-    align-items: baseline;
-
-    gap: 6px;
-  }
-
-  .summary-item strong {
-    color: #A74669;
+    color: #655B60;
 
     font-family:
       Georgia,
       serif;
 
-    font-size: 22px;
-    font-weight: 500;
+    font-size: 14px;
+    font-style: italic;
+
+    line-height: 1.4;
   }
 
-  .summary-item span {
-    color: #82767A;
+  /* ============================================================
+     ART
+  ============================================================ */
 
-    font-size: 11px;
+  .art-wrap {
+    position: relative;
+
+    z-index: 2;
+
+    width: 100%;
+
+    transform:
+      translateY(5px);
   }
 
-  .summary-line {
-    width: 1px;
-    height: 24px;
+  .pixel-scene {
+    position: relative;
+
+    width: 100%;
+    max-width: 510px;
+
+    aspect-ratio:
+      1.18 / 1;
+
+    margin: 0 auto;
+
+    overflow: hidden;
+
+    border:
+      4px solid #28222B;
+
+    background: #393344;
+
+    box-shadow:
+      10px 12px 0 #D7C2CD;
+
+    image-rendering:
+      pixelated;
+  }
+
+  .space-bg {
+    position: absolute;
+
+    inset: 0;
 
     background:
-      rgba(
-        99,
-        70,
-        81,
-        0.14
+      linear-gradient(
+        180deg,
+        #393344 0%,
+        #4B4055 100%
       );
   }
 
-  .hero-decoration {
+  .pixel-star {
     position: absolute;
 
-    color: #C3A04C;
+    width: 6px;
+    height: 6px;
+
+    background: #F6C48C;
+
+    box-shadow:
+      6px 0 0 #F6C48C,
+      -6px 0 0 #F6C48C,
+      0 6px 0 #F6C48C,
+      0 -6px 0 #F6C48C;
   }
 
-  .star-one {
-    top: 150px;
-    left: 5%;
-
-    font-size: 20px;
+  .ps-1 {
+    top: 18%;
+    left: 12%;
   }
 
-  .star-two {
-    top: 105px;
-    right: 5%;
+  .ps-2 {
+    top: 27%;
+    right: 17%;
 
-    color: #B95D80;
-
-    font-size: 25px;
+    transform:
+      scale(0.6);
   }
 
-  .hero-bottom {
+  .ps-3 {
+    top: 47%;
+    left: 7%;
+
+    transform:
+      scale(0.55);
+  }
+
+  .ps-4 {
+    top: 14%;
+    left: 55%;
+
+    transform:
+      scale(0.45);
+  }
+
+  .ps-5 {
+    top: 39%;
+    right: 8%;
+
+    transform:
+      scale(0.45);
+  }
+
+  .big-pixel-star {
     position: absolute;
 
-    left: -5%;
-    right: -5%;
-    bottom: -50px;
+    top: 12%;
+    right: 32%;
 
-    height: 75px;
+    color: #C6587C;
+
+    font-size: 30px;
+  }
+
+  .pixel-planet {
+    position: absolute;
+
+    top: 12%;
+    right: 10%;
+
+    width: 67px;
+    height: 67px;
+
+    border:
+      4px solid #28222B;
 
     border-radius: 50%;
 
-    background: #ffffff;
+    background: #9284AE;
+  }
+
+  .planet-ring {
+    position: absolute;
+
+    top: 26px;
+    left: -14px;
+
+    width: 90px;
+    height: 16px;
+
+    border:
+      4px solid #E2B37E;
+
+    border-radius: 50%;
+
+    transform:
+      rotate(-13deg);
+  }
+
+  .asteroid {
+    position: absolute;
+
+    left: 8%;
+    right: 8%;
+    bottom: -11%;
+
+    height: 42%;
+
+    border:
+      4px solid #28222B;
+
+    border-radius:
+      48% 52% 0 0;
+
+    background: #81718F;
+  }
+
+  .crater {
+    position: absolute;
+
+    border:
+      4px solid #4B4155;
+
+    border-radius: 50%;
+
+    background: #62566F;
+  }
+
+  .crater-a {
+    top: 25%;
+    left: 15%;
+
+    width: 44px;
+    height: 29px;
+  }
+
+  .crater-b {
+    top: 14%;
+    right: 20%;
+
+    width: 33px;
+    height: 24px;
+  }
+
+  .crater-c {
+    top: 55%;
+    left: 49%;
+
+    width: 55px;
+    height: 36px;
+  }
+
+  /* ASTRONAUTS */
+
+  .astronaut {
+    position: absolute;
+
+    z-index: 5;
+
+    width: 115px;
+    height: 165px;
+  }
+
+  .astro-a {
+    left: 22%;
+    bottom: 24%;
+
+    transform:
+      rotate(3deg);
+  }
+
+  .astro-b {
+    right: 19%;
+    bottom: 20%;
+
+    transform:
+      rotate(-3deg);
+  }
+
+  .helmet {
+    position: absolute;
+
+    z-index: 4;
+
+    top: 0;
+    left: 50%;
+
+    width: 77px;
+    height: 72px;
+
+    transform:
+      translateX(-50%);
+
+    border:
+      4px solid #28222B;
+
+    border-radius:
+      46% 46% 43% 43%;
+
+    background: #F4E9E1;
+  }
+
+  .helmet span {
+    position: absolute;
+
+    top: 13px;
+    left: 13px;
+
+    width: 45px;
+    height: 35px;
+
+    border:
+      4px solid #28222B;
+
+    border-radius:
+      46%;
+
+    background: #5B526B;
+
+    box-shadow:
+      inset
+      8px 6px 0
+      #8D7895;
+  }
+
+  .astro-body {
+    position: absolute;
+
+    z-index: 3;
+
+    top: 61px;
+    left: 50%;
+
+    width: 82px;
+    height: 78px;
+
+    transform:
+      translateX(-50%);
+
+    border:
+      4px solid #28222B;
+
+    border-radius:
+      15px 15px 25px 25px;
+
+    background: #F4E9E1;
+  }
+
+  .panel {
+    position: absolute;
+
+    top: 20px;
+    left: 23px;
+
+    width: 32px;
+    height: 22px;
+
+    border:
+      3px solid #28222B;
+
+    background: #D68494;
+
+    box-shadow:
+      inset
+      7px 0 0
+      #E6B066;
+  }
+
+  .leg {
+    position: absolute;
+
+    z-index: 2;
+
+    bottom: 0;
+
+    width: 36px;
+    height: 54px;
+
+    border:
+      4px solid #28222B;
+
+    border-radius:
+      10px 10px 17px 17px;
+
+    background: #F4E9E1;
+  }
+
+  .leg-left {
+    left: 20px;
+
+    transform:
+      rotate(8deg);
+  }
+
+  .leg-right {
+    right: 20px;
+
+    transform:
+      rotate(-8deg);
+  }
+
+  .astro-arm {
+    position: absolute;
+
+    z-index: 6;
+
+    top: 79px;
+
+    width: 63px;
+    height: 25px;
+
+    border:
+      4px solid #28222B;
+
+    border-radius: 10px;
+
+    background: #F4E9E1;
+  }
+
+  .arm-cup {
+    right: -25px;
+
+    transform:
+      rotate(-7deg);
+  }
+
+  .arm-reach {
+    left: -25px;
+
+    transform:
+      rotate(7deg);
+  }
+
+  .cup {
+    position: absolute;
+
+    top: -15px;
+    right: -10px;
+
+    width: 18px;
+    height: 23px;
+
+    border:
+      3px solid #28222B;
+
+    background: #E6B066;
+  }
+
+  .pixel-heart {
+    position: absolute;
+
+    z-index: 8;
+
+    top: 39%;
+    left: 50%;
+
+    color: #D9567F;
+
+    font-size: 28px;
+
+    transform:
+      translateX(-50%);
+  }
+
+  .scene-caption {
+    position: absolute;
+
+    z-index: 10;
+
+    right: 13px;
+    bottom: 12px;
+
+    padding:
+      7px 9px;
+
+    border:
+      2px solid #28222B;
+
+    background: #F6F0EA;
+
+    color: #28222B;
+
+    font-size: 9px;
+    font-weight: 900;
+
+    letter-spacing: 0.08em;
+
+    transform:
+      rotate(-2deg);
+  }
+
+  .art-sticker {
+    position: absolute;
+
+    z-index: 10;
+
+    left: -14px;
+    bottom: -17px;
+
+    padding:
+      10px 15px;
+
+    border:
+      2px solid #28222B;
+
+    background: #F6E4B7;
+
+    box-shadow:
+      4px 4px 0 #28222B;
+
+    color: #28222B;
+
+    font-size: 12px;
+    font-weight: 900;
+
+    transform:
+      rotate(-2deg);
+  }
+
+  .art-sticker span {
+    margin-right: 8px;
+
+    font-size: 8px;
+
+    letter-spacing: 0.16em;
+  }
+
+  /* ============================================================
+     ARCHETYPE
+  ============================================================ */
+
+  .archetype-block {
+    position: relative;
+
+    z-index: 4;
+
+    transform:
+      translateY(30px);
+  }
+
+  .archetype-kicker {
+    margin-bottom: 10px;
+
+    color: #B5446D;
+
+    font-size: 9px;
+    font-weight: 900;
+
+    letter-spacing: 0.19em;
+  }
+
+  .archetype-block h1 {
+    margin: 0;
+
+    font-family:
+      Georgia,
+      "Times New Roman",
+      serif;
+
+    font-size:
+      clamp(
+        43px,
+        5vw,
+        66px
+      );
+
+    font-weight: 500;
+
+    line-height: 0.91;
+
+    letter-spacing:
+      -0.06em;
+  }
+
+  .archetype-block p {
+    max-width: 280px;
+
+    margin:
+      19px
+      0
+      0;
+
+    color: #655B60;
+
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ============================================================
+     CHAOS STATS
+  ============================================================ */
+
+  .chaos-stats {
+    position: relative;
+
+    z-index: 10;
+
+    width: 520px;
+    height: 80px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 48px;
+
+    margin:
+      -2px
+      auto
+      0;
+  }
+
+  .chaos-stat {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+  }
+
+  .chaos-stat strong {
+    color: #B5446D;
+
+    font-family:
+      Georgia,
+      serif;
+
+    font-size: 34px;
+    font-weight: 500;
+  }
+
+  .chaos-stat span {
+    color: #5E5559;
+
+    font-size: 10px;
+    line-height: 1.25;
+  }
+
+  .stat-a {
+    transform:
+      rotate(-2deg);
+  }
+
+  .stat-b {
+    transform:
+      translateY(8px)
+      rotate(1deg);
+  }
+
+  .stat-c {
+    transform:
+      translateY(-5px)
+      rotate(-1deg);
+  }
+
+  .hero-star,
+  .hero-plus {
+    position: absolute;
+
+    z-index: 1;
+  }
+
+  .hero-star-a {
+    top: 155px;
+    left: 4%;
+
+    color: #D09D3C;
+
+    font-size: 27px;
+  }
+
+  .hero-star-b {
+    right: 5%;
+    bottom: 80px;
+
+    color: #B5446D;
+
+    font-size: 19px;
+  }
+
+  .hero-plus {
+    top: 250px;
+    right: 3%;
+
+    color: #8C7AA1;
+
+    font-size: 28px;
+
+    transform:
+      rotate(13deg);
   }
 
   /* ============================================================
      INSIGHTS
   ============================================================ */
 
-  .insights-section {
+  .insights {
     padding:
-      65px
+      55px
       0
-      80px;
+      100px;
 
-    background: #ffffff;
+    background: #FCFAF7;
   }
 
-  .section-heading {
+  .insights-intro {
     display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
+    align-items: flex-start;
 
-    gap: 30px;
+    gap: 13px;
 
-    margin-bottom: 30px;
+    margin-bottom: 35px;
+
+    color: #B5446D;
   }
 
-  .section-heading h2 {
-    margin:
-      8px
-      0
-      0;
-
-    color: #292326;
-
-    font-family:
-      Georgia,
-      "Times New Roman",
-      serif;
-
-    font-size:
-      clamp(
-        36px,
-        4vw,
-        50px
-      );
-
-    font-weight: 500;
-
-    line-height: 1;
-
-    letter-spacing:
-      -0.04em;
+  .insights-intro span {
+    font-size: 29px;
   }
 
-  .insight-grid {
+  .insights-intro p {
+    margin: 4px 0 0;
+
+    font-size: 11px;
+    font-weight: 900;
+
+    line-height: 1.4;
+
+    letter-spacing: 0.12em;
+
+    text-transform: uppercase;
+
+    transform:
+      rotate(-3deg);
+  }
+
+  .insight-layout {
     display: grid;
 
     grid-template-columns:
@@ -1417,222 +1881,263 @@ const styles = `
         minmax(0, 1fr)
       );
 
-    gap: 14px;
+    gap: 18px;
+
+    align-items: start;
   }
 
   .insight-card {
-    min-height: 245px;
+    position: relative;
 
-    display: flex;
-    flex-direction: column;
+    min-height: 285px;
 
-    padding: 24px;
+    padding:
+      27px
+      26px;
 
     border:
-      1px solid #EBE3E0;
+      2px solid #2B2529;
 
-    border-radius: 22px;
+    background: #FFFFFF;
 
-    background: #FBF9F8;
+    box-shadow:
+      7px 8px 0
+      #D8CDD0;
   }
 
-  .insight-top {
-    display: flex;
-    align-items: center;
+  .insight-card.offset {
+    margin-top: 35px;
 
-    gap: 10px;
+    transform:
+      rotate(1deg);
   }
 
-  .insight-symbol {
-    width: 36px;
-    height: 36px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    flex-shrink: 0;
-
-    border-radius: 12px;
-
-    background: #F0DFE6;
-
-    color: #A74669;
-
-    font-size: 15px;
-    font-weight: 800;
+  .insight-card.pink {
+    transform:
+      rotate(-0.7deg);
   }
 
-  .insight-title {
-    color: #A74669;
-
-    font-size: 10px;
-    font-weight: 850;
-
-    letter-spacing: 0.09em;
-
-    text-transform: uppercase;
+  .insight-card.yellow {
+    transform:
+      rotate(0.5deg);
   }
 
-  .insight-card p {
-    margin:
-      auto
-      0
-      0;
-
-    color: #554D50;
+  .insight-number {
+    color: #B5446D;
 
     font-family:
       Georgia,
-      "Times New Roman",
       serif;
 
-    font-size: 20px;
-    line-height: 1.42;
+    font-size: 48px;
+
+    line-height: 1;
+  }
+
+  .purple
+  .insight-number {
+    color: #82719C;
+  }
+
+  .yellow
+  .insight-number {
+    color: #C58C2E;
+  }
+
+  .insight-symbol {
+    position: absolute;
+
+    top: 24px;
+    right: 24px;
+
+    color: #B5446D;
+
+    font-size: 29px;
+  }
+
+  .purple
+  .insight-symbol {
+    color: #82719C;
+  }
+
+  .yellow
+  .insight-symbol {
+    color: #C58C2E;
+  }
+
+  .insight-kicker {
+    margin-top: 25px;
+
+    color: #71666A;
+
+    font-size: 9px;
+    font-weight: 900;
+
+    letter-spacing: 0.14em;
+  }
+
+  .insight-card h3 {
+    margin:
+      3px
+      0
+      17px;
+
+    font-family:
+      Georgia,
+      serif;
+
+    font-size: 30px;
+    font-weight: 500;
+
+    line-height: 1;
+
+    letter-spacing:
+      -0.04em;
+  }
+
+  .insight-card p {
+    margin: 0;
+
+    color: #62595D;
+
+    font-size: 14px;
+    line-height: 1.55;
   }
 
   /* ============================================================
      QUESTION
   ============================================================ */
 
-  .question-section {
+  .question {
     position: relative;
 
     overflow: hidden;
 
-    padding:
-      68px
-      24px;
+    background: #332E3D;
 
-    background: #625770;
+    color: #FFFFFF;
   }
 
   .question-shell {
     width:
       min(
-        100%,
+        calc(100% - 48px),
         1040px
       );
+
+    min-height: 350px;
 
     display: grid;
 
     grid-template-columns:
-      260px
-      minmax(0, 1fr);
+      310px
+      1fr;
 
     align-items: center;
 
-    gap: 50px;
+    gap: 55px;
 
     margin: 0 auto;
   }
 
-  .question-visual {
+  .question-art {
     position: relative;
 
-    height: 230px;
+    height: 260px;
   }
 
-  .moon {
+  .pixel-moon {
     position: absolute;
 
-    top: 0;
-    left: 50%;
+    top: 15px;
+    left: 40px;
 
-    width: 190px;
-    height: 190px;
+    width: 180px;
+    height: 180px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    transform:
-      translateX(-50%);
+    border:
+      5px solid #201D25;
 
     border-radius: 50%;
 
-    background: #F1E5C9;
+    background: #F0D59A;
 
-    color: #D1AA51;
-
-    font-size: 75px;
+    box-shadow:
+      12px 0 0 #D2A955;
   }
 
-  .tiny-couple {
+  .pixel-moon::after {
+    content: '';
+
     position: absolute;
 
-    z-index: 2;
+    top: -8px;
+    right: -35px;
 
-    left: 50%;
-    bottom: 0;
+    width: 145px;
+    height: 195px;
+
+    border-radius: 50%;
+
+    background: #332E3D;
+  }
+
+  .sitting-pair {
+    position: absolute;
+
+    z-index: 5;
+
+    left: 65px;
+    bottom: 12px;
 
     display: flex;
-    align-items: center;
 
     gap: 7px;
-
-    transform:
-      translateX(-50%);
   }
 
-  .tiny-person {
-    width: 68px;
-    height: 82px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .sitter {
+    width: 54px;
+    height: 76px;
 
     border:
-      3px solid #433D49;
+      4px solid #201D25;
 
     border-radius:
-      34px 34px 16px 16px;
+      25px 25px 10px 10px;
 
-    background: #B87891;
-
-    font-size: 29px;
+    background: #B34D70;
   }
 
-  .tiny-person.second {
-    background: #9185A6;
+  .sitter-b {
+    background: #88779E;
   }
 
-  .tiny-couple span {
-    color: #F0BDD0;
+  .question-kicker {
+    color: #D886A2;
 
-    font-size: 17px;
-  }
+    font-size: 9px;
+    font-weight: 900;
 
-  .question-label {
-    color: #DDB9C7;
-
-    font-size: 10px;
-    font-weight: 850;
-
-    letter-spacing: 0.17em;
+    letter-spacing: 0.21em;
   }
 
   .question-copy h2 {
-    max-width: 680px;
+    max-width: 660px;
 
     margin:
-      13px
+      14px
       0
       0;
 
-    color: #ffffff;
-
     font-family:
       Georgia,
-      "Times New Roman",
       serif;
 
     font-size:
       clamp(
-        34px,
-        4vw,
-        49px
+        35px,
+        4.2vw,
+        51px
       );
 
     font-weight: 500;
@@ -1645,232 +2150,239 @@ const styles = `
 
   .question-copy p {
     margin:
-      18px
+      20px
       0
       0;
 
-    color: #D8D0DB;
+    color: #BBB2BE;
 
-    font-size: 13px;
+    font-size: 12px;
   }
 
-  .question-star {
+  .question-stars {
     position: absolute;
 
-    color:
-      rgba(
-        255,
-        255,
-        255,
-        0.25
-      );
-  }
-
-  .question-star-one {
-    top: 30px;
-    left: 7%;
-
-    font-size: 25px;
-  }
-
-  .question-star-two {
+    top: 35px;
     right: 8%;
-    bottom: 35px;
 
-    font-size: 16px;
+    color: #DDAA73;
+
+    font-size: 18px;
   }
 
   /* ============================================================
      PAYWALL
   ============================================================ */
 
-  .paywall-section {
+  .paywall {
     padding:
       75px
-      24px
-      90px;
+      0
+      85px;
 
-    background: #F9F6F4;
+    background: #F0E5E8;
   }
 
-  .paywall-shell {
-    width:
-      min(
-        100%,
-        1040px
+  .paywall-layout {
+    display: grid;
+
+    grid-template-columns:
+      1fr
+      0.85fr;
+
+    align-items: center;
+
+    gap: 75px;
+  }
+
+  .paywall-copy {
+    position: relative;
+  }
+
+  .paywall-note {
+    position: absolute;
+
+    top: -27px;
+    left: -40px;
+
+    color: #B5446D;
+
+    font-family:
+      Georgia,
+      serif;
+
+    font-size: 15px;
+    font-style: italic;
+
+    line-height: 1.15;
+
+    transform:
+      rotate(-7deg);
+  }
+
+  .paywall-note span {
+    display: inline-block;
+
+    margin-left: 7px;
+
+    font-size: 25px;
+  }
+
+  .eyebrow {
+    margin-left: 100px;
+
+    color: #B5446D;
+
+    font-size: 9px;
+    font-weight: 900;
+
+    letter-spacing: 0.2em;
+  }
+
+  .paywall-copy h2 {
+    margin:
+      13px
+      0
+      0;
+
+    font-family:
+      Georgia,
+      serif;
+
+    font-size:
+      clamp(
+        42px,
+        5vw,
+        62px
       );
+
+    font-weight: 500;
+
+    line-height: 0.96;
+
+    letter-spacing:
+      -0.05em;
+  }
+
+  .paywall-action {
+    padding:
+      24px;
+
+    border:
+      2px solid #292329;
+
+    background: #F8F3EF;
+
+    box-shadow:
+      8px 8px 0
+      #CDB6BE;
+
+    transform:
+      rotate(0.5deg);
+  }
+
+  .paywall-items {
+    display: grid;
+
+    grid-template-columns:
+      1fr
+      1fr;
+
+    gap:
+      15px
+      20px;
+  }
+
+  .pay-item {
+    display: grid;
+
+    grid-template-columns:
+      17px
+      1fr;
+
+    gap: 7px;
+
+    color: #61565A;
+
+    font-size: 11px;
+    line-height: 1.35;
+  }
+
+  .pay-item span {
+    color: #B5446D;
+  }
+
+  .paywall-action button {
+    width: 100%;
 
     display: grid;
 
     grid-template-columns:
       1fr
-      0.95fr;
+      auto
+      auto;
 
     align-items: center;
 
-    gap: 70px;
-
-    margin: 0 auto;
-  }
-
-  .paywall-copy h2 {
-    max-width: 520px;
-
-    margin:
-      12px
-      0
-      18px;
-
-    color: #292326;
-
-    font-family:
-      Georgia,
-      "Times New Roman",
-      serif;
-
-    font-size:
-      clamp(
-        38px,
-        4.4vw,
-        54px
-      );
-
-    font-weight: 500;
-
-    line-height: 1.02;
-
-    letter-spacing:
-      -0.04em;
-  }
-
-  .paywall-copy p {
-    max-width: 480px;
-
-    margin: 0;
-
-    color: #81767A;
-
-    font-size: 15px;
-    line-height: 1.55;
-  }
-
-  .paywall-card {
-    padding: 26px;
-
-    border:
-      1px solid #E9DFDC;
-
-    border-radius: 24px;
-
-    background: #ffffff;
-
-    box-shadow:
-      0 20px 60px
-      rgba(
-        73,
-        52,
-        60,
-        0.05
-      );
-  }
-
-  .paywall-list {
-    display: flex;
-    flex-direction: column;
-
-    gap: 14px;
-  }
-
-  .paywall-item {
-    display: grid;
-
-    grid-template-columns:
-      24px
-      1fr;
-
-    align-items: start;
-
-    gap: 10px;
-
-    color: #554C50;
-
-    font-size: 14px;
-    line-height: 1.4;
-  }
-
-  .paywall-item > span {
-    width: 22px;
-    height: 22px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 50%;
-
-    background: #F1E0E7;
-
-    color: #A74669;
-
-    font-size: 10px;
-    font-weight: 900;
-  }
-
-  .paywall-card button {
-    width: 100%;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    gap: 15px;
+    gap: 13px;
 
     margin-top: 23px;
 
     padding:
-      17px
-      18px;
+      16px
+      17px;
 
-    border: 0;
-    border-radius: 14px;
+    border:
+      2px solid #292329;
 
-    background: #A74669;
+    background: #B5446D;
 
-    color: #ffffff;
+    box-shadow:
+      4px 4px 0
+      #292329;
+
+    color: #FFFFFF;
 
     cursor: pointer;
 
-    font-size: 14px;
-    font-weight: 750;
+    font-size: 13px;
+    font-weight: 800;
 
-    transition:
-      transform 150ms ease,
-      background 150ms ease;
+    text-align: left;
   }
 
-  .paywall-card button:hover {
+  .paywall-action button:hover {
     transform:
-      translateY(-1px);
+      translate(
+        2px,
+        2px
+      );
 
-    background: #943C5D;
+    box-shadow:
+      2px 2px 0
+      #292329;
   }
 
-  .paywall-card button strong {
+  .paywall-action button b {
     font-size: 15px;
   }
 
-  .paywall-note {
-    margin-top: 10px;
+  .paywall-action button strong {
+    font-size: 20px;
+  }
 
-    color: #A3979B;
+  .paywall-small {
+    margin-top: 11px;
 
-    font-size: 10px;
+    color: #9A8D91;
+
+    font-size: 9px;
 
     text-align: center;
   }
 
   /* ============================================================
-     LOADING
+     LOADING / ERROR
   ============================================================ */
 
   .loading-page,
@@ -1881,62 +2393,55 @@ const styles = `
     align-items: center;
     justify-content: center;
 
-    background: #F7F1F4;
+    background: #F6F0EA;
   }
 
   .loading-page {
     flex-direction: column;
   }
 
-  .loading-circles {
+  .loading-mark {
     position: relative;
 
     width: 100px;
-    height: 64px;
+    height: 65px;
 
-    margin-bottom: 20px;
+    margin-bottom: 23px;
   }
 
-  .loading-circles span {
+  .loading-mark span {
     position: absolute;
 
-    width: 64px;
-    height: 64px;
+    width: 65px;
+    height: 65px;
+
+    border:
+      3px solid #28222B;
 
     border-radius: 50%;
   }
 
-  .loading-circles span:first-child {
+  .loading-mark span:first-child {
     left: 0;
 
-    background:
-      rgba(
-        167,
-        70,
-        105,
-        0.5
-      );
+    background: #D17B99;
   }
 
-  .loading-circles span:nth-child(2) {
+  .loading-mark span:nth-child(2) {
     right: 0;
 
-    background:
-      rgba(
-        140,
-        128,
-        164,
-        0.5
-      );
+    background: #9180A7;
   }
 
-  .loading-circles b {
+  .loading-mark b {
     position: absolute;
+
+    z-index: 2;
 
     top: 50%;
     left: 50%;
 
-    color: #ffffff;
+    color: #F6F0EA;
 
     transform:
       translate(
@@ -1945,23 +2450,18 @@ const styles = `
       );
   }
 
-  .loading-brand {
-    font-family:
-      Georgia,
-      serif;
-
-    font-size: 25px;
-  }
-
   .loading-page p {
-    margin-top: 8px;
+    margin:
+      10px
+      0
+      0;
 
-    color: #93868B;
+    color: #8C7E83;
 
-    font-size: 12px;
+    font-size: 11px;
   }
 
-  .state-shell {
+  .state-box {
     width:
       min(
         calc(100% - 40px),
@@ -1969,20 +2469,23 @@ const styles = `
       );
   }
 
-  .state-shell h1 {
-    margin-top: 50px;
+  .state-box h1 {
+    margin:
+      45px
+      0
+      10px;
 
     font-family:
       Georgia,
       serif;
 
-    font-size: 48px;
+    font-size: 70px;
 
     font-weight: 500;
   }
 
-  .state-shell p {
-    color: #82767A;
+  .state-box p {
+    color: #766A6F;
   }
 
   /* ============================================================
@@ -1993,36 +2496,42 @@ const styles = `
     max-width: 900px
   ) {
 
-    .hero-result {
+    .hero-stage {
       grid-template-columns:
         0.7fr
-        1fr;
+        1.3fr;
 
-      gap: 20px;
+      margin-top: 25px;
     }
 
-    .type-column {
+    .archetype-block {
       grid-column:
         1 / -1;
 
-      max-width: 650px;
+      max-width: 600px;
 
       margin:
-        -5px
+        15px
         auto
         0;
 
       text-align: center;
+
+      transform: none;
     }
 
-    .type-column p {
+    .archetype-block p {
       margin:
-        16px
+        15px
         auto
         0;
     }
 
-    .insight-grid {
+    .chaos-stats {
+      margin-top: 30px;
+    }
+
+    .insight-layout {
       grid-template-columns: 1fr;
     }
 
@@ -2030,19 +2539,19 @@ const styles = `
       min-height: auto;
     }
 
-    .insight-card p {
-      margin-top: 25px;
+    .insight-card.offset {
+      margin-top: 0;
     }
 
     .question-shell {
       grid-template-columns:
-        200px
+        230px
         1fr;
 
       gap: 30px;
     }
 
-    .paywall-shell {
+    .paywall-layout {
       gap: 35px;
     }
 
@@ -2058,30 +2567,32 @@ const styles = `
 
     .shell {
       width:
-        calc(100% - 32px);
+        calc(100% - 30px);
     }
 
     .hero {
+      min-height: auto;
+
       padding-bottom: 45px;
     }
 
     .topbar {
-      height: 68px;
+      height: 64px;
     }
 
     .brand {
       font-size: 21px;
     }
 
-    .result-pill {
+    .top-note {
       display: none;
     }
 
-    .hero-content {
-      padding-top: 7px;
-    }
+    .hero-names {
+      gap: 8px;
 
-    .names {
+      margin-top: 9px;
+
       font-size:
         clamp(
           44px,
@@ -2090,150 +2601,215 @@ const styles = `
         );
     }
 
-    .names span {
-      margin:
-        0
-        6px;
-    }
-
-    .hero-result {
+    .hero-stage {
       display: flex;
       flex-direction: column;
 
       gap: 0;
 
-      margin-top: 20px;
+      margin-top: 22px;
     }
 
-    .score-column {
+    .score-block {
       order: 1;
-    }
-
-    .score {
-      font-size: 86px;
-    }
-
-    .score-description {
-      display: none;
-    }
-
-    .hero-art-column {
-      order: 2;
 
       width: 100%;
 
-      margin-top: -5px;
+      display: grid;
+
+      grid-template-columns:
+        auto
+        1fr;
+
+      align-items: center;
+
+      column-gap: 17px;
+
+      transform: none;
     }
 
-    .couple-art {
-      max-width: 330px;
+    .score-number {
+      grid-row:
+        1 / 4;
+
+      font-size: 82px;
     }
 
-    .type-column {
+    .score-title {
+      margin-top: 0;
+    }
+
+    .score-line {
+      width: 100%;
+      max-width: 190px;
+
+      margin-top: 10px;
+    }
+
+    .score-block p {
+      margin-top: 9px;
+
+      font-size: 12px;
+    }
+
+    .art-wrap {
+      order: 2;
+
+      margin-top: 27px;
+
+      transform: none;
+    }
+
+    .pixel-scene {
+      max-width: 390px;
+
+      border-width: 3px;
+
+      box-shadow:
+        7px 8px 0
+        #D7C2CD;
+    }
+
+    .astronaut {
+      transform:
+        scale(0.8);
+    }
+
+    .astro-a {
+      left: 17%;
+    }
+
+    .astro-b {
+      right: 14%;
+    }
+
+    .art-sticker {
+      left: 5px;
+      bottom: -16px;
+    }
+
+    .archetype-block {
       order: 3;
 
-      margin-top: -18px;
+      margin-top: 43px;
     }
 
-    .type-column h1 {
-      font-size: 46px;
+    .archetype-block h1 {
+      font-size: 48px;
     }
 
-    .type-column p {
-      max-width: 340px;
+    .archetype-block p {
+      max-width: 330px;
 
-      font-size: 14px;
+      font-size: 13px;
     }
 
-    .answer-summary {
-      gap: 12px;
+    .chaos-stats {
+      width: 100%;
+      height: auto;
 
-      margin-top: 23px;
+      gap: 20px;
 
+      margin-top: 32px;
+    }
+
+    .chaos-stat {
+      gap: 5px;
+    }
+
+    .chaos-stat strong {
+      font-size: 28px;
+    }
+
+    .chaos-stat span {
+      font-size: 9px;
+    }
+
+    .insights {
       padding:
-        10px
-        15px;
-    }
-
-    .summary-item {
-      gap: 4px;
-    }
-
-    .summary-item strong {
-      font-size: 19px;
-    }
-
-    .summary-item span {
-      font-size: 10px;
-    }
-
-    .summary-line {
-      height: 20px;
-    }
-
-    .insights-section {
-      padding:
-        52px
+        47px
         0
-        58px;
+        65px;
     }
 
-    .section-heading {
-      margin-bottom: 22px;
+    .insights-intro {
+      margin-bottom: 25px;
     }
 
-    .section-heading h2 {
-      font-size: 39px;
+    .insight-layout {
+      gap: 13px;
     }
 
-    .insight-grid {
-      gap: 10px;
+    .insight-card,
+    .insight-card.offset {
+      padding: 22px;
+
+      box-shadow:
+        5px 5px 0
+        #D8CDD0;
     }
 
-    .insight-card {
-      padding: 19px;
+    .insight-number {
+      font-size: 40px;
+    }
 
-      border-radius: 18px;
+    .insight-kicker {
+      margin-top: 18px;
+    }
+
+    .insight-card h3 {
+      font-size: 28px;
     }
 
     .insight-card p {
-      margin-top: 20px;
-
-      font-size: 17px;
-    }
-
-    .question-section {
-      padding:
-        48px
-        16px;
+      font-size: 13px;
     }
 
     .question-shell {
+      width:
+        calc(100% - 30px);
+
+      min-height: auto;
+
       grid-template-columns: 1fr;
 
-      gap: 25px;
+      gap: 10px;
 
-      width: 100%;
+      padding:
+        40px
+        0
+        50px;
     }
 
-    .question-visual {
-      height: 175px;
+    .question-art {
+      height: 180px;
     }
 
-    .moon {
-      width: 145px;
-      height: 145px;
+    .pixel-moon {
+      left: 50%;
 
-      font-size: 58px;
+      width: 140px;
+      height: 140px;
+
+      transform:
+        translateX(-50%);
     }
 
-    .tiny-person {
-      width: 53px;
-      height: 64px;
+    .pixel-moon::after {
+      width: 110px;
+      height: 155px;
+    }
 
-      border-width: 2px;
+    .sitting-pair {
+      left: 50%;
 
-      font-size: 23px;
+      transform:
+        translateX(-50%);
+    }
+
+    .sitter {
+      width: 44px;
+      height: 62px;
     }
 
     .question-copy {
@@ -2241,58 +2817,56 @@ const styles = `
     }
 
     .question-copy h2 {
-      max-width: 390px;
-
       margin:
         11px
         auto
         0;
 
-      font-size: 32px;
+      font-size: 31px;
     }
 
-    .question-copy p {
-      margin-top: 14px;
-    }
-
-    .paywall-section {
+    .paywall {
       padding:
-        55px
-        16px
+        58px
+        0
         65px;
     }
 
-    .paywall-shell {
+    .paywall-layout {
       grid-template-columns: 1fr;
 
-      gap: 27px;
+      gap: 30px;
     }
 
-    .paywall-copy {
-      text-align: center;
+    .paywall-note {
+      position: static;
+
+      margin-bottom: 25px;
+
+      transform:
+        rotate(-4deg);
+    }
+
+    .eyebrow {
+      margin-left: 0;
     }
 
     .paywall-copy h2 {
-      margin:
-        10px
-        auto
-        15px;
-
-      font-size: 39px;
+      font-size: 43px;
     }
 
-    .paywall-copy p {
-      margin:
-        0
-        auto;
-
-      font-size: 14px;
-    }
-
-    .paywall-card {
+    .paywall-action {
       padding: 20px;
 
-      border-radius: 20px;
+      box-shadow:
+        6px 6px 0
+        #CDB6BE;
+    }
+
+    .paywall-items {
+      grid-template-columns: 1fr;
+
+      gap: 12px;
     }
 
   }
@@ -2303,7 +2877,8 @@ const styles = `
   ) {
 
     * {
-      scroll-behavior: auto !important;
+      scroll-behavior:
+        auto !important;
 
       animation-duration:
         0.01ms !important;
