@@ -1,0 +1,140 @@
+{
+  "version": 3,
+  "pages404": true,
+  "appType": "app",
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "priority": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "onMatchHeaders": [],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [],
+    "fallback": []
+  },
+  "dynamicRoutes": [
+    {
+      "page": "/invite/[token]",
+      "regex": "^/invite/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPtoken": "nxtPtoken"
+      },
+      "namedRegex": "^/invite/(?<nxtPtoken>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/report/[coupleId]",
+      "regex": "^/report/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPcoupleId": "nxtPcoupleId"
+      },
+      "namedRegex": "^/report/(?<nxtPcoupleId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/result/[coupleId]",
+      "regex": "^/result/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPcoupleId": "nxtPcoupleId"
+      },
+      "namedRegex": "^/result/(?<nxtPcoupleId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/test/[coupleId]",
+      "regex": "^/test/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPcoupleId": "nxtPcoupleId"
+      },
+      "namedRegex": "^/test/(?<nxtPcoupleId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/waiting/[coupleId]",
+      "regex": "^/waiting/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPcoupleId": "nxtPcoupleId"
+      },
+      "namedRegex": "^/waiting/(?<nxtPcoupleId>[^/]+?)(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_global-error",
+      "regex": "^/_global\\-error(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_global\\-error(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/api/answers",
+      "regex": "^/api/answers(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/answers(?:/)?$"
+    },
+    {
+      "page": "/api/couples",
+      "regex": "^/api/couples(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/couples(?:/)?$"
+    },
+    {
+      "page": "/api/payment",
+      "regex": "^/api/payment(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/payment(?:/)?$"
+    },
+    {
+      "page": "/api/report",
+      "regex": "^/api/report(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/report(?:/)?$"
+    },
+    {
+      "page": "/api/webhook/yookassa",
+      "regex": "^/api/webhook/yookassa(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/webhook/yookassa(?:/)?$"
+    },
+    {
+      "page": "/start",
+      "regex": "^/start(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/start(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments",
+    "clientParamParsing": false,
+    "dynamicRSCPrerender": false
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}

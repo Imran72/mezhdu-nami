@@ -1,0 +1,16 @@
+{
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/answers/route": "app/api/answers/route.js",
+  "/api/couples/route": "app/api/couples/route.js",
+  "/api/payment/route": "app/api/payment/route.js",
+  "/api/report/route": "app/api/report/route.js",
+  "/api/webhook/yookassa/route": "app/api/webhook/yookassa/route.js",
+  "/invite/[token]/page": "app/invite/[token]/page.js",
+  "/page": "app/page.js",
+  "/report/[coupleId]/page": "app/report/[coupleId]/page.js",
+  "/result/[coupleId]/page": "app/result/[coupleId]/page.js",
+  "/start/page": "app/start/page.js",
+  "/test/[coupleId]/page": "app/test/[coupleId]/page.js",
+  "/waiting/[coupleId]/page": "app/waiting/[coupleId]/page.js"
+}

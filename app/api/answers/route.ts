@@ -1,2 +1,2 @@
-import {NextResponse} from 'next/server';import {admin} from '../../Desktop/mezhdu-nami/lib/supabase';
+import {NextResponse} from 'next/server';import { admin } from '../../../lib/supabase';
 export async function POST(req:Request){const {coupleId,role,answers}=await req.json();const db=admin();const rows=Object.entries(answers).map(([question_id,answer_value])=>({couple_id:coupleId,role,question_id,answer_value:String(answer_value)}));const {error}=await db.from('answers').upsert(rows,{onConflict:'couple_id,role,question_id'});if(error)return NextResponse.json({error:error.message},{status:500});await db.from('couples').update(role==='a'?{partner_a_completed:true}:{partner_b_completed:true}).eq('id',coupleId);return NextResponse.json({ok:true})}
