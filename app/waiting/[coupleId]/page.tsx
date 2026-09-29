@@ -39,7 +39,6 @@ export default function WaitingPage() {
 
             setCouple(data);
 
-            // Если оба уже закончили — сразу открываем результат.
             if (data.partner_a_completed && data.partner_b_completed) {
                 router.replace(`/result/${coupleId}`);
             }
@@ -53,8 +52,6 @@ export default function WaitingPage() {
     useEffect(() => {
         loadCouple();
 
-        // Проверяем раз в несколько секунд:
-        // вдруг партнёр уже закончил тест.
         const interval = setInterval(() => {
             loadCouple();
         }, 5000);
@@ -78,7 +75,9 @@ export default function WaitingPage() {
         return (
             <main className="waiting-page">
                 <div className="waiting-container">
-                    <h1>Не удалось найти пару</h1>
+                    <h1 className="waiting-title">
+                        Не удалось найти пару
+                    </h1>
 
                     <p className="waiting-description">
                         Возможно, ссылка устарела или была открыта неправильно.
@@ -114,7 +113,6 @@ export default function WaitingPage() {
         } catch (error) {
             console.error('Clipboard error:', error);
 
-            // Fallback для старых браузеров
             const textarea = document.createElement('textarea');
 
             textarea.value = inviteUrl;
@@ -152,8 +150,6 @@ export default function WaitingPage() {
 
             await copyInviteLink();
         } catch (error) {
-            // AbortError означает, что пользователь
-            // просто закрыл системное меню Share.
             if (
                 error instanceof DOMException &&
                 error.name === 'AbortError'
@@ -171,47 +167,38 @@ export default function WaitingPage() {
         <main className="waiting-page">
             <div className="waiting-container">
 
-                {/* VISUAL */}
-
                 <div className="couple-visual">
                     <div className="couple-circle couple-circle-left" />
                     <div className="couple-circle couple-circle-right" />
                 </div>
 
-                {/* STATUS */}
-
                 <div className="waiting-status">
                     1 ИЗ 2 ГОТОВ
                 </div>
-
-                {/* TITLE */}
 
                 <h1 className="waiting-title">
                     Твоя часть готова.
                 </h1>
 
                 <p className="waiting-description">
-                    Теперь нужен ответ {couple.partner_b_name}, чтобы увидеть
-                    картину целиком.
+                    Теперь очередь:{' '}
+                    <strong>{couple.partner_b_name}</strong>.
+                    <br />
+                    После второго ответа вы увидите картину целиком.
                 </p>
-
-                {/* SHARE BUTTON */}
 
                 <button
                     type="button"
                     className="waiting-share-button"
                     onClick={shareInvite}
                 >
-                    Пригласить {couple.partner_b_name}
+                    Отправить приглашение
                 </button>
-
-                {/* PERSONAL LINK */}
 
                 <div className="invite-link-section">
 
                     <div className="invite-link-label">
-                        ПЕРСОНАЛЬНАЯ ССЫЛКА ДЛЯ{' '}
-                        {couple.partner_b_name.toUpperCase()}
+                        ССЫЛКА ДЛЯ ПАРТНЁРА
                     </div>
 
                     <div className="invite-link-box">
@@ -235,8 +222,7 @@ export default function WaitingPage() {
                 </div>
 
                 <p className="waiting-note">
-                    Мы автоматически откроем результат, когда{' '}
-                    {couple.partner_b_name} закончит.
+                    Результат откроется автоматически, когда вы оба закончите.
                 </p>
 
             </div>
@@ -267,8 +253,6 @@ export default function WaitingPage() {
           text-align: center;
         }
 
-        /* VISUAL */
-
         .couple-visual {
           position: relative;
 
@@ -290,17 +274,13 @@ export default function WaitingPage() {
 
         .couple-circle-left {
           left: 0;
-
           background: rgba(173, 75, 111, 0.42);
         }
 
         .couple-circle-right {
           right: 0;
-
           background: rgba(217, 166, 184, 0.38);
         }
-
-        /* STATUS */
 
         .waiting-status {
           color: #a9476b;
@@ -312,8 +292,6 @@ export default function WaitingPage() {
 
           margin-bottom: 22px;
         }
-
-        /* TITLE */
 
         .waiting-title {
           margin: 0;
@@ -347,7 +325,10 @@ export default function WaitingPage() {
           line-height: 1.45;
         }
 
-        /* PRIMARY BUTTON */
+        .waiting-description strong {
+          color: #171515;
+          font-weight: 600;
+        }
 
         .waiting-share-button {
           width: 100%;
@@ -378,8 +359,6 @@ export default function WaitingPage() {
         .waiting-share-button:active {
           transform: scale(0.985);
         }
-
-        /* PERSONAL LINK */
 
         .invite-link-section {
           width: 100%;
@@ -476,8 +455,6 @@ export default function WaitingPage() {
           color: #52705a;
         }
 
-        /* NOTE */
-
         .waiting-note {
           margin-top: 20px;
 
@@ -494,8 +471,6 @@ export default function WaitingPage() {
 
           font-size: 18px;
         }
-
-        /* MOBILE */
 
         @media (max-width: 600px) {
 
