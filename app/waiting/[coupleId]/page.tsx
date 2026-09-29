@@ -1,187 +1,76 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { questions } from '../../../lib/questions';
+import { useEffect, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 
-type AnswerValue = string | number;
+type Couple = {
+    id: string;
+    partner_a_name: string;
+    partner_b_name: string;
+    invite_token: string;
+    partner_a_completed?: boolean;
+    partner_b_completed?: boolean;
+};
 
-type Answers = Record<string, AnswerValue>;
-
-export default function TestPage() {
+export default function WaitingPage() {
     const params = useParams<{ coupleId: string }>();
-    const searchParams = useSearchParams();
     const router = useRouter();
 
     const coupleId = params.coupleId;
 
-    // Первый участник приходит без role.
-    // Второй — по ссылке /test/.../?role=b
-    const role = searchParams.get('role') === 'b' ? 'b' : 'a';
-
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [answers, setAnswers] = useState<Answers>({});
-    const [submitting, setSubmitting] = useState(false);
-    const [checking, setChecking] = useState(true);
+    const [couple, setCouple] = useState<Couple | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [copied, setCopied] = useState(false);
     const [error, setError] = useState('');
 
-    const currentQuestion = questions[currentIndex];
-
-    const progress = useMemo(() => {
-        if (!questions.length) {
-            return 0;
-        }
-
-        return ((currentIndex + 1) / questions.length) * 100;
-    }, [currentIndex]);
-
-    /*
-     * При открытии теста проверяем состояние пары.
-     *
-     * Если оба уже прошли — сразу результат.
-     * Если конкретный участник уже отвечал — не даём
-     * ему проходить тест повторно.
-     */
-    useEffect(() => {
-        async function checkCouple() {
-            try {
-                const response = await fetch(
-                    `/api/couples?id=${encodeURIComponent(coupleId)}`,
-                    {
-                        cache: 'no-store',
-                    }
-                );
-
-                if (!response.ok) {
-                    throw new Error('Не удалось загрузить данные пары');
-                }
-
-                const couple = await response.json();
-
-                if (
-                    couple.partner_a_completed &&
-                    couple.partner_b_completed
-                ) {
-                    router.replace(`/result/${coupleId}`);
-                    return;
-                }
-
-                if (
-                    role === 'a' &&
-                    couple.partner_a_completed
-                ) {
-                    router.replace(`/waiting/${coupleId}`);
-                    return;
-                }
-
-                if (
-                    role === 'b' &&
-                    couple.partner_b_completed
-                ) {
-                    if (couple.partner_a_completed) {
-                        router.replace(`/result/${coupleId}`);
-                    } else {
-                        router.replace(`/waiting/${coupleId}`);
-                    }
-
-                    return;
-                }
-            } catch (err) {
-                console.error(err);
-            } finally {
-                setChecking(false);
-            }
-        }
-
-        checkCouple();
-    }, [coupleId, role, router]);
-
-    function saveAnswer(value: AnswerValue) {
-        if (!currentQuestion) {
-            return;
-        }
-
-        const newAnswers = {
-            ...answers,
-            [currentQuestion.id]: value,
-        };
-
-        setAnswers(newAnswers);
-
-        if (currentIndex < questions.length - 1) {
-            setCurrentIndex((index) => index + 1);
-            return;
-        }
-
-        submitAnswers(newAnswers);
-    }
-
-    async function submitAnswers(finalAnswers: Answers) {
-        if (submitting) {
-            return;
-        }
-
-        setSubmitting(true);
-        setError('');
-
+    async function loadCouple() {
         try {
-            const response = await fetch('/api/answers', {
-                method: 'POST',
-
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-
-                body: JSON.stringify({
-                    coupleId,
-                    role,
-                    answers: finalAnswers,
-                }),
-            });
-
-            if (!response.ok) {
-                const responseText = await response.text();
-
-                console.error(
-                    'Answers API error:',
-                    response.status,
-                    responseText
-                );
-
-                throw new Error('Не удалось сохранить ответы');
-            }
-
-            /*
-             * КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ:
-             *
-             * Первый участник:
-             * test → waiting
-             *
-             * Второй участник:
-             * test → result
-             */
-            if (role === 'b') {
-                router.replace(`/result/${coupleId}`);
-                return;
-            }
-
-            router.replace(`/waiting/${coupleId}`);
-        } catch (err) {
-            console.error(err);
-
-            setError(
-                'Не получилось сохранить ответы. Попробуй ещё раз.'
+            const response = await fetch(
+                `/api/couples?id=${encodeURIComponent(coupleId)}`,
+                {
+                    cache: 'no-store',
+                }
             );
 
-            setSubmitting(false);
+            if (!response.ok) {
+                throw new Error('Не удалось загрузить пару');
+            }
+
+            const data: Couple = await response.json();
+
+            setCouple(data);
+
+            if (
+                data.partner_a_completed &&
+                data.partner_b_completed
+            ) {
+                router.replace(`/result/${coupleId}`);
+            }
+        } catch (err) {
+            console.error(err);
+            setError('Не удалось загрузить данные пары.');
+        } finally {
+            setLoading(false);
         }
     }
 
-    if (checking) {
+    useEffect(() => {
+        loadCouple();
+
+        const interval = window.setInterval(() => {
+            loadCouple();
+        }, 5000);
+
+        return () => {
+            window.clearInterval(interval);
+        };
+    }, [coupleId]);
+
+    if (loading) {
         return (
-            <main className="test-page">
-                <div className="test-shell">
-                    <div className="loading">
+            <main className="waiting-page">
+                <div className="waiting-container">
+                    <div className="loading-text">
                         Загружаем...
                     </div>
                 </div>
@@ -191,13 +80,18 @@ export default function TestPage() {
         );
     }
 
-    if (!currentQuestion) {
+    if (error || !couple) {
         return (
-            <main className="test-page">
-                <div className="test-shell">
-                    <div className="loading">
-                        Вопросы не найдены.
-                    </div>
+            <main className="waiting-page">
+                <div className="waiting-container">
+                    <h1 className="waiting-title">
+                        Не удалось найти пару
+                    </h1>
+
+                    <p className="waiting-description">
+                        {error ||
+                            'Возможно, ссылка устарела или была открыта неправильно.'}
+                    </p>
                 </div>
 
                 <style jsx>{styles}</style>
@@ -205,398 +99,229 @@ export default function TestPage() {
         );
     }
 
+    const siteUrl =
+        process.env.NEXT_PUBLIC_SITE_URL ||
+        (typeof window !== 'undefined'
+            ? window.location.origin
+            : '');
+
+    const inviteUrl =
+        `${siteUrl}/invite/${couple.invite_token}`;
+
+    const shareText =
+        'Я прошёл небольшой тест про наши отношения 👀\n\n' +
+        'Теперь твоя очередь. Ответь отдельно от меня — ' +
+        'потом посмотрим, насколько одинаково мы воспринимаем наши отношения.';
+
+    async function copyInviteLink() {
+        try {
+            await navigator.clipboard.writeText(inviteUrl);
+
+            setCopied(true);
+
+            window.setTimeout(() => {
+                setCopied(false);
+            }, 2000);
+        } catch (err) {
+            console.error(err);
+
+            const textarea =
+                document.createElement('textarea');
+
+            textarea.value = inviteUrl;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+
+            document.body.appendChild(textarea);
+
+            textarea.focus();
+            textarea.select();
+
+            document.execCommand('copy');
+
+            document.body.removeChild(textarea);
+
+            setCopied(true);
+
+            window.setTimeout(() => {
+                setCopied(false);
+            }, 2000);
+        }
+    }
+
+    async function shareInvite() {
+        try {
+            if (navigator.share) {
+                await navigator.share({
+                    title: 'между нами',
+                    text: shareText,
+                    url: inviteUrl,
+                });
+
+                return;
+            }
+
+            await copyInviteLink();
+        } catch (err) {
+            if (
+                err instanceof DOMException &&
+                err.name === 'AbortError'
+            ) {
+                return;
+            }
+
+            console.error(err);
+
+            await copyInviteLink();
+        }
+    }
+
     return (
-        <main className="test-page">
+        <main className="waiting-page">
+            <div className="waiting-container">
 
-            <div className="test-shell">
+                <div className="couple-visual">
+                    <div className="couple-circle couple-circle-left" />
+                    <div className="couple-circle couple-circle-right" />
+                </div>
 
-                <div className="top">
+                <div className="waiting-status">
+                    1 ИЗ 2 ГОТОВ
+                </div>
 
-                    <div className="question-counter">
-                        {currentIndex + 1} / {questions.length}
+                <h1 className="waiting-title">
+                    Твоя часть готова.
+                </h1>
+
+                <p className="waiting-description">
+                    Теперь очередь:{' '}
+                    <strong>
+                        {couple.partner_b_name}
+                    </strong>
+                    .
+                    <br />
+                    После второго ответа вы увидите картину целиком.
+                </p>
+
+                <button
+                    type="button"
+                    className="waiting-share-button"
+                    onClick={shareInvite}
+                >
+                    Отправить приглашение
+                </button>
+
+                <div className="invite-link-section">
+
+                    <div className="invite-link-label">
+                        ССЫЛКА ДЛЯ ПАРТНЁРА
                     </div>
 
-                    <div className="progress-track">
-                        <div
-                            className="progress-value"
-                            style={{
-                                width: `${progress}%`,
-                            }}
-                        />
+                    <div className="invite-link-box">
+
+                        <div className="invite-link-value">
+                            {inviteUrl}
+                        </div>
+
+                        <button
+                            type="button"
+                            className={
+                                copied
+                                    ? 'invite-copy-button copied'
+                                    : 'invite-copy-button'
+                            }
+                            onClick={copyInviteLink}
+                        >
+                            {copied
+                                ? 'Скопировано ✓'
+                                : 'Копировать'}
+                        </button>
+
                     </div>
 
                 </div>
 
-                <div className="question-area">
-
-                    <div className="question-number">
-                        ВОПРОС {currentIndex + 1}
-                    </div>
-
-                    <h1 className="question-title">
-                        {currentQuestion.text}
-                    </h1>
-
-                    {'subtitle' in currentQuestion &&
-                        currentQuestion.subtitle && (
-                            <p className="question-subtitle">
-                                {currentQuestion.subtitle}
-                            </p>
-                        )}
-
-                    <QuestionInput
-                        question={currentQuestion}
-                        disabled={submitting}
-                        onAnswer={saveAnswer}
-                    />
-
-                    {submitting && (
-                        <div className="saving">
-                            Сохраняем ответы...
-                        </div>
-                    )}
-
-                    {error && (
-                        <div className="error">
-                            {error}
-                        </div>
-                    )}
-
-                </div>
+                <p className="waiting-note">
+                    Результат откроется автоматически,
+                    когда вы оба закончите.
+                </p>
 
             </div>
 
             <style jsx>{styles}</style>
-
         </main>
-    );
-}
-
-function QuestionInput({
-                           question,
-                           onAnswer,
-                           disabled,
-                       }: {
-    question: any;
-    onAnswer: (value: AnswerValue) => void;
-    disabled: boolean;
-}) {
-    /*
-     * Если в questions.ts есть options,
-     * показываем варианты ответа.
-     */
-    if (
-        Array.isArray(question.options) &&
-        question.options.length > 0
-    ) {
-        return (
-            <div className="answers">
-                {question.options.map(
-                    (
-                        option:
-                            | string
-                            | {
-                            label?: string;
-                            value?: string | number;
-                        },
-                        index: number
-                    ) => {
-                        const label =
-                            typeof option === 'string'
-                                ? option
-                                : option.label ??
-                                String(option.value ?? '');
-
-                        const value =
-                            typeof option === 'string'
-                                ? option
-                                : option.value ?? option.label ?? index;
-
-                        return (
-                            <button
-                                key={`${question.id}-${index}`}
-                                type="button"
-                                className="answer-button"
-                                disabled={disabled}
-                                onClick={() => onAnswer(value)}
-                            >
-                                {label}
-                            </button>
-                        );
-                    }
-                )}
-
-                <style jsx>{`
-          .answers {
-            width: 100%;
-
-            display: flex;
-            flex-direction: column;
-
-            gap: 12px;
-
-            margin-top: 34px;
-          }
-
-          .answer-button {
-            width: 100%;
-
-            border: 1px solid #e4d9d7;
-            border-radius: 18px;
-
-            background: #ffffff;
-            color: #171515;
-
-            padding: 19px 22px;
-
-            text-align: left;
-
-            font-size: 17px;
-            line-height: 1.35;
-
-            cursor: pointer;
-
-            transition:
-              border-color 150ms ease,
-              background 150ms ease,
-              transform 150ms ease;
-          }
-
-          .answer-button:hover {
-            border-color: #b65c7c;
-            background: #fcf7f8;
-          }
-
-          .answer-button:active {
-            transform: scale(0.99);
-          }
-
-          .answer-button:disabled {
-            opacity: 0.5;
-            cursor: default;
-          }
-        `}</style>
-            </div>
-        );
-    }
-
-    /*
-     * Fallback для текстового вопроса.
-     */
-    return (
-        <TextAnswer
-            disabled={disabled}
-            onAnswer={onAnswer}
-        />
-    );
-}
-
-function TextAnswer({
-                        onAnswer,
-                        disabled,
-                    }: {
-    onAnswer: (value: string) => void;
-    disabled: boolean;
-}) {
-    const [value, setValue] = useState('');
-
-    function submit() {
-        const cleanValue = value.trim();
-
-        if (!cleanValue || disabled) {
-            return;
-        }
-
-        onAnswer(cleanValue);
-    }
-
-    return (
-        <div className="text-answer">
-
-      <textarea
-          className="textarea"
-          value={value}
-          disabled={disabled}
-          placeholder="Напиши свой ответ..."
-          onChange={(event) => {
-              setValue(event.target.value);
-          }}
-      />
-
-            <button
-                type="button"
-                className="continue-button"
-                disabled={!value.trim() || disabled}
-                onClick={submit}
-            >
-                Продолжить
-            </button>
-
-            <style jsx>{`
-
-        .text-answer {
-          width: 100%;
-
-          display: flex;
-          flex-direction: column;
-
-          gap: 14px;
-
-          margin-top: 34px;
-        }
-
-        .textarea {
-          width: 100%;
-          min-height: 140px;
-
-          box-sizing: border-box;
-
-          resize: vertical;
-
-          border: 1px solid #e4d9d7;
-          border-radius: 18px;
-
-          outline: none;
-
-          background: #ffffff;
-          color: #171515;
-
-          padding: 18px;
-
-          font: inherit;
-          font-size: 17px;
-          line-height: 1.5;
-
-          transition: border-color 150ms ease;
-        }
-
-        .textarea:focus {
-          border-color: #b65c7c;
-        }
-
-        .continue-button {
-          width: 100%;
-
-          border: 0;
-          border-radius: 18px;
-
-          background: #171515;
-          color: #ffffff;
-
-          padding: 19px 22px;
-
-          font-size: 17px;
-          font-weight: 650;
-
-          cursor: pointer;
-
-          transition:
-            opacity 150ms ease,
-            transform 150ms ease;
-        }
-
-        .continue-button:hover:not(:disabled) {
-          opacity: 0.92;
-        }
-
-        .continue-button:active:not(:disabled) {
-          transform: scale(0.99);
-        }
-
-        .continue-button:disabled {
-          opacity: 0.35;
-          cursor: default;
-        }
-
-      `}</style>
-        </div>
     );
 }
 
 const styles = `
 
-  .test-page {
+  .waiting-page {
     min-height: 100svh;
-
     box-sizing: border-box;
 
     background: #faf8f6;
 
+    display: flex;
+    justify-content: center;
+
     padding:
-      max(30px, env(safe-area-inset-top))
+      max(48px, env(safe-area-inset-top))
       20px
       max(40px, env(safe-area-inset-bottom));
   }
 
-  .test-shell {
+  .waiting-container {
     width: 100%;
     max-width: 760px;
 
-    margin: 0 auto;
-  }
-
-  .top {
-    width: 100%;
-
     display: flex;
+    flex-direction: column;
     align-items: center;
 
-    gap: 18px;
+    text-align: center;
   }
 
-  .question-counter {
-    flex-shrink: 0;
+  .couple-visual {
+    position: relative;
 
-    color: #9a8f92;
+    width: 250px;
+    height: 145px;
 
-    font-size: 12px;
-    font-weight: 700;
-
-    letter-spacing: 0.08em;
+    margin-top: 105px;
+    margin-bottom: 34px;
   }
 
-  .progress-track {
-    flex: 1;
+  .couple-circle {
+    position: absolute;
 
-    height: 4px;
+    width: 145px;
+    height: 145px;
 
-    overflow: hidden;
-
-    border-radius: 999px;
-
-    background: #eadfe1;
+    border-radius: 50%;
   }
 
-  .progress-value {
-    height: 100%;
-
-    border-radius: inherit;
-
-    background: #b14e73;
-
-    transition: width 250ms ease;
+  .couple-circle-left {
+    left: 0;
+    background: rgba(173, 75, 111, 0.42);
   }
 
-  .question-area {
-    width: 100%;
-
-    margin-top: 120px;
+  .couple-circle-right {
+    right: 0;
+    background: rgba(217, 166, 184, 0.38);
   }
 
-  .question-number {
-    margin-bottom: 18px;
+  .waiting-status {
+    margin-bottom: 22px;
 
     color: #a9476b;
 
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 15px;
+    font-weight: 600;
 
-    letter-spacing: 0.13em;
+    letter-spacing: 0.14em;
   }
 
-  .question-title {
-    max-width: 720px;
-
+  .waiting-title {
     margin: 0;
 
     color: #171515;
@@ -606,76 +331,198 @@ const styles = `
       'Times New Roman',
       serif;
 
-    font-size: clamp(38px, 5vw, 58px);
-    line-height: 1.02;
+    font-size: clamp(48px, 6vw, 72px);
+    line-height: 0.98;
 
     font-weight: 500;
 
-    letter-spacing: -0.035em;
+    letter-spacing: -0.04em;
   }
 
-  .question-subtitle {
-    max-width: 650px;
+  .waiting-description {
+    max-width: 720px;
 
-    margin:
-      20px
-      0
-      0;
+    margin: 30px auto;
 
     color: #81777a;
 
-    font-size: 17px;
-    line-height: 1.5;
+    font-size: 21px;
+    line-height: 1.45;
   }
 
-  .saving {
-    margin-top: 18px;
+  .waiting-description strong {
+    color: #171515;
+    font-weight: 600;
+  }
+
+  .waiting-share-button {
+    width: 100%;
+
+    border: 0;
+    border-radius: 20px;
+
+    background: #171515;
+    color: #ffffff;
+
+    padding: 23px 24px;
+
+    font-size: 19px;
+    font-weight: 650;
+
+    cursor: pointer;
+  }
+
+  .waiting-share-button:hover {
+    opacity: 0.92;
+  }
+
+  .invite-link-section {
+    width: 100%;
+
+    margin-top: 28px;
+
+    text-align: left;
+  }
+
+  .invite-link-label {
+    margin: 0 0 10px 4px;
+
+    color: #9a8f92;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    letter-spacing: 0.12em;
+  }
+
+  .invite-link-box {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+
+    box-sizing: border-box;
+
+    padding: 9px 9px 9px 18px;
+
+    border: 1px solid #e6ddda;
+    border-radius: 18px;
+
+    background: #ffffff;
+  }
+
+  .invite-link-value {
+    flex: 1;
+    min-width: 0;
+
+    overflow: hidden;
+
+    color: #5f5759;
+
+    font-size: 14px;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .invite-copy-button {
+    flex-shrink: 0;
+
+    border: 0;
+    border-radius: 12px;
+
+    background: #f1e6e9;
+    color: #9f4667;
+
+    padding: 12px 16px;
+
+    font-size: 13px;
+    font-weight: 650;
+
+    cursor: pointer;
+  }
+
+  .invite-copy-button.copied {
+    background: #e8efe9;
+    color: #52705a;
+  }
+
+  .waiting-note {
+    margin-top: 20px;
 
     color: #93898b;
 
     font-size: 14px;
-
-    text-align: center;
+    line-height: 1.5;
   }
 
-  .error {
-    margin-top: 18px;
-
-    color: #a9476b;
-
-    font-size: 14px;
-    line-height: 1.45;
-
-    text-align: center;
-  }
-
-  .loading {
-    padding-top: 45vh;
+  .loading-text {
+    margin-top: 45vh;
 
     color: #81777a;
 
     font-size: 18px;
-
-    text-align: center;
   }
 
   @media (max-width: 600px) {
 
-    .test-page {
+    .waiting-page {
       padding-left: 18px;
       padding-right: 18px;
     }
 
-    .question-area {
-      margin-top: 70px;
+    .couple-visual {
+      width: 190px;
+      height: 112px;
+
+      margin-top: 55px;
+      margin-bottom: 28px;
     }
 
-    .question-title {
-      font-size: 40px;
+    .couple-circle {
+      width: 112px;
+      height: 112px;
     }
 
-    .question-subtitle {
-      font-size: 16px;
+    .waiting-status {
+      font-size: 12px;
+      margin-bottom: 18px;
+    }
+
+    .waiting-title {
+      font-size: 48px;
+    }
+
+    .waiting-description {
+      margin-top: 22px;
+      margin-bottom: 26px;
+
+      font-size: 17px;
+    }
+
+    .waiting-share-button {
+      padding: 19px 20px;
+
+      border-radius: 17px;
+
+      font-size: 17px;
+    }
+
+    .invite-link-box {
+      gap: 8px;
+      padding-left: 14px;
+    }
+
+    .invite-link-value {
+      font-size: 12px;
+    }
+
+    .invite-copy-button {
+      padding: 11px 12px;
+
+      font-size: 12px;
     }
 
   }
