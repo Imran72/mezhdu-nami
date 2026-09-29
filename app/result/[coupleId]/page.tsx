@@ -28,22 +28,13 @@ type Couple = {
 
 type ResultData = {
     waiting?: boolean;
-
     couple: Couple;
-
     comparisons?: Comparison[];
 
     highlights?: {
         same?: Comparison[];
         close?: Comparison[];
         different?: Comparison[];
-    };
-
-    scores?: {
-        overall?: number;
-        sameAnswers?: number;
-        closeAnswers?: number;
-        differentAnswers?: number;
     };
 };
 
@@ -55,10 +46,13 @@ export default function ResultPage() {
 
     const router = useRouter();
 
-    const coupleId = params.coupleId;
+    const coupleId =
+        params.coupleId;
 
     const [data, setData] =
-        useState<ResultData | null>(null);
+        useState<ResultData | null>(
+            null
+        );
 
     const [error, setError] =
         useState('');
@@ -148,13 +142,33 @@ export default function ResultPage() {
                 'close'
         ).length;
 
-    const comparedCount =
+    const differentCount =
+        comparisons.filter(
+            (item) =>
+                item.similarity ===
+                'different'
+        ).length;
+
+    const totalCount =
         comparisons.length;
+
+    const wavePercent =
+        totalCount > 0
+            ? Math.round(
+                (
+                    sameCount +
+                    closeCount * 0.5
+                ) /
+                totalCount *
+                100
+            )
+            : 0;
 
     if (error) {
         return (
             <>
                 <main className="state-page">
+
                     <div className="state-shell">
 
                         <div className="brand">
@@ -170,10 +184,11 @@ export default function ResultPage() {
                         </p>
 
                     </div>
+
                 </main>
 
                 <style jsx global>
-                    {globalStyles}
+                    {styles}
                 </style>
             </>
         );
@@ -184,29 +199,29 @@ export default function ResultPage() {
             <>
                 <main className="loading-page">
 
-                    <div className="loading-art">
+                    <div className="loading-circles">
 
-                        <span className="loading-orbit orbit-a" />
-                        <span className="loading-orbit orbit-b" />
+                        <span />
+                        <span />
 
-                        <span className="loading-star">
-              ✦
-            </span>
+                        <b>
+                            ✦
+                        </b>
 
                     </div>
 
-                    <div className="loading-title">
+                    <div className="loading-brand">
                         между нами
                     </div>
 
-                    <div className="loading-copy">
-                        собираем вашу историю...
-                    </div>
+                    <p>
+                        сравниваем ваши ответы...
+                    </p>
 
                 </main>
 
                 <style jsx global>
-                    {globalStyles}
+                    {styles}
                 </style>
             </>
         );
@@ -223,30 +238,20 @@ export default function ResultPage() {
             <main className="page">
 
                 {/* =====================================================
-            HERO + RESULT
+            HERO
         ===================================================== */}
 
                 <section className="hero">
 
-                    <Decoration
-                        className="hero-star hero-star-one"
-                    >
+                    <div className="hero-decoration star-one">
                         ✦
-                    </Decoration>
+                    </div>
 
-                    <Decoration
-                        className="hero-star hero-star-two"
-                    >
+                    <div className="hero-decoration star-two">
                         +
-                    </Decoration>
+                    </div>
 
-                    <Decoration
-                        className="hero-dot hero-dot-one"
-                    >
-                        ·
-                    </Decoration>
-
-                    <div className="hero-shell">
+                    <div className="shell">
 
                         <header className="topbar">
 
@@ -254,108 +259,99 @@ export default function ResultPage() {
                                 между нами
                             </div>
 
-                            <div className="topbar-pill">
+                            <div className="result-pill">
                                 результат для двоих
                             </div>
 
                         </header>
 
-                        <div className="hero-grid">
+                        <div className="hero-content">
 
-                            <div className="hero-copy">
+                            <div className="names">
+                                {nameA}
+                                <span>
+                  +
+                </span>
+                                {nameB}
+                            </div>
 
-                                <div className="names">
-                                    {nameA}
-                                    <span>
-                    +
-                  </span>
-                                    {nameB}
-                                </div>
+                            <div className="hero-result">
 
-                                <p className="intro">
+                                <div className="score-column">
 
-                                    Вы одинаково ответили на{' '}
-
-                                    <strong>
-                                        {sameCount}
-                                    </strong>{' '}
-
-                                    из{' '}
-
-                                    <strong>
-                                        {comparedCount}
-                                    </strong>{' '}
-
-                                    вопросов.
-
-                                    <br />
-
-                                    Но ваш результат —
-                                    не про количество
-                                    совпадений.
-
-                                </p>
-
-                                <div className="type-label">
-                                    ВАШ ТИП ПАРЫ
-                                </div>
-
-                                <h1 className="type-title">
-                                    {archetype.title}
-                                </h1>
-
-                                <p className="type-description">
-                                    {archetype.description}
-                                </p>
-
-                                <div className="stats">
-
-                                    <div className="stat">
-
-                                        <strong>
-                                            {sameCount}
-                                        </strong>
-
+                                    <div className="score">
+                                        {wavePercent}
                                         <span>
-                      точных
-                      <br />
-                      совпадения
+                      %
                     </span>
-
                                     </div>
 
-                                    <div className="stat-line" />
-
-                                    <div className="stat">
-
-                                        <strong>
-                                            {closeCount}
-                                        </strong>
-
-                                        <span>
-                      близких
-                      <br />
-                      ответов
-                    </span>
-
+                                    <div className="score-label">
+                                        НА ОДНОЙ ВОЛНЕ
                                     </div>
+
+                                    <p className="score-description">
+                                        Похожесть ваших ответов
+                                        на ситуации из теста
+                                    </p>
+
+                                </div>
+
+                                <div className="hero-art-column">
+
+                                    <CoupleArt
+                                        emojiA={
+                                            archetype.emojiA
+                                        }
+                                        emojiB={
+                                            archetype.emojiB
+                                        }
+                                        archetypeId={
+                                            archetype.id
+                                        }
+                                    />
+
+                                </div>
+
+                                <div className="type-column">
+
+                                    <div className="type-label">
+                                        ВАШ ТИП ПАРЫ
+                                    </div>
+
+                                    <h1>
+                                        {archetype.title}
+                                    </h1>
+
+                                    <p>
+                                        {
+                                            archetype.description
+                                        }
+                                    </p>
 
                                 </div>
 
                             </div>
 
-                            <div className="hero-visual">
+                            <div className="answer-summary">
 
-                                <CoupleIllustration
-                                    archetypeId={
-                                        archetype.id
-                                    }
-                                    emojiA={
-                                        archetype.emojiA
-                                    }
-                                    emojiB={
-                                        archetype.emojiB
-                                    }
+                                <SummaryItem
+                                    value={sameCount}
+                                    label="совпали"
+                                />
+
+                                <div className="summary-line" />
+
+                                <SummaryItem
+                                    value={closeCount}
+                                    label="близко"
+                                />
+
+                                <div className="summary-line" />
+
+                                <SummaryItem
+                                    value={differentCount}
+                                    label="по-разному"
                                 />
 
                             </div>
@@ -364,238 +360,121 @@ export default function ResultPage() {
 
                     </div>
 
-                    <div className="hero-wave">
-                        <svg
-                            viewBox="0 0 1440 110"
-                            preserveAspectRatio="none"
-                            aria-hidden="true"
-                        >
-                            <path
-                                d="
-                  M0,55
-                  C230,110 400,5 650,45
-                  C890,85 1080,110 1440,30
-                  L1440,110
-                  L0,110
-                  Z
-                "
-                                fill="#ffffff"
-                            />
-                        </svg>
-                    </div>
+                    <div className="hero-bottom" />
 
                 </section>
 
                 {/* =====================================================
-            INTRO TO INSIGHTS
+            INSIGHTS
         ===================================================== */}
 
-                <section className="story-section">
+                <section className="insights-section">
 
-                    <div className="content-shell">
+                    <div className="shell">
 
-                        <div className="story-heading">
+                        <div className="section-heading">
 
                             <div className="eyebrow">
                                 ЧТО МЫ ЗАМЕТИЛИ
                             </div>
 
                             <h2>
-                                У вас есть свой способ
-                                быть вместе.
+                                Три вещи про вас.
                             </h2>
-
-                            <p>
-                                Не диагноз и не оценка
-                                совместимости. Просто
-                                несколько вещей, которые
-                                особенно заметны в ваших
-                                ответах.
-                            </p>
 
                         </div>
 
-                        {/* =================================================
-                MATCH
-            ================================================= */}
+                        <div className="insight-grid">
 
-                        <article className="story-row">
+                            <InsightCard
+                                symbol="♥"
+                                title="Вы совпали"
+                                text={
+                                    insights.sameInsight
+                                }
+                            />
 
-                            <div className="story-art">
+                            <InsightCard
+                                symbol="↔"
+                                title="А вот тут интересно"
+                                text={
+                                    insights.differenceInsight
+                                }
+                            />
 
-                                <MiniScene
-                                    variant="heart"
-                                />
+                            <InsightCard
+                                symbol="✦"
+                                title="Ваша суперсила"
+                                text={
+                                    insights.superpower
+                                }
+                            />
 
-                            </div>
-
-                            <div className="story-copy">
-
-                                <div className="story-number">
-                                    01
-                                </div>
-
-                                <div className="story-label">
-                                    В ЧЁМ ВЫ СОВПАЛИ
-                                </div>
-
-                                <h3>
-                                    Здесь вы смотрите
-                                    примерно в одну сторону.
-                                </h3>
-
-                                <p>
-                                    {insights.sameInsight}
-                                </p>
-
-                            </div>
-
-                        </article>
-
-                        {/* =================================================
-                DIFFERENCE
-            ================================================= */}
-
-                        <article className="story-row reverse">
-
-                            <div className="story-art">
-
-                                <MiniScene
-                                    variant="different"
-                                />
-
-                            </div>
-
-                            <div className="story-copy">
-
-                                <div className="story-number">
-                                    02
-                                </div>
-
-                                <div className="story-label">
-                                    А ВОТ ТУТ ИНТЕРЕСНО
-                                </div>
-
-                                <h3>
-                                    Разные ответы —
-                                    не обязательно
-                                    разные стороны.
-                                </h3>
-
-                                <p>
-                                    {
-                                        insights.differenceInsight
-                                    }
-                                </p>
-
-                            </div>
-
-                        </article>
-
-                        {/* =================================================
-                SUPERPOWER
-            ================================================= */}
-
-                        <article className="story-row">
-
-                            <div className="story-art">
-
-                                <MiniScene
-                                    variant="power"
-                                />
-
-                            </div>
-
-                            <div className="story-copy">
-
-                                <div className="story-number">
-                                    03
-                                </div>
-
-                                <div className="story-label">
-                                    ВАША СУПЕРСИЛА
-                                </div>
-
-                                <h3>
-                                    То, что у вас уже
-                                    получается естественно.
-                                </h3>
-
-                                <p>
-                                    {insights.superpower}
-                                </p>
-
-                            </div>
-
-                        </article>
+                        </div>
 
                     </div>
 
                 </section>
 
                 {/* =====================================================
-            QUESTION FOR TWO
+            QUESTION
         ===================================================== */}
 
                 <section className="question-section">
 
-                    <div className="question-decoration question-decoration-one">
+                    <div className="question-star question-star-one">
                         ✦
                     </div>
 
-                    <div className="question-decoration question-decoration-two">
+                    <div className="question-star question-star-two">
                         ✦
                     </div>
 
                     <div className="question-shell">
 
-                        <div className="question-art">
+                        <div className="question-visual">
 
                             <div className="moon">
-                <span>
-                  ☾
-                </span>
+                                ☾
                             </div>
 
-                            <div className="question-people">
+                            <div className="tiny-couple">
 
-                                <div className="question-person">
-                                    {archetype.emojiA}
+                                <div className="tiny-person">
+                                    {
+                                        archetype.emojiA
+                                    }
                                 </div>
 
-                                <div className="question-heart">
-                                    ♥
-                                </div>
+                                <span>
+                  ♥
+                </span>
 
-                                <div className="question-person">
-                                    {archetype.emojiB}
+                                <div className="tiny-person second">
+                                    {
+                                        archetype.emojiB
+                                    }
                                 </div>
 
                             </div>
 
                         </div>
 
-                        <div className="question-content">
+                        <div className="question-copy">
 
                             <div className="question-label">
-                                ОДИН ВОПРОС ВАМ НА ВЕЧЕР
-                            </div>
-
-                            <div className="big-quote">
-                                “
+                                ВОПРОС ВАМ НА ВЕЧЕР
                             </div>
 
                             <h2>
-                                {
-                                    insights.eveningQuestion
-                                }
+                                “{
+                                insights.eveningQuestion
+                            }”
                             </h2>
 
                             <p>
-                                Иногда один хороший
-                                разговор даёт больше,
-                                чем ещё десять вопросов
-                                теста.
+                                Без правильного ответа.
+                                Просто поговорите.
                             </p>
 
                         </div>
@@ -605,118 +484,79 @@ export default function ResultPage() {
                 </section>
 
                 {/* =====================================================
-            PAID REPORT
+            PAYWALL
         ===================================================== */}
 
-                <section className="report-section">
+                <section className="paywall-section">
 
-                    <div className="content-shell">
+                    <div className="paywall-shell">
 
-                        <div className="report-heading">
+                        <div className="paywall-copy">
 
                             <div className="eyebrow">
-                                ГЛУБЖЕ
+                                ХОТИТЕ КОПНУТЬ ГЛУБЖЕ?
                             </div>
 
                             <h2>
-                                Это только верхний слой.
+                                Между ответами
+                                осталось ещё кое-что.
                             </h2>
 
                             <p>
-                                Мы нашли ещё несколько
-                                паттернов, которые не
-                                хочется превращать в
-                                короткую подпись.
+                                В полном разборе покажем
+                                паттерны, которые сложно
+                                увидеть по одному ответу.
                             </p>
 
                         </div>
 
-                        <div className="report-card">
+                        <div className="paywall-card">
 
-                            <div className="report-card-art">
+                            <div className="paywall-list">
 
-                                <div className="report-orbits">
+                                <PaywallItem>
+                                    Чего каждому немного
+                                    не хватает
+                                </PaywallItem>
 
-                                    <div className="report-orbit orbit-left" />
-                                    <div className="report-orbit orbit-right" />
+                                <PaywallItem>
+                                    Как вы по-разному
+                                    воспринимаете заботу
+                                </PaywallItem>
 
-                                    <div className="report-symbol">
-                                        ✦
-                                    </div>
+                                <PaywallItem>
+                                    Что один может
+                                    не замечать о другом
+                                </PaywallItem>
 
-                                </div>
-
-                                <div className="report-card-caption">
-                                    полный разбор
-                                </div>
+                                <PaywallItem>
+                                    Что каждый хочет
+                                    сохранить
+                                </PaywallItem>
 
                             </div>
 
-                            <div className="report-card-content">
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    router.push(
+                                        `/report/${coupleId}`
+                                    )
+                                }
+                            >
 
-                                <div className="report-small">
-                                    ВНУТРИ
-                                </div>
+                <span>
+                  Полный разбор
+                </span>
 
-                                <h3>
-                                    То, что легко
-                                    не заметить друг
-                                    в друге.
-                                </h3>
+                                <strong>
+                                    299 ₽
+                                </strong>
 
-                                <div className="report-list">
+                            </button>
 
-                                    <ReportItem
-                                        number="01"
-                                        title="Чего каждому немного не хватает"
-                                    />
-
-                                    <ReportItem
-                                        number="02"
-                                        title="Как вы по-разному воспринимаете заботу"
-                                    />
-
-                                    <ReportItem
-                                        number="03"
-                                        title="Что один может не замечать о другом"
-                                    />
-
-                                    <ReportItem
-                                        number="04"
-                                        title="Что каждый хочет сохранить"
-                                    />
-
-                                    <ReportItem
-                                        number="05"
-                                        title="5 вопросов именно для вашей пары"
-                                    />
-
-                                </div>
-
-                                <button
-                                    type="button"
-                                    className="report-button"
-                                    onClick={() =>
-                                        router.push(
-                                            `/report/${coupleId}`
-                                        )
-                                    }
-                                >
-
-                  <span>
-                    Открыть полный разбор
-                  </span>
-
-                                    <strong>
-                                        299 ₽
-                                    </strong>
-
-                                </button>
-
-                                <div className="report-note">
-                                    один разбор · доступ для вас двоих
-                                </div>
-
+                            <div className="paywall-note">
+                                один разбор · для вас двоих
                             </div>
 
                         </div>
@@ -728,141 +568,115 @@ export default function ResultPage() {
             </main>
 
             <style jsx global>
-                {globalStyles}
+                {styles}
             </style>
         </>
     );
 }
 
 /* ============================================================
-   MAIN ILLUSTRATION
-
-   Пока это SVG/CSS-like vector scene.
-   Потом сюда подключим настоящие PNG/WebP
-   для каждого архетипа без изменения layout.
+   HERO ART
 ============================================================ */
 
-function CoupleIllustration({
-                                archetypeId,
-                                emojiA,
-                                emojiB,
-                            }: {
-    archetypeId: string;
+function CoupleArt({
+                       emojiA,
+                       emojiB,
+                       archetypeId,
+                   }: {
     emojiA: string;
     emojiB: string;
+    archetypeId: string;
 }) {
     return (
-        <div className="couple-illustration">
+        <div className="couple-art">
 
             <svg
-                className="illustration-bg"
-                viewBox="0 0 600 560"
+                className="blob"
+                viewBox="0 0 420 360"
                 aria-hidden="true"
             >
                 <path
                     d="
-            M92 138
-            C148 42 296 20 408 72
-            C524 126 570 244 528 354
-            C486 464 356 532 232 492
-            C104 452 24 364 46 252
-            C54 208 70 172 92 138Z
+            M74 103
+            C118 35 222 13 304 50
+            C379 84 414 167 383 244
+            C350 326 255 356 167 329
+            C78 302 21 238 37 166
+            C43 140 54 119 74 103Z
           "
-                    fill="#E8D7E1"
+                    fill="#E9D9E1"
+                />
+
+                <circle
+                    cx="64"
+                    cy="188"
+                    r="6"
+                    fill="#C49C47"
+                />
+
+                <circle
+                    cx="360"
+                    cy="105"
+                    r="5"
+                    fill="#A74769"
                 />
 
                 <path
                     d="
-            M134 112
-            C198 48 304 36 392 74
-            C456 102 504 154 518 216
+            M335 56
+            L341 70
+            L356 76
+            L341 82
+            L335 97
+            L329 82
+            L314 76
+            L329 70Z
           "
-                    fill="none"
-                    stroke="#C58AA3"
-                    strokeWidth="3"
-                    strokeDasharray="6 12"
-                />
-
-                <circle
-                    cx="98"
-                    cy="185"
-                    r="8"
-                    fill="#D1A64D"
-                />
-
-                <circle
-                    cx="496"
-                    cy="156"
-                    r="5"
-                    fill="#A8496C"
-                />
-
-                <path
-                    d="M455 102 L462 119 L480 126 L462 133 L455 151 L448 133 L430 126 L448 119Z"
-                    fill="#D1A64D"
-                />
-
-                <path
-                    d="M120 356 L126 370 L141 376 L126 382 L120 397 L114 382 L99 376 L114 370Z"
-                    fill="#A8496C"
+                    fill="#C49C47"
                 />
             </svg>
 
-            <div className="character-stage">
+            <div className="people">
 
-                <div className="character character-a">
+                <div className="person">
 
-                    <div className="character-head">
-                        <div className="character-face">
-                            {emojiA}
-                        </div>
+                    <div className="head">
+                        {emojiA}
                     </div>
 
-                    <div className="character-body body-a" />
-
-                    <div className="character-arm arm-a" />
+                    <div className="body body-one" />
 
                 </div>
 
-                <div className="center-heart">
+                <div className="heart">
                     ♥
                 </div>
 
-                <div className="character character-b">
+                <div className="person person-two">
 
-                    <div className="character-head">
-                        <div className="character-face">
-                            {emojiB}
-                        </div>
+                    <div className="head">
+                        {emojiB}
                     </div>
 
-                    <div className="character-body body-b" />
-
-                    <div className="character-arm arm-b" />
+                    <div className="body body-two" />
 
                 </div>
 
             </div>
 
-            <div className="illustration-platform">
-
-                <span />
-                <span />
-                <span />
-
-            </div>
-
-            <div className="illustration-tag">
-                {getShortArchetypeTag(
-                    archetypeId
-                )}
+            <div className="art-tag">
+                {
+                    getArchetypeTag(
+                        archetypeId
+                    )
+                }
             </div>
 
         </div>
     );
 }
 
-function getShortArchetypeTag(
+function getArchetypeTag(
     id: string
 ) {
     switch (id) {
@@ -896,144 +710,97 @@ function getShortArchetypeTag(
 }
 
 /* ============================================================
-   SMALL EDITORIAL ILLUSTRATIONS
+   SUMMARY
 ============================================================ */
 
-function MiniScene({
-                       variant,
-                   }: {
-    variant:
-        | 'heart'
-        | 'different'
-        | 'power';
+function SummaryItem({
+                         value,
+                         label,
+                     }: {
+    value: number;
+    label: string;
 }) {
-    if (variant === 'heart') {
-        return (
-            <div className="mini-scene mini-heart">
-
-                <div className="mini-blob" />
-
-                <div className="mini-person mini-person-left">
-                    ◡
-                </div>
-
-                <div className="mini-heart-symbol">
-                    ♥
-                </div>
-
-                <div className="mini-person mini-person-right">
-                    ◡
-                </div>
-
-                <div className="mini-star">
-                    ✦
-                </div>
-
-            </div>
-        );
-    }
-
-    if (variant === 'different') {
-        return (
-            <div className="mini-scene mini-different">
-
-                <div className="mini-blob blob-yellow" />
-
-                <div className="different-circle circle-one">
-                    →
-                </div>
-
-                <div className="different-circle circle-two">
-                    ←
-                </div>
-
-                <div className="different-center">
-                    ♥
-                </div>
-
-            </div>
-        );
-    }
-
     return (
-        <div className="mini-scene mini-power">
+        <div className="summary-item">
 
-            <div className="mini-blob blob-purple" />
+            <strong>
+                {value}
+            </strong>
 
-            <div className="power-star power-star-main">
-                ✦
-            </div>
-
-            <div className="power-star power-star-small-one">
-                ✦
-            </div>
-
-            <div className="power-star power-star-small-two">
-                ✦
-            </div>
-
-            <div className="power-heart">
-                ♥
-            </div>
+            <span>
+        {label}
+      </span>
 
         </div>
     );
 }
 
 /* ============================================================
-   REPORT ITEM
+   INSIGHT
 ============================================================ */
 
-function ReportItem({
-                        number,
-                        title,
-                    }: {
-    number: string;
+function InsightCard({
+                         symbol,
+                         title,
+                         text,
+                     }: {
+    symbol: string;
     title: string;
+    text: string;
 }) {
     return (
-        <div className="report-item">
+        <article className="insight-card">
 
-            <div className="report-item-number">
-                {number}
+            <div className="insight-top">
+
+                <div className="insight-symbol">
+                    {symbol}
+                </div>
+
+                <div className="insight-title">
+                    {title}
+                </div>
+
             </div>
 
-            <div className="report-item-title">
-                {title}
-            </div>
+            <p>
+                {text}
+            </p>
 
-            <div className="report-item-lock">
-                ·
-            </div>
-
-        </div>
+        </article>
     );
 }
 
 /* ============================================================
-   DECORATION
+   PAYWALL ITEM
 ============================================================ */
 
-function Decoration({
-                        children,
-                        className,
-                    }: {
+function PaywallItem({
+                         children,
+                     }: {
     children:
         React.ReactNode;
-    className: string;
 }) {
     return (
-        <div className={className}>
-            {children}
+        <div className="paywall-item">
+
+      <span>
+        ✓
+      </span>
+
+            <div>
+                {children}
+            </div>
+
         </div>
     );
 }
 
 /* ============================================================
-   GLOBAL STYLES
+   STYLES
 ============================================================ */
 
-const globalStyles = `
+const styles = `
 
   * {
     box-sizing: border-box;
@@ -1048,7 +815,7 @@ const globalStyles = `
 
     background: #ffffff;
 
-    color: #272326;
+    color: #282326;
 
     font-family:
       Inter,
@@ -1067,12 +834,9 @@ const globalStyles = `
     min-height: 100svh;
 
     overflow: hidden;
-
-    background: #ffffff;
   }
 
-  .content-shell,
-  .hero-shell {
+  .shell {
     width:
       min(
         calc(100% - 48px),
@@ -1090,20 +854,20 @@ const globalStyles = `
       "Times New Roman",
       serif;
 
-    font-size: 27px;
+    font-size: 26px;
     font-weight: 600;
 
     letter-spacing:
-      -0.035em;
+      -0.04em;
   }
 
   .eyebrow {
-    color: #A74769;
+    color: #A74669;
 
-    font-size: 12px;
-    font-weight: 800;
+    font-size: 11px;
+    font-weight: 850;
 
-    letter-spacing: 0.19em;
+    letter-spacing: 0.18em;
   }
 
   /* ============================================================
@@ -1113,49 +877,43 @@ const globalStyles = `
   .hero {
     position: relative;
 
-    min-height: 760px;
-
     overflow: hidden;
 
     background:
       radial-gradient(
-        circle at 15% 12%,
+        circle at 85% 10%,
         rgba(
           255,
           255,
           255,
-          0.85
+          0.72
         ),
         transparent 30%
       ),
       #F7F1F4;
-  }
 
-  .hero-shell {
-    position: relative;
-
-    z-index: 2;
+    padding-bottom: 58px;
   }
 
   .topbar {
-    height: 100px;
+    height: 82px;
 
     display: flex;
     align-items: center;
     justify-content: space-between;
   }
 
-  .topbar-pill {
+  .result-pill {
     padding:
-      9px
-      14px;
+      8px
+      13px;
 
     border:
       1px solid
       rgba(
-        123,
-        84,
-        101,
+        122,
+        83,
+        98,
         0.15
       );
 
@@ -1166,38 +924,22 @@ const globalStyles = `
         255,
         255,
         255,
-        0.52
+        0.55
       );
 
-    color: #8E7B83;
+    color: #8B7C81;
 
     font-size: 11px;
-    font-weight: 650;
-
-    letter-spacing: 0.04em;
   }
 
-  .hero-grid {
-    min-height: 610px;
-
-    display: grid;
-
-    grid-template-columns:
-      minmax(0, 1.02fr)
-      minmax(440px, 0.98fr);
-
-    align-items: center;
-
-    gap: 42px;
-
-    padding:
-      20px
-      0
-      100px;
+  .hero-content {
+    padding-top: 16px;
   }
 
   .names {
-    color: #292326;
+    text-align: center;
+
+    color: #282326;
 
     font-family:
       Georgia,
@@ -1206,60 +948,50 @@ const globalStyles = `
 
     font-size:
       clamp(
-        54px,
-        6.2vw,
-        88px
+        50px,
+        6vw,
+        76px
       );
 
     font-weight: 500;
 
-    line-height: 0.96;
+    line-height: 1;
 
     letter-spacing:
       -0.055em;
   }
 
   .names span {
+    margin:
+      0
+      12px;
+
     color: #AF496E;
   }
 
-  .intro {
-    max-width: 580px;
+  .hero-result {
+    display: grid;
 
-    margin:
-      25px
-      0
-      44px;
+    grid-template-columns:
+      0.72fr
+      1.15fr
+      1fr;
 
-    color: #81767A;
+    align-items: center;
 
-    font-size: 18px;
-    line-height: 1.55;
+    gap: 30px;
+
+    margin-top: 22px;
   }
 
-  .intro strong {
-    color: #393235;
+  /* SCORE */
 
-    font-weight: 750;
+  .score-column {
+    text-align: center;
   }
 
-  .type-label {
-    margin-bottom: 11px;
-
+  .score {
     color: #A74669;
-
-    font-size: 11px;
-    font-weight: 850;
-
-    letter-spacing: 0.2em;
-  }
-
-  .type-title {
-    max-width: 620px;
-
-    margin: 0;
-
-    color: #272326;
 
     font-family:
       Georgia,
@@ -1268,9 +1000,76 @@ const globalStyles = `
 
     font-size:
       clamp(
-        48px,
-        5vw,
-        72px
+        76px,
+        8vw,
+        112px
+      );
+
+    line-height: 0.9;
+
+    letter-spacing:
+      -0.07em;
+  }
+
+  .score span {
+    margin-left: 2px;
+
+    font-size: 0.42em;
+  }
+
+  .score-label {
+    margin-top: 12px;
+
+    color: #A74669;
+
+    font-size: 11px;
+    font-weight: 900;
+
+    letter-spacing: 0.17em;
+  }
+
+  .score-description {
+    max-width: 170px;
+
+    margin:
+      9px
+      auto
+      0;
+
+    color: #93868B;
+
+    font-size: 11px;
+    line-height: 1.45;
+  }
+
+  /* TYPE */
+
+  .type-label {
+    margin-bottom: 10px;
+
+    color: #A74669;
+
+    font-size: 10px;
+    font-weight: 850;
+
+    letter-spacing: 0.19em;
+  }
+
+  .type-column h1 {
+    margin: 0;
+
+    color: #282326;
+
+    font-family:
+      Georgia,
+      "Times New Roman",
+      serif;
+
+    font-size:
+      clamp(
+        40px,
+        4.3vw,
+        59px
       );
 
     font-weight: 500;
@@ -1281,145 +1080,38 @@ const globalStyles = `
       -0.045em;
   }
 
-  .type-description {
-    max-width: 570px;
+  .type-column p {
+    max-width: 380px;
 
     margin:
-      20px
+      17px
       0
       0;
 
-    color: #675D61;
+    color: #71666A;
 
-    font-size: 17px;
-    line-height: 1.58;
+    font-size: 15px;
+    line-height: 1.55;
   }
 
-  .stats {
-    display: flex;
-    align-items: center;
+  /* ART */
 
-    gap: 20px;
-
-    margin-top: 30px;
-  }
-
-  .stat {
-    display: flex;
-    align-items: center;
-
-    gap: 10px;
-  }
-
-  .stat strong {
-    color: #A64669;
-
-    font-family:
-      Georgia,
-      "Times New Roman",
-      serif;
-
-    font-size: 32px;
-    font-weight: 500;
-  }
-
-  .stat span {
-    color: #8E8186;
-
-    font-size: 11px;
-    line-height: 1.25;
-  }
-
-  .stat-line {
-    width: 1px;
-    height: 38px;
-
-    background:
-      rgba(
-        108,
-        76,
-        89,
-        0.17
-      );
-  }
-
-  .hero-visual {
+  .hero-art-column {
     display: flex;
     justify-content: center;
   }
 
-  .hero-wave {
-    position: absolute;
-
-    left: 0;
-    right: 0;
-    bottom: -1px;
-
-    z-index: 1;
-
-    height: 100px;
-  }
-
-  .hero-wave svg {
-    width: 100%;
-    height: 100%;
-
-    display: block;
-  }
-
-  .hero-star,
-  .hero-dot {
-    position: absolute;
-
-    z-index: 1;
-
-    color: #BD6A88;
-  }
-
-  .hero-star-one {
-    top: 130px;
-    left: 4%;
-
-    font-size: 20px;
-  }
-
-  .hero-star-two {
-    top: 85px;
-    right: 5%;
-
-    color: #C6A050;
-
-    font-size: 30px;
-
-    transform:
-      rotate(18deg);
-  }
-
-  .hero-dot-one {
-    bottom: 160px;
-    left: 3%;
-
-    font-size: 50px;
-  }
-
-  /* ============================================================
-     COUPLE ILLUSTRATION
-  ============================================================ */
-
-  .couple-illustration {
+  .couple-art {
     position: relative;
 
     width: 100%;
-    max-width: 540px;
+    max-width: 400px;
 
-    aspect-ratio: 1 / 1;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    aspect-ratio:
+      420 / 360;
   }
 
-  .illustration-bg {
+  .blob {
     position: absolute;
 
     inset: 0;
@@ -1428,50 +1120,45 @@ const globalStyles = `
     height: 100%;
   }
 
-  .character-stage {
-    position: relative;
+  .people {
+    position: absolute;
 
     z-index: 2;
 
-    width: 76%;
-    height: 52%;
+    left: 50%;
+    bottom: 54px;
 
     display: flex;
     align-items: flex-end;
-    justify-content: center;
 
-    gap: 18px;
+    gap: 6px;
 
-    margin-top: 35px;
+    transform:
+      translateX(-50%);
   }
 
-  .character {
+  .person {
     position: relative;
 
-    width: 135px;
-    height: 235px;
+    width: 96px;
+    height: 162px;
   }
 
-  .character-a {
+  .person-two {
     transform:
-      rotate(-2deg)
-      translateY(6px);
+      translateY(-4px);
   }
 
-  .character-b {
-    transform:
-      rotate(2deg)
-      translateY(-2px);
-  }
-
-  .character-head {
+  .head {
     position: absolute;
+
+    z-index: 2;
 
     top: 0;
     left: 50%;
 
-    width: 100px;
-    height: 100px;
+    width: 70px;
+    height: 70px;
 
     display: flex;
     align-items: center;
@@ -1481,200 +1168,223 @@ const globalStyles = `
       translateX(-50%);
 
     border:
-      4px solid #473D41;
+      3px solid #493E42;
 
-    border-radius:
-      48% 52% 46% 54%;
+    border-radius: 50%;
 
-    background: #F0C9B7;
+    background: #EDC5B3;
+
+    font-size: 34px;
   }
 
-  .character-face {
-    font-size: 49px;
-
-    line-height: 1;
-  }
-
-  .character-body {
+  .body {
     position: absolute;
 
     left: 50%;
     bottom: 0;
 
-    width: 125px;
-    height: 150px;
+    width: 92px;
+    height: 108px;
 
     transform:
       translateX(-50%);
 
     border:
-      4px solid #473D41;
+      3px solid #493E42;
 
     border-radius:
-      54px 54px 26px 26px;
+      42px 42px 20px 20px;
   }
 
-  .body-a {
+  .body-one {
     background: #A84A6D;
   }
 
-  .body-b {
-    background: #D39AB0;
+  .body-two {
+    background: #8C80A4;
   }
 
-  .character-arm {
-    position: absolute;
-
-    top: 118px;
-
-    width: 65px;
-    height: 24px;
-
-    border:
-      4px solid #473D41;
-
-    border-radius: 999px;
-
-    background: #E8B9A5;
-  }
-
-  .arm-a {
-    right: -22px;
-
-    transform:
-      rotate(18deg);
-  }
-
-  .arm-b {
-    left: -22px;
-
-    transform:
-      rotate(-18deg);
-  }
-
-  .center-heart {
-    position: relative;
-
-    z-index: 5;
-
+  .heart {
     align-self: center;
 
-    margin:
-      0
-      -6px
-      70px;
+    margin-bottom: 60px;
 
-    color: #A83E65;
+    color: #A53E64;
 
-    font-size: 29px;
-
-    animation:
-      heartFloat
-      1.8s
-      ease-in-out
-      infinite
-      alternate;
+    font-size: 22px;
   }
 
-  @keyframes heartFloat {
-    from {
-      transform:
-        translateY(3px);
-    }
-
-    to {
-      transform:
-        translateY(-5px);
-    }
-  }
-
-  .illustration-platform {
-    position: absolute;
-
-    z-index: 3;
-
-    left: 50%;
-    bottom: 79px;
-
-    display: flex;
-
-    gap: 6px;
-
-    transform:
-      translateX(-50%);
-  }
-
-  .illustration-platform span {
-    width: 65px;
-    height: 8px;
-
-    border-radius: 10px;
-
-    background: #B17B91;
-  }
-
-  .illustration-platform
-  span:nth-child(2) {
-    transform:
-      translateY(5px);
-  }
-
-  .illustration-tag {
+  .art-tag {
     position: absolute;
 
     z-index: 4;
 
-    right: 10px;
-    bottom: 72px;
+    right: 16px;
+    bottom: 36px;
 
     padding:
-      10px
-      15px;
+      8px
+      12px;
 
     border-radius: 999px;
 
     background: #ffffff;
 
     box-shadow:
-      0 8px 30px
+      0 8px 25px
       rgba(
-        83,
-        53,
-        65,
-        0.10
+        72,
+        49,
+        58,
+        0.09
       );
 
-    color: #7C6870;
+    color: #7F6F75;
 
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
   }
 
-  /* ============================================================
-     STORY INTRO
-  ============================================================ */
+  /* SUMMARY */
 
-  .story-section {
+  .answer-summary {
+    width: fit-content;
+
+    display: flex;
+    align-items: center;
+
+    gap: 22px;
+
+    margin:
+      18px
+      auto
+      0;
+
     padding:
-      95px
-      0
-      135px;
+      12px
+      22px;
+
+    border:
+      1px solid
+      rgba(
+        111,
+        77,
+        90,
+        0.12
+      );
+
+    border-radius: 999px;
+
+    background:
+      rgba(
+        255,
+        255,
+        255,
+        0.58
+      );
+  }
+
+  .summary-item {
+    display: flex;
+    align-items: baseline;
+
+    gap: 6px;
+  }
+
+  .summary-item strong {
+    color: #A74669;
+
+    font-family:
+      Georgia,
+      serif;
+
+    font-size: 22px;
+    font-weight: 500;
+  }
+
+  .summary-item span {
+    color: #82767A;
+
+    font-size: 11px;
+  }
+
+  .summary-line {
+    width: 1px;
+    height: 24px;
+
+    background:
+      rgba(
+        99,
+        70,
+        81,
+        0.14
+      );
+  }
+
+  .hero-decoration {
+    position: absolute;
+
+    color: #C3A04C;
+  }
+
+  .star-one {
+    top: 150px;
+    left: 5%;
+
+    font-size: 20px;
+  }
+
+  .star-two {
+    top: 105px;
+    right: 5%;
+
+    color: #B95D80;
+
+    font-size: 25px;
+  }
+
+  .hero-bottom {
+    position: absolute;
+
+    left: -5%;
+    right: -5%;
+    bottom: -50px;
+
+    height: 75px;
+
+    border-radius: 50%;
 
     background: #ffffff;
   }
 
-  .story-heading {
-    max-width: 750px;
+  /* ============================================================
+     INSIGHTS
+  ============================================================ */
 
-    margin-bottom: 90px;
+  .insights-section {
+    padding:
+      65px
+      0
+      80px;
+
+    background: #ffffff;
   }
 
-  .story-heading h2,
-  .report-heading h2 {
+  .section-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 30px;
+
+    margin-bottom: 30px;
+  }
+
+  .section-heading h2 {
     margin:
-      14px
+      8px
       0
-      20px;
+      0;
 
     color: #292326;
 
@@ -1685,9 +1395,9 @@ const globalStyles = `
 
     font-size:
       clamp(
-        45px,
-        5vw,
-        68px
+        36px,
+        4vw,
+        50px
       );
 
     font-weight: 500;
@@ -1695,342 +1405,90 @@ const globalStyles = `
     line-height: 1;
 
     letter-spacing:
-      -0.045em;
+      -0.04em;
   }
 
-  .story-heading p,
-  .report-heading p {
-    max-width: 600px;
-
-    margin: 0;
-
-    color: #82777B;
-
-    font-size: 17px;
-    line-height: 1.6;
-  }
-
-  /* ============================================================
-     STORY ROWS
-  ============================================================ */
-
-  .story-row {
-    min-height: 410px;
-
+  .insight-grid {
     display: grid;
 
     grid-template-columns:
-      minmax(340px, 0.9fr)
-      minmax(0, 1.1fr);
-
-    align-items: center;
-
-    gap: 90px;
-
-    padding:
-      40px
-      0;
-  }
-
-  .story-row.reverse {
-    grid-template-columns:
-      minmax(0, 1.1fr)
-      minmax(340px, 0.9fr);
-  }
-
-  .story-row.reverse
-  .story-art {
-    order: 2;
-  }
-
-  .story-row.reverse
-  .story-copy {
-    order: 1;
-  }
-
-  .story-number {
-    margin-bottom: 18px;
-
-    color: #D0C5C8;
-
-    font-family:
-      Georgia,
-      "Times New Roman",
-      serif;
-
-    font-size: 17px;
-  }
-
-  .story-label {
-    margin-bottom: 15px;
-
-    color: #A64769;
-
-    font-size: 11px;
-    font-weight: 850;
-
-    letter-spacing: 0.17em;
-  }
-
-  .story-copy h3 {
-    max-width: 580px;
-
-    margin: 0;
-
-    color: #2B2628;
-
-    font-family:
-      Georgia,
-      "Times New Roman",
-      serif;
-
-    font-size:
-      clamp(
-        35px,
-        3.7vw,
-        51px
+      repeat(
+        3,
+        minmax(0, 1fr)
       );
 
-    font-weight: 500;
-
-    line-height: 1.04;
-
-    letter-spacing:
-      -0.035em;
+    gap: 14px;
   }
 
-  .story-copy p {
-    max-width: 590px;
+  .insight-card {
+    min-height: 245px;
 
+    display: flex;
+    flex-direction: column;
+
+    padding: 24px;
+
+    border:
+      1px solid #EBE3E0;
+
+    border-radius: 22px;
+
+    background: #FBF9F8;
+  }
+
+  .insight-top {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+  }
+
+  .insight-symbol {
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 12px;
+
+    background: #F0DFE6;
+
+    color: #A74669;
+
+    font-size: 15px;
+    font-weight: 800;
+  }
+
+  .insight-title {
+    color: #A74669;
+
+    font-size: 10px;
+    font-weight: 850;
+
+    letter-spacing: 0.09em;
+
+    text-transform: uppercase;
+  }
+
+  .insight-card p {
     margin:
-      23px
+      auto
       0
       0;
 
-    color: #756B6F;
-
-    font-size: 17px;
-    line-height: 1.65;
-  }
-
-  .story-art {
-    display: flex;
-    justify-content: center;
-  }
-
-  /* ============================================================
-     MINI SCENES
-  ============================================================ */
-
-  .mini-scene {
-    position: relative;
-
-    width: 340px;
-    height: 300px;
-  }
-
-  .mini-blob {
-    position: absolute;
-
-    inset: 25px;
-
-    border-radius:
-      45% 55% 60% 40%
-      / 54% 40% 60% 46%;
-
-    background: #F0DCE5;
-
-    transform:
-      rotate(-7deg);
-  }
-
-  .mini-person {
-    position: absolute;
-
-    z-index: 2;
-
-    top: 100px;
-
-    width: 86px;
-    height: 105px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border:
-      4px solid #4A3D42;
-
-    border-radius:
-      48% 52% 43% 57%;
-
-    background: #E9BBA8;
-
-    color: #4A3D42;
+    color: #554D50;
 
     font-family:
       Georgia,
+      "Times New Roman",
       serif;
 
-    font-size: 42px;
-  }
-
-  .mini-person-left {
-    left: 65px;
-
-    transform:
-      rotate(-6deg);
-  }
-
-  .mini-person-right {
-    right: 65px;
-
-    transform:
-      rotate(6deg);
-  }
-
-  .mini-heart-symbol {
-    position: absolute;
-
-    z-index: 4;
-
-    top: 78px;
-    left: 50%;
-
-    color: #A64267;
-
-    font-size: 25px;
-
-    transform:
-      translateX(-50%);
-  }
-
-  .mini-star {
-    position: absolute;
-
-    z-index: 4;
-
-    top: 40px;
-    right: 45px;
-
-    color: #C39D49;
-
-    font-size: 27px;
-  }
-
-  .blob-yellow {
-    background: #F2E6C9;
-
-    transform:
-      rotate(8deg);
-  }
-
-  .different-circle {
-    position: absolute;
-
-    z-index: 2;
-
-    top: 95px;
-
-    width: 105px;
-    height: 105px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 50%;
-
-    color: #ffffff;
-
-    font-size: 32px;
-  }
-
-  .circle-one {
-    left: 60px;
-
-    background: #A84A6D;
-  }
-
-  .circle-two {
-    right: 60px;
-
-    background: #8A7EAA;
-  }
-
-  .different-center {
-    position: absolute;
-
-    z-index: 4;
-
-    top: 133px;
-    left: 50%;
-
-    color: #E7C25F;
-
-    font-size: 25px;
-
-    transform:
-      translateX(-50%);
-  }
-
-  .blob-purple {
-    background: #E4DFEF;
-
-    transform:
-      rotate(-2deg);
-  }
-
-  .power-star {
-    position: absolute;
-
-    z-index: 3;
-
-    color: #8C78A5;
-  }
-
-  .power-star-main {
-    top: 87px;
-    left: 50%;
-
-    font-size: 105px;
-
-    transform:
-      translateX(-50%);
-  }
-
-  .power-star-small-one {
-    top: 60px;
-    left: 70px;
-
-    color: #C39D49;
-
-    font-size: 24px;
-  }
-
-  .power-star-small-two {
-    right: 72px;
-    bottom: 70px;
-
-    color: #A74769;
-
-    font-size: 21px;
-  }
-
-  .power-heart {
-    position: absolute;
-
-    z-index: 5;
-
-    top: 125px;
-    left: 50%;
-
-    color: #ffffff;
-
-    font-size: 25px;
-
-    transform:
-      translateX(-50%);
+    font-size: 20px;
+    line-height: 1.42;
   }
 
   /* ============================================================
@@ -2042,39 +1500,37 @@ const globalStyles = `
 
     overflow: hidden;
 
-    background: #5E536F;
-
-    color: #ffffff;
-
     padding:
-      110px
-      0;
+      68px
+      24px;
+
+    background: #625770;
   }
 
   .question-shell {
     width:
       min(
-        calc(100% - 48px),
-        1080px
+        100%,
+        1040px
       );
 
     display: grid;
 
     grid-template-columns:
-      0.8fr
-      1.2fr;
+      260px
+      minmax(0, 1fr);
 
     align-items: center;
 
-    gap: 80px;
+    gap: 50px;
 
     margin: 0 auto;
   }
 
-  .question-art {
+  .question-visual {
     position: relative;
 
-    min-height: 360px;
+    height: 230px;
   }
 
   .moon {
@@ -2083,8 +1539,8 @@ const globalStyles = `
     top: 0;
     left: 50%;
 
-    width: 260px;
-    height: 260px;
+    width: 190px;
+    height: 190px;
 
     display: flex;
     align-items: center;
@@ -2095,14 +1551,14 @@ const globalStyles = `
 
     border-radius: 50%;
 
-    background: #F0E3C7;
+    background: #F1E5C9;
 
-    color: #D2AE57;
+    color: #D1AA51;
 
-    font-size: 105px;
+    font-size: 75px;
   }
 
-  .question-people {
+  .tiny-couple {
     position: absolute;
 
     z-index: 2;
@@ -2113,70 +1569,59 @@ const globalStyles = `
     display: flex;
     align-items: center;
 
-    gap: 12px;
+    gap: 7px;
 
     transform:
       translateX(-50%);
   }
 
-  .question-person {
-    width: 100px;
-    height: 125px;
+  .tiny-person {
+    width: 68px;
+    height: 82px;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
     border:
-      4px solid #403A49;
+      3px solid #433D49;
 
     border-radius:
-      50px 50px 24px 24px;
+      34px 34px 16px 16px;
 
     background: #B87891;
 
-    font-size: 45px;
+    font-size: 29px;
   }
 
-  .question-person:last-child {
-    background: #8F83A6;
+  .tiny-person.second {
+    background: #9185A6;
   }
 
-  .question-heart {
-    color: #E5B0C3;
+  .tiny-couple span {
+    color: #F0BDD0;
 
-    font-size: 24px;
+    font-size: 17px;
   }
 
   .question-label {
-    color: #D8B7C5;
+    color: #DDB9C7;
 
-    font-size: 11px;
-    font-weight: 800;
+    font-size: 10px;
+    font-weight: 850;
 
-    letter-spacing: 0.18em;
+    letter-spacing: 0.17em;
   }
 
-  .big-quote {
-    height: 70px;
+  .question-copy h2 {
+    max-width: 680px;
 
-    margin-top: 20px;
+    margin:
+      13px
+      0
+      0;
 
-    color: #DAB3C2;
-
-    font-family:
-      Georgia,
-      serif;
-
-    font-size: 92px;
-
-    line-height: 1;
-  }
-
-  .question-content h2 {
-    max-width: 650px;
-
-    margin: 0;
+    color: #ffffff;
 
     font-family:
       Georgia,
@@ -2185,9 +1630,9 @@ const globalStyles = `
 
     font-size:
       clamp(
-        37px,
-        4.5vw,
-        57px
+        34px,
+        4vw,
+        49px
       );
 
     font-weight: 500;
@@ -2198,281 +1643,193 @@ const globalStyles = `
       -0.035em;
   }
 
-  .question-content p {
-    max-width: 480px;
-
+  .question-copy p {
     margin:
-      25px
+      18px
       0
       0;
 
-    color: #D5CDD8;
+    color: #D8D0DB;
+
+    font-size: 13px;
+  }
+
+  .question-star {
+    position: absolute;
+
+    color:
+      rgba(
+        255,
+        255,
+        255,
+        0.25
+      );
+  }
+
+  .question-star-one {
+    top: 30px;
+    left: 7%;
+
+    font-size: 25px;
+  }
+
+  .question-star-two {
+    right: 8%;
+    bottom: 35px;
+
+    font-size: 16px;
+  }
+
+  /* ============================================================
+     PAYWALL
+  ============================================================ */
+
+  .paywall-section {
+    padding:
+      75px
+      24px
+      90px;
+
+    background: #F9F6F4;
+  }
+
+  .paywall-shell {
+    width:
+      min(
+        100%,
+        1040px
+      );
+
+    display: grid;
+
+    grid-template-columns:
+      1fr
+      0.95fr;
+
+    align-items: center;
+
+    gap: 70px;
+
+    margin: 0 auto;
+  }
+
+  .paywall-copy h2 {
+    max-width: 520px;
+
+    margin:
+      12px
+      0
+      18px;
+
+    color: #292326;
+
+    font-family:
+      Georgia,
+      "Times New Roman",
+      serif;
+
+    font-size:
+      clamp(
+        38px,
+        4.4vw,
+        54px
+      );
+
+    font-weight: 500;
+
+    line-height: 1.02;
+
+    letter-spacing:
+      -0.04em;
+  }
+
+  .paywall-copy p {
+    max-width: 480px;
+
+    margin: 0;
+
+    color: #81767A;
 
     font-size: 15px;
     line-height: 1.55;
   }
 
-  .question-decoration {
-    position: absolute;
-
-    color:
-      rgba(
-        238,
-        213,
-        221,
-        0.34
-      );
-  }
-
-  .question-decoration-one {
-    top: 60px;
-    left: 7%;
-
-    font-size: 30px;
-  }
-
-  .question-decoration-two {
-    right: 7%;
-    bottom: 70px;
-
-    font-size: 19px;
-  }
-
-  /* ============================================================
-     REPORT
-  ============================================================ */
-
-  .report-section {
-    padding:
-      130px
-      0
-      110px;
-
-    background: #F9F6F4;
-  }
-
-  .report-heading {
-    max-width: 730px;
-
-    margin-bottom: 60px;
-  }
-
-  .report-card {
-    overflow: hidden;
-
-    display: grid;
-
-    grid-template-columns:
-      0.8fr
-      1.2fr;
+  .paywall-card {
+    padding: 26px;
 
     border:
-      1px solid #E8DFDC;
+      1px solid #E9DFDC;
 
-    border-radius: 32px;
+    border-radius: 24px;
 
     background: #ffffff;
 
     box-shadow:
-      0 30px 90px
+      0 20px 60px
       rgba(
-        79,
-        56,
-        64,
-        0.07
+        73,
+        52,
+        60,
+        0.05
       );
   }
 
-  .report-card-art {
-    min-height: 600px;
-
+  .paywall-list {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
 
-    background: #EEDDE5;
+    gap: 14px;
   }
 
-  .report-orbits {
-    position: relative;
-
-    width: 260px;
-    height: 180px;
-  }
-
-  .report-orbit {
-    position: absolute;
-
-    top: 20px;
-
-    width: 160px;
-    height: 160px;
-
-    border-radius: 50%;
-  }
-
-  .orbit-left {
-    left: 0;
-
-    background:
-      rgba(
-        166,
-        68,
-        104,
-        0.55
-      );
-  }
-
-  .orbit-right {
-    right: 0;
-
-    background:
-      rgba(
-        125,
-        109,
-        157,
-        0.50
-      );
-  }
-
-  .report-symbol {
-    position: absolute;
-
-    top: 50%;
-    left: 50%;
-
-    z-index: 3;
-
-    color: #ffffff;
-
-    font-size: 42px;
-
-    transform:
-      translate(
-        -50%,
-        -50%
-      );
-  }
-
-  .report-card-caption {
-    margin-top: 28px;
-
-    color: #8E6575;
-
-    font-family:
-      Georgia,
-      serif;
-
-    font-size: 28px;
-  }
-
-  .report-card-content {
-    padding:
-      65px
-      60px;
-  }
-
-  .report-small {
-    color: #A74769;
-
-    font-size: 11px;
-    font-weight: 800;
-
-    letter-spacing: 0.18em;
-  }
-
-  .report-card-content h3 {
-    max-width: 520px;
-
-    margin:
-      14px
-      0
-      35px;
-
-    color: #2C2729;
-
-    font-family:
-      Georgia,
-      serif;
-
-    font-size:
-      clamp(
-        35px,
-        4vw,
-        50px
-      );
-
-    font-weight: 500;
-
-    line-height: 1.03;
-
-    letter-spacing:
-      -0.035em;
-  }
-
-  .report-list {
-    border-top:
-      1px solid #EEE7E4;
-  }
-
-  .report-item {
+  .paywall-item {
     display: grid;
 
     grid-template-columns:
-      38px
-      1fr
-      20px;
+      24px
+      1fr;
 
-    align-items: center;
+    align-items: start;
 
-    gap: 14px;
+    gap: 10px;
 
-    padding:
-      17px
-      0;
-
-    border-bottom:
-      1px solid #EEE7E4;
-  }
-
-  .report-item-number {
-    color: #C6B9BD;
-
-    font-family:
-      Georgia,
-      serif;
-
-    font-size: 13px;
-  }
-
-  .report-item-title {
-    color: #574E51;
+    color: #554C50;
 
     font-size: 14px;
     line-height: 1.4;
   }
 
-  .report-item-lock {
-    color: #B04C70;
+  .paywall-item > span {
+    width: 22px;
+    height: 22px;
 
-    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #F1E0E7;
+
+    color: #A74669;
+
+    font-size: 10px;
+    font-weight: 900;
   }
 
-  .report-button {
+  .paywall-card button {
     width: 100%;
 
     display: flex;
     align-items: center;
     justify-content: space-between;
 
-    gap: 20px;
+    gap: 15px;
 
-    margin-top: 30px;
+    margin-top: 23px;
 
     padding:
-      19px
-      21px;
+      17px
+      18px;
 
     border: 0;
     border-radius: 14px;
@@ -2483,37 +1840,37 @@ const globalStyles = `
 
     cursor: pointer;
 
-    font-size: 15px;
-    font-weight: 700;
+    font-size: 14px;
+    font-weight: 750;
 
     transition:
       transform 150ms ease,
       background 150ms ease;
   }
 
-  .report-button:hover {
+  .paywall-card button:hover {
     transform:
-      translateY(-2px);
+      translateY(-1px);
 
     background: #943C5D;
   }
 
-  .report-button strong {
-    font-size: 16px;
+  .paywall-card button strong {
+    font-size: 15px;
   }
 
-  .report-note {
-    margin-top: 12px;
+  .paywall-note {
+    margin-top: 10px;
 
-    color: #A09599;
+    color: #A3979B;
 
-    font-size: 11px;
+    font-size: 10px;
 
     text-align: center;
   }
 
   /* ============================================================
-     LOADING / ERROR
+     LOADING
   ============================================================ */
 
   .loading-page,
@@ -2531,59 +1888,55 @@ const globalStyles = `
     flex-direction: column;
   }
 
-  .loading-art {
+  .loading-circles {
     position: relative;
 
-    width: 120px;
-    height: 80px;
+    width: 100px;
+    height: 64px;
 
-    margin-bottom: 28px;
+    margin-bottom: 20px;
   }
 
-  .loading-orbit {
+  .loading-circles span {
     position: absolute;
 
-    width: 80px;
-    height: 80px;
+    width: 64px;
+    height: 64px;
 
     border-radius: 50%;
   }
 
-  .orbit-a {
+  .loading-circles span:first-child {
     left: 0;
 
     background:
       rgba(
-        166,
-        68,
-        104,
-        0.45
+        167,
+        70,
+        105,
+        0.5
       );
   }
 
-  .orbit-b {
+  .loading-circles span:nth-child(2) {
     right: 0;
 
     background:
       rgba(
-        139,
-        122,
-        166,
-        0.45
+        140,
+        128,
+        164,
+        0.5
       );
   }
 
-  .loading-star {
+  .loading-circles b {
     position: absolute;
-
-    z-index: 2;
 
     top: 50%;
     left: 50%;
 
     color: #ffffff;
-
-    font-size: 25px;
 
     transform:
       translate(
@@ -2592,51 +1945,44 @@ const globalStyles = `
       );
   }
 
-  .loading-title {
-    color: #2C2729;
-
+  .loading-brand {
     font-family:
       Georgia,
       serif;
 
-    font-size: 28px;
+    font-size: 25px;
   }
 
-  .loading-copy {
+  .loading-page p {
     margin-top: 8px;
 
-    color: #96898E;
+    color: #93868B;
 
-    font-size: 13px;
+    font-size: 12px;
   }
 
   .state-shell {
     width:
       min(
         calc(100% - 40px),
-        700px
+        650px
       );
   }
 
   .state-shell h1 {
-    margin:
-      60px
-      0
-      15px;
+    margin-top: 50px;
 
     font-family:
       Georgia,
       serif;
 
-    font-size: 50px;
+    font-size: 48px;
 
     font-weight: 500;
   }
 
   .state-shell p {
-    color: #81767A;
-
-    font-size: 17px;
+    color: #82767A;
   }
 
   /* ============================================================
@@ -2647,75 +1993,57 @@ const globalStyles = `
     max-width: 900px
   ) {
 
-    .hero {
-      min-height: auto;
+    .hero-result {
+      grid-template-columns:
+        0.7fr
+        1fr;
+
+      gap: 20px;
     }
 
-    .hero-grid {
-      grid-template-columns: 1fr;
+    .type-column {
+      grid-column:
+        1 / -1;
 
-      gap: 25px;
+      max-width: 650px;
 
-      padding:
-        35px
-        0
-        130px;
+      margin:
+        -5px
+        auto
+        0;
+
+      text-align: center;
     }
 
-    .hero-copy {
-      max-width: 700px;
-    }
-
-    .hero-visual {
-      margin-top: -20px;
-    }
-
-    .couple-illustration {
-      max-width: 500px;
-    }
-
-    .story-row,
-    .story-row.reverse {
-      grid-template-columns: 1fr;
-
-      gap: 25px;
-
-      padding:
-        65px
+    .type-column p {
+      margin:
+        16px
+        auto
         0;
     }
 
-    .story-row.reverse
-    .story-art,
-    .story-row.reverse
-    .story-copy {
-      order: initial;
+    .insight-grid {
+      grid-template-columns: 1fr;
     }
 
-    .story-art {
-      justify-content: flex-start;
+    .insight-card {
+      min-height: auto;
+    }
+
+    .insight-card p {
+      margin-top: 25px;
     }
 
     .question-shell {
-      grid-template-columns: 1fr;
+      grid-template-columns:
+        200px
+        1fr;
 
+      gap: 30px;
+    }
+
+    .paywall-shell {
       gap: 35px;
-    }
-
-    .question-art {
-      max-width: 430px;
-
-      width: 100%;
-
-      margin: 0 auto;
-    }
-
-    .report-card {
-      grid-template-columns: 1fr;
-    }
-
-    .report-card-art {
-      min-height: 370px;
     }
 
   }
@@ -2728,290 +2056,243 @@ const globalStyles = `
     max-width: 600px
   ) {
 
-    .content-shell,
-    .hero-shell,
-    .question-shell {
+    .shell {
       width:
         calc(100% - 32px);
     }
 
+    .hero {
+      padding-bottom: 45px;
+    }
+
     .topbar {
-      height: 76px;
+      height: 68px;
     }
 
     .brand {
-      font-size: 22px;
+      font-size: 21px;
     }
 
-    .topbar-pill {
+    .result-pill {
       display: none;
     }
 
-    .hero-grid {
-      gap: 15px;
-
-      padding:
-        24px
-        0
-        95px;
+    .hero-content {
+      padding-top: 7px;
     }
 
     .names {
       font-size:
         clamp(
-          48px,
-          15vw,
-          66px
-        );
-
-      line-height: 0.98;
-    }
-
-    .intro {
-      margin:
-        20px
-        0
-        36px;
-
-      font-size: 16px;
-    }
-
-    .type-title {
-      font-size:
-        clamp(
-          43px,
-          13vw,
-          58px
+          44px,
+          14vw,
+          60px
         );
     }
 
-    .type-description {
-      font-size: 16px;
-    }
-
-    .stats {
-      margin-top: 25px;
-    }
-
-    .hero-visual {
+    .names span {
       margin:
-        5px
         0
-        -25px;
+        6px;
     }
 
-    .couple-illustration {
-      max-width: 390px;
+    .hero-result {
+      display: flex;
+      flex-direction: column;
+
+      gap: 0;
+
+      margin-top: 20px;
     }
 
-    .character {
-      width: 100px;
-      height: 185px;
+    .score-column {
+      order: 1;
     }
 
-    .character-head {
-      width: 78px;
-      height: 78px;
-
-      border-width: 3px;
+    .score {
+      font-size: 86px;
     }
 
-    .character-face {
-      font-size: 37px;
+    .score-description {
+      display: none;
     }
 
-    .character-body {
-      width: 95px;
-      height: 120px;
+    .hero-art-column {
+      order: 2;
 
-      border-width: 3px;
+      width: 100%;
 
-      border-radius:
-        42px 42px 20px 20px;
+      margin-top: -5px;
     }
 
-    .character-arm {
-      top: 93px;
+    .couple-art {
+      max-width: 330px;
+    }
 
-      width: 50px;
+    .type-column {
+      order: 3;
+
+      margin-top: -18px;
+    }
+
+    .type-column h1 {
+      font-size: 46px;
+    }
+
+    .type-column p {
+      max-width: 340px;
+
+      font-size: 14px;
+    }
+
+    .answer-summary {
+      gap: 12px;
+
+      margin-top: 23px;
+
+      padding:
+        10px
+        15px;
+    }
+
+    .summary-item {
+      gap: 4px;
+    }
+
+    .summary-item strong {
+      font-size: 19px;
+    }
+
+    .summary-item span {
+      font-size: 10px;
+    }
+
+    .summary-line {
       height: 20px;
-
-      border-width: 3px;
     }
 
-    .illustration-platform {
-      bottom: 54px;
-    }
-
-    .illustration-platform span {
-      width: 45px;
-    }
-
-    .illustration-tag {
-      right: 4px;
-      bottom: 42px;
-    }
-
-    .story-section {
+    .insights-section {
       padding:
-        75px
+        52px
         0
-        90px;
+        58px;
     }
 
-    .story-heading {
-      margin-bottom: 30px;
+    .section-heading {
+      margin-bottom: 22px;
     }
 
-    .story-heading h2,
-    .report-heading h2 {
-      font-size: 43px;
+    .section-heading h2 {
+      font-size: 39px;
     }
 
-    .story-heading p {
-      font-size: 16px;
+    .insight-grid {
+      gap: 10px;
     }
 
-    .story-row,
-    .story-row.reverse {
-      min-height: auto;
+    .insight-card {
+      padding: 19px;
 
-      padding:
-        50px
-        0;
+      border-radius: 18px;
     }
 
-    .mini-scene {
-      width: 280px;
-      height: 245px;
+    .insight-card p {
+      margin-top: 20px;
 
-      transform-origin:
-        left center;
-    }
-
-    .mini-person {
-      top: 80px;
-
-      width: 70px;
-      height: 88px;
-
-      font-size: 34px;
-    }
-
-    .mini-person-left {
-      left: 55px;
-    }
-
-    .mini-person-right {
-      right: 55px;
-    }
-
-    .mini-heart-symbol {
-      top: 65px;
-    }
-
-    .different-circle {
-      top: 75px;
-
-      width: 88px;
-      height: 88px;
-    }
-
-    .circle-one {
-      left: 48px;
-    }
-
-    .circle-two {
-      right: 48px;
-    }
-
-    .different-center {
-      top: 106px;
-    }
-
-    .power-star-main {
-      top: 65px;
-
-      font-size: 90px;
-    }
-
-    .power-heart {
-      top: 98px;
-    }
-
-    .story-copy h3 {
-      font-size: 37px;
-    }
-
-    .story-copy p {
-      margin-top: 18px;
-
-      font-size: 16px;
+      font-size: 17px;
     }
 
     .question-section {
       padding:
-        80px
-        0;
+        48px
+        16px;
     }
 
-    .question-art {
-      min-height: 285px;
+    .question-shell {
+      grid-template-columns: 1fr;
+
+      gap: 25px;
+
+      width: 100%;
+    }
+
+    .question-visual {
+      height: 175px;
     }
 
     .moon {
-      width: 210px;
-      height: 210px;
+      width: 145px;
+      height: 145px;
 
-      font-size: 85px;
+      font-size: 58px;
     }
 
-    .question-person {
-      width: 80px;
-      height: 100px;
+    .tiny-person {
+      width: 53px;
+      height: 64px;
 
-      border-width: 3px;
+      border-width: 2px;
 
-      font-size: 36px;
+      font-size: 23px;
     }
 
-    .question-content h2 {
-      font-size: 38px;
+    .question-copy {
+      text-align: center;
     }
 
-    .report-section {
+    .question-copy h2 {
+      max-width: 390px;
+
+      margin:
+        11px
+        auto
+        0;
+
+      font-size: 32px;
+    }
+
+    .question-copy p {
+      margin-top: 14px;
+    }
+
+    .paywall-section {
       padding:
-        90px
+        55px
+        16px
+        65px;
+    }
+
+    .paywall-shell {
+      grid-template-columns: 1fr;
+
+      gap: 27px;
+    }
+
+    .paywall-copy {
+      text-align: center;
+    }
+
+    .paywall-copy h2 {
+      margin:
+        10px
+        auto
+        15px;
+
+      font-size: 39px;
+    }
+
+    .paywall-copy p {
+      margin:
         0
-        70px;
+        auto;
+
+      font-size: 14px;
     }
 
-    .report-heading {
-      margin-bottom: 40px;
-    }
+    .paywall-card {
+      padding: 20px;
 
-    .report-card {
-      border-radius: 24px;
-    }
-
-    .report-card-art {
-      min-height: 310px;
-    }
-
-    .report-orbits {
-      transform:
-        scale(0.8);
-    }
-
-    .report-card-content {
-      padding:
-        38px
-        20px
-        28px;
-    }
-
-    .report-card-content h3 {
-      font-size: 38px;
+      border-radius: 20px;
     }
 
   }
@@ -3021,16 +2302,11 @@ const globalStyles = `
     reduce
   ) {
 
-    *,
-    *::before,
-    *::after {
+    * {
       scroll-behavior: auto !important;
 
       animation-duration:
         0.01ms !important;
-
-      animation-iteration-count:
-        1 !important;
 
       transition-duration:
         0.01ms !important;
