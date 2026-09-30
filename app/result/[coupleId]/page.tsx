@@ -3,7 +3,6 @@
 import {
     useEffect,
     useState,
-    type ReactNode,
 } from 'react';
 
 import {
@@ -49,7 +48,6 @@ type ResultData = {
         sameAnswers?: number;
         closeAnswers?: number;
         differentAnswers?: number;
-
         dimensions?: Dimensions;
     };
 };
@@ -60,6 +58,13 @@ type DimensionKind =
     | 'communication'
     | 'rhythm'
     | 'space';
+
+type DimensionItem = {
+    kind: DimensionKind;
+    eyebrow: string;
+    title: string;
+    value: number;
+};
 
 /* ============================================================
    PAGE
@@ -148,7 +153,9 @@ export default function ResultPage() {
                     </div>
 
                     <h1>
-                        что-то пошло не так
+                        что-то пошло
+                        <br />
+                        не так
                     </h1>
 
                     <p>
@@ -169,15 +176,15 @@ export default function ResultPage() {
             <>
                 <main className="loading-page">
 
-                    <div className="loading-orbits">
-
-                        <span />
+                    <div className="loading-symbol">
 
                         <span />
 
                         <i>
                             ♥
                         </i>
+
+                        <span />
 
                     </div>
 
@@ -186,7 +193,7 @@ export default function ResultPage() {
                     </div>
 
                     <p>
-                        соединяем ваши ответы
+                        собираем вас двоих
                     </p>
 
                 </main>
@@ -215,20 +222,41 @@ export default function ResultPage() {
     const dimensions =
         data.scores?.dimensions;
 
+    const differentCount =
+        data.scores
+            ?.differentAnswers ??
+        comparisons.filter(
+            (item) =>
+                item.similarity ===
+                'different'
+        ).length;
+
+    const closeCount =
+        data.scores
+            ?.closeAnswers ??
+        comparisons.filter(
+            (item) =>
+                item.similarity ===
+                'close'
+        ).length;
+
     const nameA =
         data.couple.partner_a_name;
 
     const nameB =
         data.couple.partner_b_name;
 
-    const dimensionItems: {
-        kind: DimensionKind;
-        label: string;
-        value: number;
-    }[] = [
+    const dimensionItems:
+        DimensionItem[] = [
         {
             kind: 'views',
-            label: 'Близость взглядов',
+
+            eyebrow:
+                'ВЗГЛЯДЫ',
+
+            title:
+                'Как вы смотрите на отношения',
+
             value:
                 dimensions?.views ??
                 overall,
@@ -236,7 +264,13 @@ export default function ResultPage() {
 
         {
             kind: 'care',
-            label: 'Забота',
+
+            eyebrow:
+                'ЗАБОТА',
+
+            title:
+                'Как вы проявляете заботу',
+
             value:
                 dimensions?.care ??
                 overall,
@@ -245,7 +279,13 @@ export default function ResultPage() {
         {
             kind:
                 'communication',
-            label: 'Общение',
+
+            eyebrow:
+                'ОБЩЕНИЕ',
+
+            title:
+                'Как вы говорите о важном',
+
             value:
                 dimensions
                     ?.communication ??
@@ -254,8 +294,13 @@ export default function ResultPage() {
 
         {
             kind: 'rhythm',
-            label:
-                'Совместный ритм',
+
+            eyebrow:
+                'ВРЕМЯ ВМЕСТЕ',
+
+            title:
+                'Как вам нравится быть вместе',
+
             value:
                 dimensions?.rhythm ??
                 overall,
@@ -263,8 +308,13 @@ export default function ResultPage() {
 
         {
             kind: 'space',
-            label:
-                'Личное пространство',
+
+            eyebrow:
+                'СВОБОДА',
+
+            title:
+                'Сколько пространства нужно каждому',
+
             value:
                 dimensions?.space ??
                 overall,
@@ -279,119 +329,62 @@ export default function ResultPage() {
             HEADER
         ===================================================== */}
 
-                <header className="header narrow">
+                <header className="header shell">
 
                     <div className="brand">
                         между нами
                     </div>
 
-                    <div className="header-names">
-                        {nameA}
-                        <span>
-              ×
+                    <div className="header-couple">
+
+            <span>
+              {nameA}
             </span>
-                        {nameB}
+
+                        <b>
+                            ×
+                        </b>
+
+                        <span>
+              {nameB}
+            </span>
+
                     </div>
 
                 </header>
 
                 {/* =====================================================
-            SCORE
+            INTRO
         ===================================================== */}
 
-                <section className="score-section narrow">
+                <section className="intro shell">
 
-                    <div className="tiny-label">
-                        РЕЗУЛЬТАТ ВАШЕЙ ПАРЫ
+                    <div className="kicker">
+                        ВАШ РЕЗУЛЬТАТ
                     </div>
 
-                    <h1>
-                        насколько
-                        <br />
-                        вы совпали
-                    </h1>
+                    <div className="intro-grid">
 
-                    <div className="score-main">
+                        <h1>
+                            А вот где
+                            <br />
+                            вы совпадаете.
+                        </h1>
 
-                        <div className="score-number">
+                        <div className="intro-note">
 
-                            {overall}
+              <span>
+                не оценка отношений
+              </span>
 
-                            <sup>
-                                %
-                            </sup>
-
-                        </div>
-
-                        <div className="score-side">
-
-                            <div className="score-orbit">
-
-                                <div className="orbit orbit-one" />
-
-                                <div className="orbit orbit-two" />
-
-                                <div className="orbit-dot dot-a" />
-
-                                <div className="orbit-dot dot-b" />
-
-                                <div className="orbit-heart">
-                                    ♥
-                                </div>
-
-                            </div>
-
-                            <div className="score-copy">
-
-                                <strong>
-                                    {
-                                        getOverallTitle(
-                                            overall
-                                        )
-                                    }
-                                </strong>
-
-                                <span>
-                  {
-                      getOverallSubtitle(
-                          overall
-                      )
-                  }
-                </span>
-
-                            </div>
+                            <p>
+                                просто пять вещей,
+                                в которых особенно
+                                интересно сравнить
+                                ваши ответы
+                            </p>
 
                         </div>
-
-                    </div>
-
-                    <div className="score-rule">
-
-            <span>
-              0
-            </span>
-
-                        <div>
-
-                            <i
-                                style={{
-                                    width:
-                                        `${overall}%`,
-                                }}
-                            />
-
-                            <b
-                                style={{
-                                    left:
-                                        `${overall}%`,
-                                }}
-                            />
-
-                        </div>
-
-                        <span>
-              100
-            </span>
 
                     </div>
 
@@ -401,147 +394,102 @@ export default function ResultPage() {
             DIMENSIONS
         ===================================================== */}
 
-                <section className="dimensions-section">
+                <section className="dimensions shell">
 
-                    <div className="narrow">
-
-                        <div className="section-heading">
-
-                            <div>
-
-                                <div className="tiny-label">
-                                    А ТЕПЕРЬ ПО ЧАСТЯМ
-                                </div>
-
-                                <h2>
-                                    Где именно
-                                    <br />
-                                    вы совпали
-                                </h2>
-
-                            </div>
-
-                            <div className="heading-note">
-                                пять сторон
-                                <br />
-                                ваших отношений
-                                <span>
-                  ↙
-                </span>
-                            </div>
-
-                        </div>
-
-                        <div className="dimensions-list">
-
-                            {
-                                dimensionItems.map(
-                                    (
-                                        item,
-                                        index
-                                    ) => (
-                                        <DimensionRow
-                                            key={
-                                                item.kind
-                                            }
-                                            number={
-                                                index + 1
-                                            }
-                                            kind={
-                                                item.kind
-                                            }
-                                            label={
-                                                item.label
-                                            }
-                                            value={
-                                                item.value
-                                            }
-                                        />
-                                    )
-                                )
-                            }
-
-                        </div>
-
-                    </div>
+                    {
+                        dimensionItems.map(
+                            (item) => (
+                                <DimensionCard
+                                    key={
+                                        item.kind
+                                    }
+                                    item={
+                                        item
+                                    }
+                                />
+                            )
+                        )
+                    }
 
                 </section>
+
+                {/* =====================================================
+            BRIDGE
+        ===================================================== */}
+
+                <div className="bridge shell">
+
+          <span>
+            но проценты —
+            только половина истории
+          </span>
+
+                    <b>
+                        ↓
+                    </b>
+
+                </div>
 
                 {/* =====================================================
             ARCHETYPE
         ===================================================== */}
 
-                <section className="archetype-section">
+                <section className="type-section shell">
 
-                    <div className="narrow">
+                    <div className="type-heading">
 
-                        <div className="archetype-intro">
+                        <div className="kicker">
+                            ВАШ ТИП ПАРЫ
+                        </div>
 
-                            <div className="tiny-label">
-                                И ЕЩЁ КОЕ-ЧТО
+                        <span>
+              №
+                            {
+                                getTypeNumber(
+                                    archetype.id
+                                )
+                            }
+            </span>
+
+                    </div>
+
+                    <div className="poster">
+
+                        <CoupleArtwork
+                            archetypeId={
+                                archetype.id
+                            }
+                        />
+
+                        <div className="poster-info">
+
+                            <div className="poster-type">
+
+                                ПАРА №
+                                {
+                                    getTypeNumber(
+                                        archetype.id
+                                    )
+                                }
+
                             </div>
 
                             <h2>
-                                какая вы
-                                <br />
-                                пара?
+                                {
+                                    getArchetypeDisplayTitle(
+                                        archetype.id,
+                                        archetype.title
+                                    )
+                                }
                             </h2>
 
-                        </div>
-
-                        <div className="archetype-poster">
-
-                            <div className="poster-top">
-
-                <span>
-                  ТИП ПАРЫ
-                </span>
-
-                                <strong>
-                                    №
-                                    {
-                                        getTypeNumber(
-                                            archetype.id
-                                        )
-                                    }
-                                </strong>
-
-                            </div>
-
-                            <CoupleArtwork
-                                archetypeId={
-                                    archetype.id
+                            <p>
+                                {
+                                    getArchetypeShortCopy(
+                                        archetype.id
+                                    )
                                 }
-                            />
-
-                            <div className="poster-copy">
-
-                                <div className="poster-number">
-                                    №
-                                    {
-                                        getTypeNumber(
-                                            archetype.id
-                                        )
-                                    }
-                                </div>
-
-                                <div>
-
-                                    <h3>
-                                        {
-                                            archetype.title
-                                        }
-                                    </h3>
-
-                                    <p>
-                                        {
-                                            archetype.description
-                                        }
-                                    </p>
-
-                                </div>
-
-                            </div>
+                            </p>
 
                         </div>
 
@@ -555,17 +503,17 @@ export default function ResultPage() {
 
                 <section className="paywall">
 
-                    <div className="narrow">
+                    <div className="paywall-inner shell">
 
-                        <div className="paywall-top">
+                        <div className="paywall-kicker">
 
               <span>
-                ЛЁГКАЯ ВЕРСИЯ ЗАКОНЧИЛАСЬ
+                ЭТО ТОЛЬКО ПОВЕРХНОСТЬ
               </span>
 
-                            <i>
+                            <b>
                                 ✦
-                            </i>
+                            </b>
 
                         </div>
 
@@ -574,48 +522,71 @@ export default function ResultPage() {
                             <div className="paywall-title">
 
                                 <h2>
-                                    А что
+                                    А где вы
                                     <br />
-                                    между строк?
+                                    можете стать
+                                    <br />
+                                    ближе?
                                 </h2>
 
                                 <p>
-                                    Разберём ваши ответы
-                                    глубже — без диагнозов
-                                    и банальностей.
+                                    В ваших ответах есть
+                                    вещи, которые простой
+                                    процент не показывает.
                                 </p>
 
                             </div>
 
-                            <div className="paywall-content">
+                            <div className="teaser">
 
-                                <PayItem
-                                    number="01"
-                                >
-                                    Что каждый из вас
-                                    считает заботой
-                                </PayItem>
+                                <div className="teaser-alert">
 
-                                <PayItem
-                                    number="02"
-                                >
-                                    Где один ждёт одного,
-                                    а второй — другого
-                                </PayItem>
+                  <span>
+                    МЫ НАШЛИ
+                  </span>
 
-                                <PayItem
-                                    number="03"
-                                >
-                                    Что вы можете
-                                    не замечать друг о друге
-                                </PayItem>
+                                    <strong>
+                                        {
+                                            getFindingCount(
+                                                differentCount,
+                                                closeCount
+                                            )
+                                        }
+                                    </strong>
 
-                                <PayItem
-                                    number="04"
-                                >
-                                    О чём вам действительно
-                                    стоит поговорить
-                                </PayItem>
+                                    <p>
+                                        {
+                                            getFindingText(
+                                                differentCount,
+                                                closeCount
+                                            )
+                                        }
+                                    </p>
+
+                                </div>
+
+                                <LockedFinding>
+                                    Что партнёр может
+                                    ждать от вас,
+                                    но не говорить
+                                </LockedFinding>
+
+                                <LockedFinding>
+                                    Где вы по-разному
+                                    понимаете заботу
+                                </LockedFinding>
+
+                                <LockedFinding>
+                                    Из-за чего один
+                                    может чувствовать
+                                    себя непонятым
+                                </LockedFinding>
+
+                                <LockedFinding>
+                                    Что у вашей пары
+                                    уже работает
+                                    особенно хорошо
+                                </LockedFinding>
 
                                 <button
                                     type="button"
@@ -627,7 +598,12 @@ export default function ResultPage() {
                                 >
 
                   <span>
-                    открыть полный разбор
+                    {
+                        getButtonText(
+                            differentCount,
+                            closeCount
+                        )
+                    }
                   </span>
 
                                     <strong>
@@ -640,7 +616,7 @@ export default function ResultPage() {
 
                                 </button>
 
-                                <div className="paywall-caption">
+                                <div className="paywall-footnote">
                                     один разбор · для вас двоих
                                 </div>
 
@@ -662,7 +638,7 @@ export default function ResultPage() {
 }
 
 /* ============================================================
-   FALLBACK SCORE
+   FALLBACK
 ============================================================ */
 
 function calculateFallback(
@@ -706,105 +682,147 @@ function calculateFallback(
 }
 
 /* ============================================================
-   SCORE COPY
+   DIMENSION CARD
 ============================================================ */
 
-function getOverallTitle(
-    score: number
-) {
-    if (score >= 86) {
-        return 'почти одна голова';
-    }
-
-    if (score >= 71) {
-        return 'очень близко';
-    }
-
-    if (score >= 56) {
-        return 'много общего';
-    }
-
-    if (score >= 41) {
-        return 'есть где поспорить';
-    }
-
-    return 'два разных мира';
-}
-
-function getOverallSubtitle(
-    score: number
-) {
-    if (score >= 86) {
-        return 'либо любовь, либо вы списывали';
-    }
-
-    if (score >= 71) {
-        return 'различия есть, но база очень похожа';
-    }
-
-    if (score >= 56) {
-        return 'понимаете друг друга чаще, чем не понимаете';
-    }
-
-    if (score >= 41) {
-        return 'совпадения есть, различий тоже хватает';
-    }
-
-    return 'зато вам точно есть что узнавать друг о друге';
-}
-
-/* ============================================================
-   DIMENSION
-============================================================ */
-
-function DimensionRow({
-                          number,
-                          kind,
-                          label,
-                          value,
-                      }: {
-    number: number;
-    kind: DimensionKind;
-    label: string;
-    value: number;
+function DimensionCard({
+                           item,
+                       }: {
+    item: DimensionItem;
 }) {
     return (
-        <div className="dimension-row">
+        <article className="dimension-card">
 
-            <div className="dimension-number">
-                0{number}
+            <div className="dimension-icon-wrap">
+
+                <DimensionIcon
+                    kind={
+                        item.kind
+                    }
+                />
+
             </div>
 
-            <DimensionIcon
-                kind={
-                    kind
-                }
-            />
+            <div className="dimension-content">
 
-            <div className="dimension-main">
+                <div className="dimension-top">
 
-                <div className="dimension-head">
+                    <div>
 
-          <span>
-            {label}
-          </span>
+            <span className="dimension-eyebrow">
+              {item.eyebrow}
+            </span>
+
+                        <h3>
+                            {item.title}
+                        </h3>
+
+                    </div>
 
                     <strong>
-                        {value}%
+                        {item.value}
+                        <sup>
+                            %
+                        </sup>
                     </strong>
 
                 </div>
 
                 <SegmentBar
                     value={
-                        value
+                        item.value
                     }
                 />
 
+                <p>
+                    {
+                        getDimensionCopy(
+                            item.kind,
+                            item.value
+                        )
+                    }
+                </p>
+
             </div>
 
-        </div>
+        </article>
     );
+}
+
+/* ============================================================
+   HUMAN COPY
+============================================================ */
+
+function getDimensionCopy(
+    kind: DimensionKind,
+    value: number
+) {
+    if (
+        kind === 'views'
+    ) {
+        if (value >= 70) {
+            return 'На отношения вы смотрите довольно похоже — базовые ожидания часто совпадают.';
+        }
+
+        if (value >= 40) {
+            return 'В главном есть пересечения, но некоторые ожидания от отношений у вас разные.';
+        }
+
+        return 'Похоже, представление о том, как должны работать отношения, у вас заметно различается.';
+    }
+
+    if (
+        kind === 'care'
+    ) {
+        if (value >= 70) {
+            return 'Вы довольно хорошо угадываете, что для другого означает «я рядом».';
+        }
+
+        if (value >= 40) {
+            return 'Заботу вы иногда понимаете одинаково, а иногда ждёте совсем разных вещей.';
+        }
+
+        return 'То, что один считает заботой, второй может просто не считать чем-то особенным.';
+    }
+
+    if (
+        kind ===
+        'communication'
+    ) {
+        if (value >= 70) {
+            return 'Когда что-то важно, вам обычно хочется разговаривать об этом похожим способом.';
+        }
+
+        if (value >= 40) {
+            return 'В обычном разговоре всё ок, но сложные темы вы можете проживать по-разному.';
+        }
+
+        return 'Когда становится сложно, одному может хотеться говорить, а другому — совсем другого.';
+    }
+
+    if (
+        kind === 'rhythm'
+    ) {
+        if (value >= 70) {
+            return 'Ваше представление о хорошем времени вдвоём часто совпадает.';
+        }
+
+        if (value >= 40) {
+            return 'Часть совместных сценариев вам подходит обоим, но отдыхаете вы не всегда одинаково.';
+        }
+
+        return 'Идеальный совместный вечер у каждого из вас может выглядеть совсем по-своему.';
+    }
+
+    if (value >= 70) {
+        return 'Вы примерно одинаково чувствуете границу между «мы» и временем для себя.';
+    }
+
+    if (value >= 40) {
+        return 'Одному иногда нужно чуть больше близости или свободы, чем другому.';
+    }
+
+    return 'Потребность быть рядом и потребность побыть отдельно у вас могут сильно различаться.';
 }
 
 /* ============================================================
@@ -822,7 +840,7 @@ function SegmentBar({
         );
 
     return (
-        <div className="segment-bar">
+        <div className="segments">
 
             {
                 Array.from({
@@ -863,11 +881,15 @@ function DimensionIcon({
         kind === 'views'
     ) {
         return (
-            <div className="dimension-icon icon-eyes">
+            <div className="mini-art views-art">
 
-                <span />
+        <span className="eye-shape eye-one">
+          <i />
+        </span>
 
-                <span />
+                <span className="eye-shape eye-two">
+          <i />
+        </span>
 
             </div>
         );
@@ -877,11 +899,15 @@ function DimensionIcon({
         kind === 'care'
     ) {
         return (
-            <div className="dimension-icon icon-care">
+            <div className="mini-art care-art">
 
-        <span>
-          ♥
-        </span>
+                <span className="hand hand-one" />
+
+                <i>
+                    ♥
+                </i>
+
+                <span className="hand hand-two" />
 
             </div>
         );
@@ -892,11 +918,15 @@ function DimensionIcon({
         'communication'
     ) {
         return (
-            <div className="dimension-icon icon-talk">
+            <div className="mini-art talk-art">
 
                 <span />
 
                 <span />
+
+                <i>
+                    · ·
+                </i>
 
             </div>
         );
@@ -906,17 +936,32 @@ function DimensionIcon({
         kind === 'rhythm'
     ) {
         return (
-            <div className="dimension-icon icon-wave">
+            <div className="mini-art rhythm-art">
 
                 <svg
-                    viewBox="0 0 64 40"
+                    viewBox="0 0 90 60"
                     aria-hidden="true"
                 >
                     <path
-                        d="M2 22 C10 4 17 4 24 22 C31 40 38 40 45 22 C52 4 58 4 62 17"
+                        d="M5 35 C16 5 27 5 38 35 C49 65 60 65 71 35 C78 16 83 13 87 24"
                         fill="none"
                         stroke="currentColor"
-                        strokeWidth="4"
+                        strokeWidth="5"
+                        strokeLinecap="round"
+                    />
+
+                    <circle
+                        cx="5"
+                        cy="35"
+                        r="4"
+                        fill="#B43D69"
+                    />
+
+                    <circle
+                        cx="87"
+                        cy="24"
+                        r="4"
+                        fill="#E4AE49"
                     />
                 </svg>
 
@@ -925,11 +970,13 @@ function DimensionIcon({
     }
 
     return (
-        <div className="dimension-icon icon-space">
+        <div className="mini-art space-art">
 
-            <span />
+            <span className="planet-one" />
 
-            <span />
+            <span className="planet-two" />
+
+            <i />
 
         </div>
     );
@@ -975,12 +1022,81 @@ function getTypeNumber(
     );
 }
 
-/* ============================================================
-   COUPLE ARTWORK
+function getArchetypeDisplayTitle(
+    id: string,
+    fallback: string
+) {
+    const map:
+        Record<string, string> = {
+        knight_princess:
+            'Рыцарь × Принцесса',
 
-   Это уже не "два CSS-человечка".
-   Делаем постерную сцену:
-   большая луна + две фигуры + орбиты.
+        wizards:
+            'Волшебник × Волшебник',
+
+        pirates:
+            'Пират × Пират',
+
+        astronauts:
+            'Космонавт × Космонавт',
+
+        sun_moon:
+            'Солнце × Луна',
+
+        dragon_keeper:
+            'Дракон × Хранитель',
+
+        players:
+            'Игрок × Игрок',
+
+        homekeepers:
+            'Дом × Дом',
+    };
+
+    return (
+        map[id] ??
+        fallback
+    );
+}
+
+function getArchetypeShortCopy(
+    id: string
+) {
+    const map:
+        Record<string, string> = {
+        knight_princess:
+            'Заботитесь по-разному, но своих не бросаете.',
+
+        wizards:
+            'Ваша сильная сторона — замечать больше, чем сказано вслух.',
+
+        pirates:
+            'Маршрут может меняться. Главное, что команда остаётся той же.',
+
+        astronauts:
+            'У каждого своя орбита, но возвращаетесь вы примерно в одно место.',
+
+        sun_moon:
+            'Часто чувствуете ситуацию по-разному — и именно это дополняет пару.',
+
+        dragon_keeper:
+            'Один добавляет огня, другой помогает не потерять направление.',
+
+        players:
+            'У каждого свой стиль игры, но выигрывать приятнее вместе.',
+
+        homekeepers:
+            'Для вас особенно важно ощущение своего места и своего человека.',
+    };
+
+    return (
+        map[id] ??
+        'Два разных человека, которые каким-то образом оказались в одной истории.'
+    );
+}
+
+/* ============================================================
+   ARTWORK
 ============================================================ */
 
 function CoupleArtwork({
@@ -988,77 +1104,68 @@ function CoupleArtwork({
                        }: {
     archetypeId: string;
 }) {
-    const theme =
-        getArtworkTheme(
-            archetypeId
-        );
-
     return (
         <div
             className={
-                `couple-art ${theme}`
+                `couple-art art-${archetypeId}`
             }
         >
 
-            <div className="art-stars">
+            <div className="sky-decoration">
 
-                <i className="art-star star-a">
+                <i className="spark spark-one">
                     ✦
                 </i>
 
-                <i className="art-star star-b">
+                <i className="spark spark-two">
                     ✦
                 </i>
 
-                <i className="art-star star-c">
-                    ·
-                </i>
-
-                <i className="art-star star-d">
+                <i className="spark spark-three">
                     +
                 </i>
 
-            </div>
+                <span className="orbit-line orbit-line-one" />
 
-            <div className="art-orbit orbit-a" />
-
-            <div className="art-orbit orbit-b" />
-
-            <div className="art-sun">
-
-                <span />
-
-                <span />
-
-                <span />
+                <span className="orbit-line orbit-line-two" />
 
             </div>
 
-            <div className="art-ground">
+            <div className="big-planet">
 
-                <span className="ground-hole hole-a" />
+                <i />
 
-                <span className="ground-hole hole-b" />
+                <i />
 
-                <span className="ground-hole hole-c" />
+                <i />
 
             </div>
 
-            <PosterCharacter
+            <div className="ground">
+
+                <i className="crater crater-one" />
+
+                <i className="crater crater-two" />
+
+                <i className="crater crater-three" />
+
+            </div>
+
+            <Character
                 side="left"
             />
 
-            <PosterCharacter
+            <Character
                 side="right"
             />
 
-            <div className="art-heart">
+            <div className="art-love">
                 ♥
             </div>
 
-            <div className="art-caption">
+            <div className="art-tag">
                 {
-                    getArtworkCaption(
+                    getArtTag(
                         archetypeId
                     )
                 }
@@ -1068,13 +1175,9 @@ function CoupleArtwork({
     );
 }
 
-/* ============================================================
-   POSTER CHARACTER
-============================================================ */
-
-function PosterCharacter({
-                             side,
-                         }: {
+function Character({
+                       side,
+                   }: {
     side:
         | 'left'
         | 'right';
@@ -1082,132 +1185,234 @@ function PosterCharacter({
     return (
         <div
             className={
-                `poster-character ${side}`
+                `character ${side}`
             }
         >
 
-            <div className="character-pack" />
+            <div className="backpack" />
 
-            <div className="character-head">
+            <div className="helmet">
 
-                <div className="character-face">
+                <div className="visor">
 
-                    <span className="face-eye eye-a" />
+                    <i />
 
-                    <span className="face-eye eye-b" />
+                    <i />
 
-                    <span className="face-smile" />
+                    <span />
 
                 </div>
 
             </div>
 
-            <div className="character-body">
+            <div className="body">
 
-        <span className="body-panel">
+                <div className="panel">
 
-          <i />
+                    <i />
 
-          <i />
+                    <i />
 
-        </span>
+                </div>
 
             </div>
 
-            <div className="character-arm arm-a" />
+            <div className="arm arm-outside" />
 
-            <div className="character-arm arm-b" />
+            <div className="arm arm-inside" />
 
-            <div className="character-leg leg-a" />
+            <div className="leg leg-one" />
 
-            <div className="character-leg leg-b" />
+            <div className="leg leg-two" />
 
         </div>
     );
 }
 
-function getArtworkTheme(
+function getArtTag(
     id: string
 ) {
-    switch (id) {
-        case 'sun_moon':
-            return 'theme-moon';
+    const map:
+        Record<string, string> = {
+        knight_princess:
+            'своих не бросаем',
 
-        case 'pirates':
-            return 'theme-pirates';
+        wizards:
+            'понимаем между строк',
 
-        case 'wizards':
-            return 'theme-wizards';
+        pirates:
+            'одна команда',
 
-        case 'dragon_keeper':
-            return 'theme-dragon';
+        astronauts:
+            'две орбиты · один маршрут',
 
-        default:
-            return 'theme-space';
-    }
-}
+        sun_moon:
+            'разные стороны одного неба',
 
-function getArtworkCaption(
-    id: string
-) {
-    switch (id) {
-        case 'astronauts':
-            return 'две орбиты · один маршрут';
+        dragon_keeper:
+            'огонь + спокойствие',
 
-        case 'knight_princess':
-            return 'своих не бросаем';
+        players:
+            'играем вместе',
 
-        case 'wizards':
-            return 'понимаем магию по-разному';
+        homekeepers:
+            'своё место',
+    };
 
-        case 'pirates':
-            return 'курс может меняться · команда нет';
-
-        case 'sun_moon':
-            return 'разные стороны одного неба';
-
-        case 'dragon_keeper':
-            return 'один зажигает · другой держит курс';
-
-        case 'players':
-            return 'играете по-разному · команда одна';
-
-        case 'homekeepers':
-            return 'главное место — своё';
-
-        default:
-            return 'между вами что-то есть';
-    }
+    return (
+        map[id] ??
+        'между вами'
+    );
 }
 
 /* ============================================================
-   PAY ITEM
+   PAYWALL
 ============================================================ */
 
-function PayItem({
-                     number,
-                     children,
-                 }: {
-    number: string;
-    children: ReactNode;
+function getFindingCount(
+    different: number,
+    close: number
+) {
+    if (different > 0) {
+        return different;
+    }
+
+    if (close > 0) {
+        return close;
+    }
+
+    return 3;
+}
+
+function getFindingText(
+    different: number,
+    close: number
+) {
+    if (different > 0) {
+        return pluralizeFinding(
+            different
+        );
+    }
+
+    if (close > 0) {
+        return pluralizeNuance(
+            close
+        );
+    }
+
+    return 'важные детали, которые не видно на поверхности';
+}
+
+function pluralizeFinding(
+    count: number
+) {
+    const mod10 =
+        count % 10;
+
+    const mod100 =
+        count % 100;
+
+    if (
+        mod10 === 1 &&
+        mod100 !== 11
+    ) {
+        return 'место, где ваши ответы особенно расходятся';
+    }
+
+    if (
+        mod10 >= 2 &&
+        mod10 <= 4 &&
+        !(
+            mod100 >= 12 &&
+            mod100 <= 14
+        )
+    ) {
+        return 'места, где ваши ответы особенно расходятся';
+    }
+
+    return 'мест, где ваши ответы особенно расходятся';
+}
+
+function pluralizeNuance(
+    count: number
+) {
+    const mod10 =
+        count % 10;
+
+    const mod100 =
+        count % 100;
+
+    if (
+        mod10 === 1 &&
+        mod100 !== 11
+    ) {
+        return 'неочевидное различие между вашими ответами';
+    }
+
+    if (
+        mod10 >= 2 &&
+        mod10 <= 4 &&
+        !(
+            mod100 >= 12 &&
+            mod100 <= 14
+        )
+    ) {
+        return 'неочевидных различия между вашими ответами';
+    }
+
+    return 'неочевидных различий между вашими ответами';
+}
+
+function getButtonText(
+    different: number,
+    close: number
+) {
+    const count =
+        getFindingCount(
+            different,
+            close
+        );
+
+    return (
+        `показать наши ${count}`
+    );
+}
+
+function LockedFinding({
+                           children,
+                       }: {
+    children:
+        React.ReactNode;
 }) {
     return (
-        <div className="pay-item">
+        <div className="locked-finding">
 
-      <span>
-        {number}
-      </span>
+            <div className="lock">
+                ↗
+            </div>
 
-            <p>
-                {children}
-            </p>
+            <div>
+
+        <span>
+          НАЙДЕНО В ВАШИХ ОТВЕТАХ
+        </span>
+
+                <p>
+                    {children}
+                </p>
+
+            </div>
+
+            <b>
+                закрыто
+            </b>
 
         </div>
     );
 }
 
 /* ============================================================
-   STYLES
+   CSS
 ============================================================ */
 
 const styles = `
@@ -1224,10 +1429,10 @@ const styles = `
     margin: 0;
 
     background:
-      #F5F0EA;
+      #F4EFE9;
 
     color:
-      #262126;
+      #292329;
 
     font-family:
       "Trebuchet MS",
@@ -1244,34 +1449,29 @@ const styles = `
     min-height: 100svh;
 
     overflow: hidden;
-
-    background:
-      #F5F0EA;
   }
 
   /*
-   * Главное изменение:
-   * весь основной контент теперь
-   * сидит в узкой колонке.
+   * Намеренно узкая композиция.
    */
 
-  .narrow {
+  .shell {
     width:
       min(
-        calc(100% - 40px),
-        820px
+        calc(100% - 36px),
+        760px
       );
 
     margin:
       0 auto;
   }
 
-  /* ============================================================
+  /* ==========================================================
      HEADER
-  ============================================================ */
+  ========================================================== */
 
   .header {
-    height: 74px;
+    height: 70px;
 
     display: flex;
     align-items: center;
@@ -1279,12 +1479,7 @@ const styles = `
 
     border-bottom:
       1px solid
-      rgba(
-        38,
-        33,
-        38,
-        0.12
-      );
+      #D8D0CD;
   }
 
   .brand {
@@ -1301,35 +1496,37 @@ const styles = `
       -0.055em;
   }
 
-  .header-names {
+  .header-couple {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
     color:
-      #8B7F85;
+      #857A80;
 
     font-size: 9px;
-    font-weight: 800;
+    font-weight: 900;
 
     letter-spacing:
-      0.13em;
+      0.12em;
 
     text-transform:
       uppercase;
   }
 
-  .header-names span {
-    margin:
-      0 8px;
-
+  .header-couple b {
     color:
-      #A93E67;
+      #B43D69;
   }
 
-  /* ============================================================
-     TYPOGRAPHY
-  ============================================================ */
+  /* ==========================================================
+     COMMON
+  ========================================================== */
 
-  .tiny-label {
+  .kicker {
     color:
-      #A93E67;
+      #B43D69;
 
     font-size: 9px;
     font-weight: 900;
@@ -1341,67 +1538,34 @@ const styles = `
       uppercase;
   }
 
-  /* ============================================================
-     SCORE
-  ============================================================ */
+  /* ==========================================================
+     INTRO
+  ========================================================== */
 
-  .score-section {
+  .intro {
     padding:
-      74px
+      64px
       0
-      78px;
+      38px;
   }
 
-  .score-section > h1 {
-    max-width:
-      680px;
-
-    margin:
-      13px
-      0
-      43px;
-
-    font-family:
-      Georgia,
-      "Times New Roman",
-      serif;
-
-    font-size:
-      clamp(
-        54px,
-        8vw,
-        86px
-      );
-
-    font-style:
-      italic;
-
-    font-weight: 400;
-
-    line-height: 0.87;
-
-    letter-spacing:
-      -0.07em;
-  }
-
-  .score-main {
+  .intro-grid {
     display: grid;
 
     grid-template-columns:
-      minmax(
-        260px,
-        0.9fr
-      )
-      1fr;
+      1fr
+      190px;
 
-    align-items: center;
+    align-items: end;
 
-    gap: 55px;
+    gap: 40px;
+
+    margin-top:
+      13px;
   }
 
-  .score-number {
-    color:
-      #A93E67;
+  .intro h1 {
+    margin: 0;
 
     font-family:
       Georgia,
@@ -1410,151 +1574,126 @@ const styles = `
 
     font-size:
       clamp(
-        120px,
-        18vw,
-        178px
+        50px,
+        8vw,
+        76px
       );
 
-    font-style:
-      italic;
-
+    font-style: italic;
     font-weight: 400;
 
-    line-height: 0.75;
+    line-height: 0.91;
 
     letter-spacing:
-      -0.09em;
+      -0.065em;
   }
 
-  .score-number sup {
-    position: relative;
-
-    top: -1.05em;
-
-    margin-left:
-      4px;
-
-    font-size:
-      0.27em;
-
-    font-style:
-      normal;
-
-    letter-spacing:
-      -0.05em;
+  .intro-note {
+    padding-bottom:
+      5px;
   }
 
-  .score-side {
-    display: flex;
-    align-items: center;
-
-    gap: 24px;
-  }
-
-  /* ============================================================
-     SCORE ORBIT
-  ============================================================ */
-
-  .score-orbit {
-    position: relative;
-
-    width: 130px;
-    height: 130px;
-
-    flex:
-      0 0 130px;
-  }
-
-  .orbit {
-    position: absolute;
-
-    border:
-      1.5px solid
-      #BEB0B6;
-
-    border-radius: 50%;
-  }
-
-  .orbit-one {
-    inset:
-      11px
-      23px;
-
-    transform:
-      rotate(31deg);
-  }
-
-  .orbit-two {
-    inset:
-      23px
-      11px;
-
-    transform:
-      rotate(-31deg);
-  }
-
-  .orbit-dot {
-    position: absolute;
-
-    width: 26px;
-    height: 26px;
-
-    border:
-      3px solid
-      #F5F0EA;
-
-    border-radius: 50%;
-
-    box-shadow:
-      0 0 0 1px
-      #302930;
-  }
-
-  .dot-a {
-    top: 17px;
-    left: 31px;
-
-    background:
-      #E4B24D;
-  }
-
-  .dot-b {
-    right: 25px;
-    bottom: 20px;
-
-    background:
-      #756487;
-  }
-
-  .orbit-heart {
-    position: absolute;
-
-    top: 50%;
-    left: 50%;
-
+  .intro-note span {
     color:
-      #A93E67;
+      #B43D69;
 
     font-family:
       Georgia,
       serif;
 
-    font-size: 25px;
-
-    transform:
-      translate(
-        -50%,
-        -50%
-      );
+    font-size: 12px;
+    font-style: italic;
   }
 
-  .score-copy {
-    max-width:
-      190px;
+  .intro-note p {
+    margin:
+      8px
+      0
+      0;
+
+    color:
+      #8D8388;
+
+    font-size: 10px;
+    line-height: 1.45;
   }
 
-  .score-copy strong {
+  /* ==========================================================
+     DIMENSIONS
+  ========================================================== */
+
+  .dimensions {
+    padding-bottom:
+      48px;
+  }
+
+  .dimension-card {
+    display: grid;
+
+    grid-template-columns:
+      86px
+      1fr;
+
+    gap: 22px;
+
+    padding:
+      26px
+      0;
+
+    border-top:
+      1px solid
+      #D8D0CD;
+  }
+
+  .dimension-card:last-child {
+    border-bottom:
+      1px solid
+      #D8D0CD;
+  }
+
+  .dimension-icon-wrap {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+
+    padding-top:
+      9px;
+  }
+
+  .dimension-content {
+    min-width: 0;
+  }
+
+  .dimension-top {
+    display: grid;
+
+    grid-template-columns:
+      1fr
+      auto;
+
+    align-items: end;
+
+    gap: 20px;
+  }
+
+  .dimension-eyebrow {
     display: block;
+
+    margin-bottom:
+      5px;
+
+    color:
+      #A4999E;
+
+    font-size: 7px;
+    font-weight: 900;
+
+    letter-spacing:
+      0.19em;
+  }
+
+  .dimension-top h3 {
+    margin: 0;
 
     font-family:
       Georgia,
@@ -1565,283 +1704,35 @@ const styles = `
     font-weight: 400;
 
     line-height: 1.05;
-  }
-
-  .score-copy span {
-    display: block;
-
-    margin-top:
-      9px;
-
-    color:
-      #8D8187;
-
-    font-size: 11px;
-    line-height: 1.45;
-  }
-
-  /* ============================================================
-     SCORE RULE
-  ============================================================ */
-
-  .score-rule {
-    display: grid;
-
-    grid-template-columns:
-      auto
-      1fr
-      auto;
-
-    align-items: center;
-
-    gap: 12px;
-
-    margin-top:
-      49px;
-
-    color:
-      #9B9095;
-
-    font-family:
-      Georgia,
-      serif;
-
-    font-size: 10px;
-    font-style: italic;
-  }
-
-  .score-rule > div {
-    position: relative;
-
-    height: 3px;
-
-    background:
-      #DDD3D5;
-  }
-
-  .score-rule i {
-    position: absolute;
-
-    top: 0;
-    left: 0;
-
-    height: 100%;
-
-    background:
-      #A93E67;
-  }
-
-  .score-rule b {
-    position: absolute;
-
-    top: 50%;
-
-    width: 13px;
-    height: 13px;
-
-    border:
-      3px solid
-      #F5F0EA;
-
-    border-radius: 50%;
-
-    background:
-      #A93E67;
-
-    box-shadow:
-      0 0 0 1px
-      #A93E67;
-
-    transform:
-      translate(
-        -50%,
-        -50%
-      );
-  }
-
-  /* ============================================================
-     DIMENSIONS
-  ============================================================ */
-
-  .dimensions-section {
-    padding:
-      74px
-      0
-      80px;
-
-    background:
-      #FCFAF7;
-
-    border-top:
-      1px solid
-      #E5DDDA;
-
-    border-bottom:
-      1px solid
-      #E5DDDA;
-  }
-
-  .section-heading {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-
-    gap: 30px;
-
-    margin-bottom:
-      38px;
-  }
-
-  .section-heading h2,
-  .archetype-intro h2 {
-    margin:
-      10px
-      0
-      0;
-
-    font-family:
-      Georgia,
-      "Times New Roman",
-      serif;
-
-    font-size:
-      clamp(
-        45px,
-        7vw,
-        68px
-      );
-
-    font-style:
-      italic;
-
-    font-weight: 400;
-
-    line-height: 0.9;
 
     letter-spacing:
-      -0.065em;
+      -0.025em;
   }
 
-  .heading-note {
-    position: relative;
-
-    margin-bottom:
-      7px;
-
+  .dimension-top strong {
     color:
-      #9B8F94;
+      #B43D69;
 
     font-family:
       Georgia,
       serif;
 
-    font-size: 12px;
-    font-style: italic;
-
-    line-height: 1.25;
-
-    transform:
-      rotate(-3deg);
-  }
-
-  .heading-note span {
-    position: absolute;
-
-    right: -20px;
-    bottom: -15px;
-
-    color:
-      #A93E67;
-
-    font-size: 23px;
-  }
-
-  .dimensions-list {
-    border-top:
-      1px solid
-      #DCD3D0;
-  }
-
-  .dimension-row {
-    min-height:
-      105px;
-
-    display: grid;
-
-    grid-template-columns:
-      34px
-      72px
-      1fr;
-
-    align-items: center;
-
-    gap: 20px;
-
-    border-bottom:
-      1px solid
-      #DCD3D0;
-  }
-
-  .dimension-number {
-    align-self:
-      start;
-
-    padding-top:
-      24px;
-
-    color:
-      #B7ACB0;
-
-    font-family:
-      Georgia,
-      serif;
-
-    font-size: 11px;
-    font-style: italic;
-  }
-
-  .dimension-main {
-    min-width: 0;
-  }
-
-  .dimension-head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-
-    gap: 20px;
-
-    margin-bottom:
-      15px;
-  }
-
-  .dimension-head span {
-    font-family:
-      Georgia,
-      serif;
-
-    font-size: 20px;
-    font-style: italic;
-  }
-
-  .dimension-head strong {
-    color:
-      #A93E67;
-
-    font-family:
-      Georgia,
-      serif;
-
-    font-size: 26px;
+    font-size: 35px;
     font-style: italic;
     font-weight: 400;
+
+    line-height: 0.8;
   }
 
-  /* ============================================================
-     SEGMENT BAR
-  ============================================================ */
+  .dimension-top strong sup {
+    margin-left:
+      2px;
 
-  .segment-bar {
+    font-size:
+      0.5em;
+  }
+
+  .segments {
     display: grid;
 
     grid-template-columns:
@@ -1850,39 +1741,55 @@ const styles = `
         1fr
       );
 
-    gap: 5px;
+    gap: 4px;
+
+    margin-top:
+      15px;
   }
 
-  .segment-bar span {
-    height: 7px;
+  .segments span {
+    height: 6px;
 
     border-radius:
       20px;
 
     background:
-      #E6DFDC;
+      #DED7D4;
   }
 
-  .segment-bar span.active {
+  .segments span.active {
     background:
-      #A93E67;
+      #B43D69;
   }
 
-  /* ============================================================
-     DIMENSION ICONS
-  ============================================================ */
+  .dimension-content > p {
+    max-width:
+      560px;
 
-  .dimension-icon {
-    position: relative;
-
-    width: 60px;
-    height: 60px;
+    margin:
+      11px
+      0
+      0;
 
     color:
-      #302A30;
+      #776D72;
+
+    font-size: 11px;
+    line-height: 1.45;
   }
 
-  .icon-eyes {
+  /* ==========================================================
+     MINI ART
+  ========================================================== */
+
+  .mini-art {
+    position: relative;
+
+    width: 70px;
+    height: 55px;
+  }
+
+  .views-art {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1890,40 +1797,38 @@ const styles = `
     gap: 5px;
   }
 
-  .icon-eyes span {
+  .eye-shape {
     position: relative;
 
-    width: 27px;
-    height: 18px;
+    width: 31px;
+    height: 20px;
 
     border:
       2px solid
-      #302A30;
+      #332D33;
 
     border-radius:
       70% 30% 70% 30%;
   }
 
-  .icon-eyes span:last-child {
+  .eye-two {
     border-radius:
       30% 70% 30% 70%;
   }
 
-  .icon-eyes span::after {
-    content: '';
-
+  .eye-shape i {
     position: absolute;
 
     top: 50%;
     left: 50%;
 
-    width: 6px;
-    height: 6px;
+    width: 7px;
+    height: 7px;
 
     border-radius: 50%;
 
     background:
-      #A93E67;
+      #B43D69;
 
     transform:
       translate(
@@ -1932,125 +1837,127 @@ const styles = `
       );
   }
 
-  .icon-care {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .icon-care::before,
-  .icon-care::after {
-    content: '';
-
+  .care-art i {
     position: absolute;
 
-    bottom: 12px;
+    top: 8px;
+    left: 50%;
 
-    width: 30px;
-    height: 16px;
-
-    border-bottom:
-      2px solid
-      #302A30;
-  }
-
-  .icon-care::before {
-    left: 2px;
-
-    border-radius:
-      0 0 100% 0;
-
-    transform:
-      rotate(13deg);
-  }
-
-  .icon-care::after {
-    right: 2px;
-
-    border-radius:
-      0 0 0 100%;
-
-    transform:
-      rotate(-13deg);
-  }
-
-  .icon-care span {
     color:
-      #A93E67;
+      #B43D69;
 
     font-family:
       Georgia,
       serif;
 
     font-size: 25px;
+    font-style: normal;
+
+    transform:
+      translateX(-50%);
   }
 
-  .icon-talk span {
+  .hand {
     position: absolute;
 
-    width: 34px;
-    height: 25px;
+    bottom: 8px;
+
+    width: 38px;
+    height: 20px;
+
+    border-bottom:
+      2px solid
+      #332D33;
+  }
+
+  .hand-one {
+    left: 0;
+
+    border-radius:
+      0 0 100% 0;
+
+    transform:
+      rotate(10deg);
+  }
+
+  .hand-two {
+    right: 0;
+
+    border-radius:
+      0 0 0 100%;
+
+    transform:
+      rotate(-10deg);
+  }
+
+  .talk-art span {
+    position: absolute;
+
+    width: 40px;
+    height: 27px;
 
     border:
       2px solid
-      #302A30;
+      #332D33;
 
-    border-radius:
-      50%;
+    border-radius: 50%;
   }
 
-  .icon-talk span:first-child {
-    top: 7px;
+  .talk-art span:first-child {
+    top: 2px;
     left: 1px;
   }
 
-  .icon-talk span:last-child {
+  .talk-art span:nth-child(2) {
     right: 1px;
-    bottom: 7px;
+    bottom: 2px;
 
     border-color:
-      #A93E67;
+      #B43D69;
   }
 
-  .icon-talk span::after {
-    content: '';
-
+  .talk-art i {
     position: absolute;
 
-    bottom: -5px;
-    left: 7px;
+    top: 13px;
+    left: 22px;
 
-    width: 8px;
-    height: 8px;
+    z-index: 3;
 
-    border-left:
-      2px solid
-      currentColor;
+    color:
+      #332D33;
 
-    transform:
-      rotate(-25deg);
+    font-family:
+      Georgia,
+      serif;
+
+    font-size: 14px;
+    font-style: normal;
   }
 
-  .icon-wave {
+  .rhythm-art {
     display: flex;
     align-items: center;
   }
 
-  .icon-wave svg {
-    width: 60px;
+  .rhythm-art svg {
+    width: 70px;
   }
 
-  .icon-space span {
+  .space-art
+  .planet-one,
+  .space-art
+  .planet-two {
     position: absolute;
 
     top: 50%;
 
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
 
     border:
       2px solid
-      #302A30;
+      #332D33;
 
     border-radius: 50%;
 
@@ -2058,221 +1965,240 @@ const styles = `
       translateY(-50%);
   }
 
-  .icon-space span:first-child {
-    left: 0;
+  .planet-one {
+    left: 1px;
 
     background:
-      #E3B34E;
+      #E5AF49;
   }
 
-  .icon-space span:last-child {
-    right: 0;
+  .planet-two {
+    right: 1px;
 
     background:
-      #8C799E;
+      #927DA1;
   }
 
-  /* ============================================================
-     ARCHETYPE
-  ============================================================ */
+  .space-art i {
+    position: absolute;
 
-  .archetype-section {
-    padding:
-      82px
-      0
-      95px;
-  }
+    top: 50%;
+    left: 50%;
 
-  .archetype-intro {
-    margin-bottom:
-      35px;
-  }
+    width: 7px;
+    height: 7px;
 
-  .archetype-poster {
-    overflow: hidden;
-
-    border:
-      1px solid
-      #332C32;
+    border-radius: 50%;
 
     background:
-      #F9F4EE;
+      #B43D69;
 
-    box-shadow:
-      9px 10px 0
-      #D9C9CE;
+    transform:
+      translate(
+        -50%,
+        -50%
+      );
   }
 
-  .poster-top {
-    height: 49px;
+  /* ==========================================================
+     BRIDGE
+  ========================================================== */
 
+  .bridge {
     display: flex;
     align-items: center;
     justify-content: space-between;
 
     padding:
-      0 19px;
-
-    border-bottom:
-      1px solid
-      #332C32;
+      0
+      0
+      68px;
 
     color:
-      #6D6267;
-
-    font-size: 8px;
-    font-weight: 900;
-
-    letter-spacing:
-      0.2em;
-  }
-
-  .poster-top strong {
-    color:
-      #A93E67;
+      #91868B;
 
     font-family:
       Georgia,
       serif;
 
-    font-size: 19px;
+    font-size: 12px;
     font-style: italic;
-    font-weight: 400;
-
-    letter-spacing: 0;
   }
 
-  /* ============================================================
+  .bridge b {
+    color:
+      #B43D69;
+
+    font-size: 22px;
+    font-weight: 400;
+  }
+
+  /* ==========================================================
+     TYPE
+  ========================================================== */
+
+  .type-section {
+    padding-bottom:
+      80px;
+  }
+
+  .type-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom:
+      15px;
+  }
+
+  .type-heading > span {
+    color:
+      #B43D69;
+
+    font-family:
+      Georgia,
+      serif;
+
+    font-size: 22px;
+    font-style: italic;
+  }
+
+  .poster {
+    overflow: hidden;
+
+    border:
+      1px solid
+      #312B31;
+
+    background:
+      #F8F2EC;
+
+    box-shadow:
+      7px 8px 0
+      #DACBD0;
+  }
+
+  /* ==========================================================
      ART
-  ============================================================ */
+  ========================================================== */
 
   .couple-art {
     position: relative;
 
     height:
-      430px;
+      380px;
 
     overflow: hidden;
 
     background:
-      #393340;
+      #393440;
   }
 
-  .art-stars {
+  .sky-decoration {
     position: absolute;
 
     inset: 0;
-
-    color:
-      #E3B057;
   }
 
-  .art-star {
+  .spark {
     position: absolute;
+
+    color:
+      #E5AF49;
 
     font-style: normal;
   }
 
-  .star-a {
-    top: 12%;
-    left: 12%;
+  .spark-one {
+    top: 15%;
+    left: 13%;
 
-    font-size: 25px;
+    font-size: 27px;
   }
 
-  .star-b {
-    top: 23%;
-    right: 11%;
+  .spark-two {
+    top: 24%;
+    right: 12%;
 
     color:
-      #BD6E8A;
+      #C36C8B;
 
-    font-size: 18px;
+    font-size: 19px;
   }
 
-  .star-c {
-    top: 8%;
-    left: 54%;
-
-    color:
-      #F4E9DC;
-
-    font-size: 30px;
-  }
-
-  .star-d {
-    top: 39%;
+  .spark-three {
+    top: 43%;
     left: 7%;
 
     color:
-      #857395;
+      #907C9E;
 
-    font-size: 22px;
+    font-size: 20px;
   }
 
-  .art-orbit {
+  .orbit-line {
     position: absolute;
+
+    left: 50%;
 
     border:
       1px solid
       rgba(
-        242,
+        241,
         225,
-        209,
-        0.22
+        211,
+        0.24
       );
 
     border-radius: 50%;
   }
 
-  .orbit-a {
-    width: 520px;
-    height: 200px;
+  .orbit-line-one {
+    top: 90px;
 
-    top: 80px;
-    left: 50%;
+    width: 510px;
+    height: 155px;
 
     transform:
       translateX(-50%)
       rotate(-13deg);
   }
 
-  .orbit-b {
-    width: 450px;
-    height: 160px;
+  .orbit-line-two {
+    top: 105px;
 
-    top: 115px;
-    left: 50%;
+    width: 450px;
+    height: 175px;
 
     transform:
       translateX(-50%)
-      rotate(15deg);
+      rotate(17deg);
   }
 
-  .art-sun {
+  .big-planet {
     position: absolute;
 
-    top: 52px;
+    top: 45px;
     left: 50%;
 
-    width: 176px;
-    height: 176px;
+    width: 165px;
+    height: 165px;
 
     border:
       4px solid
-      #2B2630;
+      #29242C;
 
     border-radius: 50%;
 
     background:
-      #E7B75B;
+      #C2B0CF;
 
     box-shadow:
-      10px 9px 0
+      8px 8px 0
       rgba(
+        28,
         24,
-        20,
-        27,
+        31,
         0.22
       );
 
@@ -2280,147 +2206,145 @@ const styles = `
       translateX(-50%);
   }
 
-  .art-sun span {
+  .big-planet i {
     position: absolute;
 
     border:
       3px solid
       rgba(
-        75,
+        70,
         57,
-        45,
-        0.3
+        75,
+        0.28
       );
 
     border-radius: 50%;
   }
 
-  .art-sun span:first-child {
-    top: 30px;
-    left: 30px;
+  .big-planet i:first-child {
+    top: 31px;
+    left: 27px;
 
-    width: 37px;
-    height: 23px;
+    width: 39px;
+    height: 22px;
   }
 
-  .art-sun span:nth-child(2) {
-    top: 78px;
-    right: 25px;
+  .big-planet i:nth-child(2) {
+    top: 82px;
+    right: 24px;
 
-    width: 30px;
-    height: 34px;
+    width: 27px;
+    height: 35px;
   }
 
-  .art-sun span:nth-child(3) {
-    bottom: 24px;
-    left: 55px;
+  .big-planet i:nth-child(3) {
+    bottom: 25px;
+    left: 63px;
 
     width: 25px;
     height: 17px;
   }
 
-  .art-ground {
+  .ground {
     position: absolute;
 
-    left: -8%;
-    right: -8%;
+    left: -9%;
+    right: -9%;
     bottom: -120px;
 
-    height: 280px;
+    height: 255px;
 
     border:
       4px solid
-      #2B2630;
+      #29242C;
 
     border-radius:
       50% 50% 0 0;
 
     background:
-      #7D6C88;
+      #81718C;
   }
 
-  .ground-hole {
+  .crater {
     position: absolute;
 
     border:
       3px solid
-      #50465A;
+      #554A5E;
 
     border-radius: 50%;
 
     background:
-      #665971;
+      #695C73;
   }
 
-  .hole-a {
-    top: 45px;
-    left: 18%;
+  .crater-one {
+    top: 42px;
+    left: 17%;
 
-    width: 62px;
-    height: 35px;
+    width: 60px;
+    height: 34px;
   }
 
-  .hole-b {
-    top: 85px;
-    left: 48%;
+  .crater-two {
+    top: 84px;
+    left: 47%;
 
-    width: 90px;
-    height: 42px;
+    width: 88px;
+    height: 40px;
   }
 
-  .hole-c {
-    top: 35px;
+  .crater-three {
+    top: 38px;
     right: 16%;
 
     width: 48px;
-    height: 28px;
+    height: 27px;
   }
 
-  /* ============================================================
-     POSTER CHARACTERS
-  ============================================================ */
+  /* ==========================================================
+     CHARACTERS
+  ========================================================== */
 
-  .poster-character {
+  .character {
     position: absolute;
 
-    z-index: 6;
+    z-index: 5;
 
-    bottom: 54px;
+    bottom: 47px;
 
-    width: 145px;
-    height: 220px;
+    width: 135px;
+    height: 205px;
   }
 
-  .poster-character.left {
+  .character.left {
     left:
       calc(
-        50% - 165px
+        50% - 154px
       );
 
     transform:
-      rotate(3deg);
+      rotate(2deg);
   }
 
-  .poster-character.right {
+  .character.right {
     right:
       calc(
-        50% - 165px
+        50% - 154px
       );
 
     transform:
-      rotate(-3deg);
+      rotate(-2deg);
   }
 
-  .character-pack {
+  .backpack {
     position: absolute;
 
-    z-index: 1;
+    top: 75px;
+    left: 4px;
 
-    top: 80px;
-    left: 7px;
-
-    width: 52px;
-    height: 90px;
+    width: 48px;
+    height: 84px;
 
     border:
       4px solid
@@ -2430,55 +2354,53 @@ const styles = `
       17px;
 
     background:
-      #A8617C;
+      #B45B7A;
   }
 
-  .character-head {
+  .helmet {
     position: absolute;
 
-    z-index: 5;
+    z-index: 6;
 
     top: 0;
     left: 50%;
 
-    width: 100px;
-    height: 94px;
+    width: 94px;
+    height: 90px;
 
     border:
       4px solid
       #29242C;
 
-    border-radius:
-      46% 46% 43% 43%;
+    border-radius: 47%;
 
     background:
-      #EEE4DA;
+      #F0E7DD;
 
     transform:
       translateX(-50%);
   }
 
-  .character-face {
+  .visor {
     position: absolute;
 
     top: 17px;
-    left: 15px;
+    left: 14px;
 
-    width: 63px;
-    height: 49px;
+    width: 59px;
+    height: 47px;
 
     border:
       4px solid
       #29242C;
 
-    border-radius:
-      45%;
+    border-radius: 45%;
 
     background:
       #665B70;
   }
 
-  .face-eye {
+  .visor i {
     position: absolute;
 
     top: 17px;
@@ -2489,29 +2411,29 @@ const styles = `
     border-radius: 50%;
 
     background:
-      #F3D8B0;
+      #F2D4A5;
   }
 
-  .eye-a {
-    left: 17px;
+  .visor i:first-child {
+    left: 16px;
   }
 
-  .eye-b {
-    right: 17px;
+  .visor i:nth-child(2) {
+    right: 16px;
   }
 
-  .face-smile {
+  .visor span {
     position: absolute;
 
     left: 50%;
     bottom: 8px;
 
     width: 18px;
-    height: 8px;
+    height: 7px;
 
     border-bottom:
       2px solid
-      #F3D8B0;
+      #F2D4A5;
 
     border-radius:
       0 0 50% 50%;
@@ -2520,342 +2442,340 @@ const styles = `
       translateX(-50%);
   }
 
-  .character-body {
+  .body {
     position: absolute;
 
-    z-index: 4;
+    z-index: 5;
 
-    top: 80px;
+    top: 76px;
     left: 50%;
 
-    width: 94px;
-    height: 94px;
+    width: 88px;
+    height: 88px;
 
     border:
       4px solid
       #29242C;
 
     border-radius:
-      16px 16px 29px 29px;
+      14px 14px 27px 27px;
 
     background:
-      #EEE4DA;
+      #F0E7DD;
 
     transform:
       translateX(-50%);
   }
 
-  .body-panel {
+  .panel {
     position: absolute;
 
     top: 25px;
     left: 50%;
 
-    width: 40px;
-    height: 28px;
+    width: 38px;
+    height: 26px;
 
     border:
       3px solid
       #29242C;
 
     background:
-      #B95A7B;
+      #C35078;
 
     transform:
       translateX(-50%);
   }
 
-  .body-panel i {
+  .panel i {
     position: absolute;
 
     top: 7px;
 
     width: 6px;
     height: 6px;
+  }
+
+  .panel i:first-child {
+    left: 7px;
 
     background:
-      #E8B653;
+      #E5AF49;
   }
 
-  .body-panel i:first-child {
-    left: 7px;
-  }
-
-  .body-panel i:last-child {
+  .panel i:last-child {
     right: 7px;
 
     background:
-      #746589;
+      #7E6C91;
   }
 
-  .character-arm {
+  .arm {
+    position: absolute;
+
+    z-index: 4;
+
+    top: 97px;
+
+    width: 61px;
+    height: 25px;
+
+    border:
+      4px solid
+      #29242C;
+
+    border-radius: 14px;
+
+    background:
+      #F0E7DD;
+  }
+
+  .character.left
+  .arm-outside {
+    left: -20px;
+
+    transform:
+      rotate(27deg);
+  }
+
+  .character.left
+  .arm-inside {
+    right: -34px;
+
+    width: 76px;
+
+    transform:
+      rotate(-11deg);
+  }
+
+  .character.right
+  .arm-outside {
+    right: -20px;
+
+    transform:
+      rotate(-27deg);
+  }
+
+  .character.right
+  .arm-inside {
+    left: -34px;
+
+    width: 76px;
+
+    transform:
+      rotate(11deg);
+  }
+
+  .leg {
     position: absolute;
 
     z-index: 3;
 
-    top: 99px;
-
-    width: 66px;
-    height: 27px;
-
-    border:
-      4px solid
-      #29242C;
-
-    border-radius:
-      13px;
-
-    background:
-      #EEE4DA;
-  }
-
-  .arm-a {
-    left: -23px;
-
-    transform:
-      rotate(23deg);
-  }
-
-  .arm-b {
-    right: -23px;
-
-    transform:
-      rotate(-23deg);
-  }
-
-  .character-leg {
-    position: absolute;
-
-    z-index: 2;
-
     bottom: 0;
 
-    width: 42px;
-    height: 69px;
+    width: 39px;
+    height: 64px;
 
     border:
       4px solid
       #29242C;
 
     border-radius:
-      10px 10px 20px 20px;
+      10px 10px 18px 18px;
 
     background:
-      #EEE4DA;
+      #F0E7DD;
   }
 
-  .leg-a {
-    left: 27px;
+  .leg-one {
+    left: 25px;
 
     transform:
-      rotate(6deg);
+      rotate(5deg);
   }
 
-  .leg-b {
-    right: 27px;
+  .leg-two {
+    right: 25px;
 
     transform:
-      rotate(-6deg);
+      rotate(-5deg);
   }
 
-  .poster-character.left
-  .arm-b {
-    width: 80px;
-
-    right: -40px;
-
-    transform:
-      rotate(-12deg);
-  }
-
-  .poster-character.right
-  .arm-a {
-    width: 80px;
-
-    left: -40px;
-
-    transform:
-      rotate(12deg);
-  }
-
-  .art-heart {
+  .art-love {
     position: absolute;
 
     z-index: 10;
 
-    top: 190px;
+    top: 185px;
     left: 50%;
 
     color:
-      #C64F76;
+      #D04F78;
 
     font-family:
       Georgia,
       serif;
 
-    font-size: 34px;
+    font-size: 32px;
 
     transform:
       translateX(-50%);
   }
 
-  .art-caption {
+  .art-tag {
     position: absolute;
 
-    z-index: 20;
+    z-index: 15;
 
-    right: 20px;
-    bottom: 18px;
+    right: 16px;
+    bottom: 14px;
 
     padding:
-      9px
-      13px;
+      8px
+      11px;
 
     border:
       1px solid
-      #332C32;
+      #302A30;
 
     background:
-      #F6EFE8;
-
-    color:
-      #332C32;
+      #F6EEE7;
 
     font-family:
       Georgia,
       serif;
 
-    font-size: 11px;
+    font-size: 10px;
     font-style: italic;
 
     transform:
       rotate(-2deg);
   }
 
-  /* different subtle palettes */
+  /*
+   * Небольшие вариации палитры
+   * по типу пары.
+   */
 
-  .theme-moon
-  .art-sun {
+  .art-sun_moon
+  .big-planet {
     background:
-      #C9B8D3;
+      #C4B1D1;
   }
 
-  .theme-pirates
-  .art-sun {
+  .art-pirates
+  .big-planet {
     background:
-      #D68B58;
+      #D98E5E;
   }
 
-  .theme-wizards
-  .art-sun {
+  .art-wizards
+  .big-planet {
     background:
-      #8F7BA8;
+      #9983AE;
   }
 
-  .theme-dragon
-  .art-sun {
+  .art-dragon_keeper
+  .big-planet {
     background:
-      #C96163;
+      #CB6968;
   }
 
-  /* ============================================================
-     POSTER COPY
-  ============================================================ */
+  .art-homekeepers
+  .big-planet {
+    background:
+      #CDA679;
+  }
 
-  .poster-copy {
-    display: grid;
+  /* ==========================================================
+     POSTER INFO
+  ========================================================== */
 
-    grid-template-columns:
-      120px
-      1fr;
-
-    gap: 25px;
-
+  .poster-info {
     padding:
-      31px
-      34px
-      36px;
-
-    border-top:
-      1px solid
-      #332C32;
+      25px
+      29px
+      29px;
   }
 
-  .poster-number {
+  .poster-type {
+    margin-bottom:
+      8px;
+
     color:
-      #A93E67;
+      #B43D69;
 
-    font-family:
-      Georgia,
-      serif;
+    font-size: 8px;
+    font-weight: 900;
 
-    font-size: 36px;
-    font-style: italic;
+    letter-spacing:
+      0.18em;
   }
 
-  .poster-copy h3 {
+  .poster-info h2 {
     margin: 0;
 
     font-family:
       Georgia,
+      "Times New Roman",
       serif;
 
     font-size:
       clamp(
-        42px,
+        43px,
         7vw,
-        67px
+        62px
       );
 
     font-style: italic;
     font-weight: 400;
 
-    line-height: 0.9;
+    line-height: 0.95;
 
     letter-spacing:
       -0.06em;
   }
 
-  .poster-copy p {
+  .poster-info p {
     max-width:
-      430px;
+      500px;
 
     margin:
-      17px
+      13px
       0
       0;
 
     color:
-      #786D72;
+      #766C71;
 
-    font-size: 13px;
-    line-height: 1.55;
+    font-size: 12px;
+    line-height: 1.45;
   }
 
-  /* ============================================================
+  /* ==========================================================
      PAYWALL
-  ============================================================ */
+  ========================================================== */
 
   .paywall {
     padding:
-      72px
+      65px
       0
-      80px;
+      72px;
 
     background:
       #2E2931;
 
     color:
-      #F6EFE9;
+      #F8F1EB;
   }
 
-  .paywall-top {
+  .paywall-kicker {
     display: flex;
     align-items: center;
     justify-content: space-between;
 
     padding-bottom:
-      20px;
+      18px;
 
     border-bottom:
       1px solid
@@ -2867,34 +2787,34 @@ const styles = `
       );
 
     color:
-      #D47B9A;
+      #DD829F;
 
     font-size: 8px;
     font-weight: 900;
 
     letter-spacing:
-      0.22em;
+      0.21em;
   }
 
-  .paywall-top i {
+  .paywall-kicker b {
     color:
-      #E5B65A;
+      #E8B54D;
 
-    font-size: 20px;
-    font-style: normal;
+    font-size: 19px;
+    font-weight: 400;
   }
 
   .paywall-grid {
     display: grid;
 
     grid-template-columns:
-      0.9fr
-      1.1fr;
+      0.8fr
+      1.2fr;
 
-    gap: 60px;
+    gap: 50px;
 
     padding-top:
-      40px;
+      37px;
   }
 
   .paywall-title h2 {
@@ -2906,44 +2826,124 @@ const styles = `
 
     font-size:
       clamp(
-        43px,
+        44px,
         7vw,
-        66px
+        63px
       );
 
     font-style: italic;
     font-weight: 400;
 
-    line-height: 0.9;
+    line-height: 0.89;
 
     letter-spacing:
-      -0.055em;
+      -0.06em;
   }
 
   .paywall-title > p {
     max-width:
-      260px;
+      230px;
 
     margin:
-      22px
+      20px
       0
       0;
 
     color:
-      #AFA4AB;
+      #ADA2A8;
 
-    font-size: 11px;
+    font-size: 10px;
     line-height: 1.5;
   }
 
-  .pay-item {
+  /* ==========================================================
+     TEASER
+  ========================================================== */
+
+  .teaser-alert {
+    position: relative;
+
+    margin-bottom:
+      15px;
+
+    padding:
+      18px
+      20px;
+
+    border:
+      1px solid
+      #D37A99;
+
+    background:
+      #3B323D;
+  }
+
+  .teaser-alert > span {
+    display: block;
+
+    color:
+      #D9829F;
+
+    font-size: 7px;
+    font-weight: 900;
+
+    letter-spacing:
+      0.18em;
+  }
+
+  .teaser-alert strong {
+    display: block;
+
+    margin-top:
+      4px;
+
+    color:
+      #F4C05C;
+
+    font-family:
+      Georgia,
+      serif;
+
+    font-size: 56px;
+    font-style: italic;
+    font-weight: 400;
+
+    line-height: 0.95;
+  }
+
+  .teaser-alert p {
+    max-width:
+      300px;
+
+    margin:
+      4px
+      0
+      0;
+
+    color:
+      #E7DDE2;
+
+    font-family:
+      Georgia,
+      serif;
+
+    font-size: 14px;
+    font-style: italic;
+
+    line-height: 1.3;
+  }
+
+  .locked-finding {
     display: grid;
 
     grid-template-columns:
-      28px
-      1fr;
+      27px
+      1fr
+      auto;
 
-    gap: 12px;
+    align-items: center;
+
+    gap: 10px;
 
     padding:
       13px
@@ -2959,35 +2959,75 @@ const styles = `
       );
   }
 
-  .pay-item span {
-    color:
-      #D47B9A;
+  .lock {
+    width: 22px;
+    height: 22px;
 
-    font-family:
-      Georgia,
-      serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border:
+      1px solid
+      #D47A99;
+
+    border-radius: 50%;
+
+    color:
+      #D47A99;
 
     font-size: 10px;
-    font-style: italic;
+
+    transform:
+      rotate(45deg);
   }
 
-  .pay-item p {
-    margin: 0;
+  .locked-finding span {
+    color:
+      #7F747D;
+
+    font-size: 6px;
+    font-weight: 900;
+
+    letter-spacing:
+      0.12em;
+  }
+
+  .locked-finding p {
+    margin:
+      3px
+      0
+      0;
 
     color:
-      #DDD5DA;
+      #F0E7EC;
 
     font-family:
       Georgia,
       serif;
 
-    font-size: 15px;
+    font-size: 13px;
     font-style: italic;
 
     line-height: 1.25;
   }
 
-  .paywall-content button {
+  .locked-finding > b {
+    color:
+      #776C75;
+
+    font-size: 7px;
+    font-weight: 700;
+
+    text-transform:
+      uppercase;
+  }
+
+  /* ==========================================================
+     CTA
+  ========================================================== */
+
+  .teaser button {
     width: 100%;
 
     display: grid;
@@ -2999,10 +3039,10 @@ const styles = `
 
     align-items: center;
 
-    gap: 14px;
+    gap: 13px;
 
     margin-top:
-      24px;
+      22px;
 
     padding:
       17px
@@ -3010,12 +3050,10 @@ const styles = `
 
     border:
       1px solid
-      #E4A0B8;
-
-    border-radius: 0;
+      #F0B1C7;
 
     background:
-      #A93E67;
+      #B43D69;
 
     color:
       #FFFFFF;
@@ -3023,48 +3061,59 @@ const styles = `
     cursor: pointer;
 
     text-align: left;
+
+    transition:
+      transform
+      160ms ease,
+      background
+      160ms ease;
   }
 
-  .paywall-content button span {
+  .teaser button:hover {
+    background:
+      #C84977;
+
+    transform:
+      translateY(-2px);
+  }
+
+  .teaser button span {
     font-family:
       Georgia,
       serif;
 
-    font-size: 15px;
+    font-size: 14px;
     font-style: italic;
   }
 
-  .paywall-content button strong {
+  .teaser button strong {
+    white-space: nowrap;
+
     font-size: 14px;
   }
 
-  .paywall-content button b {
+  .teaser button b {
     font-size: 19px;
   }
 
-  .paywall-content button:hover {
-    background:
-      #BB4B75;
-  }
-
-  .paywall-caption {
+  .paywall-footnote {
     margin-top:
-      10px;
+      9px;
 
     color:
-      #817780;
+      #776D75;
 
-    font-size: 8px;
+    font-size: 7px;
 
     text-align: center;
 
     letter-spacing:
-      0.07em;
+      0.08em;
   }
 
-  /* ============================================================
+  /* ==========================================================
      STATES
-  ============================================================ */
+  ========================================================== */
 
   .loading-page,
   .state-page {
@@ -3079,7 +3128,7 @@ const styles = `
     padding: 30px;
 
     background:
-      #F5F0EA;
+      #F4EFE9;
 
     text-align: center;
   }
@@ -3089,7 +3138,7 @@ const styles = `
       Georgia,
       serif;
 
-    font-size: 25px;
+    font-size: 24px;
     font-style: italic;
     font-weight: 700;
   }
@@ -3097,19 +3146,19 @@ const styles = `
   .loading-page p,
   .state-page p {
     color:
-      #8F8389;
+      #8D8288;
 
     font-family:
       Georgia,
       serif;
 
-    font-size: 12px;
+    font-size: 11px;
     font-style: italic;
   }
 
   .state-page h1 {
     margin:
-      30px
+      25px
       0
       10px;
 
@@ -3117,348 +3166,293 @@ const styles = `
       Georgia,
       serif;
 
-    font-size: 45px;
+    font-size: 43px;
     font-style: italic;
     font-weight: 400;
+
+    line-height: 0.95;
   }
 
-  .loading-orbits {
-    position: relative;
-
-    width: 100px;
-    height: 75px;
+  .loading-symbol {
+    display: flex;
+    align-items: center;
 
     margin-bottom:
-      28px;
+      25px;
   }
 
-  .loading-orbits span {
-    position: absolute;
-
-    top: 50%;
-
-    width: 58px;
-    height: 58px;
+  .loading-symbol span {
+    width: 48px;
+    height: 48px;
 
     border:
       2px solid
       #302A30;
 
     border-radius: 50%;
-
-    transform:
-      translateY(-50%);
   }
 
-  .loading-orbits span:first-child {
-    left: 3px;
+  .loading-symbol span:last-child {
+    margin-left:
+      -12px;
   }
 
-  .loading-orbits span:nth-child(2) {
-    right: 3px;
-  }
+  .loading-symbol i {
+    position: relative;
 
-  .loading-orbits i {
-    position: absolute;
+    z-index: 2;
 
-    top: 50%;
-    left: 50%;
+    margin:
+      0 -7px;
 
     color:
-      #A93E67;
+      #B43D69;
 
     font-family:
       Georgia,
       serif;
 
     font-style: normal;
-
-    transform:
-      translate(
-        -50%,
-        -50%
-      );
   }
 
-  /* ============================================================
+  /* ==========================================================
      MOBILE
-  ============================================================ */
+  ========================================================== */
 
   @media (
     max-width: 650px
   ) {
 
-    .narrow {
+    .shell {
       width:
         calc(
-          100% - 30px
+          100% - 28px
         );
     }
 
     .header {
-      height: 62px;
+      height: 61px;
     }
 
     .brand {
       font-size: 20px;
     }
 
-    .header-names {
+    .header-couple {
       max-width:
         150px;
 
       overflow: hidden;
 
-      font-size: 8px;
+      font-size: 7px;
 
       text-overflow:
         ellipsis;
 
-      white-space:
-        nowrap;
+      white-space: nowrap;
     }
 
-    .score-section {
+    .intro {
       padding:
-        50px
+        46px
         0
-        55px;
-    }
-
-    .score-section > h1 {
-      margin-bottom:
-        34px;
-
-      font-size:
-        clamp(
-          49px,
-          15vw,
-          67px
-        );
-    }
-
-    .score-main {
-      grid-template-columns:
-        1fr;
-
-      gap: 32px;
-    }
-
-    .score-number {
-      font-size:
-        clamp(
-          118px,
-          38vw,
-          155px
-        );
-    }
-
-    .score-side {
-      gap: 17px;
-    }
-
-    .score-orbit {
-      width: 105px;
-      height: 105px;
-
-      flex-basis:
-        105px;
-    }
-
-    .score-copy {
-      max-width:
-        190px;
-    }
-
-    .score-rule {
-      margin-top:
-        36px;
-    }
-
-    .dimensions-section {
-      padding:
-        54px
-        0
-        58px;
-    }
-
-    .section-heading {
-      align-items:
-        flex-start;
-
-      margin-bottom:
         28px;
     }
 
-    .section-heading h2,
-    .archetype-intro h2 {
-      font-size:
-        48px;
-    }
-
-    .heading-note {
-      display: none;
-    }
-
-    .dimension-row {
-      min-height:
-        98px;
-
+    .intro-grid {
       grid-template-columns:
-        25px
-        55px
+        1fr;
+
+      gap: 17px;
+    }
+
+    .intro h1 {
+      font-size:
+        clamp(
+          47px,
+          14vw,
+          61px
+        );
+    }
+
+    .intro-note {
+      max-width:
+        250px;
+    }
+
+    .dimension-card {
+      grid-template-columns:
+        60px
         1fr;
 
       gap: 12px;
+
+      padding:
+        23px
+        0;
     }
 
-    .dimension-icon {
-      width: 50px;
-      height: 50px;
+    .dimension-icon-wrap {
+      justify-content:
+        flex-start;
+
+      padding-top:
+        14px;
+    }
+
+    .mini-art {
+      width: 55px;
 
       transform:
-        scale(0.84);
+        scale(0.82);
+
+      transform-origin:
+        left center;
     }
 
-    .dimension-head {
-      margin-bottom:
-        12px;
+    .dimension-top h3 {
+      max-width:
+        210px;
+
+      font-size: 18px;
     }
 
-    .dimension-head span {
-      font-size: 16px;
+    .dimension-top strong {
+      font-size: 29px;
     }
 
-    .dimension-head strong {
-      font-size: 20px;
+    .dimension-content > p {
+      font-size: 10px;
     }
 
-    .segment-bar {
+    .segments {
       gap: 3px;
     }
 
-    .segment-bar span {
-      height: 6px;
+    .segments span {
+      height: 5px;
     }
 
-    .archetype-section {
-      padding:
-        57px
-        0
-        70px;
+    .bridge {
+      padding-bottom:
+        48px;
     }
 
-    .archetype-intro {
-      margin-bottom:
-        27px;
-    }
-
-    .archetype-poster {
-      box-shadow:
-        6px 7px 0
-        #D9C9CE;
+    .type-section {
+      padding-bottom:
+        60px;
     }
 
     .couple-art {
-      height:
-        330px;
+      height: 310px;
     }
 
-    .art-sun {
-      width: 130px;
-      height: 130px;
+    .big-planet {
+      width: 125px;
+      height: 125px;
     }
 
-    .poster-character {
-      bottom: 37px;
+    .character {
+      bottom: 34px;
 
       transform-origin:
         bottom center;
     }
 
-    .poster-character.left {
+    .character.left {
       left:
         calc(
-          50% - 137px
+          50% - 124px
         );
 
       transform:
         scale(0.78)
-        rotate(3deg);
+        rotate(2deg);
     }
 
-    .poster-character.right {
+    .character.right {
       right:
         calc(
-          50% - 137px
+          50% - 124px
         );
 
       transform:
         scale(0.78)
-        rotate(-3deg);
+        rotate(-2deg);
     }
 
-    .art-heart {
-      top: 155px;
+    .art-love {
+      top: 150px;
     }
 
-    .poster-copy {
-      grid-template-columns:
-        1fr;
+    .art-tag {
+      right: 9px;
+      bottom: 9px;
 
-      gap: 5px;
+      font-size: 8px;
+    }
 
+    .poster-info {
       padding:
-        25px
         22px
-        29px;
+        21px
+        25px;
     }
 
-    .poster-number {
-      font-size: 22px;
-    }
-
-    .poster-copy h3 {
+    .poster-info h2 {
       font-size:
-        47px;
-    }
-
-    .poster-copy p {
-      margin-top:
-        13px;
-    }
-
-    .art-caption {
-      right: 10px;
-      bottom: 10px;
-
-      font-size: 9px;
+        43px;
     }
 
     .paywall {
       padding:
-        52px
+        50px
         0
-        60px;
+        57px;
     }
 
     .paywall-grid {
       grid-template-columns:
         1fr;
 
-      gap: 33px;
+      gap: 30px;
 
       padding-top:
-        30px;
+        28px;
     }
 
     .paywall-title h2 {
-      font-size: 49px;
+      font-size:
+        48px;
     }
 
     .paywall-title > p {
       margin-top:
-        16px;
+        15px;
+    }
+
+    .teaser-alert strong {
+      font-size: 49px;
+    }
+
+    .locked-finding {
+      grid-template-columns:
+        25px
+        1fr;
+    }
+
+    .locked-finding > b {
+      display: none;
+    }
+
+    .teaser button {
+      padding:
+        16px
+        15px;
+    }
+
+    .teaser button span {
+      font-size: 13px;
     }
 
   }
