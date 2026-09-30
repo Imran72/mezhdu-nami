@@ -235,7 +235,6 @@ export default function ResultPage() {
                 </main>
 
                 <GlobalStyles />
-
                 <style jsx>{styles}</style>
             </>
         );
@@ -256,7 +255,6 @@ export default function ResultPage() {
                 </main>
 
                 <GlobalStyles />
-
                 <style jsx>{styles}</style>
             </>
         );
@@ -268,6 +266,7 @@ export default function ResultPage() {
     return (
         <>
             <main className="page">
+
                 {/* HEADER */}
 
                 <header className="header result-shell">
@@ -357,8 +356,18 @@ export default function ResultPage() {
 
                 <section className="paid-section result-shell">
                     <div className="paid-card">
-                        <div className="paid-top">
-                            <div className="paid-title">
+
+                        <img
+                            className="paid-image"
+                            src="/images/full-report-scene.png"
+                            alt=""
+                        />
+
+                        <div className="paid-overlay" />
+
+                        <div className="paid-content">
+
+                            <div className="paid-heading">
                                 <div className="paid-label">
                                     полный разбор
                                 </div>
@@ -371,33 +380,32 @@ export default function ResultPage() {
                             </div>
 
                             <div className="paid-benefits">
-                                <Benefit>
+                                <Benefit icon="♥">
                                     Где вы можете
                                     <br />
                                     не понимать друг друга
                                 </Benefit>
 
-                                <Benefit>
+                                <Benefit icon="▰">
                                     Что каждый ждёт
                                     <br />
                                     от отношений
                                 </Benefit>
 
-                                <Benefit>
+                                <Benefit icon="ϟ">
                                     Что может стать
                                     <br />
                                     причиной ссор
                                 </Benefit>
 
-                                <Benefit>
+                                <Benefit icon="▥">
                                     Как сделать вашу
                                     <br />
                                     пару крепче
                                 </Benefit>
                             </div>
-                        </div>
 
-                        <PixelFairytale />
+                        </div>
 
                         <div className="paid-bottom">
                             <button
@@ -422,8 +430,10 @@ export default function ResultPage() {
                                 один разбор · для вас двоих · сразу после оплаты
                             </div>
                         </div>
+
                     </div>
                 </section>
+
             </main>
 
             <GlobalStyles />
@@ -434,7 +444,7 @@ export default function ResultPage() {
 }
 
 /* ============================================================
-   SCORE ROW
+   SCORE
 ============================================================ */
 
 function ScoreRow({
@@ -474,96 +484,20 @@ function ScoreRow({
 ============================================================ */
 
 function Benefit({
+                     icon,
                      children,
                  }: {
+    icon: string;
     children: ReactNode;
 }) {
     return (
         <div className="benefit">
             <div className="benefit-icon">
-                ♥
+                {icon}
             </div>
 
             <div className="benefit-text">
                 {children}
-            </div>
-        </div>
-    );
-}
-
-/* ============================================================
-   PIXEL FAIRYTALE
-============================================================ */
-
-function PixelFairytale() {
-    return (
-        <div className="fairytale">
-            <div className="pixel-moon" />
-
-            <div className="sky-stars">
-                <i className="s1">✦</i>
-                <i className="s2">✦</i>
-                <i className="s3">·</i>
-                <i className="s4">♥</i>
-            </div>
-
-            <div className="mountains">
-                <div className="mountain mountain-one" />
-                <div className="mountain mountain-two" />
-                <div className="mountain mountain-three" />
-            </div>
-
-            <div className="castle">
-                <div className="tower tower-left">
-                    <span />
-                </div>
-
-                <div className="tower tower-middle">
-                    <span />
-                </div>
-
-                <div className="tower tower-right">
-                    <span />
-                </div>
-
-                <div className="castle-body">
-                    <i />
-                    <i />
-                    <i />
-                </div>
-            </div>
-
-            <div className="ground-shape" />
-
-            <div className="characters">
-                <div className="knight">
-                    <div className="knight-head">
-                        <div className="knight-hair" />
-                    </div>
-
-                    <div className="knight-body">
-                        <div className="knight-cape" />
-                        <div className="knight-arm" />
-                    </div>
-                </div>
-
-                <div className="pixel-heart">
-                    ♥
-                </div>
-
-                <div className="princess">
-                    <div className="crown">
-                        ♛
-                    </div>
-
-                    <div className="princess-head">
-                        <div className="princess-hair" />
-                    </div>
-
-                    <div className="princess-body">
-                        <div className="princess-dress" />
-                    </div>
-                </div>
             </div>
         </div>
     );
@@ -847,11 +781,6 @@ const styles = `
 
   margin-left: auto;
   margin-right: auto;
-
-  min-height: 0;
-  height: auto;
-
-  display: block;
 }
 
 /* ============================================================
@@ -864,8 +793,6 @@ const styles = `
   display: flex;
   align-items: center;
   justify-content: space-between;
-
-  padding: 0;
 }
 
 .brand {
@@ -944,7 +871,6 @@ const styles = `
   color: #888084;
 
   font-size: 12px;
-  line-height: 1.2;
 }
 
 .score-number {
@@ -1002,12 +928,7 @@ const styles = `
 
   border-radius: inherit;
 
-  background:
-    linear-gradient(
-      90deg,
-      #c84170,
-      #ca4774
-    );
+  background: #c84170;
 }
 
 /* ============================================================
@@ -1015,8 +936,6 @@ const styles = `
 ============================================================ */
 
 .forecast {
-  position: relative;
-
   padding: 28px 0 34px;
 
   border-top: 1px solid #ded8d6;
@@ -1074,10 +993,6 @@ const styles = `
   line-height: 1.4;
 }
 
-.forecast-result {
-  padding-top: 4px;
-}
-
 .years {
   color: #b51f55;
 
@@ -1099,8 +1014,6 @@ const styles = `
   margin-left: 9px;
 
   font-size: 42px;
-
-  letter-spacing: -0.04em;
 }
 
 .forecast-scale {
@@ -1153,7 +1066,7 @@ const styles = `
 }
 
 /* ============================================================
-   PAID
+   PAID CARD
 ============================================================ */
 
 .paid-section {
@@ -1163,61 +1076,90 @@ const styles = `
 .paid-card {
   position: relative;
 
-  overflow: hidden;
+  width: 100%;
+  height: 420px;
 
-  height: 540px;
+  overflow: hidden;
 
   border-radius: 20px;
 
-  background:
-    linear-gradient(
-      135deg,
-      #9f1f4d 0%,
-      #b8295d 52%,
-      #a62050 100%
-    );
+  background: #a71f50;
 
-  color: #fff8f4;
+  color: white;
+
+  isolation: isolate;
 }
 
-.paid-card::before {
-  content: "";
+/* IMAGE */
 
+.paid-image {
   position: absolute;
 
-  z-index: 0;
+  z-index: 1;
 
-  width: 360px;
-  height: 360px;
+  inset: 0;
 
-  top: -185px;
-  right: -65px;
+  width: 100%;
+  height: 100%;
 
-  border-radius: 50%;
+  object-fit: cover;
 
-  background: rgba(255, 138, 174, 0.13);
+  object-position: center;
+
+  display: block;
 }
 
-/* PAID TOP */
+/*
+  Небольшой градиент нужен только для читаемости текста.
+  Сама картинка остаётся хорошо видимой.
+*/
 
-.paid-top {
+.paid-overlay {
+  position: absolute;
+
+  z-index: 2;
+
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(79, 17, 45, 0.10) 0%,
+      rgba(79, 17, 45, 0.03) 45%,
+      rgba(91, 17, 50, 0.30) 66%,
+      rgba(91, 17, 50, 0.48) 100%
+    );
+
+  pointer-events: none;
+}
+
+/* CONTENT */
+
+.paid-content {
   position: relative;
 
-  z-index: 10;
+  z-index: 5;
 
   display: grid;
 
-  grid-template-columns: 1.18fr 0.82fr;
+  grid-template-columns:
+    minmax(0, 1.05fr)
+    minmax(230px, 0.95fr);
 
-  gap: 52px;
+  gap: 55px;
 
-  padding: 30px 40px 0;
+  height: 100%;
+
+  padding:
+    28px
+    36px
+    105px;
 }
 
 .paid-label {
   margin-bottom: 12px;
 
-  color: #efc5d3;
+  color: #f1cad6;
 
   font-size: 10px;
   font-weight: 700;
@@ -1227,47 +1169,55 @@ const styles = `
   text-transform: uppercase;
 }
 
-.paid-title h2 {
+.paid-heading h2 {
   margin: 0;
+
+  color: #fff8f5;
 
   font-family:
     Georgia,
     "Times New Roman",
     serif;
 
-  font-size: 44px;
+  font-size: 41px;
   font-weight: 400;
 
-  line-height: 0.93;
+  line-height: 0.94;
 
   letter-spacing: -0.055em;
+
+  text-shadow:
+    0 2px 14px rgba(65, 9, 32, 0.12);
 }
+
+/* BENEFITS */
 
 .paid-benefits {
   display: flex;
   flex-direction: column;
 
-  gap: 14px;
+  gap: 15px;
 
-  padding-top: 8px;
+  padding-top: 4px;
 }
 
 .benefit {
   display: grid;
 
-  grid-template-columns: 18px 1fr;
+  grid-template-columns: 23px 1fr;
 
-  gap: 9px;
+  gap: 8px;
 
   align-items: start;
 }
 
 .benefit-icon {
-  color: #ffd0dc;
+  color: #ffd1df;
 
-  font-size: 11px;
+  font-size: 15px;
+  font-weight: 700;
 
-  padding-top: 2px;
+  line-height: 1;
 }
 
 .benefit-text {
@@ -1275,513 +1225,21 @@ const styles = `
 
   font-size: 12px;
   line-height: 1.25;
+
+  text-shadow:
+    0 1px 8px rgba(75, 9, 34, 0.25);
 }
 
-/* ============================================================
-   FAIRYTALE
-============================================================ */
-
-.fairytale {
-  position: absolute;
-
-  z-index: 1;
-
-  left: 0;
-  right: 0;
-
-  bottom: 86px;
-
-  height: 275px;
-
-  overflow: hidden;
-
-  pointer-events: none;
-}
-
-/* MOON */
-
-.pixel-moon {
-  position: absolute;
-
-  z-index: 2;
-
-  top: 26px;
-  left: 31%;
-
-  width: 86px;
-  height: 86px;
-
-  border-radius: 50%;
-
-  background: #ffd0a9;
-
-  box-shadow:
-    0 0 0 8px rgba(255, 209, 170, 0.06),
-    0 0 42px rgba(255, 213, 178, 0.25);
-}
-
-/* STARS */
-
-.sky-stars i {
-  position: absolute;
-
-  z-index: 5;
-
-  color: #ffc96f;
-
-  font-style: normal;
-}
-
-.s1 {
-  top: 36px;
-  left: 15%;
-
-  font-size: 18px;
-}
-
-.s2 {
-  top: 55px;
-  left: 39%;
-
-  font-size: 15px;
-}
-
-.s3 {
-  top: 76px;
-  left: 22%;
-
-  font-size: 15px;
-}
-
-.s4 {
-  top: 118px;
-  left: 36%;
-
-  color: #ff83a8 !important;
-
-  font-size: 15px;
-}
-
-/* MOUNTAINS */
-
-.mountains {
-  position: absolute;
-
-  z-index: 1;
-
-  left: 0;
-  right: 0;
-  bottom: 0;
-
-  height: 150px;
-}
-
-.mountain {
-  position: absolute;
-
-  bottom: 35px;
-
-  width: 240px;
-  height: 120px;
-
-  background: #79264b;
-
-  clip-path:
-    polygon(
-      0 100%,
-      28% 38%,
-      44% 68%,
-      63% 18%,
-      100% 100%
-    );
-}
-
-.mountain-one {
-  left: -35px;
-}
-
-.mountain-two {
-  left: 130px;
-
-  opacity: 0.82;
-}
-
-.mountain-three {
-  left: 320px;
-
-  opacity: 0.6;
-}
-
-/* GROUND */
-
-.ground-shape {
-  position: absolute;
-
-  z-index: 3;
-
-  left: -6%;
-  right: -6%;
-
-  bottom: -72px;
-
-  height: 155px;
-
-  border-radius: 50% 50% 0 0;
-
-  background: #392739;
-}
-
-/* ============================================================
-   CASTLE
-============================================================ */
-
-.castle {
-  position: absolute;
-
-  z-index: 4;
-
-  left: 51%;
-  bottom: 42px;
-
-  width: 94px;
-  height: 126px;
-
-  transform: translateX(-50%);
-}
-
-.castle-body {
-  position: absolute;
-
-  bottom: 0;
-  left: 17px;
-
-  width: 62px;
-  height: 66px;
-
-  background: #302434;
-
-  box-shadow:
-    inset 0 0 0 3px #211a24;
-}
-
-.castle-body i {
-  position: absolute;
-
-  width: 6px;
-  height: 10px;
-
-  background: #ffc26c;
-}
-
-.castle-body i:nth-child(1) {
-  top: 15px;
-  left: 10px;
-}
-
-.castle-body i:nth-child(2) {
-  top: 15px;
-  right: 10px;
-}
-
-.castle-body i:nth-child(3) {
-  bottom: 11px;
-  left: 28px;
-}
-
-.tower {
-  position: absolute;
-
-  bottom: 0;
-
-  width: 23px;
-
-  background: #2c2130;
-}
-
-.tower::before {
-  content: "";
-
-  position: absolute;
-
-  left: -5px;
-  top: -21px;
-
-  width: 0;
-  height: 0;
-
-  border-left: 16px solid transparent;
-  border-right: 16px solid transparent;
-  border-bottom: 24px solid #2c2130;
-}
-
-.tower-left {
-  left: 0;
-
-  height: 82px;
-}
-
-.tower-middle {
-  left: 35px;
-
-  height: 110px;
-}
-
-.tower-right {
-  right: 0;
-
-  height: 78px;
-}
-
-.tower span {
-  position: absolute;
-
-  top: 18px;
-  left: 8px;
-
-  width: 6px;
-  height: 10px;
-
-  background: #ffbe66;
-}
-
-/* ============================================================
-   CHARACTERS
-============================================================ */
-
-.characters {
-  position: absolute;
-
-  z-index: 8;
-
-  left: 50%;
-  bottom: 15px;
-
-  width: 250px;
-  height: 165px;
-
-  transform: translateX(-50%);
-}
-
-.knight,
-.princess {
-  position: absolute;
-
-  bottom: 0;
-
-  width: 100px;
-  height: 160px;
-}
-
-.knight {
-  left: 15px;
-}
-
-.princess {
-  right: 15px;
-}
-
-/* KNIGHT */
-
-.knight-head {
-  position: absolute;
-
-  z-index: 5;
-
-  top: 6px;
-  left: 25px;
-
-  width: 52px;
-  height: 54px;
-
-  border: 5px solid #292029;
-
-  border-radius: 46%;
-
-  background: #e9b28d;
-}
-
-.knight-hair {
-  position: absolute;
-
-  top: -5px;
-  left: -5px;
-
-  width: 52px;
-  height: 23px;
-
-  border-radius: 50% 50% 20% 20%;
-
-  background: #3b2727;
-}
-
-.knight-body {
-  position: absolute;
-
-  z-index: 4;
-
-  top: 56px;
-  left: 16px;
-
-  width: 70px;
-  height: 88px;
-
-  border: 5px solid #292029;
-
-  border-radius: 14px;
-
-  background: #77727b;
-}
-
-.knight-cape {
-  position: absolute;
-
-  z-index: -1;
-
-  left: -25px;
-  top: 1px;
-
-  width: 44px;
-  height: 92px;
-
-  border: 5px solid #292029;
-
-  border-radius: 40% 0 0 40%;
-
-  background: #8d244d;
-}
-
-.knight-arm {
-  position: absolute;
-
-  right: -33px;
-  top: 28px;
-
-  width: 42px;
-  height: 18px;
-
-  border: 5px solid #292029;
-
-  border-radius: 10px;
-
-  background: #77727b;
-
-  transform: rotate(-8deg);
-}
-
-/* PRINCESS */
-
-.princess-head {
-  position: absolute;
-
-  z-index: 6;
-
-  top: 6px;
-  right: 25px;
-
-  width: 52px;
-  height: 54px;
-
-  border: 5px solid #2a2028;
-
-  border-radius: 46%;
-
-  background: #e9b28d;
-}
-
-.princess-hair {
-  position: absolute;
-
-  z-index: -1;
-
-  top: -5px;
-  left: -5px;
-
-  width: 52px;
-  height: 64px;
-
-  border-radius: 50% 50% 25% 25%;
-
-  background: #d39b43;
-}
-
-.crown {
-  position: absolute;
-
-  z-index: 10;
-
-  top: -20px;
-  right: 35px;
-
-  color: #ffd25f;
-
-  font-size: 27px;
-}
-
-.princess-body {
-  position: absolute;
-
-  z-index: 4;
-
-  top: 56px;
-  right: 10px;
-
-  width: 82px;
-  height: 100px;
-}
-
-.princess-dress {
-  position: absolute;
-
-  left: 50%;
-  bottom: 0;
-
-  width: 92px;
-  height: 96px;
-
-  border: 5px solid #2a2028;
-
-  background: #d96d91;
-
-  clip-path:
-    polygon(
-      34% 0,
-      66% 0,
-      100% 100%,
-      0 100%
-    );
-
-  transform: translateX(-50%);
-}
-
-.pixel-heart {
-  position: absolute;
-
-  z-index: 12;
-
-  left: 50%;
-  top: 74px;
-
-  color: #ff7ca6;
-
-  font-size: 20px;
-
-  transform: translateX(-50%);
-}
-
-/* ============================================================
-   CTA
-============================================================ */
+/* CTA */
 
 .paid-bottom {
   position: absolute;
 
-  z-index: 30;
+  z-index: 20;
 
-  left: 28px;
-  right: 28px;
+  left: 36px;
+  right: 36px;
   bottom: 18px;
-
-  width: auto;
 }
 
 .buy-button {
@@ -1792,11 +1250,13 @@ const styles = `
   grid-template-columns:
     1fr auto auto;
 
-  gap: 18px;
+  gap: 20px;
 
   align-items: center;
 
-  padding: 17px 22px;
+  min-height: 60px;
+
+  padding: 14px 20px;
 
   border: 0;
   border-radius: 13px;
@@ -1808,7 +1268,7 @@ const styles = `
   cursor: pointer;
 
   box-shadow:
-    0 10px 28px rgba(72, 16, 39, 0.13);
+    0 10px 28px rgba(72, 16, 39, 0.18);
 
   transition:
     transform 0.15s ease,
@@ -1850,9 +1310,9 @@ const styles = `
 }
 
 .paid-note {
-  margin-top: 8px;
+  margin-top: 7px;
 
-  color: #edbdcd;
+  color: rgba(255, 232, 239, 0.76);
 
   font-size: 9px;
 
@@ -1901,8 +1361,6 @@ const styles = `
 
   font-size: 38px;
   font-weight: 400;
-
-  line-height: 1;
 }
 
 .state-page p {
@@ -1939,6 +1397,7 @@ const styles = `
 ============================================================ */
 
 @media (max-width: 650px) {
+
   .result-shell {
     width: calc(100% - 30px);
   }
@@ -1956,12 +1415,15 @@ const styles = `
   }
 
   .scores {
-    padding-top: 9px;
-    padding-bottom: 25px;
+    padding:
+      9px 0
+      25px;
   }
 
   .score-row {
-    padding: 11px 0 10px;
+    padding:
+      11px 0
+      10px;
   }
 
   .score-copy h2 {
@@ -1986,9 +1448,9 @@ const styles = `
 
   .score-track {
     height: 6px;
-
-    margin-top: 9px;
   }
+
+  /* FORECAST */
 
   .forecast {
     padding:
@@ -2018,116 +1480,127 @@ const styles = `
     font-size: 37px;
   }
 
-  .forecast-result {
-    padding: 0;
-  }
+  /* PAID */
 
   .paid-section {
-    padding-top: 5px;
-    padding-bottom: 30px;
+    padding:
+      5px 0
+      30px;
   }
 
   .paid-card {
-    height: 650px;
+    height: 570px;
 
-    border-radius: 16px;
+    border-radius: 17px;
   }
 
-  .paid-top {
-    grid-template-columns: 1fr;
+  /*
+    На телефоне картинка немного смещается влево:
+    персонажи остаются в кадре,
+    а справа появляется место под текст.
+  */
 
-    gap: 18px;
+  .paid-image {
+    object-position: 39% center;
+  }
+
+  .paid-overlay {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(83, 13, 43, 0.12) 0%,
+        rgba(83, 13, 43, 0.08) 40%,
+        rgba(83, 13, 43, 0.26) 68%,
+        rgba(83, 13, 43, 0.58) 100%
+      );
+  }
+
+  .paid-content {
+    display: block;
 
     padding:
-      24px 22px
-      0;
+      23px
+      20px
+      110px;
   }
 
-  .paid-title h2 {
-    font-size: 39px;
+  .paid-label {
+    margin-bottom: 9px;
+
+    font-size: 9px;
   }
+
+  .paid-heading h2 {
+    max-width: 290px;
+
+    font-size: 36px;
+  }
+
+  /*
+    На мобиле преимущества делаем компактной
+    сеткой внизу картинки, чтобы они не закрывали
+    персонажей и замок.
+  */
 
   .paid-benefits {
+    position: absolute;
+
+    left: 20px;
+    right: 20px;
+
+    bottom: 110px;
+
     display: grid;
 
     grid-template-columns:
       1fr 1fr;
 
-    gap: 11px 13px;
+    gap:
+      9px
+      14px;
 
-    padding: 0;
+    padding: 12px;
+
+    border-radius: 12px;
+
+    background:
+      rgba(82, 18, 46, 0.54);
+
+    backdrop-filter:
+      blur(5px);
   }
 
   .benefit {
     grid-template-columns:
-      14px 1fr;
+      15px 1fr;
 
     gap: 6px;
   }
 
+  .benefit-icon {
+    font-size: 11px;
+  }
+
   .benefit-text {
-    font-size: 10px;
-  }
+    font-size: 9px;
 
-  .fairytale {
-    bottom: 81px;
-
-    height: 285px;
-  }
-
-  .pixel-moon {
-    left: 20%;
-
-    width: 72px;
-    height: 72px;
-  }
-
-  .mountain-one {
-    left: -75px;
-  }
-
-  .mountain-two {
-    left: 70px;
-  }
-
-  .mountain-three {
-    left: 210px;
-  }
-
-  .castle {
-    left: 68%;
-    bottom: 40px;
-
-    transform:
-      translateX(-50%)
-      scale(0.82);
-
-    transform-origin:
-      bottom center;
-  }
-
-  .characters {
-    left: 39%;
-    bottom: 11px;
-
-    transform:
-      translateX(-50%)
-      scale(0.82);
-
-    transform-origin:
-      bottom center;
+    line-height: 1.25;
   }
 
   .paid-bottom {
-    left: 15px;
-    right: 15px;
-    bottom: 14px;
+    left: 12px;
+    right: 12px;
+    bottom: 11px;
   }
 
   .buy-button {
-    gap: 9px;
+    min-height: 55px;
 
-    padding: 15px 14px;
+    gap: 8px;
+
+    padding:
+      13px
+      14px;
   }
 
   .buy-button span {
@@ -2143,6 +1616,8 @@ const styles = `
   }
 
   .paid-note {
+    margin-top: 6px;
+
     font-size: 8px;
   }
 }
