@@ -357,7 +357,8 @@ export default function ResultPage() {
                 <section className="paid-section result-shell">
                     <div className="paid-card">
 
-                        {/* LEFT IMAGE */}
+                        {/* FULL BACKGROUND IMAGE */}
+
                         <div className="paid-scene">
                             <img
                                 className="paid-image"
@@ -368,10 +369,8 @@ export default function ResultPage() {
                             <div className="scene-overlay" />
                         </div>
 
-                        {/* RIGHT BACKGROUND */}
-                        <div className="paid-right-bg" />
-
                         {/* TITLE */}
+
                         <div className="paid-heading">
                             <div className="paid-label">
                                 полный разбор
@@ -385,6 +384,7 @@ export default function ResultPage() {
                         </div>
 
                         {/* BENEFITS */}
+
                         <div className="paid-benefits">
                             <Benefit icon="♥">
                                 Где вы можете
@@ -412,6 +412,7 @@ export default function ResultPage() {
                         </div>
 
                         {/* CTA */}
+
                         <div className="paid-bottom">
                             <button
                                 type="button"
@@ -447,6 +448,7 @@ export default function ResultPage() {
         </>
     );
 }
+
 
 /* ============================================================
    SCORE
@@ -484,6 +486,7 @@ function ScoreRow({
     );
 }
 
+
 /* ============================================================
    BENEFIT
 ============================================================ */
@@ -507,6 +510,7 @@ function Benefit({
         </div>
     );
 }
+
 
 /* ============================================================
    CALCULATIONS
@@ -724,6 +728,7 @@ function getYearWord(years: number) {
     return 'лет';
 }
 
+
 /* ============================================================
    GLOBAL
 ============================================================ */
@@ -758,6 +763,7 @@ function GlobalStyles() {
     );
 }
 
+
 /* ============================================================
    STYLES
 ============================================================ */
@@ -765,726 +771,706 @@ function GlobalStyles() {
 const styles = `
 
 .page {
-  width: 100%;
-  min-height: 100vh;
+    width: 100%;
+    min-height: 100vh;
 
-  overflow: hidden;
+    overflow: hidden;
 
-  background:
-    radial-gradient(
-      circle at 50% 15%,
-      #ffffff 0,
-      #faf7f4 44%,
-      #f8f4f1 100%
-    );
+    background:
+        radial-gradient(
+            circle at 50% 15%,
+            #ffffff 0,
+            #faf7f4 44%,
+            #f8f4f1 100%
+        );
 
-  color: #171315;
+    color: #171315;
 }
 
 .result-shell {
-  width: min(calc(100% - 40px), 720px);
+    width: min(calc(100% - 40px), 720px);
 
-  margin-left: auto;
-  margin-right: auto;
+    margin-left: auto;
+    margin-right: auto;
 }
+
 
 /* ============================================================
    HEADER
 ============================================================ */
 
 .header {
-  height: 76px;
+    height: 76px;
 
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .brand {
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
 
-  font-size: 22px;
-  font-weight: 700;
+    font-size: 22px;
+    font-weight: 700;
 
-  letter-spacing: -0.055em;
+    letter-spacing: -0.055em;
 }
 
 .couple-names {
-  display: flex;
-  align-items: center;
+    display: flex;
+    align-items: center;
 
-  gap: 9px;
+    gap: 9px;
 
-  color: #7f777b;
+    color: #7f777b;
 
-  font-size: 10px;
-  font-weight: 700;
+    font-size: 10px;
+    font-weight: 700;
 
-  letter-spacing: 0.08em;
+    letter-spacing: 0.08em;
 
-  text-transform: uppercase;
+    text-transform: uppercase;
 }
 
 .couple-names b {
-  color: #c03968;
+    color: #c03968;
 }
+
 
 /* ============================================================
    SCORES
 ============================================================ */
 
 .scores {
-  padding: 14px 0 28px;
+    padding: 14px 0 28px;
 }
 
 .score-row {
-  padding: 11px 0;
+    padding: 11px 0;
 }
 
 .score-header {
-  display: grid;
+    display: grid;
 
-  grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr auto;
 
-  gap: 20px;
+    gap: 20px;
 
-  align-items: end;
+    align-items: end;
 }
 
 .score-copy h2 {
-  margin: 0;
+    margin: 0;
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
 
-  font-size: 28px;
-  font-weight: 400;
+    font-size: 28px;
+    font-weight: 400;
 
-  line-height: 0.95;
+    line-height: 0.95;
 
-  letter-spacing: -0.045em;
+    letter-spacing: -0.045em;
 }
 
 .score-copy p {
-  margin: 5px 0 0;
+    margin: 5px 0 0;
 
-  color: #888084;
+    color: #888084;
 
-  font-size: 12px;
+    font-size: 12px;
 }
 
 .score-number {
-  min-width: 75px;
+    min-width: 75px;
 
-  display: flex;
-  align-items: baseline;
-  justify-content: flex-end;
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-end;
 }
 
 .score-number strong {
-  color: #bb285b;
+    color: #bb285b;
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
 
-  font-size: 43px;
-  font-weight: 400;
+    font-size: 43px;
+    font-weight: 400;
 
-  line-height: 0.8;
+    line-height: 0.8;
 
-  letter-spacing: -0.06em;
+    letter-spacing: -0.06em;
 }
 
 .score-number span {
-  margin-left: 4px;
+    margin-left: 4px;
 
-  color: #797176;
+    color: #797176;
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
 
-  font-size: 20px;
+    font-size: 20px;
 }
 
 .score-track {
-  width: 100%;
-  height: 7px;
+    width: 100%;
+    height: 7px;
 
-  margin-top: 10px;
+    margin-top: 10px;
 
-  overflow: hidden;
+    overflow: hidden;
 
-  border-radius: 99px;
+    border-radius: 99px;
 
-  background: #e8e3e3;
+    background: #e8e3e3;
 }
 
 .score-fill {
-  height: 100%;
+    height: 100%;
 
-  border-radius: inherit;
+    border-radius: inherit;
 
-  background: #c84170;
+    background: #c84170;
 }
+
 
 /* ============================================================
    FORECAST
 ============================================================ */
 
 .forecast {
-  padding: 28px 0 34px;
+    padding: 28px 0 34px;
 
-  border-top: 1px solid #ded8d6;
+    border-top: 1px solid #ded8d6;
 }
 
 .forecast-label {
-  margin-bottom: 10px;
+    margin-bottom: 10px;
 
-  color: #c03a68;
+    color: #c03a68;
 
-  font-size: 10px;
-  font-weight: 700;
+    font-size: 10px;
+    font-weight: 700;
 
-  letter-spacing: 0.2em;
+    letter-spacing: 0.2em;
 
-  text-transform: uppercase;
+    text-transform: uppercase;
 }
 
 .forecast-grid {
-  display: grid;
+    display: grid;
 
-  grid-template-columns:
-    minmax(0, 1.2fr)
-    minmax(230px, 0.8fr);
+    grid-template-columns:
+        minmax(0, 1.2fr)
+        minmax(230px, 0.8fr);
 
-  gap: 45px;
+    gap: 45px;
 
-  align-items: center;
+    align-items: center;
 }
 
 .forecast-copy h2 {
-  margin: 0;
+    margin: 0;
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
 
-  font-size: 37px;
-  font-weight: 400;
+    font-size: 37px;
+    font-weight: 400;
 
-  line-height: 0.98;
+    line-height: 0.98;
 
-  letter-spacing: -0.05em;
+    letter-spacing: -0.05em;
 }
 
 .forecast-copy p {
-  max-width: 380px;
+    max-width: 380px;
 
-  margin: 11px 0 0;
+    margin: 11px 0 0;
 
-  color: #898084;
+    color: #898084;
 
-  font-size: 12px;
-  line-height: 1.4;
+    font-size: 12px;
+    line-height: 1.4;
 }
 
 .years {
-  color: #b51f55;
+    color: #b51f55;
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
 
-  font-size: 67px;
+    font-size: 67px;
 
-  line-height: 0.9;
+    line-height: 0.9;
 
-  letter-spacing: -0.06em;
+    letter-spacing: -0.06em;
 
-  white-space: nowrap;
+    white-space: nowrap;
 }
 
 .years span {
-  margin-left: 9px;
+    margin-left: 9px;
 
-  font-size: 42px;
+    font-size: 42px;
 }
 
 .forecast-scale {
-  margin-top: 19px;
+    margin-top: 19px;
 }
 
 .forecast-line {
-  position: relative;
+    position: relative;
 
-  height: 8px;
+    height: 8px;
 
-  border-radius: 99px;
+    border-radius: 99px;
 
-  background: #e5dfe1;
+    background: #e5dfe1;
 }
 
 .forecast-progress {
-  height: 100%;
+    height: 100%;
 
-  border-radius: inherit;
+    border-radius: inherit;
 
-  background: #eca6bc;
+    background: #eca6bc;
 }
 
 .forecast-dot {
-  position: absolute;
+    position: absolute;
 
-  top: 50%;
+    top: 50%;
 
-  width: 20px;
-  height: 20px;
+    width: 20px;
+    height: 20px;
 
-  border-radius: 50%;
+    border-radius: 50%;
 
-  background: #ba2057;
+    background: #ba2057;
 
-  transform:
-    translate(-50%, -50%);
+    transform:
+        translate(-50%, -50%);
 }
 
 .forecast-scale-labels {
-  display: flex;
-  justify-content: space-between;
+    display: flex;
+    justify-content: space-between;
 
-  margin-top: 11px;
+    margin-top: 11px;
 
-  color: #8c8488;
+    color: #8c8488;
 
-  font-size: 10px;
+    font-size: 10px;
 }
+
 
 /* ============================================================
    PAID CARD
 ============================================================ */
 
 .paid-section {
-  padding: 8px 0 54px;
+    padding: 8px 0 54px;
 }
 
 .paid-card {
-  position: relative;
+    position: relative;
 
-  width: 100%;
-  height: 420px;
+    width: 100%;
+    height: 370px;
 
-  overflow: hidden;
+    overflow: hidden;
 
-  border-radius: 20px;
+    border-radius: 20px;
 
-  background: #ad2053;
+    background: #a81f51;
 
-  color: white;
+    color: white;
 
-  isolation: isolate;
+    isolation: isolate;
 }
 
+
 /* ============================================================
-   LEFT SCENE
+   BACKGROUND IMAGE
 ============================================================ */
 
 .paid-scene {
-  position: absolute;
+    position: absolute;
 
-  z-index: 1;
+    z-index: 1;
 
-  top: 0;
-  bottom: 0;
-  left: 0;
+    inset: 0;
 
-  width: 68%;
+    overflow: hidden;
 
-  overflow: hidden;
-
-  background: #85183f;
+    background: #8e183f;
 }
 
 .paid-image {
-  position: absolute;
+    position: absolute;
 
-  inset: 0;
+    inset: 0;
 
-  width: 100%;
-  height: 100%;
+    width: 100%;
+    height: 100%;
 
-  display: block;
+    display: block;
 
-  object-fit: cover;
+    object-fit: cover;
 
-  /*
-    Важный момент:
-    картинку двигаем внутри ЛЕВОЙ области,
-    а не растягиваем на всю карточку.
-  */
-  object-position: 46% center;
+    /*
+      ВАЖНО.
+
+      Картинка теперь занимает ВСЮ карточку.
+
+      Из-за этого:
+      - персонажи остаются слева;
+      - замок остаётся примерно в центре;
+      - правая часть оригинальной картинки становится
+        естественным фоном под преимущества.
+    */
+
+    object-position: center center;
 }
 
 .scene-overlay {
-  position: absolute;
+    position: absolute;
 
-  z-index: 2;
+    z-index: 2;
 
-  inset: 0;
+    inset: 0;
 
-  pointer-events: none;
+    pointer-events: none;
 
-  background:
-    linear-gradient(
-      90deg,
-      rgba(65, 8, 30, 0.04) 0%,
-      rgba(65, 8, 30, 0.00) 55%,
-      rgba(114, 18, 54, 0.10) 82%,
-      rgba(114, 18, 54, 0.28) 100%
-    );
+    /*
+      Затемняем только правую сторону,
+      чтобы белый текст читался.
+
+      Слева картинку почти не трогаем.
+    */
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(76, 8, 32, 0.02) 0%,
+            rgba(76, 8, 32, 0.02) 43%,
+            rgba(91, 11, 40, 0.10) 55%,
+            rgba(126, 15, 52, 0.42) 67%,
+            rgba(135, 17, 55, 0.72) 78%,
+            rgba(137, 17, 56, 0.88) 100%
+        );
 }
 
-/* ============================================================
-   RIGHT PANEL
-============================================================ */
-
-.paid-right-bg {
-  position: absolute;
-
-  z-index: 1;
-
-  top: 0;
-  right: 0;
-  bottom: 0;
-
-  width: 32%;
-
-  background:
-    radial-gradient(
-      circle at 100% 0%,
-      rgba(255, 255, 255, 0.08) 0%,
-      rgba(255, 255, 255, 0.00) 48%
-    ),
-    linear-gradient(
-      180deg,
-      #be3065 0%,
-      #aa2053 100%
-    );
-}
-
-/*
-  Небольшое перекрытие двух областей.
-  Убирает ощущение жёсткой вертикальной полосы
-  между картинкой и правой частью.
-*/
-
-.paid-right-bg::before {
-  content: '';
-
-  position: absolute;
-
-  top: 0;
-  bottom: 0;
-  left: -36px;
-
-  width: 36px;
-
-  background:
-    linear-gradient(
-      90deg,
-      rgba(170, 32, 83, 0) 0%,
-      rgba(170, 32, 83, 1) 100%
-    );
-}
 
 /* ============================================================
    TITLE
 ============================================================ */
 
 .paid-heading {
-  position: absolute;
+    position: absolute;
 
-  z-index: 5;
+    z-index: 5;
 
-  top: 28px;
-  left: 36px;
+    top: 27px;
+    left: 37px;
 
-  width: 330px;
+    width: 340px;
 }
 
 .paid-label {
-  margin-bottom: 12px;
+    margin-bottom: 12px;
 
-  color: #f3d2dd;
+    color: #f2d0db;
 
-  font-size: 10px;
-  font-weight: 700;
+    font-size: 10px;
+    font-weight: 700;
 
-  letter-spacing: 0.18em;
+    letter-spacing: 0.18em;
 
-  text-transform: uppercase;
+    text-transform: uppercase;
 
-  text-shadow:
-    0 1px 8px rgba(55, 6, 25, 0.22);
+    text-shadow:
+        0 1px 8px rgba(55, 6, 25, 0.25);
 }
 
 .paid-heading h2 {
-  margin: 0;
+    margin: 0;
 
-  color: #fff8f5;
+    color: #fff8f5;
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
 
-  font-size: 41px;
-  font-weight: 400;
+    font-size: 40px;
+    font-weight: 400;
 
-  line-height: 0.94;
+    line-height: 0.94;
 
-  letter-spacing: -0.055em;
+    letter-spacing: -0.055em;
 
-  text-shadow:
-    0 2px 14px rgba(65, 9, 32, 0.22);
+    text-shadow:
+        0 2px 14px rgba(65, 9, 32, 0.26);
 }
+
 
 /* ============================================================
    BENEFITS
 ============================================================ */
 
 .paid-benefits {
-  position: absolute;
+    position: absolute;
 
-  z-index: 6;
+    z-index: 6;
 
-  top: 35px;
-  right: 22px;
+    top: 32px;
+    right: 29px;
 
-  width: 195px;
+    width: 205px;
 
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 
-  gap: 16px;
+    gap: 15px;
 }
 
 .benefit {
-  display: grid;
+    display: grid;
 
-  grid-template-columns:
-    20px
-    minmax(0, 1fr);
+    grid-template-columns:
+        20px
+        minmax(0, 1fr);
 
-  gap: 8px;
+    gap: 8px;
 
-  align-items: start;
+    align-items: start;
 }
 
 .benefit-icon {
-  color: #ffd1df;
+    color: #ffd0df;
 
-  font-size: 14px;
-  font-weight: 700;
+    font-size: 14px;
+    font-weight: 700;
 
-  line-height: 1.05;
+    line-height: 1.05;
 
-  text-align: center;
+    text-align: center;
 }
 
 .benefit-text {
-  color: #fff9fb;
+    color: #fff9fb;
 
-  font-size: 12px;
-  line-height: 1.28;
+    font-size: 12px;
+    line-height: 1.28;
 
-  text-shadow:
-    0 1px 8px rgba(75, 9, 34, 0.16);
+    text-shadow:
+        0 1px 8px rgba(75, 9, 34, 0.24);
 }
+
 
 /* ============================================================
    CTA
 ============================================================ */
 
 .paid-bottom {
-  position: absolute;
+    position: absolute;
 
-  z-index: 20;
+    z-index: 20;
 
-  left: 36px;
-  right: 36px;
-  bottom: 18px;
+    /*
+      В референсе кнопка НЕ идёт через всю карточку.
+
+      Она начинается примерно от центра,
+      поэтому персонажи остаются полностью видны.
+    */
+
+    left: 365px;
+    right: 27px;
+    bottom: 18px;
 }
 
 .buy-button {
-  width: 100%;
+    width: 100%;
 
-  display: grid;
+    display: grid;
 
-  grid-template-columns:
-    1fr
-    auto
-    auto;
+    grid-template-columns:
+        1fr
+        auto
+        auto;
 
-  gap: 20px;
+    gap: 18px;
 
-  align-items: center;
+    align-items: center;
 
-  min-height: 60px;
+    min-height: 58px;
 
-  padding:
-    14px
-    20px;
+    padding:
+        13px
+        18px;
 
-  border: 0;
+    border: 0;
 
-  border-radius: 13px;
+    border-radius: 13px;
 
-  background: #fffaf7;
+    background: #fffaf7;
 
-  color: #181316;
+    color: #181316;
 
-  cursor: pointer;
+    cursor: pointer;
 
-  box-shadow:
-    0 10px 28px rgba(72, 16, 39, 0.18);
+    box-shadow:
+        0 10px 28px rgba(72, 16, 39, 0.18);
 
-  transition:
-    transform 0.15s ease,
-    background 0.15s ease;
+    transition:
+        transform 0.15s ease,
+        background 0.15s ease;
 }
 
 .buy-button:hover {
-  transform: translateY(-2px);
+    transform: translateY(-2px);
 
-  background: #ffffff;
+    background: #ffffff;
 }
 
 .buy-button span {
-  text-align: left;
+    text-align: left;
 
-  font-size: 13px;
-  font-weight: 700;
+    font-size: 12px;
+    font-weight: 700;
+
+    white-space: nowrap;
 }
 
 .buy-button strong {
-  color: #b52056;
+    color: #b52056;
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
 
-  font-size: 21px;
-  font-weight: 400;
+    font-size: 21px;
+    font-weight: 400;
 
-  white-space: nowrap;
+    white-space: nowrap;
 }
 
 .buy-button i {
-  color: #bd285d;
+    color: #bd285d;
 
-  font-size: 23px;
+    font-size: 22px;
 
-  font-style: normal;
+    font-style: normal;
 }
 
 .paid-note {
-  margin-top: 7px;
+    margin-top: 7px;
 
-  color:
-    rgba(255, 232, 239, 0.78);
+    color:
+        rgba(255, 232, 239, 0.72);
 
-  font-size: 9px;
+    font-size: 8px;
 
-  text-align: center;
+    text-align: center;
 
-  text-shadow:
-    0 1px 5px rgba(73, 9, 33, 0.28);
+    white-space: nowrap;
+
+    text-shadow:
+        0 1px 5px rgba(73, 9, 33, 0.28);
 }
+
 
 /* ============================================================
    STATE
 ============================================================ */
 
 .state-page {
-  min-height: 100svh;
+    min-height: 100svh;
 
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 
-  align-items: center;
-  justify-content: center;
+    align-items: center;
+    justify-content: center;
 
-  padding: 30px;
+    padding: 30px;
 
-  background: #faf7f4;
+    background: #faf7f4;
 
-  text-align: center;
+    text-align: center;
 }
 
 .state-brand {
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
 
-  font-size: 23px;
-  font-weight: 700;
+    font-size: 23px;
+    font-weight: 700;
 }
 
 .state-page h1 {
-  max-width: 420px;
+    max-width: 420px;
 
-  margin: 25px 0 0;
+    margin: 25px 0 0;
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
 
-  font-size: 38px;
-  font-weight: 400;
+    font-size: 38px;
+    font-weight: 400;
 }
 
 .state-page p {
-  margin-top: 13px;
+    margin-top: 13px;
 
-  color: #8a8285;
+    color: #8a8285;
 
-  font-size: 13px;
+    font-size: 13px;
 }
 
 .loader {
-  display: flex;
+    display: flex;
 
-  margin-bottom: 25px;
+    margin-bottom: 25px;
 }
 
 .loader span {
-  width: 52px;
-  height: 52px;
+    width: 52px;
+    height: 52px;
 
-  border-radius: 50%;
+    border-radius: 50%;
 
-  background: #e2b4c4;
+    background: #e2b4c4;
 }
 
 .loader span:last-child {
-  margin-left: -14px;
+    margin-left: -14px;
 
-  background: #b36380;
+    background: #b36380;
 }
+
 
 /* ============================================================
    MOBILE
@@ -1492,259 +1478,237 @@ const styles = `
 
 @media (max-width: 650px) {
 
-  .result-shell {
-    width: calc(100% - 30px);
-  }
-
-  .header {
-    height: 66px;
-  }
-
-  .brand {
-    font-size: 20px;
-  }
-
-  .couple-names {
-    font-size: 9px;
-  }
-
-  .scores {
-    padding:
-      9px 0
-      25px;
-  }
-
-  .score-row {
-    padding:
-      11px 0
-      10px;
-  }
-
-  .score-copy h2 {
-    font-size: 24px;
-  }
-
-  .score-copy p {
-    font-size: 10px;
-  }
-
-  .score-number {
-    min-width: 62px;
-  }
-
-  .score-number strong {
-    font-size: 37px;
-  }
-
-  .score-number span {
-    font-size: 17px;
-  }
-
-  .score-track {
-    height: 6px;
-  }
-
-  /* ============================================================
-     FORECAST MOBILE
-  ============================================================ */
-
-  .forecast {
-    padding:
-      27px 0
-      30px;
-  }
-
-  .forecast-grid {
-    grid-template-columns: 1fr;
-
-    gap: 22px;
-  }
-
-  .forecast-copy h2 {
-    font-size: 34px;
-  }
-
-  .forecast-copy p {
-    font-size: 11px;
-  }
-
-  .years {
-    font-size: 61px;
-  }
-
-  .years span {
-    font-size: 37px;
-  }
-
-  /* ============================================================
-     PAID MOBILE
-  ============================================================ */
-
-  .paid-section {
-    padding:
-      5px 0
-      30px;
-  }
-
-  .paid-card {
-    height: 560px;
+    .result-shell {
+        width: calc(100% - 30px);
+    }
 
-    border-radius: 17px;
-
-    background: #a91f52;
-  }
+    .header {
+        height: 66px;
+    }
 
-  /*
-    На мобильном не пытаемся сохранить
-    десктопное деление 68/32.
+    .brand {
+        font-size: 20px;
+    }
 
-    Верхние 61% — картинка.
-    Нижние 39% — спокойная зона под benefits + CTA.
-  */
+    .couple-names {
+        font-size: 9px;
+    }
 
-  .paid-scene {
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: auto;
+    .scores {
+        padding:
+            9px 0
+            25px;
+    }
+
+    .score-row {
+        padding:
+            11px 0
+            10px;
+    }
+
+    .score-copy h2 {
+        font-size: 24px;
+    }
+
+    .score-copy p {
+        font-size: 10px;
+    }
 
-    width: 100%;
-    height: 64%;
-  }
+    .score-number {
+        min-width: 62px;
+    }
 
-  .paid-image {
-    object-position: 43% center;
-  }
+    .score-number strong {
+        font-size: 37px;
+    }
 
-  .scene-overlay {
-    background:
-      linear-gradient(
-        180deg,
-        rgba(69, 8, 32, 0.08) 0%,
-        rgba(69, 8, 32, 0.02) 45%,
-        rgba(94, 13, 45, 0.22) 75%,
-        rgba(153, 24, 72, 0.72) 100%
-      );
-  }
+    .score-number span {
+        font-size: 17px;
+    }
 
-  .paid-right-bg {
-    top: 64%;
-    right: 0;
-    bottom: 0;
+    .score-track {
+        height: 6px;
+    }
 
-    width: 100%;
 
-    background:
-      linear-gradient(
-        180deg,
-        #ad2155 0%,
-        #981844 100%
-      );
-  }
+    /* ========================================================
+       FORECAST MOBILE
+    ======================================================== */
 
-  .paid-right-bg::before {
-    display: none;
-  }
+    .forecast {
+        padding:
+            27px 0
+            30px;
+    }
 
-  /* TITLE */
+    .forecast-grid {
+        grid-template-columns: 1fr;
 
-  .paid-heading {
-    top: 21px;
-    left: 19px;
+        gap: 22px;
+    }
 
-    width: calc(100% - 38px);
-  }
+    .forecast-copy h2 {
+        font-size: 34px;
+    }
 
-  .paid-label {
-    margin-bottom: 8px;
+    .forecast-copy p {
+        font-size: 11px;
+    }
 
-    font-size: 9px;
-  }
+    .years {
+        font-size: 61px;
+    }
 
-  .paid-heading h2 {
-    max-width: 285px;
+    .years span {
+        font-size: 37px;
+    }
 
-    font-size: 34px;
 
-    line-height: 0.96;
-  }
+    /* ========================================================
+       PAID MOBILE
+    ======================================================== */
 
-  /* BENEFITS */
+    .paid-section {
+        padding:
+            5px 0
+            30px;
+    }
 
-  .paid-benefits {
-    top: auto;
+    .paid-card {
+        height: 535px;
 
-    left: 18px;
-    right: 18px;
-    bottom: 102px;
+        border-radius: 17px;
+    }
 
-    width: auto;
+    /*
+      На телефоне изображение остаётся фоном всей карточки.
 
-    display: grid;
+      Но делаем более сильный градиент снизу,
+      потому что benefits и CTA уходят вниз.
+    */
 
-    grid-template-columns:
-      1fr
-      1fr;
+    .paid-image {
+        object-position: 38% center;
+    }
 
-    gap:
-      10px
-      14px;
-  }
+    .scene-overlay {
+        background:
+            linear-gradient(
+                180deg,
+                rgba(67, 7, 30, 0.03) 0%,
+                rgba(67, 7, 30, 0.04) 42%,
+                rgba(110, 14, 49, 0.42) 62%,
+                rgba(139, 19, 59, 0.92) 78%,
+                rgba(145, 20, 61, 0.98) 100%
+            );
+    }
 
-  .benefit {
-    grid-template-columns:
-      14px
-      minmax(0, 1fr);
 
-    gap: 6px;
-  }
+    /* TITLE */
 
-  .benefit-icon {
-    font-size: 11px;
-  }
+    .paid-heading {
+        top: 20px;
+        left: 19px;
 
-  .benefit-text {
-    font-size: 9px;
+        width: calc(100% - 38px);
+    }
 
-    line-height: 1.25;
-  }
+    .paid-label {
+        margin-bottom: 8px;
 
-  /* CTA */
+        font-size: 9px;
+    }
 
-  .paid-bottom {
-    left: 12px;
-    right: 12px;
+    .paid-heading h2 {
+        max-width: 300px;
 
-    bottom: 10px;
-  }
+        font-size: 34px;
 
-  .buy-button {
-    min-height: 55px;
+        line-height: 0.96;
+    }
 
-    gap: 8px;
 
-    padding:
-      13px
-      14px;
-  }
+    /* BENEFITS */
 
-  .buy-button span {
-    font-size: 10px;
-  }
+    .paid-benefits {
+        top: auto;
 
-  .buy-button strong {
-    font-size: 17px;
-  }
+        left: 18px;
+        right: 18px;
+        bottom: 101px;
 
-  .buy-button i {
-    font-size: 19px;
-  }
+        width: auto;
 
-  .paid-note {
-    margin-top: 6px;
+        display: grid;
 
-    font-size: 8px;
-  }
+        grid-template-columns:
+            1fr
+            1fr;
+
+        gap:
+            10px
+            14px;
+    }
+
+    .benefit {
+        grid-template-columns:
+            14px
+            minmax(0, 1fr);
+
+        gap: 6px;
+    }
+
+    .benefit-icon {
+        font-size: 11px;
+    }
+
+    .benefit-text {
+        font-size: 9px;
+
+        line-height: 1.25;
+    }
+
+
+    /* CTA */
+
+    .paid-bottom {
+        left: 12px;
+        right: 12px;
+
+        bottom: 9px;
+    }
+
+    .buy-button {
+        min-height: 55px;
+
+        gap: 8px;
+
+        padding:
+            13px
+            14px;
+    }
+
+    .buy-button span {
+        font-size: 10px;
+
+        white-space: normal;
+    }
+
+    .buy-button strong {
+        font-size: 17px;
+    }
+
+    .buy-button i {
+        font-size: 19px;
+    }
+
+    .paid-note {
+        margin-top: 6px;
+
+        font-size: 7px;
+
+        white-space: normal;
+    }
 }
 
 `;
