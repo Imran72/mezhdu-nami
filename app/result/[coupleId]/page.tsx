@@ -38,25 +38,22 @@ type BenefitIcon =
 
 const MAX_SCORE = 10;
 
-/*
- * Картинка должна лежать:
- *
- * public/images/full-report-couple.png
- *
- * В ней должен быть только pixel-art:
- * пара + пейзаж + луна + замок.
- *
- * Текст, benefits и CTA рисуем HTML/CSS.
- */
 const PAID_IMAGE = "/images/full-report-couple.png";
+
+/*
+ * Фиксированный дизайн paid-card.
+ *
+ * Все координаты внутри блока считаются
+ * относительно этой сцены.
+ */
+const PAID_WIDTH = 1180;
+const PAID_HEIGHT = 500;
 
 export default function ResultPage() {
     const params = useParams();
     const router = useRouter();
 
-    const coupleId = String(
-        params.coupleId ?? ""
-    );
+    const coupleId = String(params.coupleId ?? "");
 
     const [data, setData] =
         useState<ApiResponse | null>(null);
@@ -72,9 +69,7 @@ export default function ResultPage() {
         async function loadResult() {
             try {
                 const response = await fetch(
-                    `/api/report?id=${encodeURIComponent(
-                        coupleId
-                    )}`,
+                    `/api/report?id=${encodeURIComponent(coupleId)}`,
                     {
                         cache: "no-store",
                     }
@@ -92,10 +87,7 @@ export default function ResultPage() {
                 if (cancelled) return;
 
                 if (result.waiting) {
-                    router.replace(
-                        `/waiting/${coupleId}`
-                    );
-
+                    router.replace(`/waiting/${coupleId}`);
                     return;
                 }
 
@@ -146,14 +138,12 @@ export default function ResultPage() {
             return [
                 {
                     title: "Дружба",
-                    subtitle:
-                        "хорошо ли вам просто вдвоём",
+                    subtitle: "хорошо ли вам просто вдвоём",
                     value: clamp(base + 1),
                 },
                 {
                     title: "Партнёрство",
-                    subtitle:
-                        "вы команда или каждый сам за себя",
+                    subtitle: "вы команда или каждый сам за себя",
                     value: clamp(base),
                 },
                 {
@@ -210,12 +200,10 @@ export default function ResultPage() {
     }, [yearsForecast]);
 
     const nameA =
-        data?.couple?.partner_a_name ||
-        "Вы";
+        data?.couple?.partner_a_name || "Вы";
 
     const nameB =
-        data?.couple?.partner_b_name ||
-        "Партнёр";
+        data?.couple?.partner_b_name || "Партнёр";
 
     if (loading) {
         return (
@@ -227,10 +215,8 @@ export default function ResultPage() {
                 <style jsx>{`
           .loading-screen {
             min-height: 100vh;
-
             display: grid;
             place-items: center;
-
             background: #f8f4f1;
             color: #211d1f;
           }
@@ -240,7 +226,6 @@ export default function ResultPage() {
               Georgia,
               "Times New Roman",
               serif;
-
             font-size: 30px;
             font-weight: 700;
           }
@@ -257,15 +242,11 @@ export default function ResultPage() {
                 <style jsx>{`
           .error-screen {
             min-height: 100vh;
-
             display: grid;
             place-items: center;
-
             padding: 24px;
-
             background: #f8f4f1;
             color: #211d1f;
-
             font-family:
               Arial,
               Helvetica,
@@ -279,9 +260,7 @@ export default function ResultPage() {
     return (
         <main className="page">
             <div className="content-shell">
-                {/* ==========================================
-            HEADER
-        ========================================== */}
+                {/* HEADER */}
 
                 <header className="header">
                     <div className="brand">
@@ -303,9 +282,7 @@ export default function ResultPage() {
                     </div>
                 </header>
 
-                {/* ==========================================
-            RESULTS
-        ========================================== */}
+                {/* RESULTS */}
 
                 <section className="results">
                     <div className="section-label">
@@ -317,20 +294,16 @@ export default function ResultPage() {
                     </h1>
 
                     <div className="category-list">
-                        {categories.map(
-                            (category) => (
-                                <CategoryRow
-                                    key={category.title}
-                                    {...category}
-                                />
-                            )
-                        )}
+                        {categories.map((category) => (
+                            <CategoryRow
+                                key={category.title}
+                                {...category}
+                            />
+                        ))}
                     </div>
                 </section>
 
-                {/* ==========================================
-            FORECAST
-        ========================================== */}
+                {/* FORECAST */}
 
                 <section className="forecast">
                     <div className="forecast-copy">
@@ -339,28 +312,23 @@ export default function ResultPage() {
                         </div>
 
                         <h2 className="forecast-title">
-                            Ориентировочная
-                            длительность ваших отношений
+                            Ориентировочная длительность
+                            ваших отношений
                         </h2>
 
                         <p className="forecast-description">
-                            На основе ваших ответов мы
-                            оценили, сколько времени ваши
-                            отношения могут продлиться при
-                            текущем сценарии.
+                            На основе ваших ответов мы оценили,
+                            сколько времени ваши отношения могут
+                            продлиться при текущем сценарии.
                         </p>
                     </div>
 
                     <div className="forecast-result">
                         <div className="years">
-                            <strong>
-                                {yearsForecast}
-                            </strong>
+                            <strong>{yearsForecast}</strong>
 
                             <span>
-                {getYearWord(
-                    yearsForecast
-                )}
+                {getYearWord(yearsForecast)}
               </span>
                         </div>
 
@@ -369,60 +337,63 @@ export default function ResultPage() {
                                 <div
                                     className="scale-fill"
                                     style={{
-                                        width:
-                                            `${forecastPosition}%`,
+                                        width: `${forecastPosition}%`,
                                     }}
                                 />
 
                                 <div
                                     className="scale-dot"
                                     style={{
-                                        left:
-                                            `${forecastPosition}%`,
+                                        left: `${forecastPosition}%`,
                                     }}
                                 />
                             </div>
 
                             <div className="scale-labels">
-                <span>
-                  1 месяц
-                </span>
-
-                                <span>
-                  вся жизнь
-                </span>
+                                <span>1 месяц</span>
+                                <span>вся жизнь</span>
                             </div>
                         </div>
                     </div>
                 </section>
             </div>
 
-            {/* ==========================================
+            {/* =====================================================
           PAID REPORT
-      ========================================== */}
+
+          Внешний контейнер responsive.
+          Внутри — фиксированный canvas 1180 × 500.
+      ===================================================== */}
 
             <section className="paid-shell">
-                <div className="paid-ratio">
-                    <div className="paid-stage">
+                <div
+                    className="paid-viewport"
+                    style={{
+                        aspectRatio:
+                            `${PAID_WIDTH} / ${PAID_HEIGHT}`,
+                    }}
+                >
+                    <div className="paid-canvas">
                         {/* ART */}
 
-                        <div
-                            className="paid-image"
-                            style={{
-                                backgroundImage:
-                                    `url("${PAID_IMAGE}")`,
-                            }}
-                        />
+                        <div className="art-window">
+                            <img
+                                className="paid-art"
+                                src={PAID_IMAGE}
+                                alt=""
+                                draggable={false}
+                            />
+                        </div>
 
-                        {/* ПЛАВНЫЙ ПЕРЕХОД */}
+                        {/* плавное растворение арта вправо */}
 
-                        <div className="paid-gradient" />
+                        <div className="art-fade" />
 
-                        {/* ЛЁГКАЯ ДЫМКА */}
+                        {/* лёгкая общая дымка */}
 
                         <div className="paid-vignette" />
 
-                        {/* HEADING */}
+                        {/* TITLE */}
 
                         <div className="paid-heading">
                             <div className="paid-label">
@@ -490,9 +461,7 @@ export default function ResultPage() {
                             type="button"
                             className="paid-cta"
                             onClick={() =>
-                                router.push(
-                                    `/report/${coupleId}`
-                                )
+                                router.push(`/report/${coupleId}`)
                             }
                         >
               <span className="cta-title">
@@ -511,8 +480,7 @@ export default function ResultPage() {
                         </button>
 
                         <div className="paid-note">
-                            один разбор · для вас двоих ·
-                            сразу после оплаты
+                            один разбор · для вас двоих · сразу после оплаты
                         </div>
                     </div>
                 </div>
@@ -529,7 +497,6 @@ export default function ResultPage() {
 
         :global(body) {
           margin: 0;
-
           background: #f8f4f1;
           color: #201c1e;
         }
@@ -541,144 +508,99 @@ export default function ResultPage() {
         .page {
           width: 100%;
           min-height: 100vh;
-
-          padding:
-            0
-            28px
-            72px;
-
+          padding: 0 28px 72px;
           overflow-x: hidden;
-
           background: #f8f4f1;
         }
 
         .content-shell {
-          width: min(
-            720px,
-            100%
-          );
-
+          width: min(720px, 100%);
           margin: 0 auto;
         }
 
-        /* ==========================================
+        /* =====================================================
            HEADER
-        ========================================== */
+        ===================================================== */
 
         .header {
           min-height: 78px;
-
           display: flex;
           align-items: center;
-          justify-content:
-            space-between;
-
+          justify-content: space-between;
           gap: 24px;
-
-          border-bottom:
-            1px solid #ddd5d2;
+          border-bottom: 1px solid #ddd5d2;
         }
 
         .brand {
           flex-shrink: 0;
-
           font-family:
             Georgia,
             "Times New Roman",
             serif;
-
           font-size: 24px;
           line-height: 1;
           font-weight: 700;
-
-          letter-spacing:
-            -1.1px;
+          letter-spacing: -1.1px;
         }
 
         .couple-names {
           min-width: 0;
-
           display: flex;
           align-items: center;
-
           gap: 9px;
-
           color: #8f8588;
-
           font-family:
             Arial,
             Helvetica,
             sans-serif;
-
           font-size: 10px;
           font-weight: 700;
-
-          letter-spacing:
-            1.2px;
-
-          text-transform:
-            uppercase;
+          letter-spacing: 1.2px;
+          text-transform: uppercase;
         }
 
         .person-name {
           overflow: hidden;
-
-          text-overflow:
-            ellipsis;
-
-          white-space:
-            nowrap;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
 
         .couple-cross {
           flex-shrink: 0;
-
           color: #c2215a;
         }
 
-        /* ==========================================
+        /* =====================================================
            RESULTS
-        ========================================== */
+        ===================================================== */
 
         .results {
-          padding:
-            42px 0
-            45px;
+          padding: 42px 0 45px;
         }
 
         .section-label {
           margin-bottom: 13px;
-
           color: #c2215a;
-
           font-family:
             Arial,
             Helvetica,
             sans-serif;
-
           font-size: 10px;
           line-height: 1;
           font-weight: 800;
-
-          letter-spacing:
-            2.2px;
+          letter-spacing: 2.2px;
         }
 
         .results-title {
-          margin:
-            0 0 32px;
-
+          margin: 0 0 32px;
           font-family:
             Georgia,
             "Times New Roman",
             serif;
-
           font-size: 48px;
           line-height: 0.98;
           font-weight: 400;
-
-          letter-spacing:
-            -2.5px;
+          letter-spacing: -2.5px;
         }
 
         .category-list {
@@ -686,27 +608,19 @@ export default function ResultPage() {
           flex-direction: column;
         }
 
-        /* ==========================================
+        /* =====================================================
            FORECAST
-        ========================================== */
+        ===================================================== */
 
         .forecast {
-          padding:
-            38px 0
-            46px;
-
+          padding: 38px 0 46px;
           display: grid;
-
           grid-template-columns:
             minmax(0, 1.1fr)
             minmax(220px, 0.9fr);
-
           gap: 42px;
-
           align-items: center;
-
-          border-top:
-            1px solid #dcd4d1;
+          border-top: 1px solid #dcd4d1;
         }
 
         .forecast-copy {
@@ -715,38 +629,27 @@ export default function ResultPage() {
 
         .forecast-title {
           max-width: 360px;
-
           margin: 0;
-
           font-family:
             Georgia,
             "Times New Roman",
             serif;
-
           font-size: 35px;
           line-height: 1.02;
           font-weight: 400;
-
-          letter-spacing:
-            -1.8px;
+          letter-spacing: -1.8px;
         }
 
         .forecast-description {
           max-width: 390px;
-
-          margin:
-            12px 0 0;
-
+          margin: 12px 0 0;
           color: #8d8587;
-
           font-family:
             Arial,
             Helvetica,
             sans-serif;
-
           font-size: 12px;
           line-height: 1.45;
-
           font-weight: 500;
         }
 
@@ -757,14 +660,11 @@ export default function ResultPage() {
         .years {
           display: flex;
           align-items: baseline;
-
           color: #c21856;
-
           font-family:
             Georgia,
             "Times New Roman",
             serif;
-
           white-space: nowrap;
         }
 
@@ -772,202 +672,181 @@ export default function ResultPage() {
           font-size: 68px;
           line-height: 0.88;
           font-weight: 400;
-
-          letter-spacing:
-            -4px;
+          letter-spacing: -4px;
         }
 
         .years span {
           margin-left: 8px;
-
           font-size: 37px;
           line-height: 1;
-
-          letter-spacing:
-            -1.5px;
+          letter-spacing: -1.5px;
         }
 
         .forecast-scale {
           width: 100%;
-
           margin-top: 20px;
         }
 
         .scale-track {
           position: relative;
-
           height: 8px;
-
-          border-radius:
-            999px;
-
+          border-radius: 999px;
           background: #e5dfe0;
         }
 
         .scale-fill {
           position: absolute;
-
-          inset:
-            0 auto
-            0 0;
-
-          border-radius:
-            inherit;
-
+          inset: 0 auto 0 0;
+          border-radius: inherit;
           background: #e99ab5;
         }
 
         .scale-dot {
           position: absolute;
-
           top: 50%;
-
           width: 20px;
           height: 20px;
-
           border-radius: 50%;
-
           background: #c21856;
-
-          transform:
-            translate(
-              -50%,
-              -50%
-            );
+          transform: translate(-50%, -50%);
         }
 
         .scale-labels {
           display: flex;
-          justify-content:
-            space-between;
-
+          justify-content: space-between;
           margin-top: 11px;
-
           color: #8d8587;
-
           font-family:
             Arial,
             Helvetica,
             sans-serif;
-
           font-size: 10px;
           font-weight: 600;
         }
 
         /* =====================================================
-           PAID REPORT
-           MASTER DESKTOP COMPOSITION
+           PAID — RESPONSIVE CANVAS
 
-           Пропорция максимально близка
-           к выбранному референсу.
+           Внутри всегда 1180 × 500.
         ===================================================== */
 
         .paid-shell {
-          width: min(
-            1180px,
-            100%
-          );
-
-          margin:
-            8px auto
-            0;
+          width: min(1180px, 100%);
+          margin: 8px auto 0;
         }
 
-        .paid-ratio {
+        /*
+         * Container query units дают нам точный scale:
+         *
+         * 1cqw = 1% текущей ширины viewport блока.
+         *
+         * --scale = фактическая ширина / 1180.
+         */
+
+        .paid-viewport {
           position: relative;
-
           width: 100%;
-
-          /*
-           * Более широкий баннер,
-           * чем предыдущие 1120/540.
-           */
-
-          aspect-ratio:
-            1180 / 500;
+          overflow: hidden;
+          container-type: inline-size;
+          border-radius: 22px;
+          background: #a6124d;
         }
 
-        .paid-stage {
-          position: absolute;
+        .paid-canvas {
+          --scale: calc(100cqw / 1180);
 
-          inset: 0;
+          position: absolute;
+          top: 0;
+          left: 0;
+
+          width: 1180px;
+          height: 500px;
 
           overflow: hidden;
 
-          border-radius:
-            clamp(
-              12px,
-              1.7vw,
-              22px
-            );
+          transform:
+            scale(var(--scale));
+
+          transform-origin:
+            top left;
 
           background:
-            #a40f49;
+            #a6124d;
 
           color: #fff;
-
-          isolation: isolate;
         }
 
-        /* ==========================================
+        /* =====================================================
            ART
+        ===================================================== */
 
-           Самая важная правка:
-           больше не используем cover
-           на весь контейнер.
-        ========================================== */
+        /*
+         * Сам арт теперь отдельный объект.
+         *
+         * Это позволяет нам независимо контролировать:
+         * - размер картинки;
+         * - положение картинки;
+         * - текст;
+         * - CTA.
+         */
 
-        .paid-image {
+        .art-window {
           position: absolute;
-
           z-index: 0;
 
-          top: 0;
-          bottom: 0;
           left: 0;
+          top: 0;
 
-          /*
-           * Изображение продолжается
-           * достаточно далеко вправо,
-           * чтобы замок был виден.
-           */
+          width: 850px;
+          height: 500px;
 
-          width: 79%;
-
-          background-repeat:
-            no-repeat;
-
-          /*
-           * Высота изображения совпадает
-           * с высотой карточки.
-           *
-           * Соотношение исходного арта
-           * сохраняется.
-           */
-
-          background-size:
-            auto 100%;
-
-          background-position:
-            left bottom;
-
-          background-color:
-            #a40f49;
+          overflow: hidden;
         }
 
-        /* ==========================================
-           FADE
-
-           Арт начинает растворяться
-           только после центра.
-        ========================================== */
-
-        .paid-gradient {
+        .paid-art {
           position: absolute;
 
+          /*
+           * Картинка немного шире окна.
+           * За счёт этого сохраняем красивую
+           * композицию пары + замка.
+           */
+
+          left: -8px;
+          bottom: 0;
+
+          width: 890px;
+          height: 500px;
+
+          object-fit: cover;
+
+          /*
+           * Фокус немного левее центра:
+           * пара остаётся слева,
+           * замок ближе к середине.
+           */
+
+          object-position: 42% center;
+
+          display: block;
+
+          user-select: none;
+          pointer-events: none;
+        }
+
+        /* =====================================================
+           ART FADE
+        ===================================================== */
+
+        .art-fade {
+          position: absolute;
           z-index: 1;
 
-          inset: 0;
+          top: 0;
+          right: 0;
+
+          width: 690px;
+          height: 500px;
 
           pointer-events: none;
 
@@ -975,92 +854,32 @@ export default function ResultPage() {
             linear-gradient(
               90deg,
 
-              rgba(
-                164,
-                15,
-                73,
-                0
-              ) 0%,
+              rgba(166, 18, 77, 0) 0px,
 
-              rgba(
-                164,
-                15,
-                73,
-                0
-              ) 45%,
+              rgba(166, 18, 77, 0) 100px,
 
-              rgba(
-                164,
-                15,
-                73,
-                0.03
-              ) 49%,
+              rgba(166, 18, 77, 0.04) 150px,
 
-              rgba(
-                164,
-                15,
-                73,
-                0.08
-              ) 53%,
+              rgba(166, 18, 77, 0.1) 200px,
 
-              rgba(
-                164,
-                15,
-                73,
-                0.16
-              ) 57%,
+              rgba(166, 18, 77, 0.22) 250px,
 
-              rgba(
-                164,
-                15,
-                73,
-                0.28
-              ) 61%,
+              rgba(166, 18, 77, 0.4) 300px,
 
-              rgba(
-                164,
-                15,
-                73,
-                0.44
-              ) 65%,
+              rgba(166, 18, 77, 0.62) 350px,
 
-              rgba(
-                164,
-                15,
-                73,
-                0.62
-              ) 69%,
+              rgba(166, 18, 77, 0.8) 400px,
 
-              rgba(
-                164,
-                15,
-                73,
-                0.78
-              ) 73%,
+              rgba(166, 18, 77, 0.93) 455px,
 
-              rgba(
-                164,
-                15,
-                73,
-                0.89
-              ) 77%,
+              #a6124d 520px,
 
-              rgba(
-                164,
-                15,
-                73,
-                0.96
-              ) 82%,
-
-              #a40f49 88%,
-
-              #a40f49 100%
+              #a6124d 100%
             );
         }
 
         .paid-vignette {
           position: absolute;
-
           z-index: 2;
 
           inset: 0;
@@ -1070,62 +889,38 @@ export default function ResultPage() {
           background:
             linear-gradient(
               180deg,
-
-              rgba(
-                42,
-                0,
-                20,
-                0.08
-              ) 0%,
-
-              rgba(
-                42,
-                0,
-                20,
-                0
-              ) 30%,
-
-              rgba(
-                42,
-                0,
-                20,
-                0
-              ) 70%,
-
-              rgba(
-                42,
-                0,
-                20,
-                0.12
-              ) 100%
+              rgba(42, 0, 20, 0.07) 0%,
+              rgba(42, 0, 20, 0) 30%,
+              rgba(42, 0, 20, 0) 72%,
+              rgba(42, 0, 20, 0.1) 100%
             );
         }
 
-        /* ==========================================
+        /* =====================================================
            HEADING
-        ========================================== */
+
+           Фиксированные координаты canvas.
+        ===================================================== */
 
         .paid-heading {
           position: absolute;
-
           z-index: 3;
 
-          top: 6.7%;
-          left: 6.1%;
+          top: 38px;
+          left: 70px;
 
-          width: 43%;
+          width: 480px;
         }
 
         .paid-label {
-          margin-bottom:
-            2.8%;
+          margin-bottom: 14px;
 
           color:
             rgba(
               255,
-              245,
+              244,
               247,
-              0.9
+              0.86
             );
 
           font-family:
@@ -1133,19 +928,11 @@ export default function ResultPage() {
             Helvetica,
             sans-serif;
 
-          font-size:
-            clamp(
-              6px,
-              0.76vw,
-              10px
-            );
-
+          font-size: 10px;
           line-height: 1;
-
           font-weight: 700;
 
-          letter-spacing:
-            0.18em;
+          letter-spacing: 2.1px;
         }
 
         .paid-heading h2 {
@@ -1158,22 +945,14 @@ export default function ResultPage() {
             "Times New Roman",
             serif;
 
-          font-size:
-            clamp(
-              20px,
-              3.55vw,
-              47px
-            );
-
-          line-height: 0.97;
-
+          font-size: 49px;
+          line-height: 0.95;
           font-weight: 400;
 
-          letter-spacing:
-            -0.04em;
+          letter-spacing: -2px;
 
           text-shadow:
-            0 2px 15px
+            0 2px 16px
             rgba(
               59,
               0,
@@ -1182,67 +961,51 @@ export default function ResultPage() {
             );
         }
 
-        /* ==========================================
+        /* =====================================================
            BENEFITS
-        ========================================== */
+        ===================================================== */
 
         .paid-benefits {
           position: absolute;
-
           z-index: 4;
 
-          top: 10%;
-          right: 5.1%;
+          top: 48px;
+          right: 63px;
 
-          width: 27%;
+          width: 300px;
 
           display: flex;
           flex-direction: column;
 
-          gap:
-            clamp(
-              9px,
-              1.55vw,
-              21px
-            );
+          gap: 25px;
         }
 
-        /* ==========================================
+        /* =====================================================
            CTA
-        ========================================== */
+        ===================================================== */
 
         .paid-cta {
           position: absolute;
-
           z-index: 5;
 
-          right: 3.1%;
-          bottom: 10.3%;
+          right: 36px;
+          bottom: 52px;
 
-          width: 54%;
-          height: 14.4%;
-
-          min-height: 0;
+          width: 638px;
+          height: 72px;
 
           padding:
             0
-            2.4%;
+            26px;
 
           display: flex;
           align-items: center;
-          justify-content:
-            space-between;
+          justify-content: space-between;
 
-          gap: 2%;
+          gap: 20px;
 
           border: 0;
-
-          border-radius:
-            clamp(
-              8px,
-              1.25vw,
-              15px
-            );
+          border-radius: 15px;
 
           background:
             #fffaf7;
@@ -1258,27 +1021,7 @@ export default function ResultPage() {
               65,
               0,
               27,
-              0.12
-            );
-
-          transition:
-            transform
-              150ms ease,
-            box-shadow
-              150ms ease;
-        }
-
-        .paid-cta:hover {
-          transform:
-            translateY(-2px);
-
-          box-shadow:
-            0 13px 30px
-            rgba(
-              65,
-              0,
-              27,
-              0.18
+              0.13
             );
         }
 
@@ -1288,34 +1031,22 @@ export default function ResultPage() {
             Helvetica,
             sans-serif;
 
-          font-size:
-            clamp(
-              7px,
-              1.05vw,
-              14px
-            );
-
+          font-size: 15px;
           line-height: 1;
 
           font-weight: 600;
 
           letter-spacing:
-            -0.01em;
+            -0.1px;
 
-          white-space:
-            nowrap;
+          white-space: nowrap;
         }
 
         .cta-right {
           display: flex;
           align-items: center;
 
-          gap:
-            clamp(
-              8px,
-              1.45vw,
-              19px
-            );
+          gap: 22px;
 
           color:
             #c51b58;
@@ -1327,19 +1058,12 @@ export default function ResultPage() {
             "Times New Roman",
             serif;
 
-          font-size:
-            clamp(
-              13px,
-              2.05vw,
-              27px
-            );
-
+          font-size: 27px;
           line-height: 1;
 
           font-weight: 400;
 
-          white-space:
-            nowrap;
+          white-space: nowrap;
         }
 
         .arrow {
@@ -1348,13 +1072,7 @@ export default function ResultPage() {
             Helvetica,
             sans-serif;
 
-          font-size:
-            clamp(
-              12px,
-              1.85vw,
-              24px
-            );
-
+          font-size: 25px;
           line-height: 1;
 
           font-weight: 300;
@@ -1362,20 +1080,19 @@ export default function ResultPage() {
 
         .paid-note {
           position: absolute;
-
           z-index: 5;
 
-          right: 3.1%;
-          bottom: 4.4%;
+          right: 36px;
+          bottom: 22px;
 
-          width: 54%;
+          width: 638px;
 
           color:
             rgba(
               255,
               238,
               243,
-              0.7
+              0.68
             );
 
           font-family:
@@ -1383,46 +1100,37 @@ export default function ResultPage() {
             Helvetica,
             sans-serif;
 
-          font-size:
-            clamp(
-              5px,
-              0.64vw,
-              8px
-            );
-
+          font-size: 9px;
           line-height: 1;
 
           font-weight: 400;
 
           text-align: center;
-
-          white-space:
-            nowrap;
         }
 
-        /* ==========================================
+        /* =====================================================
            TABLET
-        ========================================== */
+        ===================================================== */
 
-        @media (
-          max-width: 900px
-        ) {
+        @media (max-width: 900px) {
           .page {
             padding-left: 20px;
             padding-right: 20px;
           }
+
+          .paid-viewport {
+            border-radius: 16px;
+          }
         }
 
-        /* ==========================================
+        /* =====================================================
            MOBILE
 
-           Основной контент перестраиваем.
-           Paid-композицию сохраняем.
-        ========================================== */
+           Paid вообще НЕ перестраиваем.
+           Canvas просто уменьшается.
+        ===================================================== */
 
-        @media (
-          max-width: 640px
-        ) {
+        @media (max-width: 640px) {
           .page {
             padding:
               0
@@ -1432,7 +1140,6 @@ export default function ResultPage() {
 
           .header {
             min-height: 64px;
-
             gap: 12px;
           }
 
@@ -1442,13 +1149,9 @@ export default function ResultPage() {
 
           .couple-names {
             max-width: 52%;
-
             gap: 5px;
-
             font-size: 8px;
-
-            letter-spacing:
-              0.65px;
+            letter-spacing: 0.65px;
           }
 
           .results {
@@ -1458,30 +1161,17 @@ export default function ResultPage() {
           }
 
           .section-label {
-            margin-bottom:
-              11px;
-
+            margin-bottom: 11px;
             font-size: 9px;
-
-            letter-spacing:
-              1.8px;
+            letter-spacing: 1.8px;
           }
 
           .results-title {
-            margin-bottom:
-              24px;
-
+            margin-bottom: 24px;
             font-size: 37px;
             line-height: 1;
-
-            letter-spacing:
-              -1.8px;
+            letter-spacing: -1.8px;
           }
-
-          /*
-           * Forecast на телефоне
-           * вертикальный.
-           */
 
           .forecast {
             padding:
@@ -1493,43 +1183,32 @@ export default function ResultPage() {
 
           .forecast-title {
             max-width: 340px;
-
             font-size: 31px;
             line-height: 1.03;
-
-            letter-spacing:
-              -1.35px;
+            letter-spacing: -1.35px;
           }
 
           .forecast-description {
             max-width: 325px;
-
             margin-top: 12px;
-
             font-size: 12px;
             line-height: 1.45;
           }
 
           .forecast-result {
             width: 100%;
-
             margin-top: 24px;
           }
 
           .years strong {
             font-size: 62px;
-
-            letter-spacing:
-              -3px;
+            letter-spacing: -3px;
           }
 
           .years span {
             margin-left: 7px;
-
             font-size: 33px;
-
-            letter-spacing:
-              -1px;
+            letter-spacing: -1px;
           }
 
           .forecast-scale {
@@ -1547,83 +1226,16 @@ export default function ResultPage() {
 
           .scale-labels {
             margin-top: 10px;
-
             font-size: 9px;
           }
 
-          /*
-           * Paid баннер сохраняет
-           * desktop-композицию.
-           */
-
           .paid-shell {
             width: 100%;
-
             margin-top: 0;
           }
 
-          .paid-stage {
-            border-radius: 10px;
-          }
-
-          /*
-           * На маленькой ширине
-           * чуть усиливаем headline,
-           * чтобы он не исчезал.
-           */
-
-          .paid-label {
-            font-size:
-              clamp(
-                4px,
-                1.25vw,
-                6px
-              );
-          }
-
-          .paid-heading h2 {
-            font-size:
-              clamp(
-                14px,
-                4.5vw,
-                20px
-              );
-          }
-
-          .cta-title {
-            font-size:
-              clamp(
-                5px,
-                1.7vw,
-                7px
-              );
-          }
-
-          .price {
-            font-size:
-              clamp(
-                9px,
-                3vw,
-                13px
-              );
-          }
-
-          .arrow {
-            font-size:
-              clamp(
-                8px,
-                2.7vw,
-                12px
-              );
-          }
-
-          .paid-note {
-            font-size:
-              clamp(
-                3px,
-                1vw,
-                5px
-              );
+          .paid-viewport {
+            border-radius: 9px;
           }
         }
       `}</style>
@@ -1642,10 +1254,7 @@ function CategoryRow({
                      }: CategoryScore) {
     const safeValue = Math.max(
         0,
-        Math.min(
-            MAX_SCORE,
-            value
-        )
+        Math.min(MAX_SCORE, value)
     );
 
     return (
@@ -1662,13 +1271,8 @@ function CategoryRow({
                 </div>
 
                 <div className="category-score">
-                    <strong>
-                        {safeValue}
-                    </strong>
-
-                    <span>
-            /10
-          </span>
+                    <strong>{safeValue}</strong>
+                    <span>/10</span>
                 </div>
             </div>
 
@@ -1676,20 +1280,15 @@ function CategoryRow({
                 <div
                     className="category-fill"
                     style={{
-                        width:
-                            `${safeValue * 10}%`,
+                        width: `${safeValue * 10}%`,
                     }}
                 />
             </div>
 
             <style jsx>{`
         .category-row {
-          padding:
-            16px 0
-            18px;
-
-          border-bottom:
-            1px solid #e0d9d6;
+          padding: 16px 0 18px;
+          border-bottom: 1px solid #e0d9d6;
         }
 
         .category-row:first-child {
@@ -1698,12 +1297,8 @@ function CategoryRow({
 
         .category-top {
           display: flex;
-
           align-items: flex-end;
-
-          justify-content:
-            space-between;
-
+          justify-content: space-between;
           gap: 24px;
         }
 
@@ -1719,14 +1314,11 @@ function CategoryRow({
 
           font-size: 27px;
           line-height: 1;
-
-          letter-spacing:
-            -1.1px;
+          letter-spacing: -1.1px;
         }
 
         .category-subtitle {
           margin-top: 5px;
-
           color: #8e8688;
 
           font-family:
@@ -1736,16 +1328,12 @@ function CategoryRow({
 
           font-size: 11px;
           line-height: 1.3;
-
           font-weight: 500;
         }
 
         .category-score {
           display: flex;
-
-          align-items:
-            baseline;
-
+          align-items: baseline;
           flex-shrink: 0;
 
           color: #7f7679;
@@ -1761,50 +1349,33 @@ function CategoryRow({
 
           font-size: 40px;
           line-height: 0.8;
-
           font-weight: 400;
 
-          letter-spacing:
-            -1.7px;
+          letter-spacing: -1.7px;
         }
 
         .category-score span {
           margin-left: 3px;
-
           font-size: 17px;
         }
 
         .category-track {
           height: 6px;
-
           margin-top: 11px;
-
           overflow: hidden;
-
-          border-radius:
-            999px;
-
-          background:
-            #e5dfdf;
+          border-radius: 999px;
+          background: #e5dfdf;
         }
 
         .category-fill {
           height: 100%;
-
-          border-radius:
-            inherit;
-
-          background:
-            #cb3a6d;
+          border-radius: inherit;
+          background: #cb3a6d;
         }
 
-        @media (
-          max-width: 640px
-        ) {
+        @media (max-width: 640px) {
           .category-row {
-            padding:
-              13px 0
-              15px;
+            padding: 13px 0 15px;
           }
 
           .category-top {
@@ -1817,9 +1388,7 @@ function CategoryRow({
 
           .category-subtitle {
             max-width: 235px;
-
             margin-top: 4px;
-
             font-size: 10px;
           }
 
@@ -1833,7 +1402,6 @@ function CategoryRow({
 
           .category-track {
             height: 5px;
-
             margin-top: 10px;
           }
         }
@@ -1856,9 +1424,7 @@ function Benefit({
     return (
         <div className="benefit">
             <div className="benefit-icon">
-                <BenefitSvg
-                    type={icon}
-                />
+                <BenefitSvg type={icon} />
             </div>
 
             <div className="benefit-text">
@@ -1870,19 +1436,10 @@ function Benefit({
           display: grid;
 
           grid-template-columns:
-            clamp(
-              10px,
-              1.65vw,
-              22px
-            )
+            24px
             minmax(0, 1fr);
 
-          gap:
-            clamp(
-              5px,
-              0.85vw,
-              10px
-            );
+          gap: 12px;
 
           align-items: start;
 
@@ -1890,10 +1447,8 @@ function Benefit({
         }
 
         .benefit-icon {
-          width: 100%;
-
+          width: 21px;
           padding-top: 1px;
-
           color: #ffd8e1;
         }
 
@@ -1903,19 +1458,11 @@ function Benefit({
             Helvetica,
             sans-serif;
 
-          font-size:
-            clamp(
-              6px,
-              0.98vw,
-              13px
-            );
-
-          line-height: 1.27;
-
+          font-size: 14px;
+          line-height: 1.28;
           font-weight: 500;
 
-          letter-spacing:
-            -0.01em;
+          letter-spacing: -0.1px;
 
           text-shadow:
             0 1px 8px
@@ -1926,34 +1473,13 @@ function Benefit({
               0.08
             );
         }
-
-        @media (
-          max-width: 640px
-        ) {
-          .benefit {
-            grid-template-columns:
-              8px
-              minmax(0, 1fr);
-
-            gap: 4px;
-          }
-
-          .benefit-text {
-            font-size:
-              clamp(
-                4px,
-                1.45vw,
-                6px
-              );
-          }
-        }
       `}</style>
         </div>
     );
 }
 
 /* ============================================================
-   BENEFIT SVG
+   BENEFIT ICONS
 ============================================================ */
 
 function BenefitSvg({
@@ -1992,35 +1518,25 @@ function BenefitSvg({
                 viewBox="0 0 24 24"
                 width="100%"
                 height="auto"
-                fill="none"
+                fill="currentColor"
                 aria-hidden="true"
             >
-                <rect
-                    x="3"
-                    y="4"
-                    width="18"
-                    height="13"
-                    rx="4"
-                    fill="currentColor"
-                />
-
                 <path
-                    d="M8 17L7 21L12 17"
-                    fill="currentColor"
-                />
-
-                <path
-                    d="M7 9H17"
-                    stroke="#a40f49"
-                    strokeWidth="1.7"
-                    strokeLinecap="round"
-                />
-
-                <path
-                    d="M7 12H14"
-                    stroke="#a40f49"
-                    strokeWidth="1.7"
-                    strokeLinecap="round"
+                    d="
+            M6 3
+            H18
+            C20.2 3 22 4.8 22 7
+            V14
+            C22 16.2 20.2 18 18 18
+            H12
+            L7 22
+            L8 18
+            H6
+            C3.8 18 2 16.2 2 14
+            V7
+            C2 4.8 3.8 3 6 3
+            Z
+          "
                 />
             </svg>
         );
@@ -2063,7 +1579,7 @@ function BenefitSvg({
                 y="13"
                 width="4"
                 height="8"
-                rx="1.2"
+                rx="1"
             />
 
             <rect
@@ -2071,7 +1587,7 @@ function BenefitSvg({
                 y="8"
                 width="4"
                 height="13"
-                rx="1.2"
+                rx="1"
             />
 
             <rect
@@ -2079,7 +1595,7 @@ function BenefitSvg({
                 y="3"
                 width="4"
                 height="18"
-                rx="1.2"
+                rx="1"
             />
         </svg>
     );
@@ -2089,14 +1605,9 @@ function BenefitSvg({
    YEAR WORD
 ============================================================ */
 
-function getYearWord(
-    value: number
-) {
-    const mod100 =
-        value % 100;
-
-    const mod10 =
-        value % 10;
+function getYearWord(value: number) {
+    const mod100 = value % 100;
+    const mod10 = value % 10;
 
     if (
         mod100 >= 11 &&
