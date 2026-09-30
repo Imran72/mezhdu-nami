@@ -40,15 +40,6 @@ const MAX_SCORE = 10;
 
 const PAID_IMAGE = "/images/full-report-couple.png";
 
-/*
- * Фиксированный дизайн paid-card.
- *
- * Все координаты внутри блока считаются
- * относительно этой сцены.
- */
-const PAID_WIDTH = 1180;
-const PAID_HEIGHT = 500;
-
 export default function ResultPage() {
     const params = useParams();
     const router = useRouter();
@@ -138,12 +129,14 @@ export default function ResultPage() {
             return [
                 {
                     title: "Дружба",
-                    subtitle: "хорошо ли вам просто вдвоём",
+                    subtitle:
+                        "хорошо ли вам просто вдвоём",
                     value: clamp(base + 1),
                 },
                 {
                     title: "Партнёрство",
-                    subtitle: "вы команда или каждый сам за себя",
+                    subtitle:
+                        "вы команда или каждый сам за себя",
                     value: clamp(base),
                 },
                 {
@@ -213,23 +206,23 @@ export default function ResultPage() {
                 </div>
 
                 <style jsx>{`
-          .loading-screen {
-            min-height: 100vh;
-            display: grid;
-            place-items: center;
-            background: #f8f4f1;
-            color: #211d1f;
-          }
+                    .loading-screen {
+                        min-height: 100vh;
+                        display: grid;
+                        place-items: center;
+                        background: #f8f4f1;
+                        color: #211d1f;
+                    }
 
-          .loading-brand {
-            font-family:
-              Georgia,
-              "Times New Roman",
-              serif;
-            font-size: 30px;
-            font-weight: 700;
-          }
-        `}</style>
+                    .loading-brand {
+                        font-family:
+                            Georgia,
+                            "Times New Roman",
+                            serif;
+                        font-size: 30px;
+                        font-weight: 700;
+                    }
+                `}</style>
             </main>
         );
     }
@@ -240,19 +233,19 @@ export default function ResultPage() {
                 Не получилось загрузить результат.
 
                 <style jsx>{`
-          .error-screen {
-            min-height: 100vh;
-            display: grid;
-            place-items: center;
-            padding: 24px;
-            background: #f8f4f1;
-            color: #211d1f;
-            font-family:
-              Arial,
-              Helvetica,
-              sans-serif;
-          }
-        `}</style>
+                    .error-screen {
+                        min-height: 100vh;
+                        display: grid;
+                        place-items: center;
+                        padding: 24px;
+                        background: #f8f4f1;
+                        color: #211d1f;
+                        font-family:
+                            Arial,
+                            Helvetica,
+                            sans-serif;
+                    }
+                `}</style>
             </main>
         );
     }
@@ -260,7 +253,9 @@ export default function ResultPage() {
     return (
         <main className="page">
             <div className="content-shell">
-                {/* HEADER */}
+                {/* =====================================================
+                    HEADER
+                ===================================================== */}
 
                 <header className="header">
                     <div className="brand">
@@ -268,21 +263,23 @@ export default function ResultPage() {
                     </div>
 
                     <div className="couple-names">
-            <span className="person-name">
-              {nameA}
-            </span>
+                        <span className="person-name">
+                            {nameA}
+                        </span>
 
                         <span className="couple-cross">
-              ×
-            </span>
+                            ×
+                        </span>
 
                         <span className="person-name">
-              {nameB}
-            </span>
+                            {nameB}
+                        </span>
                     </div>
                 </header>
 
-                {/* RESULTS */}
+                {/* =====================================================
+                    RESULTS
+                ===================================================== */}
 
                 <section className="results">
                     <div className="section-label">
@@ -290,7 +287,9 @@ export default function ResultPage() {
                     </div>
 
                     <h1 className="results-title">
-                        Вот что получилось
+                        Вот что
+                        <br />
+                        получилось
                     </h1>
 
                     <div className="category-list">
@@ -303,7 +302,9 @@ export default function ResultPage() {
                     </div>
                 </section>
 
-                {/* FORECAST */}
+                {/* =====================================================
+                    FORECAST
+                ===================================================== */}
 
                 <section className="forecast">
                     <div className="forecast-copy">
@@ -312,24 +313,31 @@ export default function ResultPage() {
                         </div>
 
                         <h2 className="forecast-title">
-                            Ориентировочная длительность
+                            Ориентировочная
+                            <br />
+                            длительность
+                            <br className="desktop-break" />
                             ваших отношений
                         </h2>
 
                         <p className="forecast-description">
-                            На основе ваших ответов мы оценили,
-                            сколько времени ваши отношения могут
-                            продлиться при текущем сценарии.
+                            На основе ваших ответов мы оценили
+                            ориентировочный сценарий
+                            длительности ваших отношений.
                         </p>
                     </div>
 
                     <div className="forecast-result">
                         <div className="years">
-                            <strong>{yearsForecast}</strong>
+                            <strong>
+                                {yearsForecast}
+                            </strong>
 
                             <span>
-                {getYearWord(yearsForecast)}
-              </span>
+                                {getYearWord(
+                                    yearsForecast
+                                )}
+                            </span>
                         </div>
 
                         <div className="forecast-scale">
@@ -358,40 +366,49 @@ export default function ResultPage() {
                 </section>
             </div>
 
-            {/* =====================================================
-          PAID REPORT
+            {/* =========================================================
+                PAID REPORT
 
-          Внешний контейнер responsive.
-          Внутри — фиксированный canvas 1180 × 500.
-      ===================================================== */}
+                Здесь больше НЕТ фиксированного canvas 1180x500.
+
+                Desktop:
+                изображение + плавный fade + текст + CTA.
+
+                Mobile:
+                изображение сверху + плавное растворение вниз +
+                текст/benefits + CTA.
+            ========================================================= */}
 
             <section className="paid-shell">
-                <div
-                    className="paid-viewport"
-                    style={{
-                        aspectRatio:
-                            `${PAID_WIDTH} / ${PAID_HEIGHT}`,
-                    }}
-                >
-                    <div className="paid-canvas">
-                        {/* ART */}
+                <div className="paid-card">
 
-                        <div className="art-window">
-                            <img
-                                className="paid-art"
-                                src={PAID_IMAGE}
-                                alt=""
-                                draggable={false}
-                            />
-                        </div>
+                    {/* =================================================
+                        ART
+                    ================================================= */}
 
-                        {/* плавное растворение арта вправо */}
+                    <div className="paid-art-layer">
+                        <img
+                            className="paid-art"
+                            src={PAID_IMAGE}
+                            alt=""
+                            draggable={false}
+                        />
 
-                        <div className="art-fade" />
+                        <div className="desktop-art-fade" />
+                        <div className="mobile-art-fade" />
+                    </div>
 
-                        {/* лёгкая общая дымка */}
+                    {/* =================================================
+                        Общая лёгкая дымка
+                    ================================================= */}
 
-                        <div className="paid-vignette" />
+                    <div className="paid-vignette" />
+
+                    {/* =================================================
+                        CONTENT
+                    ================================================= */}
+
+                    <div className="paid-content">
 
                         {/* TITLE */}
 
@@ -410,6 +427,7 @@ export default function ResultPage() {
                         {/* BENEFITS */}
 
                         <div className="paid-benefits">
+
                             <Benefit
                                 icon="heart"
                                 text={
@@ -453,6 +471,7 @@ export default function ResultPage() {
                                     </>
                                 }
                             />
+
                         </div>
 
                         {/* CTA */}
@@ -461,784 +480,1157 @@ export default function ResultPage() {
                             type="button"
                             className="paid-cta"
                             onClick={() =>
-                                router.push(`/report/${coupleId}`)
+                                router.push(
+                                    `/report/${coupleId}`
+                                )
                             }
                         >
-              <span className="cta-title">
-                Открыть полный разбор
-              </span>
+                            <span className="cta-title">
+                                Открыть полный разбор
+                            </span>
 
                             <span className="cta-right">
-                <span className="price">
-                  299 ₽
-                </span>
+                                <span className="price">
+                                    299 ₽
+                                </span>
 
-                <span className="arrow">
-                  →
-                </span>
-              </span>
+                                <span className="arrow">
+                                    →
+                                </span>
+                            </span>
                         </button>
 
                         <div className="paid-note">
-                            один разбор · для вас двоих · сразу после оплаты
+                            один разбор · для вас двоих ·
+                            сразу после оплаты
                         </div>
                     </div>
                 </div>
             </section>
 
             <style jsx>{`
-        :global(*) {
-          box-sizing: border-box;
-        }
-
-        :global(html) {
-          background: #f8f4f1;
-        }
-
-        :global(body) {
-          margin: 0;
-          background: #f8f4f1;
-          color: #201c1e;
-        }
-
-        button {
-          font: inherit;
-        }
-
-        .page {
-          width: 100%;
-          min-height: 100vh;
-          padding: 0 28px 72px;
-          overflow-x: hidden;
-          background: #f8f4f1;
-        }
-
-        .content-shell {
-          width: min(720px, 100%);
-          margin: 0 auto;
-        }
-
-        /* =====================================================
-           HEADER
-        ===================================================== */
-
-        .header {
-          min-height: 78px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 24px;
-          border-bottom: 1px solid #ddd5d2;
-        }
-
-        .brand {
-          flex-shrink: 0;
-          font-family:
-            Georgia,
-            "Times New Roman",
-            serif;
-          font-size: 24px;
-          line-height: 1;
-          font-weight: 700;
-          letter-spacing: -1.1px;
-        }
-
-        .couple-names {
-          min-width: 0;
-          display: flex;
-          align-items: center;
-          gap: 9px;
-          color: #8f8588;
-          font-family:
-            Arial,
-            Helvetica,
-            sans-serif;
-          font-size: 10px;
-          font-weight: 700;
-          letter-spacing: 1.2px;
-          text-transform: uppercase;
-        }
-
-        .person-name {
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-
-        .couple-cross {
-          flex-shrink: 0;
-          color: #c2215a;
-        }
-
-        /* =====================================================
-           RESULTS
-        ===================================================== */
-
-        .results {
-          padding: 42px 0 45px;
-        }
-
-        .section-label {
-          margin-bottom: 13px;
-          color: #c2215a;
-          font-family:
-            Arial,
-            Helvetica,
-            sans-serif;
-          font-size: 10px;
-          line-height: 1;
-          font-weight: 800;
-          letter-spacing: 2.2px;
-        }
-
-        .results-title {
-          margin: 0 0 32px;
-          font-family:
-            Georgia,
-            "Times New Roman",
-            serif;
-          font-size: 48px;
-          line-height: 0.98;
-          font-weight: 400;
-          letter-spacing: -2.5px;
-        }
-
-        .category-list {
-          display: flex;
-          flex-direction: column;
-        }
-
-        /* =====================================================
-           FORECAST
-        ===================================================== */
-
-        .forecast {
-          padding: 38px 0 46px;
-          display: grid;
-          grid-template-columns:
-            minmax(0, 1.1fr)
-            minmax(220px, 0.9fr);
-          gap: 42px;
-          align-items: center;
-          border-top: 1px solid #dcd4d1;
-        }
-
-        .forecast-copy {
-          min-width: 0;
-        }
-
-        .forecast-title {
-          max-width: 360px;
-          margin: 0;
-          font-family:
-            Georgia,
-            "Times New Roman",
-            serif;
-          font-size: 35px;
-          line-height: 1.02;
-          font-weight: 400;
-          letter-spacing: -1.8px;
-        }
-
-        .forecast-description {
-          max-width: 390px;
-          margin: 12px 0 0;
-          color: #8d8587;
-          font-family:
-            Arial,
-            Helvetica,
-            sans-serif;
-          font-size: 12px;
-          line-height: 1.45;
-          font-weight: 500;
-        }
-
-        .forecast-result {
-          min-width: 0;
-        }
-
-        .years {
-          display: flex;
-          align-items: baseline;
-          color: #c21856;
-          font-family:
-            Georgia,
-            "Times New Roman",
-            serif;
-          white-space: nowrap;
-        }
-
-        .years strong {
-          font-size: 68px;
-          line-height: 0.88;
-          font-weight: 400;
-          letter-spacing: -4px;
-        }
-
-        .years span {
-          margin-left: 8px;
-          font-size: 37px;
-          line-height: 1;
-          letter-spacing: -1.5px;
-        }
-
-        .forecast-scale {
-          width: 100%;
-          margin-top: 20px;
-        }
-
-        .scale-track {
-          position: relative;
-          height: 8px;
-          border-radius: 999px;
-          background: #e5dfe0;
-        }
-
-        .scale-fill {
-          position: absolute;
-          inset: 0 auto 0 0;
-          border-radius: inherit;
-          background: #e99ab5;
-        }
-
-        .scale-dot {
-          position: absolute;
-          top: 50%;
-          width: 20px;
-          height: 20px;
-          border-radius: 50%;
-          background: #c21856;
-          transform: translate(-50%, -50%);
-        }
-
-        .scale-labels {
-          display: flex;
-          justify-content: space-between;
-          margin-top: 11px;
-          color: #8d8587;
-          font-family:
-            Arial,
-            Helvetica,
-            sans-serif;
-          font-size: 10px;
-          font-weight: 600;
-        }
-
-        /* =====================================================
-           PAID — RESPONSIVE CANVAS
-
-           Внутри всегда 1180 × 500.
-        ===================================================== */
-
-        .paid-shell {
-          width: min(1180px, 100%);
-          margin: 8px auto 0;
-        }
-
-        /*
-         * Container query units дают нам точный scale:
-         *
-         * 1cqw = 1% текущей ширины viewport блока.
-         *
-         * --scale = фактическая ширина / 1180.
-         */
-
-        .paid-viewport {
-          position: relative;
-          width: 100%;
-          overflow: hidden;
-          container-type: inline-size;
-          border-radius: 22px;
-          background: #a6124d;
-        }
-
-        .paid-canvas {
-          --scale: calc(100cqw / 1180);
-
-          position: absolute;
-          top: 0;
-          left: 0;
-
-          width: 1180px;
-          height: 500px;
-
-          overflow: hidden;
-
-          transform:
-            scale(var(--scale));
-
-          transform-origin:
-            top left;
-
-          background:
-            #a6124d;
-
-          color: #fff;
-        }
-
-        /* =====================================================
-           ART
-        ===================================================== */
-
-        /*
-         * Сам арт теперь отдельный объект.
-         *
-         * Это позволяет нам независимо контролировать:
-         * - размер картинки;
-         * - положение картинки;
-         * - текст;
-         * - CTA.
-         */
-
-        .art-window {
-          position: absolute;
-          z-index: 0;
-
-          left: 0;
-          top: 0;
-
-          width: 850px;
-          height: 500px;
-
-          overflow: hidden;
-        }
-
-        .paid-art {
-          position: absolute;
-
-          /*
-           * Картинка немного шире окна.
-           * За счёт этого сохраняем красивую
-           * композицию пары + замка.
-           */
-
-          left: -8px;
-          bottom: 0;
-
-          width: 890px;
-          height: 500px;
-
-          object-fit: cover;
-
-          /*
-           * Фокус немного левее центра:
-           * пара остаётся слева,
-           * замок ближе к середине.
-           */
-
-          object-position: 42% center;
-
-          display: block;
-
-          user-select: none;
-          pointer-events: none;
-        }
-
-        /* =====================================================
-           ART FADE
-        ===================================================== */
-
-        .art-fade {
-          position: absolute;
-          z-index: 1;
-
-          top: 0;
-          right: 0;
-
-          width: 690px;
-          height: 500px;
-
-          pointer-events: none;
-
-          background:
-            linear-gradient(
-              90deg,
-
-              rgba(166, 18, 77, 0) 0px,
-
-              rgba(166, 18, 77, 0) 100px,
-
-              rgba(166, 18, 77, 0.04) 150px,
-
-              rgba(166, 18, 77, 0.1) 200px,
-
-              rgba(166, 18, 77, 0.22) 250px,
-
-              rgba(166, 18, 77, 0.4) 300px,
-
-              rgba(166, 18, 77, 0.62) 350px,
-
-              rgba(166, 18, 77, 0.8) 400px,
-
-              rgba(166, 18, 77, 0.93) 455px,
-
-              #a6124d 520px,
-
-              #a6124d 100%
-            );
-        }
-
-        .paid-vignette {
-          position: absolute;
-          z-index: 2;
-
-          inset: 0;
-
-          pointer-events: none;
-
-          background:
-            linear-gradient(
-              180deg,
-              rgba(42, 0, 20, 0.07) 0%,
-              rgba(42, 0, 20, 0) 30%,
-              rgba(42, 0, 20, 0) 72%,
-              rgba(42, 0, 20, 0.1) 100%
-            );
-        }
-
-        /* =====================================================
-           HEADING
-
-           Фиксированные координаты canvas.
-        ===================================================== */
-
-        .paid-heading {
-          position: absolute;
-          z-index: 3;
-
-          top: 38px;
-          left: 70px;
-
-          width: 480px;
-        }
-
-        .paid-label {
-          margin-bottom: 14px;
-
-          color:
-            rgba(
-              255,
-              244,
-              247,
-              0.86
-            );
-
-          font-family:
-            Arial,
-            Helvetica,
-            sans-serif;
-
-          font-size: 10px;
-          line-height: 1;
-          font-weight: 700;
-
-          letter-spacing: 2.1px;
-        }
-
-        .paid-heading h2 {
-          margin: 0;
-
-          color: #fff9f6;
-
-          font-family:
-            Georgia,
-            "Times New Roman",
-            serif;
-
-          font-size: 49px;
-          line-height: 0.95;
-          font-weight: 400;
-
-          letter-spacing: -2px;
-
-          text-shadow:
-            0 2px 16px
-            rgba(
-              59,
-              0,
-              27,
-              0.1
-            );
-        }
-
-        /* =====================================================
-           BENEFITS
-        ===================================================== */
-
-        .paid-benefits {
-          position: absolute;
-          z-index: 4;
-
-          top: 48px;
-          right: 63px;
-
-          width: 300px;
-
-          display: flex;
-          flex-direction: column;
-
-          gap: 25px;
-        }
-
-        /* =====================================================
-           CTA
-        ===================================================== */
-
-        .paid-cta {
-          position: absolute;
-          z-index: 5;
-
-          right: 36px;
-          bottom: 52px;
-
-          width: 638px;
-          height: 72px;
-
-          padding:
-            0
-            26px;
-
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-
-          gap: 20px;
-
-          border: 0;
-          border-radius: 15px;
-
-          background:
-            #fffaf7;
-
-          color:
-            #201d1e;
-
-          cursor: pointer;
-
-          box-shadow:
-            0 9px 25px
-            rgba(
-              65,
-              0,
-              27,
-              0.13
-            );
-        }
-
-        .cta-title {
-          font-family:
-            Arial,
-            Helvetica,
-            sans-serif;
-
-          font-size: 15px;
-          line-height: 1;
-
-          font-weight: 600;
-
-          letter-spacing:
-            -0.1px;
-
-          white-space: nowrap;
-        }
-
-        .cta-right {
-          display: flex;
-          align-items: center;
-
-          gap: 22px;
-
-          color:
-            #c51b58;
-        }
-
-        .price {
-          font-family:
-            Georgia,
-            "Times New Roman",
-            serif;
-
-          font-size: 27px;
-          line-height: 1;
-
-          font-weight: 400;
-
-          white-space: nowrap;
-        }
-
-        .arrow {
-          font-family:
-            Arial,
-            Helvetica,
-            sans-serif;
-
-          font-size: 25px;
-          line-height: 1;
-
-          font-weight: 300;
-        }
-
-        .paid-note {
-          position: absolute;
-          z-index: 5;
-
-          right: 36px;
-          bottom: 22px;
-
-          width: 638px;
-
-          color:
-            rgba(
-              255,
-              238,
-              243,
-              0.68
-            );
-
-          font-family:
-            Arial,
-            Helvetica,
-            sans-serif;
-
-          font-size: 9px;
-          line-height: 1;
-
-          font-weight: 400;
-
-          text-align: center;
-        }
-
-        /* =====================================================
-           TABLET
-        ===================================================== */
-
-        @media (max-width: 900px) {
-          .page {
-            padding-left: 20px;
-            padding-right: 20px;
-          }
-
-          .paid-viewport {
-            border-radius: 16px;
-          }
-        }
-
-        /* =====================================================
-           MOBILE
-
-           Paid вообще НЕ перестраиваем.
-           Canvas просто уменьшается.
-        ===================================================== */
-
-        @media (max-width: 640px) {
-          .page {
-            padding:
-              0
-              12px
-              32px;
-          }
-
-          .header {
-            min-height: 64px;
-            gap: 12px;
-          }
-
-          .brand {
-            font-size: 21px;
-          }
-
-          .couple-names {
-            max-width: 52%;
-            gap: 5px;
-            font-size: 8px;
-            letter-spacing: 0.65px;
-          }
-
-          .results {
-            padding:
-              29px 0
-              33px;
-          }
-
-          .section-label {
-            margin-bottom: 11px;
-            font-size: 9px;
-            letter-spacing: 1.8px;
-          }
-
-          .results-title {
-            margin-bottom: 24px;
-            font-size: 37px;
-            line-height: 1;
-            letter-spacing: -1.8px;
-          }
-
-          .forecast {
-            padding:
-              29px 0
-              37px;
-
-            display: block;
-          }
-
-          .forecast-title {
-            max-width: 340px;
-            font-size: 31px;
-            line-height: 1.03;
-            letter-spacing: -1.35px;
-          }
-
-          .forecast-description {
-            max-width: 325px;
-            margin-top: 12px;
-            font-size: 12px;
-            line-height: 1.45;
-          }
-
-          .forecast-result {
-            width: 100%;
-            margin-top: 24px;
-          }
-
-          .years strong {
-            font-size: 62px;
-            letter-spacing: -3px;
-          }
-
-          .years span {
-            margin-left: 7px;
-            font-size: 33px;
-            letter-spacing: -1px;
-          }
-
-          .forecast-scale {
-            margin-top: 19px;
-          }
-
-          .scale-track {
-            height: 7px;
-          }
-
-          .scale-dot {
-            width: 19px;
-            height: 19px;
-          }
-
-          .scale-labels {
-            margin-top: 10px;
-            font-size: 9px;
-          }
-
-          .paid-shell {
-            width: 100%;
-            margin-top: 0;
-          }
-
-          .paid-viewport {
-            border-radius: 9px;
-          }
-        }
-      `}</style>
+
+                /* =====================================================
+                   BASE
+                ===================================================== */
+
+                :global(*) {
+                    box-sizing: border-box;
+                }
+
+                :global(html) {
+                    background: #f8f4f1;
+                }
+
+                :global(body) {
+                    margin: 0;
+                    background: #f8f4f1;
+                    color: #201c1e;
+                }
+
+                button {
+                    font: inherit;
+                }
+
+                .page {
+                    width: 100%;
+                    min-height: 100vh;
+                    padding: 0 28px 72px;
+                    overflow-x: hidden;
+                    background: #f8f4f1;
+                }
+
+                .content-shell {
+                    width: min(920px, 100%);
+                    margin: 0 auto;
+                }
+
+                /* =====================================================
+                   HEADER
+                ===================================================== */
+
+                .header {
+                    min-height: 78px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 24px;
+                    border-bottom: 1px solid #ddd5d2;
+                }
+
+                .brand {
+                    flex-shrink: 0;
+                    font-family:
+                        Georgia,
+                        "Times New Roman",
+                        serif;
+                    font-size: 24px;
+                    line-height: 1;
+                    font-weight: 700;
+                    letter-spacing: -1.1px;
+                }
+
+                .couple-names {
+                    min-width: 0;
+                    display: flex;
+                    align-items: center;
+                    gap: 9px;
+                    color: #8f8588;
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+                    font-size: 10px;
+                    font-weight: 700;
+                    letter-spacing: 1.2px;
+                    text-transform: uppercase;
+                }
+
+                .person-name {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+
+                .couple-cross {
+                    flex-shrink: 0;
+                    color: #c2215a;
+                }
+
+                /* =====================================================
+                   RESULTS
+                ===================================================== */
+
+                .results {
+                    padding: 42px 0 45px;
+                }
+
+                .section-label {
+                    margin-bottom: 13px;
+                    color: #c2215a;
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+                    font-size: 10px;
+                    line-height: 1;
+                    font-weight: 800;
+                    letter-spacing: 2.2px;
+                }
+
+                .results-title {
+                    margin: 0 0 32px;
+                    font-family:
+                        Georgia,
+                        "Times New Roman",
+                        serif;
+                    font-size: 48px;
+                    line-height: 0.98;
+                    font-weight: 400;
+                    letter-spacing: -2.5px;
+                }
+
+                .category-list {
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                /* =====================================================
+                   FORECAST
+                ===================================================== */
+
+                .forecast {
+                    padding: 38px 0 46px;
+                    display: grid;
+                    grid-template-columns:
+                        minmax(0, 1.15fr)
+                        minmax(280px, 0.85fr);
+                    gap: 55px;
+                    align-items: center;
+                    border-top: 1px solid #dcd4d1;
+                }
+
+                .forecast-copy {
+                    min-width: 0;
+                }
+
+                .forecast-title {
+                    max-width: 520px;
+                    margin: 0;
+                    font-family:
+                        Georgia,
+                        "Times New Roman",
+                        serif;
+                    font-size: 43px;
+                    line-height: 1.01;
+                    font-weight: 400;
+                    letter-spacing: -2.2px;
+                }
+
+                .forecast-description {
+                    max-width: 520px;
+                    margin: 15px 0 0;
+                    color: #8d8587;
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+                    font-size: 14px;
+                    line-height: 1.5;
+                    font-weight: 500;
+                }
+
+                .forecast-result {
+                    min-width: 0;
+                }
+
+                .years {
+                    display: flex;
+                    align-items: baseline;
+                    color: #c21856;
+                    font-family:
+                        Georgia,
+                        "Times New Roman",
+                        serif;
+                    white-space: nowrap;
+                }
+
+                .years strong {
+                    font-size: 76px;
+                    line-height: 0.88;
+                    font-weight: 400;
+                    letter-spacing: -4px;
+                }
+
+                .years span {
+                    margin-left: 9px;
+                    font-size: 39px;
+                    line-height: 1;
+                    letter-spacing: -1.5px;
+                }
+
+                .forecast-scale {
+                    width: 100%;
+                    margin-top: 23px;
+                }
+
+                .scale-track {
+                    position: relative;
+                    height: 9px;
+                    border-radius: 999px;
+                    background: #e5dfe0;
+                }
+
+                .scale-fill {
+                    position: absolute;
+                    inset: 0 auto 0 0;
+                    border-radius: inherit;
+                    background: #e99ab5;
+                }
+
+                .scale-dot {
+                    position: absolute;
+                    top: 50%;
+                    width: 22px;
+                    height: 22px;
+                    border-radius: 50%;
+                    background: #c21856;
+                    transform: translate(-50%, -50%);
+                }
+
+                .scale-labels {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-top: 12px;
+                    color: #8d8587;
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+                    font-size: 11px;
+                    font-weight: 600;
+                }
+
+                /* =====================================================
+                   PAID SHELL
+                ===================================================== */
+
+                .paid-shell {
+                    width: min(1180px, 100%);
+                    margin: 8px auto 0;
+                }
+
+                /* =====================================================
+                   PAID CARD
+                ===================================================== */
+
+                .paid-card {
+                    position: relative;
+                    width: 100%;
+                    min-height: 500px;
+
+                    overflow: hidden;
+
+                    border-radius: 24px;
+
+                    background:
+                        linear-gradient(
+                            90deg,
+                            #9c124c 0%,
+                            #a70e4c 48%,
+                            #a70f4d 100%
+                        );
+
+                    isolation: isolate;
+                }
+
+                /* =====================================================
+                   ART LAYER
+
+                   ВАЖНО:
+                   Картинка занимает большую часть карточки.
+
+                   Мы НЕ режем её вертикальной границей.
+                   Вместо этого поверх неё идёт длинный gradient.
+                ===================================================== */
+
+                .paid-art-layer {
+                    position: absolute;
+                    inset: 0;
+
+                    z-index: 0;
+
+                    overflow: hidden;
+
+                    pointer-events: none;
+                }
+
+                .paid-art {
+                    position: absolute;
+
+                    left: 0;
+                    top: 0;
+
+                    width: 73%;
+                    height: 100%;
+
+                    display: block;
+
+                    object-fit: cover;
+
+                    /*
+                     * Главная настройка композиции.
+                     *
+                     * Пара остаётся слева.
+                     * Замок остаётся ближе к центру.
+                     */
+                    object-position: 43% center;
+
+                    user-select: none;
+                    pointer-events: none;
+                }
+
+                /*
+                 * DESKTOP FADE
+                 *
+                 * Самое важное изменение:
+                 * картинка НЕ заканчивается резкой
+                 * вертикальной линией.
+                 *
+                 * Она постепенно растворяется
+                 * в цвет правой части карточки.
+                 */
+
+                .desktop-art-fade {
+                    position: absolute;
+                    z-index: 2;
+
+                    top: 0;
+                    left: 38%;
+
+                    width: 38%;
+                    height: 100%;
+
+                    pointer-events: none;
+
+                    background:
+                        linear-gradient(
+                            90deg,
+                            rgba(166, 18, 77, 0) 0%,
+                            rgba(166, 18, 77, 0.03) 10%,
+                            rgba(166, 18, 77, 0.12) 24%,
+                            rgba(166, 18, 77, 0.28) 38%,
+                            rgba(166, 18, 77, 0.50) 53%,
+                            rgba(166, 18, 77, 0.72) 67%,
+                            rgba(166, 18, 77, 0.88) 80%,
+                            rgba(166, 18, 77, 0.97) 91%,
+                            #a6124d 100%
+                        );
+                }
+
+                .mobile-art-fade {
+                    display: none;
+                }
+
+                /* =====================================================
+                   VIGNETTE
+                ===================================================== */
+
+                .paid-vignette {
+                    position: absolute;
+                    z-index: 3;
+
+                    inset: 0;
+
+                    pointer-events: none;
+
+                    background:
+                        linear-gradient(
+                            180deg,
+                            rgba(40, 0, 20, 0.05) 0%,
+                            rgba(40, 0, 20, 0) 28%,
+                            rgba(40, 0, 20, 0) 74%,
+                            rgba(40, 0, 20, 0.08) 100%
+                        );
+                }
+
+                /* =====================================================
+                   CONTENT
+                ===================================================== */
+
+                .paid-content {
+                    position: relative;
+                    z-index: 10;
+
+                    min-height: 500px;
+
+                    width: 100%;
+                }
+
+                /* =====================================================
+                   TITLE
+                ===================================================== */
+
+                .paid-heading {
+                    position: absolute;
+
+                    top: 38px;
+                    left: 70px;
+
+                    width: 490px;
+                }
+
+                .paid-label {
+                    margin-bottom: 14px;
+
+                    color:
+                        rgba(
+                            255,
+                            244,
+                            247,
+                            0.88
+                        );
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size: 10px;
+                    line-height: 1;
+                    font-weight: 700;
+
+                    letter-spacing: 2.1px;
+                }
+
+                .paid-heading h2 {
+                    margin: 0;
+
+                    color: #fff9f6;
+
+                    font-family:
+                        Georgia,
+                        "Times New Roman",
+                        serif;
+
+                    font-size: clamp(
+                        44px,
+                        4.2vw,
+                        55px
+                    );
+
+                    line-height: 0.95;
+                    font-weight: 400;
+
+                    letter-spacing: -2.4px;
+
+                    text-shadow:
+                        0 2px 16px
+                        rgba(
+                            59,
+                            0,
+                            27,
+                            0.1
+                        );
+                }
+
+                /* =====================================================
+                   BENEFITS
+                ===================================================== */
+
+                .paid-benefits {
+                    position: absolute;
+
+                    top: 48px;
+                    right: 68px;
+
+                    width: 305px;
+
+                    display: flex;
+                    flex-direction: column;
+
+                    gap: 25px;
+                }
+
+                /* =====================================================
+                   CTA
+                ===================================================== */
+
+                .paid-cta {
+                    position: absolute;
+
+                    right: 36px;
+                    bottom: 52px;
+
+                    width: min(
+                        638px,
+                        calc(100% - 600px)
+                    );
+
+                    min-width: 500px;
+
+                    height: 72px;
+
+                    padding:
+                        0 26px;
+
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+
+                    gap: 20px;
+
+                    border: 0;
+                    border-radius: 15px;
+
+                    background: #fffaf7;
+
+                    color: #201d1e;
+
+                    cursor: pointer;
+
+                    box-shadow:
+                        0 9px 25px
+                        rgba(
+                            65,
+                            0,
+                            27,
+                            0.13
+                        );
+
+                    transition:
+                        transform 160ms ease,
+                        box-shadow 160ms ease;
+                }
+
+                .paid-cta:hover {
+                    transform: translateY(-2px);
+
+                    box-shadow:
+                        0 13px 30px
+                        rgba(
+                            65,
+                            0,
+                            27,
+                            0.17
+                        );
+                }
+
+                .paid-cta:active {
+                    transform: translateY(0);
+                }
+
+                .cta-title {
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size: 15px;
+                    line-height: 1;
+
+                    font-weight: 600;
+
+                    letter-spacing:
+                        -0.1px;
+
+                    white-space: nowrap;
+                }
+
+                .cta-right {
+                    display: flex;
+                    align-items: center;
+
+                    gap: 22px;
+
+                    color: #c51b58;
+                }
+
+                .price {
+                    font-family:
+                        Georgia,
+                        "Times New Roman",
+                        serif;
+
+                    font-size: 29px;
+                    line-height: 1;
+
+                    font-weight: 400;
+
+                    white-space: nowrap;
+                }
+
+                .arrow {
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size: 26px;
+                    line-height: 1;
+
+                    font-weight: 300;
+                }
+
+                .paid-note {
+                    position: absolute;
+
+                    right: 36px;
+                    bottom: 22px;
+
+                    width: min(
+                        638px,
+                        calc(100% - 600px)
+                    );
+
+                    min-width: 500px;
+
+                    color:
+                        rgba(
+                            255,
+                            238,
+                            243,
+                            0.68
+                        );
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size: 9px;
+                    line-height: 1;
+
+                    font-weight: 400;
+
+                    text-align: center;
+                }
+
+                /* =====================================================
+                   TABLET
+                ===================================================== */
+
+                @media (max-width: 1000px) {
+
+                    .content-shell {
+                        width: min(820px, 100%);
+                    }
+
+                    .paid-card {
+                        min-height: 470px;
+                    }
+
+                    .paid-content {
+                        min-height: 470px;
+                    }
+
+                    .paid-heading {
+                        left: 48px;
+                        top: 34px;
+                        width: 430px;
+                    }
+
+                    .paid-heading h2 {
+                        font-size: 45px;
+                    }
+
+                    .paid-benefits {
+                        right: 38px;
+                        width: 275px;
+                        gap: 21px;
+                    }
+
+                    .paid-cta {
+                        right: 28px;
+                        bottom: 43px;
+                        min-width: 430px;
+                        width: 52%;
+                    }
+
+                    .paid-note {
+                        right: 28px;
+                        bottom: 18px;
+                        min-width: 430px;
+                        width: 52%;
+                    }
+                }
+
+                /* =====================================================
+                   MOBILE
+
+                   Здесь уже НЕ scale desktop.
+
+                   Это отдельная композиция:
+                   картинка сверху,
+                   пара остаётся вместе,
+                   изображение постепенно растворяется
+                   в berry-фон,
+                   benefits ниже,
+                   CTA внизу.
+                ===================================================== */
+
+                @media (max-width: 640px) {
+
+                    .page {
+                        padding:
+                            0
+                            12px
+                            32px;
+                    }
+
+                    .content-shell {
+                        width: 100%;
+                    }
+
+                    .header {
+                        min-height: 64px;
+                        gap: 12px;
+                    }
+
+                    .brand {
+                        font-size: 21px;
+                    }
+
+                    .couple-names {
+                        max-width: 52%;
+                        gap: 5px;
+                        font-size: 8px;
+                        letter-spacing: 0.65px;
+                    }
+
+                    /* ---------------------------------------------
+                       RESULTS
+                    --------------------------------------------- */
+
+                    .results {
+                        padding:
+                            29px 0
+                            33px;
+                    }
+
+                    .section-label {
+                        margin-bottom: 11px;
+                        font-size: 9px;
+                        letter-spacing: 1.8px;
+                    }
+
+                    .results-title {
+                        margin-bottom: 24px;
+                        font-size: 37px;
+                        line-height: 1;
+                        letter-spacing: -1.8px;
+                    }
+
+                    /* ---------------------------------------------
+                       FORECAST
+                    --------------------------------------------- */
+
+                    .forecast {
+                        padding:
+                            29px 0
+                            37px;
+
+                        display: block;
+                    }
+
+                    .forecast-title {
+                        max-width: 100%;
+
+                        font-size: 34px;
+                        line-height: 1.01;
+                        letter-spacing: -1.55px;
+                    }
+
+                    .forecast-description {
+                        max-width: 100%;
+                        margin-top: 13px;
+                        font-size: 12px;
+                        line-height: 1.45;
+                    }
+
+                    .desktop-break {
+                        display: none;
+                    }
+
+                    .forecast-result {
+                        width: 100%;
+                        margin-top: 25px;
+                    }
+
+                    .years strong {
+                        font-size: 64px;
+                        letter-spacing: -3px;
+                    }
+
+                    .years span {
+                        margin-left: 7px;
+                        font-size: 34px;
+                        letter-spacing: -1px;
+                    }
+
+                    .forecast-scale {
+                        margin-top: 20px;
+                    }
+
+                    .scale-track {
+                        height: 7px;
+                    }
+
+                    .scale-dot {
+                        width: 19px;
+                        height: 19px;
+                    }
+
+                    .scale-labels {
+                        margin-top: 10px;
+                        font-size: 9px;
+                    }
+
+                    /* ---------------------------------------------
+                       PAID SHELL
+                    --------------------------------------------- */
+
+                    .paid-shell {
+                        width: 100%;
+                        margin-top: 0;
+                    }
+
+                    /* ---------------------------------------------
+                       PAID CARD
+
+                       Height специально больше,
+                       чтобы mobile композиция была вертикальной.
+                    --------------------------------------------- */
+
+                    .paid-card {
+                        min-height: 620px;
+
+                        border-radius: 22px;
+
+                        background:
+                            linear-gradient(
+                                180deg,
+                                #a30e4d 0%,
+                                #aa104f 100%
+                            );
+                    }
+
+                    .paid-content {
+                        min-height: 620px;
+                    }
+
+                    /* ---------------------------------------------
+                       MOBILE ART
+
+                       Изображение занимает верхнюю часть.
+                       Используем почти всю ширину.
+
+                       object-position 43%:
+                       парень + девушка остаются рядом.
+                    --------------------------------------------- */
+
+                    .paid-art {
+                        left: -4%;
+                        top: 0;
+
+                        width: 108%;
+                        height: 370px;
+
+                        object-fit: cover;
+
+                        object-position:
+                            43%
+                            center;
+                    }
+
+                    .paid-art-layer {
+                        height: 410px;
+                    }
+
+                    /*
+                     * На mobile горизонтальный fade НЕ нужен.
+                     */
+
+                    .desktop-art-fade {
+                        display: none;
+                    }
+
+                    /*
+                     * Вместо него картинка растворяется
+                     * вниз в berry-фон.
+
+                     * Именно это должно дать тот эффект,
+                     * который был в референсе.
+                     */
+
+                    .mobile-art-fade {
+                        display: block;
+
+                        position: absolute;
+
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+
+                        height: 190px;
+
+                        background:
+                            linear-gradient(
+                                180deg,
+                                rgba(
+                                    163,
+                                    14,
+                                    77,
+                                    0
+                                ) 0%,
+
+                                rgba(
+                                    163,
+                                    14,
+                                    77,
+                                    0.08
+                                ) 18%,
+
+                                rgba(
+                                    163,
+                                    14,
+                                    77,
+                                    0.28
+                                ) 38%,
+
+                                rgba(
+                                    163,
+                                    14,
+                                    77,
+                                    0.52
+                                ) 58%,
+
+                                rgba(
+                                    163,
+                                    14,
+                                    77,
+                                    0.78
+                                ) 76%,
+
+                                #a30e4d 100%
+                            );
+                    }
+
+                    /* ---------------------------------------------
+                       MOBILE TITLE
+                    --------------------------------------------- */
+
+                    .paid-heading {
+                        top: 31px;
+                        left: 28px;
+
+                        width:
+                            calc(100% - 56px);
+                    }
+
+                    .paid-label {
+                        margin-bottom: 13px;
+
+                        font-size: 9px;
+                        letter-spacing: 1.9px;
+                    }
+
+                    .paid-heading h2 {
+                        font-size: 38px;
+                        line-height: 0.96;
+                        letter-spacing: -1.8px;
+
+                        /*
+                         * Очень лёгкая тень,
+                         * как в референсе.
+                         */
+                        text-shadow:
+                            0 2px 14px
+                            rgba(
+                                49,
+                                0,
+                                25,
+                                0.16
+                            );
+                    }
+
+                    /* ---------------------------------------------
+                       MOBILE BENEFITS
+                    --------------------------------------------- */
+
+                    .paid-benefits {
+                        top: 385px;
+                        left: 28px;
+                        right: 28px;
+
+                        width:
+                            calc(100% - 56px);
+
+                        gap: 18px;
+                    }
+
+                    /* ---------------------------------------------
+                       MOBILE CTA
+                    --------------------------------------------- */
+
+                    .paid-cta {
+                        left: 20px;
+                        right: 20px;
+                        bottom: 48px;
+
+                        width:
+                            calc(100% - 40px);
+
+                        min-width: 0;
+
+                        height: 58px;
+
+                        padding:
+                            0 18px;
+
+                        border-radius: 14px;
+                    }
+
+                    .cta-title {
+                        font-size: 13px;
+                    }
+
+                    .cta-right {
+                        gap: 13px;
+                    }
+
+                    .price {
+                        font-size: 24px;
+                    }
+
+                    .arrow {
+                        font-size: 23px;
+                    }
+
+                    .paid-note {
+                        left: 20px;
+                        right: 20px;
+                        bottom: 20px;
+
+                        width:
+                            calc(100% - 40px);
+
+                        min-width: 0;
+
+                        font-size: 8px;
+                    }
+                }
+
+                /* =====================================================
+                   SMALL MOBILE
+
+                   iPhone SE / маленькие Android.
+                ===================================================== */
+
+                @media (max-width: 390px) {
+
+                    .paid-card {
+                        min-height: 600px;
+                    }
+
+                    .paid-content {
+                        min-height: 600px;
+                    }
+
+                    .paid-art {
+                        height: 355px;
+                        object-position: 43% center;
+                    }
+
+                    .paid-art-layer {
+                        height: 395px;
+                    }
+
+                    .paid-heading {
+                        top: 28px;
+                        left: 24px;
+
+                        width:
+                            calc(100% - 48px);
+                    }
+
+                    .paid-heading h2 {
+                        font-size: 35px;
+                    }
+
+                    .paid-benefits {
+                        top: 370px;
+
+                        left: 24px;
+                        right: 24px;
+
+                        width:
+                            calc(100% - 48px);
+
+                        gap: 16px;
+                    }
+
+                    .paid-cta {
+                        left: 16px;
+                        right: 16px;
+
+                        width:
+                            calc(100% - 32px);
+
+                        padding:
+                            0 16px;
+                    }
+
+                    .paid-note {
+                        left: 16px;
+                        right: 16px;
+
+                        width:
+                            calc(100% - 32px);
+                    }
+                }
+
+            `}</style>
         </main>
     );
 }
@@ -1271,7 +1663,10 @@ function CategoryRow({
                 </div>
 
                 <div className="category-score">
-                    <strong>{safeValue}</strong>
+                    <strong>
+                        {safeValue}
+                    </strong>
+
                     <span>/10</span>
                 </div>
             </div>
@@ -1286,126 +1681,150 @@ function CategoryRow({
             </div>
 
             <style jsx>{`
-        .category-row {
-          padding: 16px 0 18px;
-          border-bottom: 1px solid #e0d9d6;
-        }
+                .category-row {
+                    padding:
+                        16px 0
+                        18px;
 
-        .category-row:first-child {
-          padding-top: 0;
-        }
+                    border-bottom:
+                        1px solid
+                        #e0d9d6;
+                }
 
-        .category-top {
-          display: flex;
-          align-items: flex-end;
-          justify-content: space-between;
-          gap: 24px;
-        }
+                .category-row:first-child {
+                    padding-top: 0;
+                }
 
-        .category-copy {
-          min-width: 0;
-        }
+                .category-top {
+                    display: flex;
+                    align-items: flex-end;
+                    justify-content: space-between;
 
-        .category-title {
-          font-family:
-            Georgia,
-            "Times New Roman",
-            serif;
+                    gap: 24px;
+                }
 
-          font-size: 27px;
-          line-height: 1;
-          letter-spacing: -1.1px;
-        }
+                .category-copy {
+                    min-width: 0;
+                }
 
-        .category-subtitle {
-          margin-top: 5px;
-          color: #8e8688;
+                .category-title {
+                    font-family:
+                        Georgia,
+                        "Times New Roman",
+                        serif;
 
-          font-family:
-            Arial,
-            Helvetica,
-            sans-serif;
+                    font-size: 29px;
+                    line-height: 1;
 
-          font-size: 11px;
-          line-height: 1.3;
-          font-weight: 500;
-        }
+                    letter-spacing:
+                        -1.2px;
+                }
 
-        .category-score {
-          display: flex;
-          align-items: baseline;
-          flex-shrink: 0;
+                .category-subtitle {
+                    margin-top: 5px;
 
-          color: #7f7679;
+                    color: #8e8688;
 
-          font-family:
-            Georgia,
-            "Times New Roman",
-            serif;
-        }
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
 
-        .category-score strong {
-          color: #c21856;
+                    font-size: 12px;
+                    line-height: 1.3;
 
-          font-size: 40px;
-          line-height: 0.8;
-          font-weight: 400;
+                    font-weight: 500;
+                }
 
-          letter-spacing: -1.7px;
-        }
+                .category-score {
+                    display: flex;
+                    align-items: baseline;
 
-        .category-score span {
-          margin-left: 3px;
-          font-size: 17px;
-        }
+                    flex-shrink: 0;
 
-        .category-track {
-          height: 6px;
-          margin-top: 11px;
-          overflow: hidden;
-          border-radius: 999px;
-          background: #e5dfdf;
-        }
+                    color: #7f7679;
 
-        .category-fill {
-          height: 100%;
-          border-radius: inherit;
-          background: #cb3a6d;
-        }
+                    font-family:
+                        Georgia,
+                        "Times New Roman",
+                        serif;
+                }
 
-        @media (max-width: 640px) {
-          .category-row {
-            padding: 13px 0 15px;
-          }
+                .category-score strong {
+                    color: #c21856;
 
-          .category-top {
-            gap: 15px;
-          }
+                    font-size: 42px;
+                    line-height: 0.8;
 
-          .category-title {
-            font-size: 24px;
-          }
+                    font-weight: 400;
 
-          .category-subtitle {
-            max-width: 235px;
-            margin-top: 4px;
-            font-size: 10px;
-          }
+                    letter-spacing:
+                        -1.8px;
+                }
 
-          .category-score strong {
-            font-size: 34px;
-          }
+                .category-score span {
+                    margin-left: 3px;
+                    font-size: 18px;
+                }
 
-          .category-score span {
-            font-size: 14px;
-          }
+                .category-track {
+                    height: 6px;
 
-          .category-track {
-            height: 5px;
-            margin-top: 10px;
-          }
-        }
-      `}</style>
+                    margin-top: 11px;
+
+                    overflow: hidden;
+
+                    border-radius: 999px;
+
+                    background: #e5dfdf;
+                }
+
+                .category-fill {
+                    height: 100%;
+
+                    border-radius: inherit;
+
+                    background: #cb3a6d;
+                }
+
+                @media (max-width: 640px) {
+
+                    .category-row {
+                        padding:
+                            13px 0
+                            15px;
+                    }
+
+                    .category-top {
+                        gap: 15px;
+                    }
+
+                    .category-title {
+                        font-size: 24px;
+                    }
+
+                    .category-subtitle {
+                        max-width: 250px;
+
+                        margin-top: 4px;
+
+                        font-size: 10px;
+                    }
+
+                    .category-score strong {
+                        font-size: 34px;
+                    }
+
+                    .category-score span {
+                        font-size: 14px;
+                    }
+
+                    .category-track {
+                        height: 5px;
+                        margin-top: 10px;
+                    }
+                }
+            `}</style>
         </div>
     );
 }
@@ -1432,48 +1851,72 @@ function Benefit({
             </div>
 
             <style jsx>{`
-        .benefit {
-          display: grid;
+                .benefit {
+                    display: grid;
 
-          grid-template-columns:
-            24px
-            minmax(0, 1fr);
+                    grid-template-columns:
+                        24px
+                        minmax(0, 1fr);
 
-          gap: 12px;
+                    gap: 12px;
 
-          align-items: start;
+                    align-items: start;
 
-          color: #fff8f6;
-        }
+                    color: #fff8f6;
+                }
 
-        .benefit-icon {
-          width: 21px;
-          padding-top: 1px;
-          color: #ffd8e1;
-        }
+                .benefit-icon {
+                    width: 21px;
 
-        .benefit-text {
-          font-family:
-            Arial,
-            Helvetica,
-            sans-serif;
+                    padding-top: 1px;
 
-          font-size: 14px;
-          line-height: 1.28;
-          font-weight: 500;
+                    color: #ffd8e1;
+                }
 
-          letter-spacing: -0.1px;
+                .benefit-text {
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
 
-          text-shadow:
-            0 1px 8px
-            rgba(
-              65,
-              0,
-              27,
-              0.08
-            );
-        }
-      `}</style>
+                    font-size: 14px;
+                    line-height: 1.28;
+
+                    font-weight: 500;
+
+                    letter-spacing:
+                        -0.1px;
+
+                    text-shadow:
+                        0 1px 8px
+                        rgba(
+                            65,
+                            0,
+                            27,
+                            0.08
+                        );
+                }
+
+                @media (max-width: 640px) {
+
+                    .benefit {
+                        grid-template-columns:
+                            22px
+                            minmax(0, 1fr);
+
+                        gap: 10px;
+                    }
+
+                    .benefit-icon {
+                        width: 19px;
+                    }
+
+                    .benefit-text {
+                        font-size: 13px;
+                        line-height: 1.25;
+                    }
+                }
+            `}</style>
         </div>
     );
 }
@@ -1498,15 +1941,15 @@ function BenefitSvg({
             >
                 <path
                     d="
-            M12 21
-            C10.9 19.9 5.4 15.2 3.1 12.3
-            C0.6 9.2 1.3 5.1 4.7 3.5
-            C7.2 2.3 10.1 3.1 12 5.3
-            C13.9 3.1 16.8 2.3 19.3 3.5
-            C22.7 5.1 23.4 9.2 20.9 12.3
-            C18.6 15.2 13.1 19.9 12 21
-            Z
-          "
+                        M12 21
+                        C10.9 19.9 5.4 15.2 3.1 12.3
+                        C0.6 9.2 1.3 5.1 4.7 3.5
+                        C7.2 2.3 10.1 3.1 12 5.3
+                        C13.9 3.1 16.8 2.3 19.3 3.5
+                        C22.7 5.1 23.4 9.2 20.9 12.3
+                        C18.6 15.2 13.1 19.9 12 21
+                        Z
+                    "
                 />
             </svg>
         );
@@ -1523,20 +1966,20 @@ function BenefitSvg({
             >
                 <path
                     d="
-            M6 3
-            H18
-            C20.2 3 22 4.8 22 7
-            V14
-            C22 16.2 20.2 18 18 18
-            H12
-            L7 22
-            L8 18
-            H6
-            C3.8 18 2 16.2 2 14
-            V7
-            C2 4.8 3.8 3 6 3
-            Z
-          "
+                        M6 3
+                        H18
+                        C20.2 3 22 4.8 22 7
+                        V14
+                        C22 16.2 20.2 18 18 18
+                        H12
+                        L7 22
+                        L8 18
+                        H6
+                        C3.8 18 2 16.2 2 14
+                        V7
+                        C2 4.8 3.8 3 6 3
+                        Z
+                    "
                 />
             </svg>
         );
@@ -1553,14 +1996,14 @@ function BenefitSvg({
             >
                 <path
                     d="
-            M13.6 1.8
-            L5.2 13
-            H10.5
-            L9.3 22.2
-            L18.8 9.6
-            H13.1
-            Z
-          "
+                        M13.6 1.8
+                        L5.2 13
+                        H10.5
+                        L9.3 22.2
+                        L18.8 9.6
+                        H13.1
+                        Z
+                    "
                 />
             </svg>
         );
