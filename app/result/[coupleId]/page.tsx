@@ -318,8 +318,8 @@ export default function ResultPage() {
                                 {yearsTogether}
 
                                 <span>
-                  {getYearWord(yearsTogether)}
-                </span>
+                                    {getYearWord(yearsTogether)}
+                                </span>
                             </div>
 
                             <div className="forecast-scale">
@@ -357,56 +357,61 @@ export default function ResultPage() {
                 <section className="paid-section result-shell">
                     <div className="paid-card">
 
-                        <img
-                            className="paid-image"
-                            src="/images/full-report-scene.png"
-                            alt=""
-                        />
+                        {/* LEFT IMAGE */}
+                        <div className="paid-scene">
+                            <img
+                                className="paid-image"
+                                src="/images/full-report-scene.png"
+                                alt=""
+                            />
 
-                        <div className="paid-overlay" />
-
-                        <div className="paid-content">
-
-                            <div className="paid-heading">
-                                <div className="paid-label">
-                                    полный разбор
-                                </div>
-
-                                <h2>
-                                    Чтобы вместе —
-                                    <br />
-                                    и надолго.
-                                </h2>
-                            </div>
-
-                            <div className="paid-benefits">
-                                <Benefit icon="♥">
-                                    Где вы можете
-                                    <br />
-                                    не понимать друг друга
-                                </Benefit>
-
-                                <Benefit icon="▰">
-                                    Что каждый ждёт
-                                    <br />
-                                    от отношений
-                                </Benefit>
-
-                                <Benefit icon="ϟ">
-                                    Что может стать
-                                    <br />
-                                    причиной ссор
-                                </Benefit>
-
-                                <Benefit icon="▥">
-                                    Как сделать вашу
-                                    <br />
-                                    пару крепче
-                                </Benefit>
-                            </div>
-
+                            <div className="scene-overlay" />
                         </div>
 
+                        {/* RIGHT BACKGROUND */}
+                        <div className="paid-right-bg" />
+
+                        {/* TITLE */}
+                        <div className="paid-heading">
+                            <div className="paid-label">
+                                полный разбор
+                            </div>
+
+                            <h2>
+                                Чтобы вместе —
+                                <br />
+                                и надолго.
+                            </h2>
+                        </div>
+
+                        {/* BENEFITS */}
+                        <div className="paid-benefits">
+                            <Benefit icon="♥">
+                                Где вы можете
+                                <br />
+                                не понимать друг друга
+                            </Benefit>
+
+                            <Benefit icon="▰">
+                                Что каждый ждёт
+                                <br />
+                                от отношений
+                            </Benefit>
+
+                            <Benefit icon="ϟ">
+                                Что может стать
+                                <br />
+                                причиной ссор
+                            </Benefit>
+
+                            <Benefit icon="▥">
+                                Как сделать вашу
+                                <br />
+                                пару крепче
+                            </Benefit>
+                        </div>
+
+                        {/* CTA */}
                         <div className="paid-bottom">
                             <button
                                 type="button"
@@ -415,9 +420,9 @@ export default function ResultPage() {
                                     router.push(`/report/${coupleId}`)
                                 }
                             >
-                <span>
-                  Открыть полный разбор
-                </span>
+                                <span>
+                                    Открыть полный разбор
+                                </span>
 
                                 <strong>
                                     299 ₽
@@ -726,30 +731,30 @@ function getYearWord(years: number) {
 function GlobalStyles() {
     return (
         <style jsx global>{`
-      html,
-      body {
-        margin: 0 !important;
-        padding: 0 !important;
-        background: #faf7f4 !important;
-      }
+            html,
+            body {
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #faf7f4 !important;
+            }
 
-      body {
-        color: #171315;
+            body {
+                color: #171315;
 
-        font-family:
-          Arial,
-          Helvetica,
-          sans-serif;
-      }
+                font-family:
+                    Arial,
+                    Helvetica,
+                    sans-serif;
+            }
 
-      * {
-        box-sizing: border-box;
-      }
+            * {
+                box-sizing: border-box;
+            }
 
-      button {
-        font: inherit;
-      }
-    `}</style>
+            button {
+                font: inherit;
+            }
+        `}</style>
     );
 }
 
@@ -1083,83 +1088,144 @@ const styles = `
 
   border-radius: 20px;
 
-  background: #a71f50;
+  background: #ad2053;
 
   color: white;
 
   isolation: isolate;
 }
 
-/* IMAGE */
+/* ============================================================
+   LEFT SCENE
+============================================================ */
 
-.paid-image {
+.paid-scene {
   position: absolute;
 
   z-index: 1;
+
+  top: 0;
+  bottom: 0;
+  left: 0;
+
+  width: 68%;
+
+  overflow: hidden;
+
+  background: #85183f;
+}
+
+.paid-image {
+  position: absolute;
 
   inset: 0;
 
   width: 100%;
   height: 100%;
 
+  display: block;
+
   object-fit: cover;
 
-  object-position: center;
-
-  display: block;
+  /*
+    Важный момент:
+    картинку двигаем внутри ЛЕВОЙ области,
+    а не растягиваем на всю карточку.
+  */
+  object-position: 46% center;
 }
 
-/*
-  Небольшой градиент нужен только для читаемости текста.
-  Сама картинка остаётся хорошо видимой.
-*/
-
-.paid-overlay {
+.scene-overlay {
   position: absolute;
 
   z-index: 2;
 
   inset: 0;
 
+  pointer-events: none;
+
   background:
     linear-gradient(
       90deg,
-      rgba(79, 17, 45, 0.10) 0%,
-      rgba(79, 17, 45, 0.03) 45%,
-      rgba(91, 17, 50, 0.30) 66%,
-      rgba(91, 17, 50, 0.48) 100%
+      rgba(65, 8, 30, 0.04) 0%,
+      rgba(65, 8, 30, 0.00) 55%,
+      rgba(114, 18, 54, 0.10) 82%,
+      rgba(114, 18, 54, 0.28) 100%
     );
-
-  pointer-events: none;
 }
 
-/* CONTENT */
+/* ============================================================
+   RIGHT PANEL
+============================================================ */
 
-.paid-content {
-  position: relative;
+.paid-right-bg {
+  position: absolute;
+
+  z-index: 1;
+
+  top: 0;
+  right: 0;
+  bottom: 0;
+
+  width: 32%;
+
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.00) 48%
+    ),
+    linear-gradient(
+      180deg,
+      #be3065 0%,
+      #aa2053 100%
+    );
+}
+
+/*
+  Небольшое перекрытие двух областей.
+  Убирает ощущение жёсткой вертикальной полосы
+  между картинкой и правой частью.
+*/
+
+.paid-right-bg::before {
+  content: '';
+
+  position: absolute;
+
+  top: 0;
+  bottom: 0;
+  left: -36px;
+
+  width: 36px;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(170, 32, 83, 0) 0%,
+      rgba(170, 32, 83, 1) 100%
+    );
+}
+
+/* ============================================================
+   TITLE
+============================================================ */
+
+.paid-heading {
+  position: absolute;
 
   z-index: 5;
 
-  display: grid;
+  top: 28px;
+  left: 36px;
 
-  grid-template-columns:
-    minmax(0, 1.05fr)
-    minmax(230px, 0.95fr);
-
-  gap: 55px;
-
-  height: 100%;
-
-  padding:
-    28px
-    36px
-    105px;
+  width: 330px;
 }
 
 .paid-label {
   margin-bottom: 12px;
 
-  color: #f1cad6;
+  color: #f3d2dd;
 
   font-size: 10px;
   font-weight: 700;
@@ -1167,6 +1233,9 @@ const styles = `
   letter-spacing: 0.18em;
 
   text-transform: uppercase;
+
+  text-shadow:
+    0 1px 8px rgba(55, 6, 25, 0.22);
 }
 
 .paid-heading h2 {
@@ -1187,24 +1256,35 @@ const styles = `
   letter-spacing: -0.055em;
 
   text-shadow:
-    0 2px 14px rgba(65, 9, 32, 0.12);
+    0 2px 14px rgba(65, 9, 32, 0.22);
 }
 
-/* BENEFITS */
+/* ============================================================
+   BENEFITS
+============================================================ */
 
 .paid-benefits {
+  position: absolute;
+
+  z-index: 6;
+
+  top: 35px;
+  right: 22px;
+
+  width: 195px;
+
   display: flex;
   flex-direction: column;
 
-  gap: 15px;
-
-  padding-top: 4px;
+  gap: 16px;
 }
 
 .benefit {
   display: grid;
 
-  grid-template-columns: 23px 1fr;
+  grid-template-columns:
+    20px
+    minmax(0, 1fr);
 
   gap: 8px;
 
@@ -1214,23 +1294,27 @@ const styles = `
 .benefit-icon {
   color: #ffd1df;
 
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
 
-  line-height: 1;
+  line-height: 1.05;
+
+  text-align: center;
 }
 
 .benefit-text {
-  color: #fff8fa;
+  color: #fff9fb;
 
   font-size: 12px;
-  line-height: 1.25;
+  line-height: 1.28;
 
   text-shadow:
-    0 1px 8px rgba(75, 9, 34, 0.25);
+    0 1px 8px rgba(75, 9, 34, 0.16);
 }
 
-/* CTA */
+/* ============================================================
+   CTA
+============================================================ */
 
 .paid-bottom {
   position: absolute;
@@ -1248,7 +1332,9 @@ const styles = `
   display: grid;
 
   grid-template-columns:
-    1fr auto auto;
+    1fr
+    auto
+    auto;
 
   gap: 20px;
 
@@ -1256,9 +1342,12 @@ const styles = `
 
   min-height: 60px;
 
-  padding: 14px 20px;
+  padding:
+    14px
+    20px;
 
   border: 0;
+
   border-radius: 13px;
 
   background: #fffaf7;
@@ -1306,17 +1395,22 @@ const styles = `
   color: #bd285d;
 
   font-size: 23px;
+
   font-style: normal;
 }
 
 .paid-note {
   margin-top: 7px;
 
-  color: rgba(255, 232, 239, 0.76);
+  color:
+    rgba(255, 232, 239, 0.78);
 
   font-size: 9px;
 
   text-align: center;
+
+  text-shadow:
+    0 1px 5px rgba(73, 9, 33, 0.28);
 }
 
 /* ============================================================
@@ -1450,7 +1544,9 @@ const styles = `
     height: 6px;
   }
 
-  /* FORECAST */
+  /* ============================================================
+     FORECAST MOBILE
+  ============================================================ */
 
   .forecast {
     padding:
@@ -1480,7 +1576,9 @@ const styles = `
     font-size: 37px;
   }
 
-  /* PAID */
+  /* ============================================================
+     PAID MOBILE
+  ============================================================ */
 
   .paid-section {
     padding:
@@ -1489,90 +1587,114 @@ const styles = `
   }
 
   .paid-card {
-    height: 570px;
+    height: 560px;
 
     border-radius: 17px;
+
+    background: #a91f52;
   }
 
   /*
-    На телефоне картинка немного смещается влево:
-    персонажи остаются в кадре,
-    а справа появляется место под текст.
+    На мобильном не пытаемся сохранить
+    десктопное деление 68/32.
+
+    Верхние 61% — картинка.
+    Нижние 39% — спокойная зона под benefits + CTA.
   */
 
-  .paid-image {
-    object-position: 39% center;
+  .paid-scene {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: auto;
+
+    width: 100%;
+    height: 64%;
   }
 
-  .paid-overlay {
+  .paid-image {
+    object-position: 43% center;
+  }
+
+  .scene-overlay {
     background:
       linear-gradient(
         180deg,
-        rgba(83, 13, 43, 0.12) 0%,
-        rgba(83, 13, 43, 0.08) 40%,
-        rgba(83, 13, 43, 0.26) 68%,
-        rgba(83, 13, 43, 0.58) 100%
+        rgba(69, 8, 32, 0.08) 0%,
+        rgba(69, 8, 32, 0.02) 45%,
+        rgba(94, 13, 45, 0.22) 75%,
+        rgba(153, 24, 72, 0.72) 100%
       );
   }
 
-  .paid-content {
-    display: block;
+  .paid-right-bg {
+    top: 64%;
+    right: 0;
+    bottom: 0;
 
-    padding:
-      23px
-      20px
-      110px;
+    width: 100%;
+
+    background:
+      linear-gradient(
+        180deg,
+        #ad2155 0%,
+        #981844 100%
+      );
+  }
+
+  .paid-right-bg::before {
+    display: none;
+  }
+
+  /* TITLE */
+
+  .paid-heading {
+    top: 21px;
+    left: 19px;
+
+    width: calc(100% - 38px);
   }
 
   .paid-label {
-    margin-bottom: 9px;
+    margin-bottom: 8px;
 
     font-size: 9px;
   }
 
   .paid-heading h2 {
-    max-width: 290px;
+    max-width: 285px;
 
-    font-size: 36px;
+    font-size: 34px;
+
+    line-height: 0.96;
   }
 
-  /*
-    На мобиле преимущества делаем компактной
-    сеткой внизу картинки, чтобы они не закрывали
-    персонажей и замок.
-  */
+  /* BENEFITS */
 
   .paid-benefits {
-    position: absolute;
+    top: auto;
 
-    left: 20px;
-    right: 20px;
+    left: 18px;
+    right: 18px;
+    bottom: 102px;
 
-    bottom: 110px;
+    width: auto;
 
     display: grid;
 
     grid-template-columns:
-      1fr 1fr;
+      1fr
+      1fr;
 
     gap:
-      9px
+      10px
       14px;
-
-    padding: 12px;
-
-    border-radius: 12px;
-
-    background:
-      rgba(82, 18, 46, 0.54);
-
-    backdrop-filter:
-      blur(5px);
   }
 
   .benefit {
     grid-template-columns:
-      15px 1fr;
+      14px
+      minmax(0, 1fr);
 
     gap: 6px;
   }
@@ -1587,10 +1709,13 @@ const styles = `
     line-height: 1.25;
   }
 
+  /* CTA */
+
   .paid-bottom {
     left: 12px;
     right: 12px;
-    bottom: 11px;
+
+    bottom: 10px;
   }
 
   .buy-button {
