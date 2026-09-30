@@ -1,60 +1,43 @@
-module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131),e=a.i(50944);let f=[{id:"knight_princess",title:"Рыцарь и принцесса",emojiA:"⚔️",emojiB:"👑",description:"У вас много заботы в мелочах. Для этой пары любовь чаще видна не в громких словах, а в ощущении: «я рядом и помню о тебе».",traits:["care_practical","attention","warmth","initiative","support_action","physical_closeness","support_physical"]},{id:"astronauts",title:"Два космонавта",emojiA:"🚀",emojiB:"🪐",description:"У каждого может быть своя орбита, но вам важно знать, что маршрут всё равно общий. Близость для вас не обязательно означает быть вместе каждую минуту.",traits:["independence","personal_space_high","space_high","space_balanced","autonomy","value_independence","planning","need_future_alignment"]},{id:"wizards",title:"Два волшебника",emojiA:"🔮",emojiB:"✨",description:"Ваш главный инструмент — разговор. Вам важно не просто быть рядом, а понимать, что происходит внутри другого человека.",traits:["communication","emotional_sharing","support_listening","conflict_verbal_resolution","need_communication","need_deep_communication","value_communication","listening"]},{id:"pirates",title:"Два пирата",emojiA:"🏴‍☠️",emojiB:"🗺️",description:"Вашей паре особенно идёт ощущение приключения. Планы хороши, но иногда лучший план — придумать всё по дороге.",traits:["spontaneity","shared_experience","activity","need_spontaneity","need_novelty","flexibility","money_experience","money_present"]},{id:"sun_moon",title:"Солнце и Луна",emojiA:"☀️",emojiB:"🌙",description:"Вы не обязаны одинаково реагировать на всё. В вашей паре особенно заметно, как разные способы чувствовать и действовать могут существовать рядом.",traits:["support_proactive","support_space","space_high","closeness_high","independence","direct_communication","quiet_closeness","emotional_sharing"]},{id:"dragon_keeper",title:"Дракон и хранитель",emojiA:"🐉",emojiB:"🛡️",description:"В вашей динамике есть энергия и спокойствие. Один момент может проживаться ярко, другой — через паузу, действие или присутствие рядом.",traits:["emotion_intensity","self_regulation","support_available","support_presence","conflict_time_repair","indirect_repair","repair_delayed"]},{id:"players",title:"Два игрока",emojiA:"🎮",emojiB:"👾",description:"У вас есть важная суперсила — лёгкость. Юмор, свои приколы и ощущение команды помогают вам снова находить друг друга.",traits:["humor","playfulness","support_humor","conflict_humor_repair","micro_connection","value_playfulness","need_lightness","message_team"]},{id:"homekeepers",title:"Хранители дома",emojiA:"🕯️",emojiB:"🏡",description:"Сила вашей пары прячется в обычной жизни: знакомых ритуалах, спокойных вечерах и ощущении места, куда хочется возвращаться.",traits:["home_comfort","quiet_closeness","ritual","stability","value_ritual","need_stability","shared_life","message_everyday_love"]}];function g(){return(0,b.jsx)(c.default,{id:"f9f529b14080e195",children:"html,body{background:#f4efe9!important;margin:0!important;padding:0!important}body{color:#292329;font-family:Trebuchet MS,Helvetica Neue,Arial,sans-serif}*{box-sizing:border-box}"})}function h({item:a}){var c,d;return(0,b.jsxs)("article",{className:"result-dimension",children:[(0,b.jsx)("div",{className:"result-dimension-icon",children:(0,b.jsx)(j,{kind:a.kind})}),(0,b.jsxs)("div",{className:"result-dimension-body",children:[(0,b.jsxs)("div",{className:"result-dimension-top",children:[(0,b.jsxs)("div",{children:[(0,b.jsx)("span",{className:"result-dimension-label",children:a.eyebrow}),(0,b.jsx)("h3",{children:a.title})]}),(0,b.jsxs)("strong",{children:[a.value,(0,b.jsx)("sup",{children:"%"})]})]}),(0,b.jsx)(i,{value:a.value}),(0,b.jsx)("p",{children:(c=a.kind,d=a.value,"views"===c?d>=70?"Базовые ожидания от отношений у вас часто совпадают.":d>=40?"В главном есть пересечения, но некоторые ожидания различаются.":"Представление о том, как должны работать отношения, у вас заметно различается.":"care"===c?d>=70?"Вы хорошо угадываете, что для другого означает «я рядом».":d>=40?"Иногда вы ждёте друг от друга разных проявлений заботы.":"То, что один считает заботой, второй может почти не замечать.":"communication"===c?d>=70?"О важном вам обычно хочется разговаривать похожим способом.":d>=40?"Сложные темы вы можете проживать немного по-разному.":"В сложный момент одному может хотеться говорить, а другому — совсем другого.":"rhythm"===c?d>=70?"Ваше представление о хорошем времени вдвоём часто совпадает.":d>=40?"Часть совместных сценариев подходит обоим, но отдыхаете вы не всегда одинаково.":"Идеальный совместный вечер у каждого может выглядеть по-своему.":d>=70?"Вы похоже чувствуете границу между «мы» и временем для себя.":d>=40?"Одному иногда нужно чуть больше близости или свободы, чем другому.":"Потребность быть рядом и потребность побыть отдельно у вас заметно различаются.")})]})]})}function i({value:a}){let c=Math.round(a/10);return(0,b.jsx)("div",{className:"result-segments",children:Array.from({length:10}).map((a,d)=>(0,b.jsx)("span",{className:d<c?"active":""},d))})}function j({kind:a}){return"views"===a?(0,b.jsxs)("div",{className:"result-mini-art result-views-art",children:[(0,b.jsx)("span",{className:"result-eye",children:(0,b.jsx)("i",{})}),(0,b.jsx)("span",{className:"result-eye result-eye-second",children:(0,b.jsx)("i",{})})]}):"care"===a?(0,b.jsxs)("div",{className:"result-mini-art result-care-art",children:[(0,b.jsx)("span",{className:"result-hand result-hand-left"}),(0,b.jsx)("i",{children:"♥"}),(0,b.jsx)("span",{className:"result-hand result-hand-right"})]}):"communication"===a?(0,b.jsxs)("div",{className:"result-mini-art result-talk-art",children:[(0,b.jsx)("span",{}),(0,b.jsx)("span",{}),(0,b.jsx)("i",{children:"··"})]}):"rhythm"===a?(0,b.jsx)("div",{className:"result-mini-art result-rhythm-art",children:(0,b.jsxs)("svg",{viewBox:"0 0 90 60","aria-hidden":"true",children:[(0,b.jsx)("path",{d:"M5 35 C16 5 27 5 38 35 C49 65 60 65 71 35 C78 16 83 13 87 24",fill:"none",stroke:"currentColor",strokeWidth:"5",strokeLinecap:"round"}),(0,b.jsx)("circle",{cx:"5",cy:"35",r:"4",fill:"#B43D69"}),(0,b.jsx)("circle",{cx:"87",cy:"24",r:"4",fill:"#E4AE49"})]})}):(0,b.jsxs)("div",{className:"result-mini-art result-space-art",children:[(0,b.jsx)("span",{className:"result-planet result-planet-one"}),(0,b.jsx)("span",{className:"result-planet result-planet-two"}),(0,b.jsx)("i",{})]})}function k({archetypeId:a}){return(0,b.jsxs)("div",{className:"result-art",children:[(0,b.jsx)("i",{className:"result-spark result-spark-one",children:"✦"}),(0,b.jsx)("i",{className:"result-spark result-spark-two",children:"✦"}),(0,b.jsx)("i",{className:"result-spark result-spark-three",children:"+"}),(0,b.jsx)("span",{className:"result-orbit result-orbit-one"}),(0,b.jsx)("span",{className:"result-orbit result-orbit-two"}),(0,b.jsxs)("div",{className:"result-big-planet",children:[(0,b.jsx)("i",{}),(0,b.jsx)("i",{}),(0,b.jsx)("i",{})]}),(0,b.jsxs)("div",{className:"result-ground",children:[(0,b.jsx)("i",{}),(0,b.jsx)("i",{}),(0,b.jsx)("i",{})]}),(0,b.jsx)(l,{side:"left"}),(0,b.jsx)(l,{side:"right"}),(0,b.jsx)("div",{className:"result-heart",children:"♥"}),(0,b.jsx)("div",{className:"result-art-tag",children:{knight_princess:"своих не бросаем",wizards:"понимаем между строк",pirates:"одна команда",astronauts:"две орбиты · один маршрут",sun_moon:"разные стороны одного неба",dragon_keeper:"огонь + спокойствие",players:"играем вместе",homekeepers:"своё место"}[a]??"между вами"})]})}function l({side:a}){return(0,b.jsxs)("div",{className:`result-character ${a}`,children:[(0,b.jsx)("div",{className:"result-backpack"}),(0,b.jsx)("div",{className:"result-helmet",children:(0,b.jsxs)("div",{className:"result-visor",children:[(0,b.jsx)("i",{}),(0,b.jsx)("i",{}),(0,b.jsx)("span",{})]})}),(0,b.jsx)("div",{className:"result-body",children:(0,b.jsxs)("div",{className:"result-panel",children:[(0,b.jsx)("i",{}),(0,b.jsx)("i",{})]})}),(0,b.jsx)("div",{className:"result-arm result-arm-outside"}),(0,b.jsx)("div",{className:"result-arm result-arm-inside"}),(0,b.jsx)("div",{className:"result-leg result-leg-one"}),(0,b.jsx)("div",{className:"result-leg result-leg-two"})]})}function m({children:a}){return(0,b.jsxs)("div",{className:"result-locked",children:[(0,b.jsx)("div",{className:"result-lock",children:"↗"}),(0,b.jsxs)("div",{children:[(0,b.jsx)("span",{children:"НАЙДЕНО В ВАШИХ ОТВЕТАХ"}),(0,b.jsx)("p",{children:a})]}),(0,b.jsx)("b",{children:"закрыто"})]})}function n(a){return({knight_princess:"01",wizards:"02",pirates:"03",astronauts:"04",sun_moon:"05",dragon_keeper:"06",players:"07",homekeepers:"08"})[a]??"00"}let o=`
+module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131),e=a.i(50944);let f=[{id:"knight_princess",title:"Рыцарь и принцесса",emojiA:"⚔️",emojiB:"👑",description:"У вас много заботы в мелочах. Для этой пары любовь чаще видна не в громких словах, а в ощущении: «я рядом и помню о тебе».",traits:["care_practical","attention","warmth","initiative","support_action","physical_closeness","support_physical"]},{id:"astronauts",title:"Два космонавта",emojiA:"🚀",emojiB:"🪐",description:"У каждого может быть своя орбита, но вам важно знать, что маршрут всё равно общий. Близость для вас не обязательно означает быть вместе каждую минуту.",traits:["independence","personal_space_high","space_high","space_balanced","autonomy","value_independence","planning","need_future_alignment"]},{id:"wizards",title:"Два волшебника",emojiA:"🔮",emojiB:"✨",description:"Ваш главный инструмент — разговор. Вам важно не просто быть рядом, а понимать, что происходит внутри другого человека.",traits:["communication","emotional_sharing","support_listening","conflict_verbal_resolution","need_communication","need_deep_communication","value_communication","listening"]},{id:"pirates",title:"Два пирата",emojiA:"🏴‍☠️",emojiB:"🗺️",description:"Вашей паре особенно идёт ощущение приключения. Планы хороши, но иногда лучший план — придумать всё по дороге.",traits:["spontaneity","shared_experience","activity","need_spontaneity","need_novelty","flexibility","money_experience","money_present"]},{id:"sun_moon",title:"Солнце и Луна",emojiA:"☀️",emojiB:"🌙",description:"Вы не обязаны одинаково реагировать на всё. В вашей паре особенно заметно, как разные способы чувствовать и действовать могут существовать рядом.",traits:["support_proactive","support_space","space_high","closeness_high","independence","direct_communication","quiet_closeness","emotional_sharing"]},{id:"dragon_keeper",title:"Дракон и хранитель",emojiA:"🐉",emojiB:"🛡️",description:"В вашей динамике есть энергия и спокойствие. Один момент может проживаться ярко, другой — через паузу, действие или присутствие рядом.",traits:["emotion_intensity","self_regulation","support_available","support_presence","conflict_time_repair","indirect_repair","repair_delayed"]},{id:"players",title:"Два игрока",emojiA:"🎮",emojiB:"👾",description:"У вас есть важная суперсила — лёгкость. Юмор, свои приколы и ощущение команды помогают вам снова находить друг друга.",traits:["humor","playfulness","support_humor","conflict_humor_repair","micro_connection","value_playfulness","need_lightness","message_team"]},{id:"homekeepers",title:"Хранители дома",emojiA:"🕯️",emojiB:"🏡",description:"Сила вашей пары прячется в обычной жизни: знакомых ритуалах, спокойных вечерах и ощущении места, куда хочется возвращаться.",traits:["home_comfort","quiet_closeness","ritual","stability","value_ritual","need_stability","shared_life","message_everyday_love"]}];function g(){return(0,b.jsx)(c.default,{id:"e6ce027b4ee37d01",children:"html,body{background:#f2eee8!important;margin:0!important;padding:0!important}body{color:#211f20;font-family:Arial,Helvetica,Helvetica Neue,sans-serif}*{box-sizing:border-box}button,input{font:inherit}"})}function h({item:a,index:c}){var d,e;return(0,b.jsxs)("article",{className:"dimension-row",children:[(0,b.jsx)("span",{className:"dimension-number",children:String(c).padStart(2,"0")}),(0,b.jsx)(j,{kind:a.kind}),(0,b.jsxs)("div",{className:"dimension-content",children:[(0,b.jsxs)("div",{className:"dimension-main",children:[(0,b.jsxs)("div",{children:[(0,b.jsx)("h3",{children:a.title}),(0,b.jsx)("p",{children:a.subtitle})]}),(0,b.jsxs)("strong",{className:"dimension-value",children:[a.value,(0,b.jsx)("sup",{children:"%"})]})]}),(0,b.jsx)(i,{value:a.value}),(0,b.jsx)("div",{className:"dimension-comment",children:(d=a.kind,e=a.value,"views"===d?e>=70?"В главном вы примерно об одном.":e>=40?"Основа похожа, детали — уже нет.":"От отношений вы можете ждать довольно разных вещей.":"care"===d?e>=70?"Вы хорошо считываете заботу друг друга.":e>=40?"Заботитесь оба, но показываете это по-разному.":"Один может стараться, а второй этого не замечать.":"communication"===d?e>=70?"Разговаривать о сложном вам обычно удобно похожим способом.":e>=40?"В сложном разговоре вам иногда нужны разные вещи.":"Когда становится сложно, ваши реакции заметно расходятся.":"rhythm"===d?e>=70?"Ваш хороший день вдвоём выглядит довольно похоже.":e>=40?"Вместе вам хорошо, но сценарии отдыха совпадают не всегда.":"То, что для одного отдых, для другого может быть вообще не отдыхом.":e>=70?"Вы похоже чувствуете, когда быть вместе, а когда разойтись по своим делам.":e>=40?"Иногда одному нужно больше близости, а другому — больше воздуха.":"Количество нужного личного пространства у вас заметно различается.")})]})]})}function i({value:a}){let c=Math.round(a/10);return(0,b.jsx)("div",{className:"segments",children:Array.from({length:10}).map((a,d)=>(0,b.jsx)("span",{className:d<c?"active":""},d))})}function j({kind:a}){return"views"===a?(0,b.jsxs)("div",{className:"dimension-mark mark-views",children:[(0,b.jsx)("span",{}),(0,b.jsx)("span",{})]}):"care"===a?(0,b.jsx)("div",{className:"dimension-mark mark-care",children:(0,b.jsx)("b",{children:"+"})}):"communication"===a?(0,b.jsxs)("div",{className:"dimension-mark mark-talk",children:[(0,b.jsx)("span",{}),(0,b.jsx)("span",{})]}):"rhythm"===a?(0,b.jsx)("div",{className:"dimension-mark mark-rhythm",children:(0,b.jsx)("span",{children:"~"})}):(0,b.jsxs)("div",{className:"dimension-mark mark-space",children:[(0,b.jsx)("span",{}),(0,b.jsx)("span",{})]})}function k({archetypeId:a}){return(0,b.jsxs)("div",{className:"art",children:[(0,b.jsx)("div",{className:"art-label",children:o(a)}),(0,b.jsx)("span",{className:"star star-a",children:"✦"}),(0,b.jsx)("span",{className:"star star-b",children:"+"}),(0,b.jsx)("span",{className:"star star-c",children:"✦"}),(0,b.jsx)("div",{className:"orbit orbit-a"}),(0,b.jsx)("div",{className:"orbit orbit-b"}),(0,b.jsxs)("div",{className:"planet",children:[(0,b.jsx)("span",{}),(0,b.jsx)("span",{}),(0,b.jsx)("span",{})]}),(0,b.jsxs)("div",{className:"ground",children:[(0,b.jsx)("span",{}),(0,b.jsx)("span",{}),(0,b.jsx)("span",{})]}),(0,b.jsx)(l,{side:"left"}),(0,b.jsx)(l,{side:"right"}),(0,b.jsx)("div",{className:"art-heart",children:"♥"})]})}function l({side:a}){return(0,b.jsxs)("div",{className:`astronaut ${a}`,children:[(0,b.jsx)("div",{className:"backpack"}),(0,b.jsx)("div",{className:"helmet",children:(0,b.jsxs)("div",{className:"visor",children:[(0,b.jsx)("i",{}),(0,b.jsx)("i",{}),(0,b.jsx)("span",{})]})}),(0,b.jsx)("div",{className:"body",children:(0,b.jsxs)("div",{className:"panel",children:[(0,b.jsx)("i",{}),(0,b.jsx)("i",{})]})}),(0,b.jsx)("div",{className:"arm outside"}),(0,b.jsx)("div",{className:"arm inside"}),(0,b.jsx)("div",{className:"leg leg-a"}),(0,b.jsx)("div",{className:"leg leg-b"})]})}function m({number:a,children:c}){return(0,b.jsxs)("div",{className:"locked-row",children:[(0,b.jsx)("span",{className:"locked-number",children:a}),(0,b.jsx)("p",{children:c}),(0,b.jsx)("span",{className:"locked-status",children:"ЗАКРЫТО"})]})}function n(a){return({knight_princess:"01",wizards:"02",pirates:"03",astronauts:"04",sun_moon:"05",dragon_keeper:"06",players:"07",homekeepers:"08"})[a]??"00"}function o(a){return({knight_princess:"СВОИХ НЕ БРОСАЕМ",wizards:"МЕЖДУ СТРОК",pirates:"ОДНА КОМАНДА",astronauts:"ДВЕ ОРБИТЫ / ОДИН МАРШРУТ",sun_moon:"РАЗНЫЕ СТОРОНЫ ОДНОГО НЕБА",dragon_keeper:"ОГОНЬ + СПОКОЙСТВИЕ",players:"CO-OP MODE",homekeepers:"СВОЁ МЕСТО"})[a]??"МЕЖДУ ВАМИ"}let p=`
 
 .result-page {
-  display: block !important;
-  width: 100% !important;
-  min-height: 100vh !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: #F4EFE9;
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  background: #F2EEE8;
   overflow: hidden;
 }
 
 .result-shell {
-  display: block;
   width: min(calc(100% - 36px), 760px);
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto;
 }
 
 /* HEADER */
 
 .result-header {
-  position: relative !important;
-  inset: auto !important;
-
-  width: min(calc(100% - 36px), 760px) !important;
-
   height: 58px !important;
   min-height: 58px !important;
   max-height: 58px !important;
 
-  margin: 0 auto !important;
   padding: 0 !important;
+  margin: 0 auto !important;
 
   display: flex !important;
-  flex-direction: row !important;
   align-items: center !important;
   justify-content: space-between !important;
 
-  border-bottom: 1px solid #D8D0CD;
+  border-bottom: 1px solid #BEB8B4;
 
   background: transparent !important;
-
-  transform: none !important;
 }
 
 .result-brand {
-  margin: 0 !important;
-  padding: 0 !important;
-
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 22px;
-  font-style: italic;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 900;
   line-height: 1;
 
-  letter-spacing: -0.055em;
+  letter-spacing: -0.07em;
 }
 
 .result-names {
@@ -62,446 +45,416 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
   align-items: center;
   gap: 8px;
 
-  margin: 0;
-  padding: 0;
-
-  color: #857A80;
+  color: #686164;
 
   font-size: 8px;
-  font-weight: 900;
-  line-height: 1;
+  font-weight: 800;
 
-  letter-spacing: 0.12em;
+  letter-spacing: 0.13em;
   text-transform: uppercase;
 }
 
 .result-names b {
-  color: #B43D69;
+  color: #B13A63;
 }
 
-/* INTRO */
+/* HERO */
 
-.result-intro {
-  padding: 28px 0 18px;
+.result-hero {
+  padding: 27px 0 25px;
 }
 
-.result-kicker {
-  color: #B43D69;
-
-  font-size: 8px;
+.result-index,
+.section-head {
+  font-size: 7px;
   font-weight: 900;
 
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
+  letter-spacing: 0.18em;
 }
 
-.result-intro-grid {
+.result-index {
+  color: #B13A63;
+}
+
+.result-hero-grid {
   display: grid;
 
-  grid-template-columns: 1fr 180px;
+  grid-template-columns: 1fr 175px;
+
+  gap: 30px;
 
   align-items: end;
 
-  gap: 28px;
-
-  margin-top: 8px;
+  margin-top: 14px;
 }
 
-.result-intro h1 {
+.result-hero h1 {
   margin: 0;
-  padding: 0;
 
-  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(45px, 8vw, 67px);
+  font-weight: 900;
 
-  font-size: clamp(43px, 7vw, 61px);
+  line-height: 0.83;
 
-  font-style: italic;
-  font-weight: 400;
-
-  line-height: 0.89;
-
-  letter-spacing: -0.065em;
+  letter-spacing: -0.075em;
 }
 
-.result-intro p {
-  margin: 0 0 3px;
-  padding: 0;
+.result-score {
+  padding-left: 18px;
 
-  color: #8D8388;
-
-  font-family: Georgia, serif;
-
-  font-size: 10px;
-  font-style: italic;
-
-  line-height: 1.4;
+  border-left: 1px solid #BEB8B4;
 }
 
-/* DIMENSIONS */
-
-.result-dimensions {
-  padding: 0 0 26px;
-}
-
-.result-dimension {
-  display: grid;
-
-  grid-template-columns: 67px 1fr;
-
-  gap: 17px;
-
-  margin: 0;
-  padding: 15px 0;
-
-  border-top: 1px solid #D8D0CD;
-}
-
-.result-dimension:last-child {
-  border-bottom: 1px solid #D8D0CD;
-}
-
-.result-dimension-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.result-dimension-body {
-  min-width: 0;
-}
-
-.result-dimension-top {
-  display: grid;
-
-  grid-template-columns: 1fr auto;
-
-  align-items: end;
-
-  gap: 18px;
-}
-
-.result-dimension-label {
+.result-score > span {
   display: block;
 
   margin-bottom: 3px;
 
-  color: #A4999E;
+  color: #777074;
 
-  font-size: 6px;
+  font-size: 7px;
   font-weight: 900;
 
-  letter-spacing: 0.19em;
+  letter-spacing: 0.18em;
 }
 
-.result-dimension-top h3 {
-  margin: 0;
-  padding: 0;
+.result-score strong {
+  display: block;
 
-  font-family: Georgia, serif;
+  color: #B13A63;
 
-  font-size: 19px;
-  font-style: italic;
-  font-weight: 400;
+  font-size: 59px;
+  font-weight: 900;
+
+  line-height: 0.9;
+
+  letter-spacing: -0.075em;
+}
+
+.result-score sup {
+  font-size: 0.4em;
+}
+
+.result-score p {
+  margin: 7px 0 0;
+
+  color: #7E777A;
+
+  font-size: 8px;
+  font-weight: 600;
+
+  line-height: 1.35;
+}
+
+.result-quick {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  margin-top: 22px;
+
+  border-top: 1px solid #BEB8B4;
+  border-bottom: 1px solid #BEB8B4;
+}
+
+.result-quick > div {
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  min-height: 54px;
+
+  padding: 8px 13px;
+}
+
+.result-quick > div + div {
+  border-left: 1px solid #BEB8B4;
+}
+
+.result-quick strong {
+  color: #B13A63;
+
+  font-size: 25px;
+  font-weight: 900;
+
+  letter-spacing: -0.06em;
+}
+
+.result-quick span {
+  max-width: 80px;
+
+  color: #6E676A;
+
+  font-size: 7px;
+  font-weight: 700;
+
+  line-height: 1.25;
+}
+
+/* SECTION */
+
+.section-head {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  padding-bottom: 8px;
+
+  border-bottom: 2px solid #242123;
+
+  color: #242123;
+}
+
+.section-head b {
+  color: #B13A63;
+
+  font-size: 8px;
+}
+
+/* BREAKDOWN */
+
+.result-breakdown {
+  padding-bottom: 27px;
+}
+
+.dimension-row {
+  display: grid;
+
+  grid-template-columns: 25px 45px 1fr;
+
+  gap: 12px;
+
+  align-items: center;
+
+  padding: 14px 0;
+
+  border-bottom: 1px solid #C8C1BD;
+}
+
+.dimension-number {
+  align-self: start;
+
+  padding-top: 3px;
+
+  color: #AAA2A4;
+
+  font-size: 7px;
+  font-weight: 800;
+}
+
+.dimension-mark {
+  position: relative;
+
+  width: 38px;
+  height: 38px;
+}
+
+.mark-views span {
+  position: absolute;
+
+  top: 11px;
+
+  width: 23px;
+  height: 14px;
+
+  border: 2px solid #252225;
+
+  border-radius: 50%;
+}
+
+.mark-views span:first-child {
+  left: 0;
+}
+
+.mark-views span:last-child {
+  right: 0;
+
+  border-color: #B13A63;
+}
+
+.mark-care {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border: 2px solid #252225;
+
+  border-radius: 50%;
+}
+
+.mark-care b {
+  color: #B13A63;
+
+  font-size: 25px;
+  font-weight: 500;
+}
+
+.mark-talk span {
+  position: absolute;
+
+  width: 26px;
+  height: 18px;
+
+  border: 2px solid #252225;
+}
+
+.mark-talk span:first-child {
+  top: 3px;
+  left: 0;
+}
+
+.mark-talk span:last-child {
+  right: 0;
+  bottom: 3px;
+
+  border-color: #B13A63;
+}
+
+.mark-rhythm {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+}
+
+.mark-rhythm span {
+  font-size: 49px;
+  font-weight: 300;
 
   line-height: 1;
 
-  letter-spacing: -0.025em;
+  transform: rotate(-8deg);
 }
 
-.result-dimension-top strong {
-  color: #B43D69;
+.mark-space span {
+  position: absolute;
 
-  font-family: Georgia, serif;
+  top: 7px;
 
-  font-size: 30px;
-  font-style: italic;
-  font-weight: 400;
+  width: 25px;
+  height: 25px;
 
-  line-height: 0.8;
+  border: 2px solid #252225;
+
+  border-radius: 50%;
 }
 
-.result-dimension-top sup {
-  font-size: 0.48em;
+.mark-space span:first-child {
+  left: 0;
+
+  background: #E2AE45;
 }
 
-.result-segments {
+.mark-space span:last-child {
+  right: 0;
+
+  background: #8E789D;
+}
+
+.dimension-content {
+  min-width: 0;
+}
+
+.dimension-main {
+  display: grid;
+
+  grid-template-columns: 1fr auto;
+
+  gap: 16px;
+
+  align-items: end;
+}
+
+.dimension-main h3 {
+  margin: 0;
+
+  font-size: 17px;
+  font-weight: 900;
+
+  line-height: 1;
+
+  letter-spacing: -0.045em;
+}
+
+.dimension-main p {
+  margin: 3px 0 0;
+
+  color: #777074;
+
+  font-size: 8px;
+  font-weight: 600;
+}
+
+.dimension-value {
+  color: #B13A63;
+
+  font-size: 28px;
+  font-weight: 900;
+
+  line-height: 0.9;
+
+  letter-spacing: -0.06em;
+}
+
+.dimension-value sup {
+  font-size: 0.45em;
+}
+
+.segments {
   display: grid;
 
   grid-template-columns: repeat(10, 1fr);
 
   gap: 4px;
 
-  margin-top: 10px;
+  margin-top: 9px;
 }
 
-.result-segments span {
+.segments span {
   height: 5px;
 
-  border-radius: 30px;
-
-  background: #DED7D4;
+  background: #DAD3CF;
 }
 
-.result-segments span.active {
-  background: #B43D69;
+.segments span.active {
+  background: #B13A63;
 }
 
-.result-dimension-body > p {
-  margin: 7px 0 0;
+.dimension-comment {
+  margin-top: 6px;
 
-  color: #776D72;
+  color: #514B4E;
 
-  font-size: 10px;
-  line-height: 1.35;
-}
+  font-size: 8px;
+  font-weight: 700;
 
-/* MINI ART */
-
-.result-mini-art {
-  position: relative;
-
-  width: 58px;
-  height: 45px;
-
-  transform: scale(0.84);
-}
-
-.result-views-art {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  gap: 4px;
-}
-
-.result-eye {
-  position: relative;
-
-  width: 30px;
-  height: 19px;
-
-  border: 2px solid #332D33;
-
-  border-radius: 70% 30% 70% 30%;
-}
-
-.result-eye-second {
-  border-radius: 30% 70% 30% 70%;
-}
-
-.result-eye i {
-  position: absolute;
-
-  top: 50%;
-  left: 50%;
-
-  width: 7px;
-  height: 7px;
-
-  border-radius: 50%;
-
-  background: #B43D69;
-
-  transform: translate(-50%, -50%);
-}
-
-.result-care-art > i {
-  position: absolute;
-
-  top: 2px;
-  left: 50%;
-
-  color: #B43D69;
-
-  font-family: Georgia, serif;
-  font-size: 24px;
-  font-style: normal;
-
-  transform: translateX(-50%);
-}
-
-.result-hand {
-  position: absolute;
-
-  bottom: 4px;
-
-  width: 35px;
-  height: 18px;
-
-  border-bottom: 2px solid #332D33;
-}
-
-.result-hand-left {
-  left: -3px;
-
-  border-radius: 0 0 100% 0;
-
-  transform: rotate(10deg);
-}
-
-.result-hand-right {
-  right: -3px;
-
-  border-radius: 0 0 0 100%;
-
-  transform: rotate(-10deg);
-}
-
-.result-talk-art span {
-  position: absolute;
-
-  width: 36px;
-  height: 24px;
-
-  border: 2px solid #332D33;
-
-  border-radius: 50%;
-}
-
-.result-talk-art span:first-child {
-  top: 0;
-  left: 0;
-}
-
-.result-talk-art span:nth-child(2) {
-  right: 0;
-  bottom: 0;
-
-  border-color: #B43D69;
-}
-
-.result-talk-art i {
-  position: absolute;
-
-  top: 10px;
-  left: 18px;
-
-  color: #332D33;
-
-  font-family: Georgia, serif;
-  font-size: 13px;
-  font-style: normal;
-}
-
-.result-rhythm-art {
-  display: flex;
-  align-items: center;
-}
-
-.result-rhythm-art svg {
-  width: 60px;
-}
-
-.result-planet {
-  position: absolute;
-
-  top: 50%;
-
-  width: 28px;
-  height: 28px;
-
-  border: 2px solid #332D33;
-
-  border-radius: 50%;
-
-  transform: translateY(-50%);
-}
-
-.result-planet-one {
-  left: 0;
-  background: #E5AF49;
-}
-
-.result-planet-two {
-  right: 0;
-  background: #927DA1;
-}
-
-.result-space-art > i {
-  position: absolute;
-
-  top: 50%;
-  left: 50%;
-
-  width: 6px;
-  height: 6px;
-
-  border-radius: 50%;
-
-  background: #B43D69;
-
-  transform: translate(-50%, -50%);
+  line-height: 1.3;
 }
 
 /* TYPE */
 
 .result-type {
-  padding: 0 0 32px;
+  padding-bottom: 30px;
 }
 
-.result-type-heading {
-  display: flex;
+.type-title-row {
+  display: grid;
 
-  align-items: flex-end;
-  justify-content: space-between;
+  grid-template-columns: 1fr 220px;
 
-  gap: 20px;
+  gap: 25px;
 
-  margin: 0 0 12px;
+  align-items: end;
+
+  padding: 17px 0 13px;
 }
 
-.result-type-heading h2 {
-  margin: 5px 0 0;
-  padding: 0;
-
-  font-family: Georgia, serif;
-
-  font-size: clamp(33px, 5vw, 45px);
-
-  font-style: italic;
-  font-weight: 400;
-
-  line-height: 0.95;
-
-  letter-spacing: -0.055em;
-}
-
-.result-type-number {
-  flex-shrink: 0;
-
-  color: #B43D69;
-
-  font-family: Georgia, serif;
-
-  font-size: 24px;
-  font-style: italic;
-}
-
-.result-poster {
-  overflow: hidden;
-
-  border: 1px solid #312B31;
-
-  background: #F8F2EC;
-
-  box-shadow: 6px 6px 0 #DACBD0;
-}
-
-.result-poster-footer {
-  display: flex;
-
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 24px;
-
-  padding: 12px 17px;
-}
-
-.result-poster-footer span {
-  flex-shrink: 0;
-
-  color: #B43D69;
+.type-title-row > div > span {
+  color: #B13A63;
 
   font-size: 7px;
   font-weight: 900;
@@ -509,24 +462,76 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
   letter-spacing: 0.16em;
 }
 
-.result-poster-footer p {
-  margin: 0;
+.type-title-row h2 {
+  margin: 4px 0 0;
 
-  color: #6F666B;
+  font-size: clamp(34px, 6vw, 48px);
+  font-weight: 900;
 
-  font-family: Georgia, serif;
+  line-height: 0.88;
 
-  font-size: 11px;
-  font-style: italic;
+  letter-spacing: -0.065em;
+}
 
-  line-height: 1.3;
+.type-title-row > p {
+  margin: 0 0 2px;
+
+  color: #5F585B;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  line-height: 1.35;
+}
+
+.type-poster {
+  overflow: hidden;
+
+  border: 2px solid #242124;
+
+  background: #F7F1EB;
+
+  box-shadow: 6px 6px 0 #CDBDC3;
+}
+
+.poster-strip {
+  min-height: 41px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 8px 13px;
+
+  border-top: 2px solid #242124;
+}
+
+.poster-strip span {
+  color: #777074;
+
+  font-size: 6px;
+  font-weight: 900;
+
+  letter-spacing: 0.13em;
+}
+
+.poster-strip strong {
+  color: #B13A63;
+
+  font-size: 8px;
+  font-weight: 900;
+
+  letter-spacing: 0.04em;
 
   text-align: right;
 }
 
 /* ART */
 
-.result-art {
+.art {
   position: relative;
 
   height: 290px;
@@ -536,53 +541,73 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
   background: #393440;
 }
 
-.result-spark {
+.art-label {
   position: absolute;
 
-  z-index: 2;
+  z-index: 20;
 
-  color: #E5AF49;
+  top: 12px;
+  left: 12px;
+
+  padding: 6px 8px;
+
+  background: #F2EEE8;
+
+  color: #282428;
+
+  font-size: 7px;
+  font-weight: 900;
+
+  letter-spacing: 0.06em;
+}
+
+.star {
+  position: absolute;
+
+  z-index: 3;
 
   font-style: normal;
 }
 
-.result-spark-one {
-  top: 12%;
-  left: 13%;
+.star-a {
+  top: 18%;
+  left: 15%;
 
-  font-size: 23px;
+  color: #E7B246;
+
+  font-size: 25px;
 }
 
-.result-spark-two {
-  top: 21%;
-  right: 12%;
+.star-b {
+  top: 39%;
+  left: 8%;
 
-  color: #C36C8B;
+  color: #907B9D;
 
-  font-size: 17px;
+  font-size: 20px;
 }
 
-.result-spark-three {
-  top: 40%;
-  left: 7%;
+.star-c {
+  top: 22%;
+  right: 13%;
 
-  color: #907C9E;
+  color: #CC6B8D;
 
-  font-size: 18px;
+  font-size: 19px;
 }
 
-.result-orbit {
+.orbit {
   position: absolute;
 
   left: 50%;
 
-  border: 1px solid rgba(241,225,211,0.24);
+  border: 1px solid rgba(245, 234, 224, 0.25);
 
   border-radius: 50%;
 }
 
-.result-orbit-one {
-  top: 67px;
+.orbit-a {
+  top: 68px;
 
   width: 490px;
   height: 125px;
@@ -590,8 +615,8 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
   transform: translateX(-50%) rotate(-13deg);
 }
 
-.result-orbit-two {
-  top: 79px;
+.orbit-b {
+  top: 78px;
 
   width: 430px;
   height: 145px;
@@ -599,59 +624,59 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
   transform: translateX(-50%) rotate(17deg);
 }
 
-.result-big-planet {
+.planet {
   position: absolute;
 
-  top: 29px;
+  top: 28px;
   left: 50%;
 
-  width: 135px;
-  height: 135px;
+  width: 137px;
+  height: 137px;
 
-  border: 4px solid #29242C;
+  border: 4px solid #27232B;
 
   border-radius: 50%;
 
   background: #C2B0CF;
 
-  box-shadow: 7px 7px 0 rgba(28,24,31,0.22);
+  box-shadow: 7px 7px 0 rgba(25, 21, 28, 0.24);
 
   transform: translateX(-50%);
 }
 
-.result-big-planet i {
+.planet span {
   position: absolute;
 
-  border: 3px solid rgba(70,57,75,0.28);
+  border: 3px solid rgba(72, 58, 77, 0.28);
 
   border-radius: 50%;
 }
 
-.result-big-planet i:first-child {
-  top: 24px;
-  left: 21px;
+.planet span:first-child {
+  top: 23px;
+  left: 20px;
 
-  width: 33px;
-  height: 18px;
+  width: 34px;
+  height: 19px;
 }
 
-.result-big-planet i:nth-child(2) {
+.planet span:nth-child(2) {
   top: 65px;
   right: 18px;
 
+  width: 24px;
+  height: 31px;
+}
+
+.planet span:last-child {
+  bottom: 18px;
+  left: 52px;
+
   width: 23px;
-  height: 30px;
+  height: 16px;
 }
 
-.result-big-planet i:nth-child(3) {
-  bottom: 19px;
-  left: 51px;
-
-  width: 22px;
-  height: 15px;
-}
-
-.result-ground {
+.ground {
   position: absolute;
 
   left: -9%;
@@ -660,14 +685,14 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
 
   height: 240px;
 
-  border: 4px solid #29242C;
+  border: 4px solid #27232B;
 
   border-radius: 50% 50% 0 0;
 
   background: #81718C;
 }
 
-.result-ground i {
+.ground span {
   position: absolute;
 
   border: 3px solid #554A5E;
@@ -677,7 +702,7 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
   background: #695C73;
 }
 
-.result-ground i:first-child {
+.ground span:first-child {
   top: 28px;
   left: 17%;
 
@@ -685,7 +710,7 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
   height: 30px;
 }
 
-.result-ground i:nth-child(2) {
+.ground span:nth-child(2) {
   top: 65px;
   left: 47%;
 
@@ -693,7 +718,7 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
   height: 35px;
 }
 
-.result-ground i:nth-child(3) {
+.ground span:last-child {
   top: 27px;
   right: 16%;
 
@@ -701,9 +726,9 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
   height: 25px;
 }
 
-/* CHARACTERS */
+/* ASTRONAUT */
 
-.result-character {
+.astronaut {
   position: absolute;
 
   z-index: 5;
@@ -716,19 +741,19 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
   transform-origin: bottom center;
 }
 
-.result-character.left {
+.astronaut.left {
   left: calc(50% - 142px);
 
   transform: scale(0.82) rotate(2deg);
 }
 
-.result-character.right {
+.astronaut.right {
   right: calc(50% - 142px);
 
   transform: scale(0.82) rotate(-2deg);
 }
 
-.result-backpack {
+.backpack {
   position: absolute;
 
   top: 75px;
@@ -744,7 +769,7 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
   background: #B45B7A;
 }
 
-.result-helmet {
+.helmet {
   position: absolute;
 
   z-index: 6;
@@ -764,7 +789,7 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
   transform: translateX(-50%);
 }
 
-.result-visor {
+.visor {
   position: absolute;
 
   top: 17px;
@@ -780,7 +805,7 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
   background: #665B70;
 }
 
-.result-visor i {
+.visor i {
   position: absolute;
 
   top: 17px;
@@ -793,15 +818,15 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
   background: #F2D4A5;
 }
 
-.result-visor i:first-child {
+.visor i:first-child {
   left: 16px;
 }
 
-.result-visor i:nth-child(2) {
+.visor i:nth-child(2) {
   right: 16px;
 }
 
-.result-visor span {
+.visor span {
   position: absolute;
 
   left: 50%;
@@ -817,7 +842,7 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
   transform: translateX(-50%);
 }
 
-.result-body {
+.body {
   position: absolute;
 
   z-index: 5;
@@ -837,7 +862,7 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
   transform: translateX(-50%);
 }
 
-.result-panel {
+.panel {
   position: absolute;
 
   top: 25px;
@@ -853,7 +878,7 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
   transform: translateX(-50%);
 }
 
-.result-panel i {
+.panel i {
   position: absolute;
 
   top: 7px;
@@ -862,17 +887,19 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
   height: 6px;
 }
 
-.result-panel i:first-child {
+.panel i:first-child {
   left: 7px;
+
   background: #E5AF49;
 }
 
-.result-panel i:last-child {
+.panel i:last-child {
   right: 7px;
+
   background: #7E6C91;
 }
 
-.result-arm {
+.arm {
   position: absolute;
 
   z-index: 4;
@@ -889,29 +916,35 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
   background: #F0E7DD;
 }
 
-.result-character.left .result-arm-outside {
+.astronaut.left .outside {
   left: -20px;
+
   transform: rotate(27deg);
 }
 
-.result-character.left .result-arm-inside {
+.astronaut.left .inside {
   right: -34px;
+
   width: 76px;
+
   transform: rotate(-11deg);
 }
 
-.result-character.right .result-arm-outside {
+.astronaut.right .outside {
   right: -20px;
+
   transform: rotate(-27deg);
 }
 
-.result-character.right .result-arm-inside {
+.astronaut.right .inside {
   left: -34px;
+
   width: 76px;
+
   transform: rotate(11deg);
 }
 
-.result-leg {
+.leg {
   position: absolute;
 
   z-index: 3;
@@ -928,17 +961,19 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
   background: #F0E7DD;
 }
 
-.result-leg-one {
+.leg-a {
   left: 25px;
+
   transform: rotate(5deg);
 }
 
-.result-leg-two {
+.leg-b {
   right: 25px;
+
   transform: rotate(-5deg);
 }
 
-.result-heart {
+.art-heart {
   position: absolute;
 
   z-index: 10;
@@ -948,232 +983,191 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
 
   color: #D04F78;
 
-  font-family: Georgia, serif;
-
   font-size: 27px;
 
   transform: translateX(-50%);
 }
 
-.result-art-tag {
-  position: absolute;
-
-  z-index: 15;
-
-  right: 12px;
-  bottom: 10px;
-
-  padding: 6px 9px;
-
-  border: 1px solid #302A30;
-
-  background: #F6EEE7;
-
-  font-family: Georgia, serif;
-
-  font-size: 9px;
-  font-style: italic;
-
-  transform: rotate(-2deg);
-}
-
 /* PAYWALL */
 
 .result-paywall {
-  margin: 0 !important;
+  padding: 29px 0 32px;
 
-  padding: 31px 0 35px !important;
+  background: #272328;
 
-  background: #2E2931;
-
-  color: #F8F1EB;
+  color: #F7F0EA;
 }
 
-.result-paywall-label {
+.paywall-top {
   display: flex;
 
   align-items: center;
   justify-content: space-between;
 
-  padding-bottom: 10px;
+  padding-bottom: 9px;
 
-  border-bottom: 1px solid rgba(255,255,255,0.15);
+  border-bottom: 2px solid #F7F0EA;
 
-  color: #DD829F;
+  color: #E17C9E;
 
   font-size: 7px;
   font-weight: 900;
 
-  letter-spacing: 0.21em;
+  letter-spacing: 0.18em;
 }
 
-.result-paywall-label b {
-  color: #E8B54D;
-
-  font-size: 17px;
-  font-weight: 400;
+.paywall-top b {
+  color: #E7B246;
 }
 
-.result-paywall-grid {
+.paywall-grid {
   display: grid;
 
-  grid-template-columns: 0.82fr 1.18fr;
+  grid-template-columns: 0.88fr 1.12fr;
 
   gap: 35px;
 
   padding-top: 22px;
 }
 
-.result-paywall-title h2 {
-  margin: 0;
-
-  font-family: Georgia, serif;
-
-  font-size: clamp(39px, 6vw, 54px);
-
-  font-style: italic;
-  font-weight: 400;
-
-  line-height: 0.88;
-
-  letter-spacing: -0.06em;
+.paywall-left {
+  position: relative;
 }
 
-.result-paywall-title p {
-  max-width: 220px;
-
-  margin: 13px 0 0;
-
-  color: #ADA2A8;
-
-  font-size: 9px;
-  line-height: 1.45;
-}
-
-.result-found {
-  display: grid;
-
-  grid-template-columns: auto 1fr;
-
-  grid-template-areas:
-    "label label"
-    "number copy";
-
-  align-items: end;
-
-  column-gap: 15px;
-
-  margin-bottom: 6px;
-
-  padding: 11px 14px;
-
-  border: 1px solid #D37A99;
-
-  background: #3B323D;
-}
-
-.result-found > span {
-  grid-area: label;
-
-  color: #D9829F;
-
-  font-size: 6px;
-  font-weight: 900;
-
-  letter-spacing: 0.18em;
-}
-
-.result-found strong {
-  grid-area: number;
-
-  color: #F4C05C;
-
-  font-family: Georgia, serif;
-
-  font-size: 46px;
-  font-style: italic;
-  font-weight: 400;
-
-  line-height: 0.9;
-}
-
-.result-found p {
-  grid-area: copy;
-
-  margin: 0 0 3px;
-
-  color: #E7DDE2;
-
-  font-family: Georgia, serif;
-
-  font-size: 12px;
-  font-style: italic;
-
-  line-height: 1.2;
-}
-
-.result-locked {
-  display: grid;
-
-  grid-template-columns: 24px 1fr auto;
-
-  align-items: center;
-
-  gap: 9px;
-
-  padding: 8px 0;
-
-  border-bottom: 1px solid rgba(255,255,255,0.11);
-}
-
-.result-lock {
-  width: 19px;
-  height: 19px;
+.paywall-sticker {
+  width: 82px;
+  height: 82px;
 
   display: flex;
+  flex-direction: column;
+
   align-items: center;
   justify-content: center;
 
-  border: 1px solid #D47A99;
+  margin-bottom: 15px;
 
   border-radius: 50%;
 
-  color: #D47A99;
+  background: #E7B246;
 
-  font-size: 9px;
-
-  transform: rotate(45deg);
-}
-
-.result-locked span {
-  color: #7F747D;
-
-  font-size: 5px;
-  font-weight: 900;
-
-  letter-spacing: 0.12em;
-}
-
-.result-locked p {
-  margin: 2px 0 0;
-
-  color: #F0E7EC;
-
-  font-family: Georgia, serif;
-
-  font-size: 11px;
-  font-style: italic;
-
-  line-height: 1.2;
-}
-
-.result-locked > b {
-  color: #776C75;
+  color: #272328;
 
   font-size: 6px;
+  font-weight: 900;
+
+  letter-spacing: 0.1em;
+
+  transform: rotate(-7deg);
+}
+
+.paywall-sticker strong {
+  display: block;
+
+  font-size: 34px;
+  font-weight: 900;
+
+  line-height: 0.9;
+
+  letter-spacing: -0.07em;
+}
+
+.paywall-left h2 {
+  margin: 0;
+
+  font-size: clamp(39px, 6vw, 52px);
+  font-weight: 900;
+
+  line-height: 0.84;
+
+  letter-spacing: -0.07em;
+}
+
+.paywall-left > p {
+  max-width: 225px;
+
+  margin: 14px 0 0;
+
+  color: #B9AEB4;
+
+  font-size: 9px;
+  font-weight: 600;
+
+  line-height: 1.45;
+}
+
+.paywall-hook {
+  margin-bottom: 5px;
+
+  padding: 13px;
+
+  border: 1px solid #D86E92;
+
+  background: #342D35;
+}
+
+.paywall-hook span {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #D86E92;
+
+  font-size: 6px;
+  font-weight: 900;
+
+  letter-spacing: 0.15em;
+}
+
+.paywall-hook strong {
+  display: block;
+
+  font-size: 15px;
+  font-weight: 800;
+
+  line-height: 1.15;
+
+  letter-spacing: -0.025em;
+}
+
+.locked-row {
+  display: grid;
+
+  grid-template-columns: 23px 1fr auto;
+
+  gap: 10px;
+
+  align-items: center;
+
+  min-height: 48px;
+
+  border-bottom: 1px solid rgba(255,255,255,0.13);
+}
+
+.locked-number {
+  color: #E17C9E;
+
+  font-size: 7px;
+  font-weight: 900;
+}
+
+.locked-row p {
+  margin: 0;
+
+  color: #F3EBEF;
+
+  font-size: 9px;
   font-weight: 700;
 
-  text-transform: uppercase;
+  line-height: 1.25;
+}
+
+.locked-status {
+  color: #716971;
+
+  font-size: 6px;
+  font-weight: 900;
+
+  letter-spacing: 0.1em;
 }
 
 .result-buy {
@@ -1183,55 +1177,61 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
 
   grid-template-columns: 1fr auto auto;
 
+  gap: 13px;
+
   align-items: center;
 
-  gap: 12px;
+  margin-top: 13px;
 
-  margin: 13px 0 0;
+  padding: 15px;
 
-  padding: 14px 15px;
+  border: 0;
 
-  border: 1px solid #F0B1C7;
+  background: #B63B67;
 
-  background: #B43D69;
-
-  color: #FFFFFF;
+  color: white;
 
   cursor: pointer;
 
   text-align: left;
 }
 
-.result-buy span {
-  font-family: Georgia, serif;
+.result-buy:hover {
+  background: #C84372;
+}
 
-  font-size: 13px;
-  font-style: italic;
+.result-buy span {
+  font-size: 9px;
+  font-weight: 900;
+
+  letter-spacing: -0.01em;
 }
 
 .result-buy strong {
   white-space: nowrap;
 
   font-size: 13px;
+  font-weight: 900;
 }
 
 .result-buy b {
-  font-size: 18px;
+  font-size: 20px;
 }
 
-.result-footnote {
-  margin-top: 6px;
+.buy-note {
+  margin-top: 7px;
 
-  color: #776D75;
+  color: #766D75;
 
   font-size: 6px;
+  font-weight: 700;
+
+  letter-spacing: 0.06em;
 
   text-align: center;
-
-  letter-spacing: 0.08em;
 }
 
-/* STATES */
+/* STATE */
 
 .result-state {
   width: 100%;
@@ -1243,76 +1243,59 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
   align-items: center;
   justify-content: center;
 
-  margin: 0;
   padding: 30px;
 
-  background: #F4EFE9;
+  background: #F2EEE8;
 
   text-align: center;
 }
 
-.result-state-brand {
-  font-family: Georgia, serif;
+.state-brand {
+  font-size: 23px;
+  font-weight: 900;
 
-  font-size: 24px;
-  font-style: italic;
-  font-weight: 700;
+  letter-spacing: -0.07em;
 }
 
 .result-state h1 {
-  margin: 25px 0 10px;
+  max-width: 400px;
 
-  font-family: Georgia, serif;
+  margin: 22px 0 8px;
 
   font-size: 43px;
-  font-style: italic;
-  font-weight: 400;
+  font-weight: 900;
 
-  line-height: 0.95;
+  line-height: 0.9;
+
+  letter-spacing: -0.065em;
 }
 
 .result-state p {
-  color: #8D8288;
+  color: #777074;
 
-  font-family: Georgia, serif;
-
-  font-size: 11px;
-  font-style: italic;
+  font-size: 9px;
+  font-weight: 700;
 }
 
-.result-loader {
+.state-mark {
   display: flex;
 
-  align-items: center;
-
-  margin-bottom: 25px;
+  margin-bottom: 20px;
 }
 
-.result-loader span {
-  width: 48px;
-  height: 48px;
+.state-mark span {
+  width: 44px;
+  height: 44px;
 
-  border: 2px solid #302A30;
+  border: 3px solid #272328;
 
   border-radius: 50%;
 }
 
-.result-loader span:last-child {
+.state-mark span:last-child {
   margin-left: -12px;
-}
 
-.result-loader i {
-  position: relative;
-
-  z-index: 2;
-
-  margin: 0 -7px;
-
-  color: #B43D69;
-
-  font-family: Georgia, serif;
-
-  font-style: normal;
+  border-color: #B13A63;
 }
 
 /* MOBILE */
@@ -1324,7 +1307,7 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
   }
 
   .result-header {
-    width: calc(100% - 26px) !important;
+    width: calc(100% - 26px);
 
     height: 52px !important;
     min-height: 52px !important;
@@ -1332,161 +1315,175 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
   }
 
   .result-brand {
-    font-size: 19px;
+    font-size: 18px;
   }
 
   .result-names {
-    max-width: 150px;
-
-    overflow: hidden;
-
     font-size: 7px;
-
-    white-space: nowrap;
   }
 
-  .result-intro {
-    padding: 22px 0 14px;
+  .result-hero {
+    padding: 21px 0 20px;
   }
 
-  .result-intro-grid {
-    grid-template-columns: 1fr;
+  .result-hero-grid {
+    grid-template-columns: 1fr 105px;
+
+    gap: 14px;
+
+    margin-top: 10px;
+  }
+
+  .result-hero h1 {
+    font-size: clamp(39px, 12vw, 53px);
+  }
+
+  .result-score {
+    padding-left: 10px;
+  }
+
+  .result-score strong {
+    font-size: 44px;
+  }
+
+  .result-score p {
+    font-size: 6px;
+  }
+
+  .result-quick {
+    margin-top: 17px;
+  }
+
+  .result-quick > div {
+    display: block;
+
+    min-height: 53px;
+
+    padding: 8px;
+  }
+
+  .result-quick strong {
+    display: block;
+
+    margin-bottom: 3px;
+
+    font-size: 22px;
+  }
+
+  .result-quick span {
+    display: block;
+
+    font-size: 6px;
+  }
+
+  .dimension-row {
+    grid-template-columns: 17px 35px 1fr;
 
     gap: 7px;
+
+    padding: 12px 0;
+  }
+
+  .dimension-mark {
+    width: 31px;
+    height: 31px;
+
+    transform: scale(0.8);
+    transform-origin: left center;
+  }
+
+  .dimension-main h3 {
+    font-size: 15px;
+  }
+
+  .dimension-main p {
+    max-width: 180px;
+
+    font-size: 7px;
+  }
+
+  .dimension-value {
+    font-size: 23px;
+  }
+
+  .segments {
+    gap: 2px;
 
     margin-top: 7px;
   }
 
-  .result-intro h1 {
-    font-size: clamp(42px, 13vw, 55px);
-  }
-
-  .result-intro p {
-    max-width: 260px;
-  }
-
-  .result-dimensions {
-    padding-bottom: 20px;
-  }
-
-  .result-dimension {
-    grid-template-columns: 48px 1fr;
-
-    gap: 9px;
-
-    padding: 13px 0;
-  }
-
-  .result-dimension-icon {
-    justify-content: flex-start;
-  }
-
-  .result-mini-art {
-    transform: scale(0.68);
-    transform-origin: left center;
-  }
-
-  .result-dimension-top {
-    gap: 8px;
-  }
-
-  .result-dimension-top h3 {
-    max-width: 205px;
-
-    font-size: 17px;
-  }
-
-  .result-dimension-top strong {
-    font-size: 26px;
-  }
-
-  .result-segments {
-    gap: 3px;
-
-    margin-top: 8px;
-  }
-
-  .result-segments span {
+  .segments span {
     height: 4px;
   }
 
-  .result-dimension-body > p {
-    margin-top: 5px;
-
-    font-size: 9px;
+  .dimension-comment {
+    font-size: 7px;
   }
 
-  .result-type {
-    padding-bottom: 25px;
+  .type-title-row {
+    grid-template-columns: 1fr;
+
+    gap: 7px;
+
+    padding: 14px 0 10px;
   }
 
-  .result-type-heading {
-    margin-bottom: 9px;
+  .type-title-row h2 {
+    font-size: 34px;
   }
 
-  .result-type-heading h2 {
-    font-size: 33px;
+  .type-title-row > p {
+    max-width: 310px;
+
+    font-size: 8px;
   }
 
-  .result-type-number {
-    font-size: 20px;
-  }
-
-  .result-art {
+  .art {
     height: 235px;
   }
 
-  .result-big-planet {
+  .planet {
     top: 23px;
 
     width: 108px;
     height: 108px;
   }
 
-  .result-character {
+  .astronaut {
     bottom: 13px;
   }
 
-  .result-character.left {
+  .astronaut.left {
     left: calc(50% - 110px);
 
     transform: scale(0.68) rotate(2deg);
   }
 
-  .result-character.right {
+  .astronaut.right {
     right: calc(50% - 110px);
 
     transform: scale(0.68) rotate(-2deg);
   }
 
-  .result-heart {
+  .art-heart {
     top: 116px;
 
     font-size: 23px;
   }
 
-  .result-art-tag {
-    right: 7px;
-    bottom: 7px;
-
-    font-size: 7px;
+  .poster-strip {
+    padding: 8px 10px;
   }
 
-  .result-poster-footer {
-    gap: 10px;
-
-    padding: 10px 12px;
-  }
-
-  .result-poster-footer p {
-    font-size: 9px;
+  .poster-strip strong {
+    max-width: 155px;
   }
 
   .result-paywall {
-    padding: 25px 0 28px !important;
+    padding: 24px 0 27px;
   }
 
-  .result-paywall-grid {
+  .paywall-grid {
     grid-template-columns: 1fr;
 
     gap: 17px;
@@ -1494,36 +1491,59 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
     padding-top: 17px;
   }
 
-  .result-paywall-title h2 {
-    font-size: 42px;
+  .paywall-left {
+    display: grid;
+
+    grid-template-columns: 64px 1fr;
+
+    column-gap: 13px;
+
+    align-items: center;
   }
 
-  .result-paywall-title p {
-    margin-top: 9px;
+  .paywall-sticker {
+    grid-row: 1 / 3;
+
+    width: 62px;
+    height: 62px;
+
+    margin: 0;
   }
 
-  .result-found strong {
-    font-size: 41px;
+  .paywall-sticker strong {
+    font-size: 27px;
   }
 
-  .result-locked {
-    grid-template-columns: 22px 1fr;
-
-    padding: 8px 0;
+  .paywall-left h2 {
+    font-size: 37px;
   }
 
-  .result-locked > b {
+  .paywall-left > p {
+    margin: 7px 0 0;
+
+    font-size: 8px;
+  }
+
+  .locked-row {
+    grid-template-columns: 20px 1fr;
+
+    min-height: 45px;
+  }
+
+  .locked-status {
     display: none;
   }
 
   .result-buy {
-    margin-top: 11px;
+    padding: 14px 12px;
+  }
 
-    padding: 13px;
+  .result-buy span {
+    font-size: 8px;
   }
 
 }
 
-`;a.s(["default",0,function(){var a,i,j,l,p,q;let r=(0,e.useParams)(),s=(0,e.useRouter)(),t=r.coupleId,[u,v]=(0,d.useState)(null),[w,x]=(0,d.useState)("");if((0,d.useEffect)(()=>{!async function(){try{let a=await fetch(`/api/report?id=${encodeURIComponent(t)}`,{cache:"no-store"});if(!a.ok)throw Error("Не удалось загрузить результат");let b=await a.json();if(b.waiting)return void s.replace(`/waiting/${t}`);v(b)}catch(a){console.error(a),x("Не получилось загрузить результат.")}}()},[t,s]),w)return(0,b.jsxs)(b.Fragment,{children:[(0,b.jsxs)("main",{className:`jsx-${o.__hash} result-state`,children:[(0,b.jsx)("div",{className:`jsx-${o.__hash} result-state-brand`,children:"между нами"}),(0,b.jsxs)("h1",{className:`jsx-${o.__hash}`,children:["что-то пошло",(0,b.jsx)("br",{className:`jsx-${o.__hash}`}),"не так"]}),(0,b.jsx)("p",{className:`jsx-${o.__hash}`,children:w})]}),(0,b.jsx)(g,{}),(0,b.jsx)(c.default,{id:o.__hash,children:o})]});if(!u)return(0,b.jsxs)(b.Fragment,{children:[(0,b.jsxs)("main",{className:`jsx-${o.__hash} result-state`,children:[(0,b.jsxs)("div",{className:`jsx-${o.__hash} result-loader`,children:[(0,b.jsx)("span",{className:`jsx-${o.__hash}`}),(0,b.jsx)("i",{className:`jsx-${o.__hash}`,children:"♥"}),(0,b.jsx)("span",{className:`jsx-${o.__hash}`})]}),(0,b.jsx)("div",{className:`jsx-${o.__hash} result-state-brand`,children:"между нами"}),(0,b.jsx)("p",{className:`jsx-${o.__hash}`,children:"собираем вас двоих"})]}),(0,b.jsx)(g,{}),(0,b.jsx)(c.default,{id:o.__hash,children:o})]});let y=u.comparisons??[],z=function(a){let b=new Map;for(let a of f)b.set(a.id,0);for(let c of a){let a="same"===c.similarity?2:"close"===c.similarity?1.35:.65,d=[...c.traitsA,...c.traitsB];for(let c of f)for(let e of d)c.traits.includes(e)&&b.set(c.id,(b.get(c.id)??0)+a)}let c=a.filter(a=>"different"===a.similarity).length,d=a.filter(a=>"same"===a.similarity).length;a.length>0&&c>d&&b.set("sun_moon",(b.get("sun_moon")??0)+4);let e=f[0],g=b.get(e.id)??0;for(let a of f){let c=b.get(a.id)??0;c>g&&(e=a,g=c)}return{id:e.id,title:e.title,emojiA:e.emojiA,emojiB:e.emojiB,description:e.description}}(y),A=u.scores?.overall??function(a){if(!a.length)return 0;let b=0;for(let c of a)"same"===c.similarity&&(b+=1),"close"===c.similarity&&(b+=.5);return Math.round(b/a.length*100)}(y),B=u.scores?.dimensions,C=u.scores?.differentAnswers??y.filter(a=>"different"===a.similarity).length,D=u.scores?.closeAnswers??y.filter(a=>"close"===a.similarity).length,E=u.couple.partner_a_name,F=u.couple.partner_b_name,G=[{kind:"views",eyebrow:"ВЗГЛЯДЫ",title:"Как вы смотрите на отношения",value:B?.views??A},{kind:"care",eyebrow:"ЗАБОТА",title:"Как вы проявляете заботу",value:B?.care??A},{kind:"communication",eyebrow:"ОБЩЕНИЕ",title:"Как вы говорите о важном",value:B?.communication??A},{kind:"rhythm",eyebrow:"ВРЕМЯ ВМЕСТЕ",title:"Как вам нравится быть вместе",value:B?.rhythm??A},{kind:"space",eyebrow:"СВОБОДА",title:"Сколько пространства нужно каждому",value:B?.space??A}];return(0,b.jsxs)(b.Fragment,{children:[(0,b.jsxs)("main",{className:`jsx-${o.__hash} result-page`,children:[(0,b.jsxs)("header",{className:`jsx-${o.__hash} result-header result-shell`,children:[(0,b.jsx)("div",{className:`jsx-${o.__hash} result-brand`,children:"между нами"}),(0,b.jsxs)("div",{className:`jsx-${o.__hash} result-names`,children:[(0,b.jsx)("span",{className:`jsx-${o.__hash}`,children:E}),(0,b.jsx)("b",{className:`jsx-${o.__hash}`,children:"×"}),(0,b.jsx)("span",{className:`jsx-${o.__hash}`,children:F})]})]}),(0,b.jsxs)("section",{className:`jsx-${o.__hash} result-intro result-shell`,children:[(0,b.jsx)("div",{className:`jsx-${o.__hash} result-kicker`,children:"ВАШ РЕЗУЛЬТАТ"}),(0,b.jsxs)("div",{className:`jsx-${o.__hash} result-intro-grid`,children:[(0,b.jsxs)("h1",{className:`jsx-${o.__hash}`,children:["Вот как",(0,b.jsx)("br",{className:`jsx-${o.__hash}`}),"вы совпали."]}),(0,b.jsx)("p",{className:`jsx-${o.__hash}`,children:"пять сторон ваших отношений — без оценок «хорошо» или «плохо»"})]})]}),(0,b.jsx)("section",{className:`jsx-${o.__hash} result-dimensions result-shell`,children:G.map(a=>(0,b.jsx)(h,{item:a},a.kind))}),(0,b.jsxs)("section",{className:`jsx-${o.__hash} result-type result-shell`,children:[(0,b.jsxs)("div",{className:`jsx-${o.__hash} result-type-heading`,children:[(0,b.jsxs)("div",{className:`jsx-${o.__hash}`,children:[(0,b.jsx)("span",{className:`jsx-${o.__hash} result-kicker`,children:"ВАШ ТИП ПАРЫ"}),(0,b.jsx)("h2",{className:`jsx-${o.__hash}`,children:(a=z.id,i=z.title,({knight_princess:"Рыцарь × Принцесса",wizards:"Волшебник × Волшебник",pirates:"Пират × Пират",astronauts:"Космонавт × Космонавт",sun_moon:"Солнце × Луна",dragon_keeper:"Дракон × Хранитель",players:"Игрок × Игрок",homekeepers:"Дом × Дом"})[a]??i)})]}),(0,b.jsxs)("span",{className:`jsx-${o.__hash} result-type-number`,children:["№",n(z.id)]})]}),(0,b.jsxs)("div",{className:`jsx-${o.__hash} result-poster`,children:[(0,b.jsx)(k,{archetypeId:z.id}),(0,b.jsxs)("div",{className:`jsx-${o.__hash} result-poster-footer`,children:[(0,b.jsxs)("span",{className:`jsx-${o.__hash}`,children:["ПАРА №",n(z.id)]}),(0,b.jsx)("p",{className:`jsx-${o.__hash}`,children:{knight_princess:"Заботитесь по-разному, но своих не бросаете.",wizards:"Замечаете больше, чем успеваете сказать вслух.",pirates:"Маршрут меняется. Команда остаётся.",astronauts:"Две орбиты. Один маршрут.",sun_moon:"Чувствуете по-разному — дополняете друг друга.",dragon_keeper:"Один добавляет огня. Другой держит курс.",players:"Разный стиль игры. Одна команда.",homekeepers:"Своё место. Свой человек."}[z.id]??"Два человека. Одна история."})]})]})]}),(0,b.jsx)("section",{className:`jsx-${o.__hash} result-paywall`,children:(0,b.jsxs)("div",{className:`jsx-${o.__hash} result-shell`,children:[(0,b.jsxs)("div",{className:`jsx-${o.__hash} result-paywall-label`,children:[(0,b.jsx)("span",{className:`jsx-${o.__hash}`,children:"ЭТО ТОЛЬКО ПОВЕРХНОСТЬ"}),(0,b.jsx)("b",{className:`jsx-${o.__hash}`,children:"✦"})]}),(0,b.jsxs)("div",{className:`jsx-${o.__hash} result-paywall-grid`,children:[(0,b.jsxs)("div",{className:`jsx-${o.__hash} result-paywall-title`,children:[(0,b.jsxs)("h2",{className:`jsx-${o.__hash}`,children:["А где вы",(0,b.jsx)("br",{className:`jsx-${o.__hash}`}),"можете стать",(0,b.jsx)("br",{className:`jsx-${o.__hash}`}),"ближе?"]}),(0,b.jsx)("p",{className:`jsx-${o.__hash}`,children:"Мы сравнили ваши ответы глубже и нашли то, чего не видно в процентах."})]}),(0,b.jsxs)("div",{className:`jsx-${o.__hash} result-teaser`,children:[(0,b.jsxs)("div",{className:`jsx-${o.__hash} result-found`,children:[(0,b.jsx)("span",{className:`jsx-${o.__hash}`,children:"МЫ НАШЛИ"}),(0,b.jsx)("strong",{className:`jsx-${o.__hash}`,children:(j=C,l=D,j>0?j:l>0?l:3)}),(0,b.jsx)("p",{className:`jsx-${o.__hash}`,children:(p=C,q=D,p>0?1===p?"место, где ваши ответы особенно расходятся":"места, где ваши ответы особенно расходятся":q>0?"неочевидных различия в ваших ответах":"важные детали, которых не видно на поверхности")})]}),(0,b.jsx)(m,{children:"Что партнёр может ждать от вас, но не говорить"}),(0,b.jsx)(m,{children:"Где вы по-разному понимаете заботу"}),(0,b.jsx)(m,{children:"Из-за чего один может чувствовать себя непонятым"}),(0,b.jsx)(m,{children:"Что у вашей пары уже работает особенно хорошо"}),(0,b.jsxs)("button",{type:"button",onClick:()=>s.push(`/report/${t}`),className:`jsx-${o.__hash} result-buy`,children:[(0,b.jsx)("span",{className:`jsx-${o.__hash}`,children:"открыть наш разбор"}),(0,b.jsx)("strong",{className:`jsx-${o.__hash}`,children:"299 ₽"}),(0,b.jsx)("b",{className:`jsx-${o.__hash}`,children:"→"})]}),(0,b.jsx)("div",{className:`jsx-${o.__hash} result-footnote`,children:"один разбор · для вас двоих"})]})]})]})})]}),(0,b.jsx)(g,{}),(0,b.jsx)(c.default,{id:o.__hash,children:o})]})}],66248)}];
+`;a.s(["default",0,function(){var a,i,j,l,q,r;let s=(0,e.useParams)(),t=(0,e.useRouter)(),u=s.coupleId,[v,w]=(0,d.useState)(null),[x,y]=(0,d.useState)("");if((0,d.useEffect)(()=>{!async function(){try{let a=await fetch(`/api/report?id=${encodeURIComponent(u)}`,{cache:"no-store"});if(!a.ok)throw Error("Не удалось загрузить результат");let b=await a.json();if(b.waiting)return void t.replace(`/waiting/${u}`);w(b)}catch(a){console.error(a),y("Не получилось загрузить результат.")}}()},[u,t]),x)return(0,b.jsxs)(b.Fragment,{children:[(0,b.jsxs)("main",{className:`jsx-${p.__hash} result-state`,children:[(0,b.jsx)("div",{className:`jsx-${p.__hash} state-brand`,children:"между нами."}),(0,b.jsx)("h1",{className:`jsx-${p.__hash}`,children:"что-то пошло не так"}),(0,b.jsx)("p",{className:`jsx-${p.__hash}`,children:x})]}),(0,b.jsx)(g,{}),(0,b.jsx)(c.default,{id:p.__hash,children:p})]});if(!v)return(0,b.jsxs)(b.Fragment,{children:[(0,b.jsxs)("main",{className:`jsx-${p.__hash} result-state`,children:[(0,b.jsxs)("div",{className:`jsx-${p.__hash} state-mark`,children:[(0,b.jsx)("span",{className:`jsx-${p.__hash}`}),(0,b.jsx)("span",{className:`jsx-${p.__hash}`})]}),(0,b.jsx)("div",{className:`jsx-${p.__hash} state-brand`,children:"между нами."}),(0,b.jsx)("p",{className:`jsx-${p.__hash}`,children:"собираем результат"})]}),(0,b.jsx)(g,{}),(0,b.jsx)(c.default,{id:p.__hash,children:p})]});let z=v.comparisons??[],A=function(a){let b=new Map;for(let a of f)b.set(a.id,0);for(let c of a){let a="same"===c.similarity?2:"close"===c.similarity?1.35:.65,d=[...c.traitsA,...c.traitsB];for(let c of f)for(let e of d)c.traits.includes(e)&&b.set(c.id,(b.get(c.id)??0)+a)}let c=a.filter(a=>"different"===a.similarity).length,d=a.filter(a=>"same"===a.similarity).length;a.length>0&&c>d&&b.set("sun_moon",(b.get("sun_moon")??0)+4);let e=f[0],g=b.get(e.id)??0;for(let a of f){let c=b.get(a.id)??0;c>g&&(e=a,g=c)}return{id:e.id,title:e.title,emojiA:e.emojiA,emojiB:e.emojiB,description:e.description}}(z),B=v.scores?.overall??function(a){if(!a.length)return 0;let b=0;for(let c of a)"same"===c.similarity&&(b+=1),"close"===c.similarity&&(b+=.5);return Math.round(b/a.length*100)}(z),C=v.scores?.dimensions,D=v.scores?.differentAnswers??z.filter(a=>"different"===a.similarity).length,E=v.scores?.closeAnswers??z.filter(a=>"close"===a.similarity).length,F=v.scores?.sameAnswers??z.filter(a=>"same"===a.similarity).length,G=v.couple.partner_a_name,H=v.couple.partner_b_name,I=[{kind:"views",title:"Взгляды",subtitle:"Как вы представляете отношения",value:C?.views??B},{kind:"care",title:"Забота",subtitle:"Что для каждого значит «я рядом»",value:C?.care??B},{kind:"communication",title:"Общение",subtitle:"Что происходит, когда надо поговорить",value:C?.communication??B},{kind:"rhythm",title:"Время вместе",subtitle:"Как выглядит хороший день вдвоём",value:C?.rhythm??B},{kind:"space",title:"Свобода",subtitle:"Сколько своего пространства нужно каждому",value:C?.space??B}],J=(a=D,i=E,a>0?a:i>0?i:3);return(0,b.jsxs)(b.Fragment,{children:[(0,b.jsxs)("main",{className:`jsx-${p.__hash} result-page`,children:[(0,b.jsxs)("header",{className:`jsx-${p.__hash} result-header result-shell`,children:[(0,b.jsx)("div",{className:`jsx-${p.__hash} result-brand`,children:"между нами."}),(0,b.jsxs)("div",{className:`jsx-${p.__hash} result-names`,children:[G,(0,b.jsx)("b",{className:`jsx-${p.__hash}`,children:"×"}),H]})]}),(0,b.jsxs)("section",{className:`jsx-${p.__hash} result-hero result-shell`,children:[(0,b.jsx)("div",{className:`jsx-${p.__hash} result-index`,children:"РЕЗУЛЬТАТ / 01"}),(0,b.jsxs)("div",{className:`jsx-${p.__hash} result-hero-grid`,children:[(0,b.jsxs)("h1",{className:`jsx-${p.__hash}`,children:["ВОТ КАК",(0,b.jsx)("br",{className:`jsx-${p.__hash}`}),"ВЫ СОВПАЛИ"]}),(0,b.jsxs)("div",{className:`jsx-${p.__hash} result-score`,children:[(0,b.jsx)("span",{className:`jsx-${p.__hash}`,children:"ОБЩАЯ"}),(0,b.jsxs)("strong",{className:`jsx-${p.__hash}`,children:[B,(0,b.jsx)("sup",{className:`jsx-${p.__hash}`,children:"%"})]}),(0,b.jsxs)("p",{className:`jsx-${p.__hash}`,children:["не оценка отношений.",(0,b.jsx)("br",{className:`jsx-${p.__hash}`}),"просто насколько похожи",(0,b.jsx)("br",{className:`jsx-${p.__hash}`}),"ваши ответы."]})]})]}),(0,b.jsxs)("div",{className:`jsx-${p.__hash} result-quick`,children:[(0,b.jsxs)("div",{className:`jsx-${p.__hash}`,children:[(0,b.jsx)("strong",{className:`jsx-${p.__hash}`,children:F}),(0,b.jsx)("span",{className:`jsx-${p.__hash}`,children:"ответов совпали"})]}),(0,b.jsxs)("div",{className:`jsx-${p.__hash}`,children:[(0,b.jsx)("strong",{className:`jsx-${p.__hash}`,children:E}),(0,b.jsx)("span",{className:`jsx-${p.__hash}`,children:"оказались близкими"})]}),(0,b.jsxs)("div",{className:`jsx-${p.__hash}`,children:[(0,b.jsx)("strong",{className:`jsx-${p.__hash}`,children:D}),(0,b.jsx)("span",{className:`jsx-${p.__hash}`,children:"заметно разошлись"})]})]})]}),(0,b.jsxs)("section",{className:`jsx-${p.__hash} result-breakdown result-shell`,children:[(0,b.jsxs)("div",{className:`jsx-${p.__hash} section-head`,children:[(0,b.jsx)("span",{className:`jsx-${p.__hash}`,children:"РАЗБИРАЕМ ПО ЧАСТЯМ"}),(0,b.jsx)("b",{className:`jsx-${p.__hash}`,children:"02"})]}),(0,b.jsx)("div",{className:`jsx-${p.__hash} dimension-list`,children:I.map((a,c)=>(0,b.jsx)(h,{item:a,index:c+1},a.kind))})]}),(0,b.jsxs)("section",{className:`jsx-${p.__hash} result-type result-shell`,children:[(0,b.jsxs)("div",{className:`jsx-${p.__hash} section-head`,children:[(0,b.jsx)("span",{className:`jsx-${p.__hash}`,children:"ТИП ВАШЕЙ ПАРЫ"}),(0,b.jsx)("b",{className:`jsx-${p.__hash}`,children:"03"})]}),(0,b.jsxs)("div",{className:`jsx-${p.__hash} type-title-row`,children:[(0,b.jsxs)("div",{className:`jsx-${p.__hash}`,children:[(0,b.jsxs)("span",{className:`jsx-${p.__hash}`,children:["ПАРА №",n(A.id)]}),(0,b.jsx)("h2",{className:`jsx-${p.__hash}`,children:(j=A.id,l=A.title,({knight_princess:"Рыцарь × Принцесса",wizards:"Два волшебника",pirates:"Два пирата",astronauts:"Два космонавта",sun_moon:"Солнце × Луна",dragon_keeper:"Дракон × Хранитель",players:"Два игрока",homekeepers:"Хранители дома"})[j]??l)})]}),(0,b.jsx)("p",{className:`jsx-${p.__hash}`,children:{knight_princess:"По-разному показываете чувства. Одинаково держитесь за своих.",wizards:"Многое понимаете без длинных объяснений.",pirates:"Планы могут меняться. Команда — нет.",astronauts:"Каждый на своей орбите, но летите в одну сторону.",sun_moon:"По-разному реагируете на мир — и в этом ваша механика.",dragon_keeper:"Один добавляет огня. Второй не даёт всему сгореть.",players:"Разные стратегии. Одна команда.",homekeepers:"Вам важно своё место и свой человек."}[A.id]??"Два человека. Одна история."})]}),(0,b.jsxs)("div",{className:`jsx-${p.__hash} type-poster`,children:[(0,b.jsx)(k,{archetypeId:A.id}),(0,b.jsxs)("div",{className:`jsx-${p.__hash} poster-strip`,children:[(0,b.jsxs)("span",{className:`jsx-${p.__hash}`,children:["МЕЖДУ НАМИ / TYPE ",n(A.id)]}),(0,b.jsx)("strong",{className:`jsx-${p.__hash}`,children:o(A.id)})]})]})]}),(0,b.jsx)("section",{className:`jsx-${p.__hash} result-paywall`,children:(0,b.jsxs)("div",{className:`jsx-${p.__hash} result-shell`,children:[(0,b.jsxs)("div",{className:`jsx-${p.__hash} paywall-top`,children:[(0,b.jsx)("span",{className:`jsx-${p.__hash}`,children:"ДАЛЬШЕ — ИНТЕРЕСНЕЕ"}),(0,b.jsx)("b",{className:`jsx-${p.__hash}`,children:"04"})]}),(0,b.jsxs)("div",{className:`jsx-${p.__hash} paywall-grid`,children:[(0,b.jsxs)("div",{className:`jsx-${p.__hash} paywall-left`,children:[(0,b.jsxs)("div",{className:`jsx-${p.__hash} paywall-sticker`,children:["НАЙДЕНО",(0,b.jsx)("strong",{className:`jsx-${p.__hash}`,children:J})]}),(0,b.jsxs)("h2",{className:`jsx-${p.__hash}`,children:["В ПРОЦЕНТАХ",(0,b.jsx)("br",{className:`jsx-${p.__hash}`}),"НЕ ВСЁ."]}),(0,b.jsx)("p",{className:`jsx-${p.__hash}`,children:"В ваших ответах есть вещи, которые легко пропустить — но именно они часто решают, насколько вы понимаете друг друга."})]}),(0,b.jsxs)("div",{className:`jsx-${p.__hash} paywall-right`,children:[(0,b.jsxs)("div",{className:`jsx-${p.__hash} paywall-hook`,children:[(0,b.jsx)("span",{className:`jsx-${p.__hash}`,children:"В ВАШИХ ОТВЕТАХ"}),(0,b.jsx)("strong",{className:`jsx-${p.__hash}`,children:(q=D,r=E,q>=4?`${q} мест, где вы можете понимать друг друга совсем по-разному`:q>0?`${q} места, где ваши ожидания заметно расходятся`:r>0?`${r} ответов, которые выглядят похожими — но означают не одно и то же`:"несколько вещей, которые не видно по одному проценту")})]}),(0,b.jsx)(m,{number:"01",children:"Что один из вас ждёт от другого, но может не говорить прямо"}),(0,b.jsx)(m,{number:"02",children:"Где заботу одного второй может просто не замечать"}),(0,b.jsx)(m,{number:"03",children:"Из-за чего вы можете спорить вообще о разных вещах"}),(0,b.jsx)(m,{number:"04",children:"Что уже делает вашу пару сильнее — и как это использовать"}),(0,b.jsxs)("button",{type:"button",onClick:()=>t.push(`/report/${u}`),className:`jsx-${p.__hash} result-buy`,children:[(0,b.jsx)("span",{className:`jsx-${p.__hash}`,children:"ПОКАЗАТЬ, ЧТО МЕЖДУ ВАМИ"}),(0,b.jsx)("strong",{className:`jsx-${p.__hash}`,children:"299 ₽"}),(0,b.jsx)("b",{className:`jsx-${p.__hash}`,children:"→"})]}),(0,b.jsx)("div",{className:`jsx-${p.__hash} buy-note`,children:"один разбор · открывается для вас двоих"})]})]})]})})]}),(0,b.jsx)(g,{}),(0,b.jsx)(c.default,{id:p.__hash,children:p})]})}],66248)}];
 
 //# sourceMappingURL=app_result_%5BcoupleId%5D_page_tsx_1boadhs._.js.map

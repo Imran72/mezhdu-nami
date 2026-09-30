@@ -29,7 +29,6 @@ type ResultData = {
     waiting?: boolean;
     couple: Couple;
     comparisons?: Comparison[];
-
     scores?: {
         overall?: number;
         sameAnswers?: number;
@@ -48,8 +47,8 @@ type DimensionKind =
 
 type DimensionItem = {
     kind: DimensionKind;
-    eyebrow: string;
     title: string;
+    subtitle: string;
     value: number;
 };
 
@@ -67,9 +66,7 @@ export default function ResultPage() {
             try {
                 const response = await fetch(
                     `/api/report?id=${encodeURIComponent(coupleId)}`,
-                    {
-                        cache: 'no-store',
-                    }
+                    { cache: 'no-store' }
                 );
 
                 if (!response.ok) {
@@ -97,16 +94,8 @@ export default function ResultPage() {
         return (
             <>
                 <main className="result-state">
-                    <div className="result-state-brand">
-                        между нами
-                    </div>
-
-                    <h1>
-                        что-то пошло
-                        <br />
-                        не так
-                    </h1>
-
+                    <div className="state-brand">между нами.</div>
+                    <h1>что-то пошло не так</h1>
                     <p>{error}</p>
                 </main>
 
@@ -120,17 +109,13 @@ export default function ResultPage() {
         return (
             <>
                 <main className="result-state">
-                    <div className="result-loader">
+                    <div className="state-mark">
                         <span />
-                        <i>♥</i>
                         <span />
                     </div>
 
-                    <div className="result-state-brand">
-                        между нами
-                    </div>
-
-                    <p>собираем вас двоих</p>
+                    <div className="state-brand">между нами.</div>
+                    <p>собираем результат</p>
                 </main>
 
                 <GlobalStyles />
@@ -160,41 +145,52 @@ export default function ResultPage() {
             (item) => item.similarity === 'close'
         ).length;
 
+    const sameCount =
+        data.scores?.sameAnswers ??
+        comparisons.filter(
+            (item) => item.similarity === 'same'
+        ).length;
+
     const nameA = data.couple.partner_a_name;
     const nameB = data.couple.partner_b_name;
 
     const dimensionItems: DimensionItem[] = [
         {
             kind: 'views',
-            eyebrow: 'ВЗГЛЯДЫ',
-            title: 'Как вы смотрите на отношения',
+            title: 'Взгляды',
+            subtitle: 'Как вы представляете отношения',
             value: dimensions?.views ?? overall,
         },
         {
             kind: 'care',
-            eyebrow: 'ЗАБОТА',
-            title: 'Как вы проявляете заботу',
+            title: 'Забота',
+            subtitle: 'Что для каждого значит «я рядом»',
             value: dimensions?.care ?? overall,
         },
         {
             kind: 'communication',
-            eyebrow: 'ОБЩЕНИЕ',
-            title: 'Как вы говорите о важном',
+            title: 'Общение',
+            subtitle: 'Что происходит, когда надо поговорить',
             value: dimensions?.communication ?? overall,
         },
         {
             kind: 'rhythm',
-            eyebrow: 'ВРЕМЯ ВМЕСТЕ',
-            title: 'Как вам нравится быть вместе',
+            title: 'Время вместе',
+            subtitle: 'Как выглядит хороший день вдвоём',
             value: dimensions?.rhythm ?? overall,
         },
         {
             kind: 'space',
-            eyebrow: 'СВОБОДА',
-            title: 'Сколько пространства нужно каждому',
+            title: 'Свобода',
+            subtitle: 'Сколько своего пространства нужно каждому',
             value: dimensions?.space ?? overall,
         },
     ];
+
+    const findingCount = getFindingCount(
+        differentCount,
+        closeCount
+    );
 
     return (
         <>
@@ -204,56 +200,100 @@ export default function ResultPage() {
 
                 <header className="result-header result-shell">
                     <div className="result-brand">
-                        между нами
+                        между нами.
                     </div>
 
                     <div className="result-names">
-                        <span>{nameA}</span>
+                        {nameA}
                         <b>×</b>
-                        <span>{nameB}</span>
+                        {nameB}
                     </div>
                 </header>
 
-                {/* INTRO */}
+                {/* HERO */}
 
-                <section className="result-intro result-shell">
-                    <div className="result-kicker">
-                        ВАШ РЕЗУЛЬТАТ
+                <section className="result-hero result-shell">
+                    <div className="result-index">
+                        РЕЗУЛЬТАТ / 01
                     </div>
 
-                    <div className="result-intro-grid">
+                    <div className="result-hero-grid">
                         <h1>
-                            Вот как
+                            ВОТ КАК
                             <br />
-                            вы совпали.
+                            ВЫ СОВПАЛИ
                         </h1>
 
-                        <p>
-                            пять сторон ваших отношений —
-                            без оценок «хорошо» или «плохо»
-                        </p>
+                        <div className="result-score">
+                            <span>ОБЩАЯ</span>
+
+                            <strong>
+                                {overall}
+                                <sup>%</sup>
+                            </strong>
+
+                            <p>
+                                не оценка отношений.
+                                <br />
+                                просто насколько похожи
+                                <br />
+                                ваши ответы.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="result-quick">
+                        <div>
+                            <strong>{sameCount}</strong>
+                            <span>ответов совпали</span>
+                        </div>
+
+                        <div>
+                            <strong>{closeCount}</strong>
+                            <span>оказались близкими</span>
+                        </div>
+
+                        <div>
+                            <strong>{differentCount}</strong>
+                            <span>заметно разошлись</span>
+                        </div>
                     </div>
                 </section>
 
                 {/* DIMENSIONS */}
 
-                <section className="result-dimensions result-shell">
-                    {dimensionItems.map((item) => (
-                        <DimensionCard
-                            key={item.kind}
-                            item={item}
-                        />
-                    ))}
+                <section className="result-breakdown result-shell">
+
+                    <div className="section-head">
+                        <span>РАЗБИРАЕМ ПО ЧАСТЯМ</span>
+                        <b>02</b>
+                    </div>
+
+                    <div className="dimension-list">
+                        {dimensionItems.map((item, index) => (
+                            <DimensionRow
+                                key={item.kind}
+                                item={item}
+                                index={index + 1}
+                            />
+                        ))}
+                    </div>
+
                 </section>
 
                 {/* TYPE */}
 
                 <section className="result-type result-shell">
-                    <div className="result-type-heading">
 
+                    <div className="section-head">
+                        <span>ТИП ВАШЕЙ ПАРЫ</span>
+                        <b>03</b>
+                    </div>
+
+                    <div className="type-title-row">
                         <div>
-              <span className="result-kicker">
-                ВАШ ТИП ПАРЫ
+              <span>
+                ПАРА №{getTypeNumber(archetype.id)}
               </span>
 
                             <h2>
@@ -264,113 +304,103 @@ export default function ResultPage() {
                             </h2>
                         </div>
 
-                        <span className="result-type-number">
-              №{getTypeNumber(archetype.id)}
-            </span>
-
+                        <p>
+                            {getArchetypeShortCopy(archetype.id)}
+                        </p>
                     </div>
 
-                    <div className="result-poster">
+                    <div className="type-poster">
+                        <CoupleArtwork archetypeId={archetype.id} />
 
-                        <CoupleArtwork
-                            archetypeId={archetype.id}
-                        />
-
-                        <div className="result-poster-footer">
-
+                        <div className="poster-strip">
               <span>
-                ПАРА №{getTypeNumber(archetype.id)}
+                МЕЖДУ НАМИ / TYPE {getTypeNumber(archetype.id)}
               </span>
 
-                            <p>
-                                {getArchetypeShortCopy(archetype.id)}
-                            </p>
-
+                            <strong>
+                                {getArtTag(archetype.id)}
+                            </strong>
                         </div>
-
                     </div>
+
                 </section>
 
                 {/* PAYWALL */}
 
                 <section className="result-paywall">
-
                     <div className="result-shell">
 
-                        <div className="result-paywall-label">
-              <span>
-                ЭТО ТОЛЬКО ПОВЕРХНОСТЬ
-              </span>
-
-                            <b>✦</b>
+                        <div className="paywall-top">
+                            <span>ДАЛЬШЕ — ИНТЕРЕСНЕЕ</span>
+                            <b>04</b>
                         </div>
 
-                        <div className="result-paywall-grid">
+                        <div className="paywall-grid">
 
-                            <div className="result-paywall-title">
+                            <div className="paywall-left">
+                                <div className="paywall-sticker">
+                                    НАЙДЕНО
+                                    <strong>{findingCount}</strong>
+                                </div>
+
                                 <h2>
-                                    А где вы
+                                    В ПРОЦЕНТАХ
                                     <br />
-                                    можете стать
-                                    <br />
-                                    ближе?
+                                    НЕ ВСЁ.
                                 </h2>
 
                                 <p>
-                                    Мы сравнили ваши ответы глубже
-                                    и нашли то, чего не видно
-                                    в процентах.
+                                    В ваших ответах есть вещи,
+                                    которые легко пропустить —
+                                    но именно они часто решают,
+                                    насколько вы понимаете друг друга.
                                 </p>
                             </div>
 
-                            <div className="result-teaser">
+                            <div className="paywall-right">
 
-                                <div className="result-found">
-                                    <span>МЫ НАШЛИ</span>
+                                <div className="paywall-hook">
+                  <span>
+                    В ВАШИХ ОТВЕТАХ
+                  </span>
 
                                     <strong>
-                                        {getFindingCount(
+                                        {getPaywallHook(
                                             differentCount,
                                             closeCount
                                         )}
                                     </strong>
-
-                                    <p>
-                                        {getFindingText(
-                                            differentCount,
-                                            closeCount
-                                        )}
-                                    </p>
                                 </div>
 
-                                <LockedFinding>
-                                    Что партнёр может ждать от вас,
-                                    но не говорить
+                                <LockedFinding number="01">
+                                    Что один из вас ждёт от другого,
+                                    но может не говорить прямо
                                 </LockedFinding>
 
-                                <LockedFinding>
-                                    Где вы по-разному понимаете заботу
+                                <LockedFinding number="02">
+                                    Где заботу одного второй
+                                    может просто не замечать
                                 </LockedFinding>
 
-                                <LockedFinding>
-                                    Из-за чего один может чувствовать
-                                    себя непонятым
+                                <LockedFinding number="03">
+                                    Из-за чего вы можете спорить
+                                    вообще о разных вещах
                                 </LockedFinding>
 
-                                <LockedFinding>
-                                    Что у вашей пары уже работает
-                                    особенно хорошо
+                                <LockedFinding number="04">
+                                    Что уже делает вашу пару
+                                    сильнее — и как это использовать
                                 </LockedFinding>
 
                                 <button
-                                    className="result-buy"
                                     type="button"
+                                    className="result-buy"
                                     onClick={() =>
                                         router.push(`/report/${coupleId}`)
                                     }
                                 >
                   <span>
-                    открыть наш разбор
+                    ПОКАЗАТЬ, ЧТО МЕЖДУ ВАМИ
                   </span>
 
                                     <strong>
@@ -380,8 +410,8 @@ export default function ResultPage() {
                                     <b>→</b>
                                 </button>
 
-                                <div className="result-footnote">
-                                    один разбор · для вас двоих
+                                <div className="buy-note">
+                                    один разбор · открывается для вас двоих
                                 </div>
 
                             </div>
@@ -389,13 +419,11 @@ export default function ResultPage() {
                         </div>
 
                     </div>
-
                 </section>
 
             </main>
 
             <GlobalStyles />
-
             <style jsx>{styles}</style>
         </>
     );
@@ -412,20 +440,25 @@ function GlobalStyles() {
       body {
         margin: 0 !important;
         padding: 0 !important;
-        background: #f4efe9 !important;
+        background: #f2eee8 !important;
       }
 
       body {
-        color: #292329;
+        color: #211f20;
         font-family:
-          "Trebuchet MS",
-          "Helvetica Neue",
           Arial,
+          Helvetica,
+          "Helvetica Neue",
           sans-serif;
       }
 
       * {
         box-sizing: border-box;
+      }
+
+      button,
+      input {
+        font: inherit;
       }
     `}</style>
     );
@@ -435,47 +468,44 @@ function GlobalStyles() {
    DIMENSION
 ============================================================ */
 
-function DimensionCard({
-                           item,
-                       }: {
+function DimensionRow({
+                          item,
+                          index,
+                      }: {
     item: DimensionItem;
+    index: number;
 }) {
     return (
-        <article className="result-dimension">
+        <article className="dimension-row">
 
-            <div className="result-dimension-icon">
-                <DimensionIcon kind={item.kind} />
-            </div>
+      <span className="dimension-number">
+        {String(index).padStart(2, '0')}
+      </span>
 
-            <div className="result-dimension-body">
+            <DimensionMark kind={item.kind} />
 
-                <div className="result-dimension-top">
+            <div className="dimension-content">
 
+                <div className="dimension-main">
                     <div>
-            <span className="result-dimension-label">
-              {item.eyebrow}
-            </span>
-
-                        <h3>
-                            {item.title}
-                        </h3>
+                        <h3>{item.title}</h3>
+                        <p>{item.subtitle}</p>
                     </div>
 
-                    <strong>
+                    <strong className="dimension-value">
                         {item.value}
                         <sup>%</sup>
                     </strong>
-
                 </div>
 
                 <SegmentBar value={item.value} />
 
-                <p>
+                <div className="dimension-comment">
                     {getDimensionCopy(
                         item.kind,
                         item.value
                     )}
-                </p>
+                </div>
 
             </div>
 
@@ -491,7 +521,7 @@ function SegmentBar({
     const active = Math.round(value / 10);
 
     return (
-        <div className="result-segments">
+        <div className="segments">
             {Array.from({ length: 10 }).map(
                 (_, index) => (
                     <span
@@ -508,93 +538,55 @@ function SegmentBar({
     );
 }
 
-/* ============================================================
-   ICONS
-============================================================ */
-
-function DimensionIcon({
+function DimensionMark({
                            kind,
                        }: {
     kind: DimensionKind;
 }) {
     if (kind === 'views') {
         return (
-            <div className="result-mini-art result-views-art">
-        <span className="result-eye">
-          <i />
-        </span>
-
-                <span className="result-eye result-eye-second">
-          <i />
-        </span>
+            <div className="dimension-mark mark-views">
+                <span />
+                <span />
             </div>
         );
     }
 
     if (kind === 'care') {
         return (
-            <div className="result-mini-art result-care-art">
-                <span className="result-hand result-hand-left" />
-                <i>♥</i>
-                <span className="result-hand result-hand-right" />
+            <div className="dimension-mark mark-care">
+                <b>+</b>
             </div>
         );
     }
 
     if (kind === 'communication') {
         return (
-            <div className="result-mini-art result-talk-art">
+            <div className="dimension-mark mark-talk">
                 <span />
                 <span />
-                <i>··</i>
             </div>
         );
     }
 
     if (kind === 'rhythm') {
         return (
-            <div className="result-mini-art result-rhythm-art">
-                <svg
-                    viewBox="0 0 90 60"
-                    aria-hidden="true"
-                >
-                    <path
-                        d="M5 35 C16 5 27 5 38 35 C49 65 60 65 71 35 C78 16 83 13 87 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="5"
-                        strokeLinecap="round"
-                    />
-
-                    <circle
-                        cx="5"
-                        cy="35"
-                        r="4"
-                        fill="#B43D69"
-                    />
-
-                    <circle
-                        cx="87"
-                        cy="24"
-                        r="4"
-                        fill="#E4AE49"
-                    />
-                </svg>
+            <div className="dimension-mark mark-rhythm">
+                <span>~</span>
             </div>
         );
     }
 
     return (
-        <div className="result-mini-art result-space-art">
-            <span className="result-planet result-planet-one" />
-            <span className="result-planet result-planet-two" />
-            <i />
+        <div className="dimension-mark mark-space">
+            <span />
+            <span />
         </div>
     );
 }
 
 /* ============================================================
-   ARTWORK
+   ART
 ============================================================ */
 
 function CoupleArtwork({
@@ -603,114 +595,98 @@ function CoupleArtwork({
     archetypeId: string;
 }) {
     return (
-        <div className="result-art">
+        <div className="art">
 
-            <i className="result-spark result-spark-one">
-                ✦
-            </i>
-
-            <i className="result-spark result-spark-two">
-                ✦
-            </i>
-
-            <i className="result-spark result-spark-three">
-                +
-            </i>
-
-            <span className="result-orbit result-orbit-one" />
-            <span className="result-orbit result-orbit-two" />
-
-            <div className="result-big-planet">
-                <i />
-                <i />
-                <i />
-            </div>
-
-            <div className="result-ground">
-                <i />
-                <i />
-                <i />
-            </div>
-
-            <Character side="left" />
-            <Character side="right" />
-
-            <div className="result-heart">
-                ♥
-            </div>
-
-            <div className="result-art-tag">
+            <div className="art-label">
                 {getArtTag(archetypeId)}
             </div>
+
+            <span className="star star-a">✦</span>
+            <span className="star star-b">+</span>
+            <span className="star star-c">✦</span>
+
+            <div className="orbit orbit-a" />
+            <div className="orbit orbit-b" />
+
+            <div className="planet">
+                <span />
+                <span />
+                <span />
+            </div>
+
+            <div className="ground">
+                <span />
+                <span />
+                <span />
+            </div>
+
+            <Astronaut side="left" />
+            <Astronaut side="right" />
+
+            <div className="art-heart">♥</div>
 
         </div>
     );
 }
 
-function Character({
+function Astronaut({
                        side,
                    }: {
     side: 'left' | 'right';
 }) {
     return (
-        <div className={`result-character ${side}`}>
+        <div className={`astronaut ${side}`}>
 
-            <div className="result-backpack" />
+            <div className="backpack" />
 
-            <div className="result-helmet">
-                <div className="result-visor">
+            <div className="helmet">
+                <div className="visor">
                     <i />
                     <i />
                     <span />
                 </div>
             </div>
 
-            <div className="result-body">
-                <div className="result-panel">
+            <div className="body">
+                <div className="panel">
                     <i />
                     <i />
                 </div>
             </div>
 
-            <div className="result-arm result-arm-outside" />
-            <div className="result-arm result-arm-inside" />
+            <div className="arm outside" />
+            <div className="arm inside" />
 
-            <div className="result-leg result-leg-one" />
-            <div className="result-leg result-leg-two" />
+            <div className="leg leg-a" />
+            <div className="leg leg-b" />
 
         </div>
     );
 }
 
 /* ============================================================
-   PAYWALL
+   LOCKED
 ============================================================ */
 
 function LockedFinding({
+                           number,
                            children,
                        }: {
+    number: string;
     children: ReactNode;
 }) {
     return (
-        <div className="result-locked">
+        <div className="locked-row">
 
-            <div className="result-lock">
-                ↗
-            </div>
+      <span className="locked-number">
+        {number}
+      </span>
 
-            <div>
-        <span>
-          НАЙДЕНО В ВАШИХ ОТВЕТАХ
-        </span>
+            <p>{children}</p>
 
-                <p>
-                    {children}
-                </p>
-            </div>
-
-            <b>
-                закрыто
-            </b>
+            <span className="locked-status">
+        ЗАКРЫТО
+      </span>
 
         </div>
     );
@@ -750,61 +726,61 @@ function getDimensionCopy(
 ) {
     if (kind === 'views') {
         if (value >= 70) {
-            return 'Базовые ожидания от отношений у вас часто совпадают.';
+            return 'В главном вы примерно об одном.';
         }
 
         if (value >= 40) {
-            return 'В главном есть пересечения, но некоторые ожидания различаются.';
+            return 'Основа похожа, детали — уже нет.';
         }
 
-        return 'Представление о том, как должны работать отношения, у вас заметно различается.';
+        return 'От отношений вы можете ждать довольно разных вещей.';
     }
 
     if (kind === 'care') {
         if (value >= 70) {
-            return 'Вы хорошо угадываете, что для другого означает «я рядом».';
+            return 'Вы хорошо считываете заботу друг друга.';
         }
 
         if (value >= 40) {
-            return 'Иногда вы ждёте друг от друга разных проявлений заботы.';
+            return 'Заботитесь оба, но показываете это по-разному.';
         }
 
-        return 'То, что один считает заботой, второй может почти не замечать.';
+        return 'Один может стараться, а второй этого не замечать.';
     }
 
     if (kind === 'communication') {
         if (value >= 70) {
-            return 'О важном вам обычно хочется разговаривать похожим способом.';
+            return 'Разговаривать о сложном вам обычно удобно похожим способом.';
         }
 
         if (value >= 40) {
-            return 'Сложные темы вы можете проживать немного по-разному.';
+            return 'В сложном разговоре вам иногда нужны разные вещи.';
         }
 
-        return 'В сложный момент одному может хотеться говорить, а другому — совсем другого.';
+        return 'Когда становится сложно, ваши реакции заметно расходятся.';
     }
 
     if (kind === 'rhythm') {
         if (value >= 70) {
-            return 'Ваше представление о хорошем времени вдвоём часто совпадает.';
+            return 'Ваш хороший день вдвоём выглядит довольно похоже.';
         }
 
         if (value >= 40) {
-            return 'Часть совместных сценариев подходит обоим, но отдыхаете вы не всегда одинаково.';
+            return 'Вместе вам хорошо, но сценарии отдыха совпадают не всегда.';
         }
 
-        return 'Идеальный совместный вечер у каждого может выглядеть по-своему.';
+        return 'То, что для одного отдых, для другого может быть вообще не отдыхом.';
     }
 
     if (value >= 70) {
-        return 'Вы похоже чувствуете границу между «мы» и временем для себя.';
+        return 'Вы похоже чувствуете, когда быть вместе, а когда разойтись по своим делам.';
     }
 
     if (value >= 40) {
-        return 'Одному иногда нужно чуть больше близости или свободы, чем другому.';
+        return 'Иногда одному нужно больше близости, а другому — больше воздуха.';
     }
 
-    return 'Потребность быть рядом и потребность побыть отдельно у вас заметно различаются.';
+    return 'Количество нужного личного пространства у вас заметно различается.';
 }
 
 function getTypeNumber(id: string) {
@@ -828,13 +804,13 @@ function getArchetypeDisplayTitle(
 ) {
     const map: Record<string, string> = {
         knight_princess: 'Рыцарь × Принцесса',
-        wizards: 'Волшебник × Волшебник',
-        pirates: 'Пират × Пират',
-        astronauts: 'Космонавт × Космонавт',
+        wizards: 'Два волшебника',
+        pirates: 'Два пирата',
+        astronauts: 'Два космонавта',
         sun_moon: 'Солнце × Луна',
         dragon_keeper: 'Дракон × Хранитель',
-        players: 'Игрок × Игрок',
-        homekeepers: 'Дом × Дом',
+        players: 'Два игрока',
+        homekeepers: 'Хранители дома',
     };
 
     return map[id] ?? fallback;
@@ -843,28 +819,28 @@ function getArchetypeDisplayTitle(
 function getArchetypeShortCopy(id: string) {
     const map: Record<string, string> = {
         knight_princess:
-            'Заботитесь по-разному, но своих не бросаете.',
+            'По-разному показываете чувства. Одинаково держитесь за своих.',
 
         wizards:
-            'Замечаете больше, чем успеваете сказать вслух.',
+            'Многое понимаете без длинных объяснений.',
 
         pirates:
-            'Маршрут меняется. Команда остаётся.',
+            'Планы могут меняться. Команда — нет.',
 
         astronauts:
-            'Две орбиты. Один маршрут.',
+            'Каждый на своей орбите, но летите в одну сторону.',
 
         sun_moon:
-            'Чувствуете по-разному — дополняете друг друга.',
+            'По-разному реагируете на мир — и в этом ваша механика.',
 
         dragon_keeper:
-            'Один добавляет огня. Другой держит курс.',
+            'Один добавляет огня. Второй не даёт всему сгореть.',
 
         players:
-            'Разный стиль игры. Одна команда.',
+            'Разные стратегии. Одна команда.',
 
         homekeepers:
-            'Своё место. Свой человек.',
+            'Вам важно своё место и свой человек.',
     };
 
     return map[id] ?? 'Два человека. Одна история.';
@@ -872,17 +848,17 @@ function getArchetypeShortCopy(id: string) {
 
 function getArtTag(id: string) {
     const map: Record<string, string> = {
-        knight_princess: 'своих не бросаем',
-        wizards: 'понимаем между строк',
-        pirates: 'одна команда',
-        astronauts: 'две орбиты · один маршрут',
-        sun_moon: 'разные стороны одного неба',
-        dragon_keeper: 'огонь + спокойствие',
-        players: 'играем вместе',
-        homekeepers: 'своё место',
+        knight_princess: 'СВОИХ НЕ БРОСАЕМ',
+        wizards: 'МЕЖДУ СТРОК',
+        pirates: 'ОДНА КОМАНДА',
+        astronauts: 'ДВЕ ОРБИТЫ / ОДИН МАРШРУТ',
+        sun_moon: 'РАЗНЫЕ СТОРОНЫ ОДНОГО НЕБА',
+        dragon_keeper: 'ОГОНЬ + СПОКОЙСТВИЕ',
+        players: 'CO-OP MODE',
+        homekeepers: 'СВОЁ МЕСТО',
     };
 
-    return map[id] ?? 'между вами';
+    return map[id] ?? 'МЕЖДУ ВАМИ';
 }
 
 function getFindingCount(
@@ -900,84 +876,69 @@ function getFindingCount(
     return 3;
 }
 
-function getFindingText(
+function getPaywallHook(
     different: number,
     close: number
 ) {
+    if (different >= 4) {
+        return `${different} мест, где вы можете понимать друг друга совсем по-разному`;
+    }
+
     if (different > 0) {
-        return different === 1
-            ? 'место, где ваши ответы особенно расходятся'
-            : 'места, где ваши ответы особенно расходятся';
+        return `${different} места, где ваши ожидания заметно расходятся`;
     }
 
     if (close > 0) {
-        return 'неочевидных различия в ваших ответах';
+        return `${close} ответов, которые выглядят похожими — но означают не одно и то же`;
     }
 
-    return 'важные детали, которых не видно на поверхности';
+    return 'несколько вещей, которые не видно по одному проценту';
 }
 
 /* ============================================================
-   STYLES
+   CSS
 ============================================================ */
 
 const styles = `
 
 .result-page {
-  display: block !important;
-  width: 100% !important;
-  min-height: 100vh !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: #F4EFE9;
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  background: #F2EEE8;
   overflow: hidden;
 }
 
 .result-shell {
-  display: block;
   width: min(calc(100% - 36px), 760px);
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto;
 }
 
 /* HEADER */
 
 .result-header {
-  position: relative !important;
-  inset: auto !important;
-
-  width: min(calc(100% - 36px), 760px) !important;
-
   height: 58px !important;
   min-height: 58px !important;
   max-height: 58px !important;
 
-  margin: 0 auto !important;
   padding: 0 !important;
+  margin: 0 auto !important;
 
   display: flex !important;
-  flex-direction: row !important;
   align-items: center !important;
   justify-content: space-between !important;
 
-  border-bottom: 1px solid #D8D0CD;
+  border-bottom: 1px solid #BEB8B4;
 
   background: transparent !important;
-
-  transform: none !important;
 }
 
 .result-brand {
-  margin: 0 !important;
-  padding: 0 !important;
-
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 22px;
-  font-style: italic;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 900;
   line-height: 1;
 
-  letter-spacing: -0.055em;
+  letter-spacing: -0.07em;
 }
 
 .result-names {
@@ -985,446 +946,416 @@ const styles = `
   align-items: center;
   gap: 8px;
 
-  margin: 0;
-  padding: 0;
-
-  color: #857A80;
+  color: #686164;
 
   font-size: 8px;
-  font-weight: 900;
-  line-height: 1;
+  font-weight: 800;
 
-  letter-spacing: 0.12em;
+  letter-spacing: 0.13em;
   text-transform: uppercase;
 }
 
 .result-names b {
-  color: #B43D69;
+  color: #B13A63;
 }
 
-/* INTRO */
+/* HERO */
 
-.result-intro {
-  padding: 28px 0 18px;
+.result-hero {
+  padding: 27px 0 25px;
 }
 
-.result-kicker {
-  color: #B43D69;
-
-  font-size: 8px;
+.result-index,
+.section-head {
+  font-size: 7px;
   font-weight: 900;
 
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
+  letter-spacing: 0.18em;
 }
 
-.result-intro-grid {
+.result-index {
+  color: #B13A63;
+}
+
+.result-hero-grid {
   display: grid;
 
-  grid-template-columns: 1fr 180px;
+  grid-template-columns: 1fr 175px;
+
+  gap: 30px;
 
   align-items: end;
 
-  gap: 28px;
-
-  margin-top: 8px;
+  margin-top: 14px;
 }
 
-.result-intro h1 {
+.result-hero h1 {
   margin: 0;
-  padding: 0;
 
-  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(45px, 8vw, 67px);
+  font-weight: 900;
 
-  font-size: clamp(43px, 7vw, 61px);
+  line-height: 0.83;
 
-  font-style: italic;
-  font-weight: 400;
-
-  line-height: 0.89;
-
-  letter-spacing: -0.065em;
+  letter-spacing: -0.075em;
 }
 
-.result-intro p {
-  margin: 0 0 3px;
-  padding: 0;
+.result-score {
+  padding-left: 18px;
 
-  color: #8D8388;
-
-  font-family: Georgia, serif;
-
-  font-size: 10px;
-  font-style: italic;
-
-  line-height: 1.4;
+  border-left: 1px solid #BEB8B4;
 }
 
-/* DIMENSIONS */
-
-.result-dimensions {
-  padding: 0 0 26px;
-}
-
-.result-dimension {
-  display: grid;
-
-  grid-template-columns: 67px 1fr;
-
-  gap: 17px;
-
-  margin: 0;
-  padding: 15px 0;
-
-  border-top: 1px solid #D8D0CD;
-}
-
-.result-dimension:last-child {
-  border-bottom: 1px solid #D8D0CD;
-}
-
-.result-dimension-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.result-dimension-body {
-  min-width: 0;
-}
-
-.result-dimension-top {
-  display: grid;
-
-  grid-template-columns: 1fr auto;
-
-  align-items: end;
-
-  gap: 18px;
-}
-
-.result-dimension-label {
+.result-score > span {
   display: block;
 
   margin-bottom: 3px;
 
-  color: #A4999E;
+  color: #777074;
 
-  font-size: 6px;
+  font-size: 7px;
   font-weight: 900;
 
-  letter-spacing: 0.19em;
+  letter-spacing: 0.18em;
 }
 
-.result-dimension-top h3 {
-  margin: 0;
-  padding: 0;
+.result-score strong {
+  display: block;
 
-  font-family: Georgia, serif;
+  color: #B13A63;
 
-  font-size: 19px;
-  font-style: italic;
-  font-weight: 400;
+  font-size: 59px;
+  font-weight: 900;
+
+  line-height: 0.9;
+
+  letter-spacing: -0.075em;
+}
+
+.result-score sup {
+  font-size: 0.4em;
+}
+
+.result-score p {
+  margin: 7px 0 0;
+
+  color: #7E777A;
+
+  font-size: 8px;
+  font-weight: 600;
+
+  line-height: 1.35;
+}
+
+.result-quick {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  margin-top: 22px;
+
+  border-top: 1px solid #BEB8B4;
+  border-bottom: 1px solid #BEB8B4;
+}
+
+.result-quick > div {
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  min-height: 54px;
+
+  padding: 8px 13px;
+}
+
+.result-quick > div + div {
+  border-left: 1px solid #BEB8B4;
+}
+
+.result-quick strong {
+  color: #B13A63;
+
+  font-size: 25px;
+  font-weight: 900;
+
+  letter-spacing: -0.06em;
+}
+
+.result-quick span {
+  max-width: 80px;
+
+  color: #6E676A;
+
+  font-size: 7px;
+  font-weight: 700;
+
+  line-height: 1.25;
+}
+
+/* SECTION */
+
+.section-head {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  padding-bottom: 8px;
+
+  border-bottom: 2px solid #242123;
+
+  color: #242123;
+}
+
+.section-head b {
+  color: #B13A63;
+
+  font-size: 8px;
+}
+
+/* BREAKDOWN */
+
+.result-breakdown {
+  padding-bottom: 27px;
+}
+
+.dimension-row {
+  display: grid;
+
+  grid-template-columns: 25px 45px 1fr;
+
+  gap: 12px;
+
+  align-items: center;
+
+  padding: 14px 0;
+
+  border-bottom: 1px solid #C8C1BD;
+}
+
+.dimension-number {
+  align-self: start;
+
+  padding-top: 3px;
+
+  color: #AAA2A4;
+
+  font-size: 7px;
+  font-weight: 800;
+}
+
+.dimension-mark {
+  position: relative;
+
+  width: 38px;
+  height: 38px;
+}
+
+.mark-views span {
+  position: absolute;
+
+  top: 11px;
+
+  width: 23px;
+  height: 14px;
+
+  border: 2px solid #252225;
+
+  border-radius: 50%;
+}
+
+.mark-views span:first-child {
+  left: 0;
+}
+
+.mark-views span:last-child {
+  right: 0;
+
+  border-color: #B13A63;
+}
+
+.mark-care {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border: 2px solid #252225;
+
+  border-radius: 50%;
+}
+
+.mark-care b {
+  color: #B13A63;
+
+  font-size: 25px;
+  font-weight: 500;
+}
+
+.mark-talk span {
+  position: absolute;
+
+  width: 26px;
+  height: 18px;
+
+  border: 2px solid #252225;
+}
+
+.mark-talk span:first-child {
+  top: 3px;
+  left: 0;
+}
+
+.mark-talk span:last-child {
+  right: 0;
+  bottom: 3px;
+
+  border-color: #B13A63;
+}
+
+.mark-rhythm {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+}
+
+.mark-rhythm span {
+  font-size: 49px;
+  font-weight: 300;
 
   line-height: 1;
 
-  letter-spacing: -0.025em;
+  transform: rotate(-8deg);
 }
 
-.result-dimension-top strong {
-  color: #B43D69;
+.mark-space span {
+  position: absolute;
 
-  font-family: Georgia, serif;
+  top: 7px;
 
-  font-size: 30px;
-  font-style: italic;
-  font-weight: 400;
+  width: 25px;
+  height: 25px;
 
-  line-height: 0.8;
+  border: 2px solid #252225;
+
+  border-radius: 50%;
 }
 
-.result-dimension-top sup {
-  font-size: 0.48em;
+.mark-space span:first-child {
+  left: 0;
+
+  background: #E2AE45;
 }
 
-.result-segments {
+.mark-space span:last-child {
+  right: 0;
+
+  background: #8E789D;
+}
+
+.dimension-content {
+  min-width: 0;
+}
+
+.dimension-main {
+  display: grid;
+
+  grid-template-columns: 1fr auto;
+
+  gap: 16px;
+
+  align-items: end;
+}
+
+.dimension-main h3 {
+  margin: 0;
+
+  font-size: 17px;
+  font-weight: 900;
+
+  line-height: 1;
+
+  letter-spacing: -0.045em;
+}
+
+.dimension-main p {
+  margin: 3px 0 0;
+
+  color: #777074;
+
+  font-size: 8px;
+  font-weight: 600;
+}
+
+.dimension-value {
+  color: #B13A63;
+
+  font-size: 28px;
+  font-weight: 900;
+
+  line-height: 0.9;
+
+  letter-spacing: -0.06em;
+}
+
+.dimension-value sup {
+  font-size: 0.45em;
+}
+
+.segments {
   display: grid;
 
   grid-template-columns: repeat(10, 1fr);
 
   gap: 4px;
 
-  margin-top: 10px;
+  margin-top: 9px;
 }
 
-.result-segments span {
+.segments span {
   height: 5px;
 
-  border-radius: 30px;
-
-  background: #DED7D4;
+  background: #DAD3CF;
 }
 
-.result-segments span.active {
-  background: #B43D69;
+.segments span.active {
+  background: #B13A63;
 }
 
-.result-dimension-body > p {
-  margin: 7px 0 0;
+.dimension-comment {
+  margin-top: 6px;
 
-  color: #776D72;
+  color: #514B4E;
 
-  font-size: 10px;
-  line-height: 1.35;
-}
+  font-size: 8px;
+  font-weight: 700;
 
-/* MINI ART */
-
-.result-mini-art {
-  position: relative;
-
-  width: 58px;
-  height: 45px;
-
-  transform: scale(0.84);
-}
-
-.result-views-art {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  gap: 4px;
-}
-
-.result-eye {
-  position: relative;
-
-  width: 30px;
-  height: 19px;
-
-  border: 2px solid #332D33;
-
-  border-radius: 70% 30% 70% 30%;
-}
-
-.result-eye-second {
-  border-radius: 30% 70% 30% 70%;
-}
-
-.result-eye i {
-  position: absolute;
-
-  top: 50%;
-  left: 50%;
-
-  width: 7px;
-  height: 7px;
-
-  border-radius: 50%;
-
-  background: #B43D69;
-
-  transform: translate(-50%, -50%);
-}
-
-.result-care-art > i {
-  position: absolute;
-
-  top: 2px;
-  left: 50%;
-
-  color: #B43D69;
-
-  font-family: Georgia, serif;
-  font-size: 24px;
-  font-style: normal;
-
-  transform: translateX(-50%);
-}
-
-.result-hand {
-  position: absolute;
-
-  bottom: 4px;
-
-  width: 35px;
-  height: 18px;
-
-  border-bottom: 2px solid #332D33;
-}
-
-.result-hand-left {
-  left: -3px;
-
-  border-radius: 0 0 100% 0;
-
-  transform: rotate(10deg);
-}
-
-.result-hand-right {
-  right: -3px;
-
-  border-radius: 0 0 0 100%;
-
-  transform: rotate(-10deg);
-}
-
-.result-talk-art span {
-  position: absolute;
-
-  width: 36px;
-  height: 24px;
-
-  border: 2px solid #332D33;
-
-  border-radius: 50%;
-}
-
-.result-talk-art span:first-child {
-  top: 0;
-  left: 0;
-}
-
-.result-talk-art span:nth-child(2) {
-  right: 0;
-  bottom: 0;
-
-  border-color: #B43D69;
-}
-
-.result-talk-art i {
-  position: absolute;
-
-  top: 10px;
-  left: 18px;
-
-  color: #332D33;
-
-  font-family: Georgia, serif;
-  font-size: 13px;
-  font-style: normal;
-}
-
-.result-rhythm-art {
-  display: flex;
-  align-items: center;
-}
-
-.result-rhythm-art svg {
-  width: 60px;
-}
-
-.result-planet {
-  position: absolute;
-
-  top: 50%;
-
-  width: 28px;
-  height: 28px;
-
-  border: 2px solid #332D33;
-
-  border-radius: 50%;
-
-  transform: translateY(-50%);
-}
-
-.result-planet-one {
-  left: 0;
-  background: #E5AF49;
-}
-
-.result-planet-two {
-  right: 0;
-  background: #927DA1;
-}
-
-.result-space-art > i {
-  position: absolute;
-
-  top: 50%;
-  left: 50%;
-
-  width: 6px;
-  height: 6px;
-
-  border-radius: 50%;
-
-  background: #B43D69;
-
-  transform: translate(-50%, -50%);
+  line-height: 1.3;
 }
 
 /* TYPE */
 
 .result-type {
-  padding: 0 0 32px;
+  padding-bottom: 30px;
 }
 
-.result-type-heading {
-  display: flex;
+.type-title-row {
+  display: grid;
 
-  align-items: flex-end;
-  justify-content: space-between;
+  grid-template-columns: 1fr 220px;
 
-  gap: 20px;
+  gap: 25px;
 
-  margin: 0 0 12px;
+  align-items: end;
+
+  padding: 17px 0 13px;
 }
 
-.result-type-heading h2 {
-  margin: 5px 0 0;
-  padding: 0;
-
-  font-family: Georgia, serif;
-
-  font-size: clamp(33px, 5vw, 45px);
-
-  font-style: italic;
-  font-weight: 400;
-
-  line-height: 0.95;
-
-  letter-spacing: -0.055em;
-}
-
-.result-type-number {
-  flex-shrink: 0;
-
-  color: #B43D69;
-
-  font-family: Georgia, serif;
-
-  font-size: 24px;
-  font-style: italic;
-}
-
-.result-poster {
-  overflow: hidden;
-
-  border: 1px solid #312B31;
-
-  background: #F8F2EC;
-
-  box-shadow: 6px 6px 0 #DACBD0;
-}
-
-.result-poster-footer {
-  display: flex;
-
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 24px;
-
-  padding: 12px 17px;
-}
-
-.result-poster-footer span {
-  flex-shrink: 0;
-
-  color: #B43D69;
+.type-title-row > div > span {
+  color: #B13A63;
 
   font-size: 7px;
   font-weight: 900;
@@ -1432,24 +1363,76 @@ const styles = `
   letter-spacing: 0.16em;
 }
 
-.result-poster-footer p {
-  margin: 0;
+.type-title-row h2 {
+  margin: 4px 0 0;
 
-  color: #6F666B;
+  font-size: clamp(34px, 6vw, 48px);
+  font-weight: 900;
 
-  font-family: Georgia, serif;
+  line-height: 0.88;
 
-  font-size: 11px;
-  font-style: italic;
+  letter-spacing: -0.065em;
+}
 
-  line-height: 1.3;
+.type-title-row > p {
+  margin: 0 0 2px;
+
+  color: #5F585B;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  line-height: 1.35;
+}
+
+.type-poster {
+  overflow: hidden;
+
+  border: 2px solid #242124;
+
+  background: #F7F1EB;
+
+  box-shadow: 6px 6px 0 #CDBDC3;
+}
+
+.poster-strip {
+  min-height: 41px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 8px 13px;
+
+  border-top: 2px solid #242124;
+}
+
+.poster-strip span {
+  color: #777074;
+
+  font-size: 6px;
+  font-weight: 900;
+
+  letter-spacing: 0.13em;
+}
+
+.poster-strip strong {
+  color: #B13A63;
+
+  font-size: 8px;
+  font-weight: 900;
+
+  letter-spacing: 0.04em;
 
   text-align: right;
 }
 
 /* ART */
 
-.result-art {
+.art {
   position: relative;
 
   height: 290px;
@@ -1459,53 +1442,73 @@ const styles = `
   background: #393440;
 }
 
-.result-spark {
+.art-label {
   position: absolute;
 
-  z-index: 2;
+  z-index: 20;
 
-  color: #E5AF49;
+  top: 12px;
+  left: 12px;
+
+  padding: 6px 8px;
+
+  background: #F2EEE8;
+
+  color: #282428;
+
+  font-size: 7px;
+  font-weight: 900;
+
+  letter-spacing: 0.06em;
+}
+
+.star {
+  position: absolute;
+
+  z-index: 3;
 
   font-style: normal;
 }
 
-.result-spark-one {
-  top: 12%;
-  left: 13%;
+.star-a {
+  top: 18%;
+  left: 15%;
 
-  font-size: 23px;
+  color: #E7B246;
+
+  font-size: 25px;
 }
 
-.result-spark-two {
-  top: 21%;
-  right: 12%;
+.star-b {
+  top: 39%;
+  left: 8%;
 
-  color: #C36C8B;
+  color: #907B9D;
 
-  font-size: 17px;
+  font-size: 20px;
 }
 
-.result-spark-three {
-  top: 40%;
-  left: 7%;
+.star-c {
+  top: 22%;
+  right: 13%;
 
-  color: #907C9E;
+  color: #CC6B8D;
 
-  font-size: 18px;
+  font-size: 19px;
 }
 
-.result-orbit {
+.orbit {
   position: absolute;
 
   left: 50%;
 
-  border: 1px solid rgba(241,225,211,0.24);
+  border: 1px solid rgba(245, 234, 224, 0.25);
 
   border-radius: 50%;
 }
 
-.result-orbit-one {
-  top: 67px;
+.orbit-a {
+  top: 68px;
 
   width: 490px;
   height: 125px;
@@ -1513,8 +1516,8 @@ const styles = `
   transform: translateX(-50%) rotate(-13deg);
 }
 
-.result-orbit-two {
-  top: 79px;
+.orbit-b {
+  top: 78px;
 
   width: 430px;
   height: 145px;
@@ -1522,59 +1525,59 @@ const styles = `
   transform: translateX(-50%) rotate(17deg);
 }
 
-.result-big-planet {
+.planet {
   position: absolute;
 
-  top: 29px;
+  top: 28px;
   left: 50%;
 
-  width: 135px;
-  height: 135px;
+  width: 137px;
+  height: 137px;
 
-  border: 4px solid #29242C;
+  border: 4px solid #27232B;
 
   border-radius: 50%;
 
   background: #C2B0CF;
 
-  box-shadow: 7px 7px 0 rgba(28,24,31,0.22);
+  box-shadow: 7px 7px 0 rgba(25, 21, 28, 0.24);
 
   transform: translateX(-50%);
 }
 
-.result-big-planet i {
+.planet span {
   position: absolute;
 
-  border: 3px solid rgba(70,57,75,0.28);
+  border: 3px solid rgba(72, 58, 77, 0.28);
 
   border-radius: 50%;
 }
 
-.result-big-planet i:first-child {
-  top: 24px;
-  left: 21px;
+.planet span:first-child {
+  top: 23px;
+  left: 20px;
 
-  width: 33px;
-  height: 18px;
+  width: 34px;
+  height: 19px;
 }
 
-.result-big-planet i:nth-child(2) {
+.planet span:nth-child(2) {
   top: 65px;
   right: 18px;
 
+  width: 24px;
+  height: 31px;
+}
+
+.planet span:last-child {
+  bottom: 18px;
+  left: 52px;
+
   width: 23px;
-  height: 30px;
+  height: 16px;
 }
 
-.result-big-planet i:nth-child(3) {
-  bottom: 19px;
-  left: 51px;
-
-  width: 22px;
-  height: 15px;
-}
-
-.result-ground {
+.ground {
   position: absolute;
 
   left: -9%;
@@ -1583,14 +1586,14 @@ const styles = `
 
   height: 240px;
 
-  border: 4px solid #29242C;
+  border: 4px solid #27232B;
 
   border-radius: 50% 50% 0 0;
 
   background: #81718C;
 }
 
-.result-ground i {
+.ground span {
   position: absolute;
 
   border: 3px solid #554A5E;
@@ -1600,7 +1603,7 @@ const styles = `
   background: #695C73;
 }
 
-.result-ground i:first-child {
+.ground span:first-child {
   top: 28px;
   left: 17%;
 
@@ -1608,7 +1611,7 @@ const styles = `
   height: 30px;
 }
 
-.result-ground i:nth-child(2) {
+.ground span:nth-child(2) {
   top: 65px;
   left: 47%;
 
@@ -1616,7 +1619,7 @@ const styles = `
   height: 35px;
 }
 
-.result-ground i:nth-child(3) {
+.ground span:last-child {
   top: 27px;
   right: 16%;
 
@@ -1624,9 +1627,9 @@ const styles = `
   height: 25px;
 }
 
-/* CHARACTERS */
+/* ASTRONAUT */
 
-.result-character {
+.astronaut {
   position: absolute;
 
   z-index: 5;
@@ -1639,19 +1642,19 @@ const styles = `
   transform-origin: bottom center;
 }
 
-.result-character.left {
+.astronaut.left {
   left: calc(50% - 142px);
 
   transform: scale(0.82) rotate(2deg);
 }
 
-.result-character.right {
+.astronaut.right {
   right: calc(50% - 142px);
 
   transform: scale(0.82) rotate(-2deg);
 }
 
-.result-backpack {
+.backpack {
   position: absolute;
 
   top: 75px;
@@ -1667,7 +1670,7 @@ const styles = `
   background: #B45B7A;
 }
 
-.result-helmet {
+.helmet {
   position: absolute;
 
   z-index: 6;
@@ -1687,7 +1690,7 @@ const styles = `
   transform: translateX(-50%);
 }
 
-.result-visor {
+.visor {
   position: absolute;
 
   top: 17px;
@@ -1703,7 +1706,7 @@ const styles = `
   background: #665B70;
 }
 
-.result-visor i {
+.visor i {
   position: absolute;
 
   top: 17px;
@@ -1716,15 +1719,15 @@ const styles = `
   background: #F2D4A5;
 }
 
-.result-visor i:first-child {
+.visor i:first-child {
   left: 16px;
 }
 
-.result-visor i:nth-child(2) {
+.visor i:nth-child(2) {
   right: 16px;
 }
 
-.result-visor span {
+.visor span {
   position: absolute;
 
   left: 50%;
@@ -1740,7 +1743,7 @@ const styles = `
   transform: translateX(-50%);
 }
 
-.result-body {
+.body {
   position: absolute;
 
   z-index: 5;
@@ -1760,7 +1763,7 @@ const styles = `
   transform: translateX(-50%);
 }
 
-.result-panel {
+.panel {
   position: absolute;
 
   top: 25px;
@@ -1776,7 +1779,7 @@ const styles = `
   transform: translateX(-50%);
 }
 
-.result-panel i {
+.panel i {
   position: absolute;
 
   top: 7px;
@@ -1785,17 +1788,19 @@ const styles = `
   height: 6px;
 }
 
-.result-panel i:first-child {
+.panel i:first-child {
   left: 7px;
+
   background: #E5AF49;
 }
 
-.result-panel i:last-child {
+.panel i:last-child {
   right: 7px;
+
   background: #7E6C91;
 }
 
-.result-arm {
+.arm {
   position: absolute;
 
   z-index: 4;
@@ -1812,29 +1817,35 @@ const styles = `
   background: #F0E7DD;
 }
 
-.result-character.left .result-arm-outside {
+.astronaut.left .outside {
   left: -20px;
+
   transform: rotate(27deg);
 }
 
-.result-character.left .result-arm-inside {
+.astronaut.left .inside {
   right: -34px;
+
   width: 76px;
+
   transform: rotate(-11deg);
 }
 
-.result-character.right .result-arm-outside {
+.astronaut.right .outside {
   right: -20px;
+
   transform: rotate(-27deg);
 }
 
-.result-character.right .result-arm-inside {
+.astronaut.right .inside {
   left: -34px;
+
   width: 76px;
+
   transform: rotate(11deg);
 }
 
-.result-leg {
+.leg {
   position: absolute;
 
   z-index: 3;
@@ -1851,17 +1862,19 @@ const styles = `
   background: #F0E7DD;
 }
 
-.result-leg-one {
+.leg-a {
   left: 25px;
+
   transform: rotate(5deg);
 }
 
-.result-leg-two {
+.leg-b {
   right: 25px;
+
   transform: rotate(-5deg);
 }
 
-.result-heart {
+.art-heart {
   position: absolute;
 
   z-index: 10;
@@ -1871,232 +1884,191 @@ const styles = `
 
   color: #D04F78;
 
-  font-family: Georgia, serif;
-
   font-size: 27px;
 
   transform: translateX(-50%);
 }
 
-.result-art-tag {
-  position: absolute;
-
-  z-index: 15;
-
-  right: 12px;
-  bottom: 10px;
-
-  padding: 6px 9px;
-
-  border: 1px solid #302A30;
-
-  background: #F6EEE7;
-
-  font-family: Georgia, serif;
-
-  font-size: 9px;
-  font-style: italic;
-
-  transform: rotate(-2deg);
-}
-
 /* PAYWALL */
 
 .result-paywall {
-  margin: 0 !important;
+  padding: 29px 0 32px;
 
-  padding: 31px 0 35px !important;
+  background: #272328;
 
-  background: #2E2931;
-
-  color: #F8F1EB;
+  color: #F7F0EA;
 }
 
-.result-paywall-label {
+.paywall-top {
   display: flex;
 
   align-items: center;
   justify-content: space-between;
 
-  padding-bottom: 10px;
+  padding-bottom: 9px;
 
-  border-bottom: 1px solid rgba(255,255,255,0.15);
+  border-bottom: 2px solid #F7F0EA;
 
-  color: #DD829F;
+  color: #E17C9E;
 
   font-size: 7px;
   font-weight: 900;
 
-  letter-spacing: 0.21em;
+  letter-spacing: 0.18em;
 }
 
-.result-paywall-label b {
-  color: #E8B54D;
-
-  font-size: 17px;
-  font-weight: 400;
+.paywall-top b {
+  color: #E7B246;
 }
 
-.result-paywall-grid {
+.paywall-grid {
   display: grid;
 
-  grid-template-columns: 0.82fr 1.18fr;
+  grid-template-columns: 0.88fr 1.12fr;
 
   gap: 35px;
 
   padding-top: 22px;
 }
 
-.result-paywall-title h2 {
-  margin: 0;
-
-  font-family: Georgia, serif;
-
-  font-size: clamp(39px, 6vw, 54px);
-
-  font-style: italic;
-  font-weight: 400;
-
-  line-height: 0.88;
-
-  letter-spacing: -0.06em;
+.paywall-left {
+  position: relative;
 }
 
-.result-paywall-title p {
-  max-width: 220px;
-
-  margin: 13px 0 0;
-
-  color: #ADA2A8;
-
-  font-size: 9px;
-  line-height: 1.45;
-}
-
-.result-found {
-  display: grid;
-
-  grid-template-columns: auto 1fr;
-
-  grid-template-areas:
-    "label label"
-    "number copy";
-
-  align-items: end;
-
-  column-gap: 15px;
-
-  margin-bottom: 6px;
-
-  padding: 11px 14px;
-
-  border: 1px solid #D37A99;
-
-  background: #3B323D;
-}
-
-.result-found > span {
-  grid-area: label;
-
-  color: #D9829F;
-
-  font-size: 6px;
-  font-weight: 900;
-
-  letter-spacing: 0.18em;
-}
-
-.result-found strong {
-  grid-area: number;
-
-  color: #F4C05C;
-
-  font-family: Georgia, serif;
-
-  font-size: 46px;
-  font-style: italic;
-  font-weight: 400;
-
-  line-height: 0.9;
-}
-
-.result-found p {
-  grid-area: copy;
-
-  margin: 0 0 3px;
-
-  color: #E7DDE2;
-
-  font-family: Georgia, serif;
-
-  font-size: 12px;
-  font-style: italic;
-
-  line-height: 1.2;
-}
-
-.result-locked {
-  display: grid;
-
-  grid-template-columns: 24px 1fr auto;
-
-  align-items: center;
-
-  gap: 9px;
-
-  padding: 8px 0;
-
-  border-bottom: 1px solid rgba(255,255,255,0.11);
-}
-
-.result-lock {
-  width: 19px;
-  height: 19px;
+.paywall-sticker {
+  width: 82px;
+  height: 82px;
 
   display: flex;
+  flex-direction: column;
+
   align-items: center;
   justify-content: center;
 
-  border: 1px solid #D47A99;
+  margin-bottom: 15px;
 
   border-radius: 50%;
 
-  color: #D47A99;
+  background: #E7B246;
 
-  font-size: 9px;
-
-  transform: rotate(45deg);
-}
-
-.result-locked span {
-  color: #7F747D;
-
-  font-size: 5px;
-  font-weight: 900;
-
-  letter-spacing: 0.12em;
-}
-
-.result-locked p {
-  margin: 2px 0 0;
-
-  color: #F0E7EC;
-
-  font-family: Georgia, serif;
-
-  font-size: 11px;
-  font-style: italic;
-
-  line-height: 1.2;
-}
-
-.result-locked > b {
-  color: #776C75;
+  color: #272328;
 
   font-size: 6px;
+  font-weight: 900;
+
+  letter-spacing: 0.1em;
+
+  transform: rotate(-7deg);
+}
+
+.paywall-sticker strong {
+  display: block;
+
+  font-size: 34px;
+  font-weight: 900;
+
+  line-height: 0.9;
+
+  letter-spacing: -0.07em;
+}
+
+.paywall-left h2 {
+  margin: 0;
+
+  font-size: clamp(39px, 6vw, 52px);
+  font-weight: 900;
+
+  line-height: 0.84;
+
+  letter-spacing: -0.07em;
+}
+
+.paywall-left > p {
+  max-width: 225px;
+
+  margin: 14px 0 0;
+
+  color: #B9AEB4;
+
+  font-size: 9px;
+  font-weight: 600;
+
+  line-height: 1.45;
+}
+
+.paywall-hook {
+  margin-bottom: 5px;
+
+  padding: 13px;
+
+  border: 1px solid #D86E92;
+
+  background: #342D35;
+}
+
+.paywall-hook span {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #D86E92;
+
+  font-size: 6px;
+  font-weight: 900;
+
+  letter-spacing: 0.15em;
+}
+
+.paywall-hook strong {
+  display: block;
+
+  font-size: 15px;
+  font-weight: 800;
+
+  line-height: 1.15;
+
+  letter-spacing: -0.025em;
+}
+
+.locked-row {
+  display: grid;
+
+  grid-template-columns: 23px 1fr auto;
+
+  gap: 10px;
+
+  align-items: center;
+
+  min-height: 48px;
+
+  border-bottom: 1px solid rgba(255,255,255,0.13);
+}
+
+.locked-number {
+  color: #E17C9E;
+
+  font-size: 7px;
+  font-weight: 900;
+}
+
+.locked-row p {
+  margin: 0;
+
+  color: #F3EBEF;
+
+  font-size: 9px;
   font-weight: 700;
 
-  text-transform: uppercase;
+  line-height: 1.25;
+}
+
+.locked-status {
+  color: #716971;
+
+  font-size: 6px;
+  font-weight: 900;
+
+  letter-spacing: 0.1em;
 }
 
 .result-buy {
@@ -2106,55 +2078,61 @@ const styles = `
 
   grid-template-columns: 1fr auto auto;
 
+  gap: 13px;
+
   align-items: center;
 
-  gap: 12px;
+  margin-top: 13px;
 
-  margin: 13px 0 0;
+  padding: 15px;
 
-  padding: 14px 15px;
+  border: 0;
 
-  border: 1px solid #F0B1C7;
+  background: #B63B67;
 
-  background: #B43D69;
-
-  color: #FFFFFF;
+  color: white;
 
   cursor: pointer;
 
   text-align: left;
 }
 
-.result-buy span {
-  font-family: Georgia, serif;
+.result-buy:hover {
+  background: #C84372;
+}
 
-  font-size: 13px;
-  font-style: italic;
+.result-buy span {
+  font-size: 9px;
+  font-weight: 900;
+
+  letter-spacing: -0.01em;
 }
 
 .result-buy strong {
   white-space: nowrap;
 
   font-size: 13px;
+  font-weight: 900;
 }
 
 .result-buy b {
-  font-size: 18px;
+  font-size: 20px;
 }
 
-.result-footnote {
-  margin-top: 6px;
+.buy-note {
+  margin-top: 7px;
 
-  color: #776D75;
+  color: #766D75;
 
   font-size: 6px;
+  font-weight: 700;
+
+  letter-spacing: 0.06em;
 
   text-align: center;
-
-  letter-spacing: 0.08em;
 }
 
-/* STATES */
+/* STATE */
 
 .result-state {
   width: 100%;
@@ -2166,76 +2144,59 @@ const styles = `
   align-items: center;
   justify-content: center;
 
-  margin: 0;
   padding: 30px;
 
-  background: #F4EFE9;
+  background: #F2EEE8;
 
   text-align: center;
 }
 
-.result-state-brand {
-  font-family: Georgia, serif;
+.state-brand {
+  font-size: 23px;
+  font-weight: 900;
 
-  font-size: 24px;
-  font-style: italic;
-  font-weight: 700;
+  letter-spacing: -0.07em;
 }
 
 .result-state h1 {
-  margin: 25px 0 10px;
+  max-width: 400px;
 
-  font-family: Georgia, serif;
+  margin: 22px 0 8px;
 
   font-size: 43px;
-  font-style: italic;
-  font-weight: 400;
+  font-weight: 900;
 
-  line-height: 0.95;
+  line-height: 0.9;
+
+  letter-spacing: -0.065em;
 }
 
 .result-state p {
-  color: #8D8288;
+  color: #777074;
 
-  font-family: Georgia, serif;
-
-  font-size: 11px;
-  font-style: italic;
+  font-size: 9px;
+  font-weight: 700;
 }
 
-.result-loader {
+.state-mark {
   display: flex;
 
-  align-items: center;
-
-  margin-bottom: 25px;
+  margin-bottom: 20px;
 }
 
-.result-loader span {
-  width: 48px;
-  height: 48px;
+.state-mark span {
+  width: 44px;
+  height: 44px;
 
-  border: 2px solid #302A30;
+  border: 3px solid #272328;
 
   border-radius: 50%;
 }
 
-.result-loader span:last-child {
+.state-mark span:last-child {
   margin-left: -12px;
-}
 
-.result-loader i {
-  position: relative;
-
-  z-index: 2;
-
-  margin: 0 -7px;
-
-  color: #B43D69;
-
-  font-family: Georgia, serif;
-
-  font-style: normal;
+  border-color: #B13A63;
 }
 
 /* MOBILE */
@@ -2247,7 +2208,7 @@ const styles = `
   }
 
   .result-header {
-    width: calc(100% - 26px) !important;
+    width: calc(100% - 26px);
 
     height: 52px !important;
     min-height: 52px !important;
@@ -2255,161 +2216,175 @@ const styles = `
   }
 
   .result-brand {
-    font-size: 19px;
+    font-size: 18px;
   }
 
   .result-names {
-    max-width: 150px;
-
-    overflow: hidden;
-
     font-size: 7px;
-
-    white-space: nowrap;
   }
 
-  .result-intro {
-    padding: 22px 0 14px;
+  .result-hero {
+    padding: 21px 0 20px;
   }
 
-  .result-intro-grid {
-    grid-template-columns: 1fr;
+  .result-hero-grid {
+    grid-template-columns: 1fr 105px;
+
+    gap: 14px;
+
+    margin-top: 10px;
+  }
+
+  .result-hero h1 {
+    font-size: clamp(39px, 12vw, 53px);
+  }
+
+  .result-score {
+    padding-left: 10px;
+  }
+
+  .result-score strong {
+    font-size: 44px;
+  }
+
+  .result-score p {
+    font-size: 6px;
+  }
+
+  .result-quick {
+    margin-top: 17px;
+  }
+
+  .result-quick > div {
+    display: block;
+
+    min-height: 53px;
+
+    padding: 8px;
+  }
+
+  .result-quick strong {
+    display: block;
+
+    margin-bottom: 3px;
+
+    font-size: 22px;
+  }
+
+  .result-quick span {
+    display: block;
+
+    font-size: 6px;
+  }
+
+  .dimension-row {
+    grid-template-columns: 17px 35px 1fr;
 
     gap: 7px;
+
+    padding: 12px 0;
+  }
+
+  .dimension-mark {
+    width: 31px;
+    height: 31px;
+
+    transform: scale(0.8);
+    transform-origin: left center;
+  }
+
+  .dimension-main h3 {
+    font-size: 15px;
+  }
+
+  .dimension-main p {
+    max-width: 180px;
+
+    font-size: 7px;
+  }
+
+  .dimension-value {
+    font-size: 23px;
+  }
+
+  .segments {
+    gap: 2px;
 
     margin-top: 7px;
   }
 
-  .result-intro h1 {
-    font-size: clamp(42px, 13vw, 55px);
-  }
-
-  .result-intro p {
-    max-width: 260px;
-  }
-
-  .result-dimensions {
-    padding-bottom: 20px;
-  }
-
-  .result-dimension {
-    grid-template-columns: 48px 1fr;
-
-    gap: 9px;
-
-    padding: 13px 0;
-  }
-
-  .result-dimension-icon {
-    justify-content: flex-start;
-  }
-
-  .result-mini-art {
-    transform: scale(0.68);
-    transform-origin: left center;
-  }
-
-  .result-dimension-top {
-    gap: 8px;
-  }
-
-  .result-dimension-top h3 {
-    max-width: 205px;
-
-    font-size: 17px;
-  }
-
-  .result-dimension-top strong {
-    font-size: 26px;
-  }
-
-  .result-segments {
-    gap: 3px;
-
-    margin-top: 8px;
-  }
-
-  .result-segments span {
+  .segments span {
     height: 4px;
   }
 
-  .result-dimension-body > p {
-    margin-top: 5px;
-
-    font-size: 9px;
+  .dimension-comment {
+    font-size: 7px;
   }
 
-  .result-type {
-    padding-bottom: 25px;
+  .type-title-row {
+    grid-template-columns: 1fr;
+
+    gap: 7px;
+
+    padding: 14px 0 10px;
   }
 
-  .result-type-heading {
-    margin-bottom: 9px;
+  .type-title-row h2 {
+    font-size: 34px;
   }
 
-  .result-type-heading h2 {
-    font-size: 33px;
+  .type-title-row > p {
+    max-width: 310px;
+
+    font-size: 8px;
   }
 
-  .result-type-number {
-    font-size: 20px;
-  }
-
-  .result-art {
+  .art {
     height: 235px;
   }
 
-  .result-big-planet {
+  .planet {
     top: 23px;
 
     width: 108px;
     height: 108px;
   }
 
-  .result-character {
+  .astronaut {
     bottom: 13px;
   }
 
-  .result-character.left {
+  .astronaut.left {
     left: calc(50% - 110px);
 
     transform: scale(0.68) rotate(2deg);
   }
 
-  .result-character.right {
+  .astronaut.right {
     right: calc(50% - 110px);
 
     transform: scale(0.68) rotate(-2deg);
   }
 
-  .result-heart {
+  .art-heart {
     top: 116px;
 
     font-size: 23px;
   }
 
-  .result-art-tag {
-    right: 7px;
-    bottom: 7px;
-
-    font-size: 7px;
+  .poster-strip {
+    padding: 8px 10px;
   }
 
-  .result-poster-footer {
-    gap: 10px;
-
-    padding: 10px 12px;
-  }
-
-  .result-poster-footer p {
-    font-size: 9px;
+  .poster-strip strong {
+    max-width: 155px;
   }
 
   .result-paywall {
-    padding: 25px 0 28px !important;
+    padding: 24px 0 27px;
   }
 
-  .result-paywall-grid {
+  .paywall-grid {
     grid-template-columns: 1fr;
 
     gap: 17px;
@@ -2417,32 +2392,55 @@ const styles = `
     padding-top: 17px;
   }
 
-  .result-paywall-title h2 {
-    font-size: 42px;
+  .paywall-left {
+    display: grid;
+
+    grid-template-columns: 64px 1fr;
+
+    column-gap: 13px;
+
+    align-items: center;
   }
 
-  .result-paywall-title p {
-    margin-top: 9px;
+  .paywall-sticker {
+    grid-row: 1 / 3;
+
+    width: 62px;
+    height: 62px;
+
+    margin: 0;
   }
 
-  .result-found strong {
-    font-size: 41px;
+  .paywall-sticker strong {
+    font-size: 27px;
   }
 
-  .result-locked {
-    grid-template-columns: 22px 1fr;
-
-    padding: 8px 0;
+  .paywall-left h2 {
+    font-size: 37px;
   }
 
-  .result-locked > b {
+  .paywall-left > p {
+    margin: 7px 0 0;
+
+    font-size: 8px;
+  }
+
+  .locked-row {
+    grid-template-columns: 20px 1fr;
+
+    min-height: 45px;
+  }
+
+  .locked-status {
     display: none;
   }
 
   .result-buy {
-    margin-top: 11px;
+    padding: 14px 12px;
+  }
 
-    padding: 13px;
+  .result-buy span {
+    font-size: 8px;
   }
 
 }
