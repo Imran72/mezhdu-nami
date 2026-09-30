@@ -1,12 +1,9 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
-import {
-    determineArchetype,
-    type Comparison,
-} from '../../../lib/archetypes';
+import type { Comparison } from '../../../lib/archetypes';
 
 type Couple = {
     id: string;
@@ -15,14 +12,6 @@ type Couple = {
     partner_a_completed: boolean;
     partner_b_completed: boolean;
     paid?: boolean;
-};
-
-type Dimensions = {
-    views?: number;
-    care?: number;
-    communication?: number;
-    rhythm?: number;
-    space?: number;
 };
 
 type ResultData = {
@@ -34,22 +23,127 @@ type ResultData = {
         sameAnswers?: number;
         closeAnswers?: number;
         differentAnswers?: number;
-        dimensions?: Dimensions;
     };
 };
 
-type DimensionKind =
-    | 'views'
+type CategoryId =
+    | 'friendship'
+    | 'partnership'
+    | 'sex'
+    | 'money'
     | 'care'
-    | 'communication'
-    | 'rhythm'
-    | 'space';
+    | 'home';
 
-type DimensionItem = {
-    kind: DimensionKind;
+type Category = {
+    id: CategoryId;
     title: string;
     subtitle: string;
-    value: number;
+    score: number;
+};
+
+const CATEGORY_META: Record<
+    CategoryId,
+    {
+        title: string;
+        subtitle: string;
+        keywords: string[];
+    }
+> = {
+    friendship: {
+        title: 'Дружба',
+        subtitle: 'хорошо ли вам просто вдвоём',
+        keywords: [
+            'friend',
+            'fun',
+            'humor',
+            'laugh',
+            'together',
+            'free_saturday',
+            'normal_evening',
+            'weekend',
+            'weekend_plan',
+            'extra_hour',
+        ],
+    },
+
+    partnership: {
+        title: 'Партнёрство',
+        subtitle: 'вы команда или каждый сам за себя',
+        keywords: [
+            'team',
+            'partner',
+            'support',
+            'decision',
+            'future',
+            'plan',
+            'responsibility',
+            'keep_in_year',
+            'relationship_button',
+            'want_more',
+        ],
+    },
+
+    sex: {
+        title: 'Секс',
+        subtitle: 'совпадает ли ваше представление о близости',
+        keywords: [
+            'sex',
+            'sexual',
+            'intimacy',
+            'physical',
+            'touch',
+            'affection',
+            'closeness',
+            'romance',
+        ],
+    },
+
+    money: {
+        title: 'Деньги',
+        subtitle: 'одинаково ли вы смотрите на траты',
+        keywords: [
+            'money',
+            'finance',
+            'spend',
+            'saving',
+            'budget',
+            'unexpected_money',
+            'purchase',
+        ],
+    },
+
+    care: {
+        title: 'Забота',
+        subtitle: 'понимаете ли вы «я рядом» одинаково',
+        keywords: [
+            'care',
+            'support',
+            'help',
+            'hard_day',
+            'reunion',
+            'care_signal',
+            'emotion',
+            'attention',
+            'comfort',
+        ],
+    },
+
+    home: {
+        title: 'Быт',
+        subtitle: 'как вам живётся в обычный вторник',
+        keywords: [
+            'home',
+            'house',
+            'routine',
+            'daily',
+            'chores',
+            'clean',
+            'food',
+            'sleep',
+            'normal_evening',
+            'weekend_plan',
+        ],
+    },
 };
 
 export default function ResultPage() {
@@ -62,6 +156,8 @@ export default function ResultPage() {
     const [error, setError] = useState('');
 
     useEffect(() => {
+        let cancelled = false;
+
         async function load() {
             try {
                 const response = await fetch(
@@ -77,6 +173,10 @@ export default function ResultPage() {
 
                 const result: ResultData = await response.json();
 
+                if (cancelled) {
+                    return;
+                }
+
                 if (result.waiting) {
                     router.replace(`/waiting/${coupleId}`);
                     return;
@@ -85,23 +185,56 @@ export default function ResultPage() {
                 setData(result);
             } catch (err) {
                 console.error(err);
-                setError('Не получилось загрузить результат.');
+
+                if (!cancelled) {
+                    setError('Не получилось загрузить результат.');
+                }
             }
         }
 
         load();
+
+        return () => {
+            cancelled = true;
+        };
     }, [coupleId, router]);
+
+    const comparisons = useMemo(
+        () => data?.comparisons ?? [],
+        [data]
+    );
+
+    const overallScore = useMemo(() => {
+        if (typeof data?.scores?.overall === 'number') {
+            return normalizePercent(data.scores.overall);
+        }
+
+        return calculateOverallScore(comparisons);
+    }, [data, comparisons]);
+
+    const categories = useMemo(
+        () => buildCategories(comparisons, overallScore),
+        [comparisons, overallScore]
+    );
+
+    const yearsTogether = useMemo(
+        () => calculateYearsTogether(categories, overallScore),
+        [categories, overallScore]
+    );
 
     if (error) {
         return (
             <>
                 <main className="state-page">
-                    <div className="brand">между нами.</div>
-                    <h1>что-то пошло не так</h1>
+                    <div className="state-brand">между нами.</div>
+
+                    <h1>не получилось открыть результат</h1>
+
                     <p>{error}</p>
                 </main>
 
                 <GlobalStyles />
+
                 <style jsx>{styles}</style>
             </>
         );
@@ -111,77 +244,25 @@ export default function ResultPage() {
         return (
             <>
                 <main className="state-page">
-                    <div className="loader-circles">
+                    <div className="loader">
                         <span />
                         <span />
                     </div>
 
-                    <div className="brand">между нами.</div>
-                    <p>собираем ваш результат</p>
+                    <div className="state-brand">между нами.</div>
+
+                    <p>собираем ваши ответы</p>
                 </main>
 
                 <GlobalStyles />
+
                 <style jsx>{styles}</style>
             </>
         );
     }
 
-    const comparisons = data.comparisons ?? [];
-    const archetype = determineArchetype(comparisons);
-
-    const overall =
-        data.scores?.overall ??
-        calculateFallback(comparisons);
-
-    const dimensions = data.scores?.dimensions;
-
-    const dimensionItems: DimensionItem[] = [
-        {
-            kind: 'views',
-            title: 'Взгляды',
-            subtitle: 'Как вы смотрите на отношения',
-            value: dimensions?.views ?? overall,
-        },
-        {
-            kind: 'care',
-            title: 'Забота',
-            subtitle: 'Что для вас значит «я рядом»',
-            value: dimensions?.care ?? overall,
-        },
-        {
-            kind: 'communication',
-            title: 'Общение',
-            subtitle: 'Как вы проходите сложные разговоры',
-            value: dimensions?.communication ?? overall,
-        },
-        {
-            kind: 'rhythm',
-            title: 'Время вместе',
-            subtitle: 'Как выглядит хороший день вдвоём',
-            value: dimensions?.rhythm ?? overall,
-        },
-        {
-            kind: 'space',
-            title: 'Свобода',
-            subtitle: 'Сколько своего пространства вам нужно',
-            value: dimensions?.space ?? overall,
-        },
-    ];
-
     const nameA = data.couple.partner_a_name;
     const nameB = data.couple.partner_b_name;
-
-    const differentCount =
-        data.scores?.differentAnswers ??
-        comparisons.filter(
-            (item) => item.similarity === 'different'
-        ).length;
-
-    const closeCount =
-        data.scores?.closeAnswers ??
-        comparisons.filter(
-            (item) => item.similarity === 'close'
-        ).length;
 
     return (
         <>
@@ -194,182 +275,168 @@ export default function ResultPage() {
                         между нами.
                     </div>
 
-                    <div className="names">
-                        {nameA}
-                        <span>×</span>
-                        {nameB}
+                    <div className="couple-names">
+                        <span>{nameA}</span>
+                        <b>×</b>
+                        <span>{nameB}</span>
                     </div>
                 </header>
 
-                {/* RESULT */}
+                {/* SCORES */}
 
-                <section className="hero shell">
-
-                    <div className="eyebrow">
-                        ваш результат
-                    </div>
-
-                    <div className="hero-result">
-
-                        <div className="score">
-                            {overall}
-                            <sup>%</sup>
-                        </div>
-
-                        <div className="hero-copy">
-                            <h1>
-                                {getOverallTitle(overall)}
-                            </h1>
-
-                            <p>
-                                {getOverallCopy(overall)}
-                            </p>
-                        </div>
-
-                    </div>
-
-                </section>
-
-                {/* BREAKDOWN */}
-
-                <section className="breakdown shell">
-
-                    <div className="section-intro">
-                        <h2>
-                            А если
-                            <br />
-                            по частям?
-                        </h2>
-
-                        <p>
-                            Пять вещей, в которых особенно
-                            интересно сравнить ваши ответы.
-                        </p>
-                    </div>
-
-                    <div className="dimensions">
-                        {dimensionItems.map((item) => (
-                            <DimensionRow
-                                key={item.kind}
-                                item={item}
-                            />
-                        ))}
-                    </div>
-
-                </section>
-
-                {/* TYPE */}
-
-                <section className="type-section shell">
-
-                    <div className="type-heading">
-                        <span>ваш тип пары</span>
-
-                        <h2>
-                            {getArchetypeDisplayTitle(
-                                archetype.id,
-                                archetype.title
-                            )}
-                        </h2>
-
-                        <p>
-                            {getArchetypeShortCopy(archetype.id)}
-                        </p>
-                    </div>
-
-                    <div className="type-card">
-
-                        <div className="type-number">
-                            №{getTypeNumber(archetype.id)}
-                        </div>
-
-                        <CoupleArtwork
-                            archetypeId={archetype.id}
+                <section className="scores shell">
+                    {categories.map((category) => (
+                        <ScoreRow
+                            key={category.id}
+                            category={category}
                         />
-
-                        <div className="type-caption">
-                            {getArtTag(archetype.id)}
-                        </div>
-
-                    </div>
-
+                    ))}
                 </section>
 
-                {/* PAYWALL */}
+                {/* FORECAST */}
 
-                <section className="paywall">
+                <section className="forecast shell">
 
-                    <div className="shell paywall-inner">
+                    <div className="forecast-label">
+                        прогноз
+                    </div>
 
-                        <div className="paywall-heading">
-                            <span>а вот здесь интереснее</span>
+                    <div className="forecast-grid">
 
+                        <div className="forecast-copy">
                             <h2>
-                                В процентах
+                                Вы можете быть
                                 <br />
-                                видно не всё.
+                                вместе очень долго
                             </h2>
 
                             <p>
-                                Мы нашли несколько вещей,
-                                которые легко пропустить
-                                в обычном разговоре.
+                                На основе ваших ответов мы оценили,
+                                сколько лет вы можете быть вместе.
                             </p>
                         </div>
 
-                        <div className="locked-list">
+                        <div className="forecast-result">
 
-                            <LockedItem>
-                                Где вы ждёте друг от друга
-                                разного
-                            </LockedItem>
-
-                            <LockedItem>
-                                Как каждый из вас понимает
-                                заботу
-                            </LockedItem>
-
-                            <LockedItem>
-                                Что вы можете не замечать
-                                друг о друге
-                            </LockedItem>
-
-                            <LockedItem>
-                                О чём вам действительно
-                                стоит поговорить
-                            </LockedItem>
-
-                        </div>
-
-                        <button
-                            type="button"
-                            className="buy-button"
-                            onClick={() =>
-                                router.push(`/report/${coupleId}`)
-                            }
-                        >
-              <span>
-                Открыть полный разбор
-              </span>
-
-                            <strong>
-                                299 ₽
-                            </strong>
-                        </button>
-
-                        <div className="buy-note">
-                            один разбор · для вас двоих
-                        </div>
-
-                        {(differentCount > 0 ||
-                            closeCount > 0) && (
-                            <div className="personal-hook">
-                                {getPersonalHook(
-                                    differentCount,
-                                    closeCount
-                                )}
+                            <div className="years">
+                                {yearsTogether}
+                                <span>
+                  {getYearWord(yearsTogether)}
+                </span>
                             </div>
-                        )}
+
+                            <div className="forecast-scale">
+                                <div className="forecast-line">
+                                    <div
+                                        className="forecast-progress"
+                                        style={{
+                                            width: `${getForecastPosition(
+                                                yearsTogether
+                                            )}%`,
+                                        }}
+                                    />
+
+                                    <div
+                                        className="forecast-dot"
+                                        style={{
+                                            left: `${getForecastPosition(
+                                                yearsTogether
+                                            )}%`,
+                                        }}
+                                    />
+                                </div>
+
+                                <div className="forecast-scale-labels">
+                                    <span>1 месяц</span>
+                                    <span>вся жизнь</span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+                {/* PAID REPORT */}
+
+                <section className="paid-section shell">
+
+                    <div className="paid-card">
+
+                        <div className="paid-top">
+
+                            <div className="paid-title">
+
+                                <div className="paid-label">
+                                    полный разбор
+                                </div>
+
+                                <h2>
+                                    Чтобы вместе —
+                                    <br />
+                                    и надолго.
+                                </h2>
+
+                            </div>
+
+                            <div className="paid-benefits">
+
+                                <Benefit>
+                                    Где вы можете
+                                    <br />
+                                    не понимать друг друга
+                                </Benefit>
+
+                                <Benefit>
+                                    Что каждый ждёт
+                                    <br />
+                                    от отношений
+                                </Benefit>
+
+                                <Benefit>
+                                    Что может стать
+                                    <br />
+                                    причиной ссор
+                                </Benefit>
+
+                                <Benefit>
+                                    Как сделать вашу
+                                    <br />
+                                    пару крепче
+                                </Benefit>
+
+                            </div>
+
+                        </div>
+
+                        <PixelFairytale />
+
+                        <div className="paid-bottom">
+
+                            <button
+                                type="button"
+                                className="buy-button"
+                                onClick={() =>
+                                    router.push(`/report/${coupleId}`)
+                                }
+                            >
+                <span>
+                  Открыть полный разбор
+                </span>
+
+                                <strong>
+                                    299 ₽
+                                </strong>
+
+                                <i>→</i>
+                            </button>
+
+                            <div className="paid-note">
+                                один разбор · для вас двоих · сразу после оплаты
+                            </div>
+
+                        </div>
 
                     </div>
 
@@ -378,9 +445,377 @@ export default function ResultPage() {
             </main>
 
             <GlobalStyles />
+
             <style jsx>{styles}</style>
         </>
     );
+}
+
+/* ============================================================
+   SCORE ROW
+============================================================ */
+
+function ScoreRow({
+                      category,
+                  }: {
+    category: Category;
+}) {
+    return (
+        <article className="score-row">
+
+            <div className="score-header">
+
+                <div className="score-copy">
+                    <h2>{category.title}</h2>
+
+                    <p>{category.subtitle}</p>
+                </div>
+
+                <div className="score-number">
+                    <strong>{category.score}</strong>
+                    <span>/10</span>
+                </div>
+
+            </div>
+
+            <div className="score-track">
+                <div
+                    className="score-fill"
+                    style={{
+                        width: `${category.score * 10}%`,
+                    }}
+                />
+            </div>
+
+        </article>
+    );
+}
+
+/* ============================================================
+   BENEFIT
+============================================================ */
+
+function Benefit({
+                     children,
+                 }: {
+    children: React.ReactNode;
+}) {
+    return (
+        <div className="benefit">
+
+            <div className="benefit-icon">
+                ♥
+            </div>
+
+            <div className="benefit-text">
+                {children}
+            </div>
+
+        </div>
+    );
+}
+
+/* ============================================================
+   PIXEL FAIRYTALE
+============================================================ */
+
+function PixelFairytale() {
+    return (
+        <div className="fairytale">
+
+            <div className="sky-stars">
+                <i className="s1">✦</i>
+                <i className="s2">·</i>
+                <i className="s3">✦</i>
+                <i className="s4">·</i>
+                <i className="s5">✦</i>
+            </div>
+
+            <div className="pixel-moon" />
+
+            <div className="mountain mountain-one" />
+            <div className="mountain mountain-two" />
+            <div className="mountain mountain-three" />
+
+            <div className="castle">
+                <div className="tower tower-left">
+                    <span />
+                </div>
+
+                <div className="tower tower-middle">
+                    <span />
+                </div>
+
+                <div className="tower tower-right">
+                    <span />
+                </div>
+
+                <div className="castle-body">
+                    <i />
+                    <i />
+                    <i />
+                </div>
+            </div>
+
+            <div className="ground-shape" />
+
+            <div className="characters">
+
+                <div className="knight">
+                    <div className="knight-head">
+                        <div className="knight-hair" />
+                    </div>
+
+                    <div className="knight-body">
+                        <div className="knight-cape" />
+                        <div className="knight-arm" />
+                    </div>
+                </div>
+
+                <div className="princess">
+                    <div className="crown">
+                        ♛
+                    </div>
+
+                    <div className="princess-head">
+                        <div className="princess-hair" />
+                    </div>
+
+                    <div className="princess-body">
+                        <div className="princess-dress" />
+                    </div>
+                </div>
+
+            </div>
+
+            <div className="pixel-heart">
+                ♥
+            </div>
+
+        </div>
+    );
+}
+
+/* ============================================================
+   CALCULATIONS
+============================================================ */
+
+function normalizePercent(value: number) {
+    if (!Number.isFinite(value)) {
+        return 0;
+    }
+
+    if (value >= 0 && value <= 1) {
+        return Math.round(value * 100);
+    }
+
+    return Math.round(
+        Math.max(0, Math.min(100, value))
+    );
+}
+
+function calculateOverallScore(
+    comparisons: Comparison[]
+) {
+    if (!comparisons.length) {
+        return 50;
+    }
+
+    const points = comparisons.reduce(
+        (sum, comparison) => {
+            if (comparison.similarity === 'same') {
+                return sum + 1;
+            }
+
+            if (comparison.similarity === 'close') {
+                return sum + 0.55;
+            }
+
+            return sum;
+        },
+        0
+    );
+
+    return Math.round(
+        (points / comparisons.length) * 100
+    );
+}
+
+function buildCategories(
+    comparisons: Comparison[],
+    overallPercent: number
+): Category[] {
+    const ids: CategoryId[] = [
+        'friendship',
+        'partnership',
+        'sex',
+        'money',
+        'care',
+        'home',
+    ];
+
+    return ids.map((id) => {
+        const meta = CATEGORY_META[id];
+
+        const relevant = comparisons.filter(
+            (comparison) =>
+                comparisonBelongsToCategory(
+                    comparison,
+                    meta.keywords
+                )
+        );
+
+        const source =
+            relevant.length > 0
+                ? relevant
+                : comparisons;
+
+        const scorePercent =
+            source.length > 0
+                ? calculateComparisonPercent(source)
+                : overallPercent;
+
+        return {
+            id,
+            title: meta.title,
+            subtitle: meta.subtitle,
+            score: percentToTen(scorePercent),
+        };
+    });
+}
+
+function comparisonBelongsToCategory(
+    comparison: Comparison,
+    keywords: string[]
+) {
+    const haystack = [
+        comparison.questionId,
+        comparison.question,
+        ...(comparison.traitsA ?? []),
+        ...(comparison.traitsB ?? []),
+        ...(comparison.sharedTraits ?? []),
+    ]
+        .join(' ')
+        .toLowerCase();
+
+    return keywords.some((keyword) =>
+        haystack.includes(keyword.toLowerCase())
+    );
+}
+
+function calculateComparisonPercent(
+    comparisons: Comparison[]
+) {
+    if (!comparisons.length) {
+        return 50;
+    }
+
+    const points = comparisons.reduce(
+        (sum, comparison) => {
+            if (comparison.similarity === 'same') {
+                return sum + 1;
+            }
+
+            if (comparison.similarity === 'close') {
+                return sum + 0.55;
+            }
+
+            return sum;
+        },
+        0
+    );
+
+    return Math.round(
+        (points / comparisons.length) * 100
+    );
+}
+
+function percentToTen(percent: number) {
+    return Math.max(
+        0,
+        Math.min(
+            10,
+            Math.round(percent / 10)
+        )
+    );
+}
+
+/*
+  Это развлекательный индекс, а не статистический прогноз
+  продолжительности отношений.
+
+  Значение намеренно не используется как "вероятность".
+*/
+function calculateYearsTogether(
+    categories: Category[],
+    overallPercent: number
+) {
+    if (!categories.length) {
+        return 1;
+    }
+
+    const average =
+        categories.reduce(
+            (sum, category) => sum + category.score,
+            0
+        ) / categories.length;
+
+    const weakest = Math.min(
+        ...categories.map((category) => category.score)
+    );
+
+    const strongest = Math.max(
+        ...categories.map((category) => category.score)
+    );
+
+    const normalized =
+        average * 0.6 +
+        weakest * 0.2 +
+        strongest * 0.1 +
+        (overallPercent / 10) * 0.1;
+
+    const years = Math.round(
+        1 + Math.pow(normalized / 10, 1.55) * 54
+    );
+
+    return Math.max(
+        1,
+        Math.min(55, years)
+    );
+}
+
+function getForecastPosition(years: number) {
+    const normalized = Math.max(
+        0,
+        Math.min(1, years / 55)
+    );
+
+    return 4 + normalized * 92;
+}
+
+function getYearWord(years: number) {
+    const lastTwo = years % 100;
+    const last = years % 10;
+
+    if (
+        lastTwo >= 11 &&
+        lastTwo <= 14
+    ) {
+        return 'лет';
+    }
+
+    if (last === 1) {
+        return 'год';
+    }
+
+    if (
+        last >= 2 &&
+        last <= 4
+    ) {
+        return 'года';
+    }
+
+    return 'лет';
 }
 
 /* ============================================================
@@ -394,11 +829,13 @@ function GlobalStyles() {
       body {
         margin: 0 !important;
         padding: 0 !important;
-        background: #f7f3f0 !important;
+
+        background: #faf7f4 !important;
       }
 
       body {
-        color: #191617;
+        color: #171315;
+
         font-family:
           Arial,
           Helvetica,
@@ -417,326 +854,36 @@ function GlobalStyles() {
 }
 
 /* ============================================================
-   DIMENSION
-============================================================ */
-
-function DimensionRow({
-                          item,
-                      }: {
-    item: DimensionItem;
-}) {
-    return (
-        <article className="dimension">
-
-            <div className="dimension-top">
-
-                <div className="dimension-text">
-                    <h3>{item.title}</h3>
-                    <p>{item.subtitle}</p>
-                </div>
-
-                <strong>
-                    {item.value}
-                    <sup>%</sup>
-                </strong>
-
-            </div>
-
-            <div className="bar">
-        <span
-            style={{
-                width: `${Math.max(
-                    3,
-                    Math.min(100, item.value)
-                )}%`,
-            }}
-        />
-            </div>
-
-        </article>
-    );
-}
-
-/* ============================================================
-   LOCKED ITEM
-============================================================ */
-
-function LockedItem({
-                        children,
-                    }: {
-    children: ReactNode;
-}) {
-    return (
-        <div className="locked-item">
-
-            <div className="lock-dot">
-                <span />
-            </div>
-
-            <p>{children}</p>
-
-        </div>
-    );
-}
-
-/* ============================================================
-   ART
-============================================================ */
-
-function CoupleArtwork({
-                           archetypeId,
-                       }: {
-    archetypeId: string;
-}) {
-    return (
-        <div className="art">
-
-            <div className="moon">
-                <span />
-                <span />
-            </div>
-
-            <div className="orbit orbit-one" />
-            <div className="orbit orbit-two" />
-
-            <span className="star star-one">✦</span>
-            <span className="star star-two">·</span>
-            <span className="star star-three">✦</span>
-
-            <Astronaut side="left" />
-            <Astronaut side="right" />
-
-            <div className="heart">
-                ♥
-            </div>
-
-            <div className="ground" />
-
-            <div className="art-note">
-                {getArtTag(archetypeId)}
-            </div>
-
-        </div>
-    );
-}
-
-function Astronaut({
-                       side,
-                   }: {
-    side: 'left' | 'right';
-}) {
-    return (
-        <div className={`astronaut ${side}`}>
-
-            <div className="backpack" />
-
-            <div className="helmet">
-                <div className="visor">
-                    <i />
-                    <i />
-                    <span />
-                </div>
-            </div>
-
-            <div className="astronaut-body">
-                <div className="panel">
-                    <i />
-                    <i />
-                </div>
-            </div>
-
-            <div className="arm arm-out" />
-            <div className="arm arm-in" />
-
-            <div className="leg leg-left" />
-            <div className="leg leg-right" />
-
-        </div>
-    );
-}
-
-/* ============================================================
-   HELPERS
-============================================================ */
-
-function calculateFallback(
-    comparisons: Comparison[]
-) {
-    if (!comparisons.length) {
-        return 0;
-    }
-
-    let points = 0;
-
-    comparisons.forEach((item) => {
-        if (item.similarity === 'same') {
-            points += 1;
-        }
-
-        if (item.similarity === 'close') {
-            points += 0.5;
-        }
-    });
-
-    return Math.round(
-        (points / comparisons.length) * 100
-    );
-}
-
-function getOverallTitle(value: number) {
-    if (value >= 75) {
-        return 'Вы часто смотрите в одну сторону';
-    }
-
-    if (value >= 55) {
-        return 'Во многом вы друг друга понимаете';
-    }
-
-    if (value >= 35) {
-        return 'Вы похожи меньше, чем кажется';
-    }
-
-    return 'Вы правда довольно разные';
-}
-
-function getOverallCopy(value: number) {
-    if (value >= 75) {
-        return 'Во многих ситуациях ваши ожидания и реакции оказываются похожими.';
-    }
-
-    if (value >= 55) {
-        return 'Есть заметная общая база, но некоторые вещи каждый видит по-своему.';
-    }
-
-    if (value >= 35) {
-        return 'В чём-то вы совпадаете, а в чём-то смотрите на отношения совсем по-разному.';
-    }
-
-    return 'Это не плохо и не хорошо. Просто у вас особенно много вещей, которые интересно обсудить.';
-}
-
-function getTypeNumber(id: string) {
-    const map: Record<string, string> = {
-        knight_princess: '01',
-        wizards: '02',
-        pirates: '03',
-        astronauts: '04',
-        sun_moon: '05',
-        dragon_keeper: '06',
-        players: '07',
-        homekeepers: '08',
-    };
-
-    return map[id] ?? '00';
-}
-
-function getArchetypeDisplayTitle(
-    id: string,
-    fallback: string
-) {
-    const map: Record<string, string> = {
-        knight_princess: 'Рыцарь и принцесса',
-        wizards: 'Два волшебника',
-        pirates: 'Два пирата',
-        astronauts: 'Два космонавта',
-        sun_moon: 'Солнце и Луна',
-        dragon_keeper: 'Дракон и хранитель',
-        players: 'Два игрока',
-        homekeepers: 'Хранители дома',
-    };
-
-    return map[id] ?? fallback;
-}
-
-function getArchetypeShortCopy(id: string) {
-    const map: Record<string, string> = {
-        knight_princess:
-            'По-разному показываете чувства, но одинаково держитесь за своих.',
-
-        wizards:
-            'Многое понимаете без длинных объяснений.',
-
-        pirates:
-            'Планы могут меняться. Команда — нет.',
-
-        astronauts:
-            'Каждый на своей орбите, но летите в одну сторону.',
-
-        sun_moon:
-            'По-разному реагируете на мир и хорошо дополняете друг друга.',
-
-        dragon_keeper:
-            'Один добавляет огня, второй не даёт всему сгореть.',
-
-        players:
-            'Разные стратегии. Одна команда.',
-
-        homekeepers:
-            'Вам важно своё место и свой человек.',
-    };
-
-    return map[id] ?? 'Два человека. Одна история.';
-}
-
-function getArtTag(id: string) {
-    const map: Record<string, string> = {
-        knight_princess: 'своих не бросаем',
-        wizards: 'понимаем между строк',
-        pirates: 'одна команда',
-        astronauts: 'две орбиты · один маршрут',
-        sun_moon: 'разные стороны одного неба',
-        dragon_keeper: 'огонь + спокойствие',
-        players: 'играем вдвоём',
-        homekeepers: 'своё место',
-    };
-
-    return map[id] ?? 'между вами';
-}
-
-function getPersonalHook(
-    different: number,
-    close: number
-) {
-    if (different >= 4) {
-        return `Особенно интересно: в ${different} ответах вы заметно разошлись.`;
-    }
-
-    if (different > 0) {
-        return `Есть ${different} ответа, где вы смотрите на ситуацию по-разному.`;
-    }
-
-    if (close > 0) {
-        return `${close} ответов оказались близкими, но не одинаковыми.`;
-    }
-
-    return '';
-}
-
-/* ============================================================
-   CSS
+   STYLES
 ============================================================ */
 
 const styles = `
 
 .page {
-  width: 100%;
   min-height: 100vh;
 
-  background: #F7F3F0;
-  color: #191617;
-
   overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle at 50% 15%,
+      #ffffff 0,
+      #faf7f4 44%,
+      #f8f4f1 100%
+    );
+
+  color: #171315;
 }
 
 .shell {
-  width: min(calc(100% - 40px), 630px);
+  width: min(calc(100% - 40px), 720px);
   margin: 0 auto;
 }
 
 /* HEADER */
 
 .header {
-  height: 72px;
+  height: 82px;
 
   display: flex;
   align-items: center;
@@ -749,168 +896,43 @@ const styles = `
     "Times New Roman",
     serif;
 
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
 
-  letter-spacing: -0.045em;
+  letter-spacing: -0.055em;
 }
 
-.names {
+.couple-names {
   display: flex;
   align-items: center;
 
-  gap: 8px;
+  gap: 9px;
 
-  color: #8A8184;
+  color: #7f777b;
 
   font-size: 10px;
   font-weight: 700;
 
-  letter-spacing: 0.09em;
+  letter-spacing: 0.08em;
 
   text-transform: uppercase;
 }
 
-.names span {
-  color: #B0476C;
+.couple-names b {
+  color: #c03968;
 }
 
-/* HERO */
+/* SCORES */
 
-.hero {
-  padding: 48px 0 58px;
+.scores {
+  padding: 18px 0 34px;
 }
 
-.eyebrow,
-.type-heading > span,
-.paywall-heading > span {
-  display: block;
-
-  margin-bottom: 17px;
-
-  color: #B0476C;
-
-  font-size: 11px;
-  font-weight: 700;
-
-  letter-spacing: 0.13em;
-
-  text-transform: uppercase;
+.score-row {
+  padding: 12px 0 11px;
 }
 
-.hero-result {
-  display: grid;
-
-  grid-template-columns: 185px 1fr;
-
-  gap: 40px;
-
-  align-items: center;
-}
-
-.score {
-  color: #B0476C;
-
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
-
-  font-size: 104px;
-  font-weight: 400;
-
-  line-height: 0.85;
-
-  letter-spacing: -0.08em;
-}
-
-.score sup {
-  position: relative;
-
-  top: -0.7em;
-
-  margin-left: 4px;
-
-  font-size: 0.3em;
-}
-
-.hero-copy h1,
-.section-intro h2,
-.type-heading h2,
-.paywall-heading h2,
-.state-page h1 {
-  margin: 0;
-
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
-
-  font-weight: 400;
-
-  letter-spacing: -0.045em;
-}
-
-.hero-copy h1 {
-  max-width: 330px;
-
-  font-size: 39px;
-  line-height: 0.98;
-}
-
-.hero-copy p {
-  max-width: 310px;
-
-  margin: 14px 0 0;
-
-  color: #777073;
-
-  font-size: 14px;
-  line-height: 1.45;
-}
-
-/* BREAKDOWN */
-
-.breakdown {
-  padding: 24px 0 66px;
-}
-
-.section-intro {
-  display: grid;
-
-  grid-template-columns: 220px 1fr;
-
-  gap: 42px;
-
-  align-items: end;
-
-  margin-bottom: 31px;
-}
-
-.section-intro h2 {
-  font-size: 48px;
-  line-height: 0.93;
-}
-
-.section-intro p {
-  max-width: 245px;
-
-  margin: 0 0 4px;
-
-  color: #777073;
-
-  font-size: 14px;
-  line-height: 1.45;
-}
-
-.dimensions {
-  display: flex;
-  flex-direction: column;
-
-  gap: 27px;
-}
-
-.dimension-top {
+.score-header {
   display: grid;
 
   grid-template-columns: 1fr auto;
@@ -920,7 +942,7 @@ const styles = `
   align-items: end;
 }
 
-.dimension-text h3 {
+.score-copy h2 {
   margin: 0;
 
   font-family:
@@ -928,699 +950,855 @@ const styles = `
     "Times New Roman",
     serif;
 
-  font-size: 22px;
+  font-size: 28px;
   font-weight: 400;
 
-  line-height: 1;
+  line-height: 0.95;
+
+  letter-spacing: -0.045em;
 }
 
-.dimension-text p {
+.score-copy p {
   margin: 5px 0 0;
 
-  color: #898184;
+  color: #888084;
 
   font-size: 12px;
-  line-height: 1.3;
+  line-height: 1.2;
 }
 
-.dimension-top strong {
-  color: #B0476C;
+.score-number {
+  min-width: 75px;
+
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+}
+
+.score-number strong {
+  color: #bb285b;
 
   font-family:
     Georgia,
     "Times New Roman",
     serif;
 
-  font-size: 24px;
+  font-size: 43px;
   font-weight: 400;
 
-  line-height: 1;
+  line-height: 0.8;
+
+  letter-spacing: -0.06em;
 }
 
-.dimension-top sup {
-  font-size: 0.55em;
+.score-number span {
+  margin-left: 4px;
+
+  color: #797176;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 20px;
 }
 
-.bar {
+.score-track {
   width: 100%;
-  height: 5px;
+  height: 7px;
 
-  margin-top: 11px;
+  margin-top: 10px;
 
   overflow: hidden;
 
   border-radius: 99px;
 
-  background: #E5DEDC;
+  background: #e8e3e3;
 }
 
-.bar span {
-  display: block;
-
+.score-fill {
   height: 100%;
 
   border-radius: inherit;
 
-  background: #B0476C;
+  background: linear-gradient(
+    90deg,
+    #c84170,
+    #ca4774
+  );
 }
 
-/* TYPE */
+/* FORECAST */
 
-.type-section {
-  padding: 10px 0 72px;
-}
-
-.type-heading {
-  max-width: 520px;
-
-  margin-bottom: 27px;
-}
-
-.type-heading h2 {
-  font-size: 52px;
-  line-height: 0.95;
-}
-
-.type-heading p {
-  max-width: 420px;
-
-  margin: 15px 0 0;
-
-  color: #777073;
-
-  font-size: 14px;
-  line-height: 1.45;
-}
-
-.type-card {
+.forecast {
   position: relative;
+
+  padding: 30px 10px 34px;
+
+  border-top: 1px solid #ded8d6;
 }
 
-.type-number {
-  position: absolute;
+.forecast-label {
+  margin-bottom: 10px;
 
-  z-index: 20;
+  color: #c03a68;
 
-  top: 17px;
-  right: 18px;
+  font-size: 10px;
+  font-weight: 700;
 
-  color: #F7F3F0;
+  letter-spacing: 0.2em;
+
+  text-transform: uppercase;
+}
+
+.forecast-grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.2fr)
+    minmax(230px, 0.8fr);
+
+  gap: 45px;
+
+  align-items: center;
+}
+
+.forecast-copy h2 {
+  margin: 0;
 
   font-family:
     Georgia,
     "Times New Roman",
     serif;
 
-  font-size: 19px;
+  font-size: 37px;
+  font-weight: 400;
+
+  line-height: 0.98;
+
+  letter-spacing: -0.05em;
 }
 
-.type-caption {
-  margin-top: 11px;
+.forecast-copy p {
+  max-width: 380px;
 
-  color: #8B8385;
+  margin: 11px 0 0;
 
-  font-size: 11px;
-  line-height: 1.3;
+  color: #898084;
 
-  text-align: right;
+  font-size: 12px;
+  line-height: 1.4;
 }
 
-/* ART */
+.forecast-result {
+  padding-top: 4px;
+}
 
-.art {
+.years {
+  color: #b51f55;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 67px;
+
+  line-height: 0.9;
+
+  letter-spacing: -0.06em;
+
+  white-space: nowrap;
+}
+
+.years span {
+  margin-left: 9px;
+
+  font-size: 42px;
+
+  letter-spacing: -0.04em;
+}
+
+.forecast-scale {
+  margin-top: 19px;
+}
+
+.forecast-line {
   position: relative;
 
-  height: 355px;
+  height: 8px;
+
+  border-radius: 99px;
+
+  background: #e5dfe1;
+}
+
+.forecast-progress {
+  height: 100%;
+
+  border-radius: inherit;
+
+  background: #eca6bc;
+}
+
+.forecast-dot {
+  position: absolute;
+
+  top: 50%;
+
+  width: 20px;
+  height: 20px;
+
+  border-radius: 50%;
+
+  background: #ba2057;
+
+  transform:
+    translate(-50%, -50%);
+}
+
+.forecast-scale-labels {
+  display: flex;
+  justify-content: space-between;
+
+  margin-top: 11px;
+
+  color: #8c8488;
+
+  font-size: 10px;
+}
+
+/* PAID */
+
+.paid-section {
+  padding: 8px 0 54px;
+}
+
+.paid-card {
+  position: relative;
 
   overflow: hidden;
 
-  border-radius: 3px;
+  min-height: 440px;
 
-  background: #39333F;
+  border-radius: 18px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #9f1f4d 0%,
+      #b5295b 48%,
+      #9d204e 100%
+    );
+
+  color: #fff8f4;
 }
 
-.moon {
+.paid-card::before {
+  content: "";
+
   position: absolute;
 
-  top: 35px;
-  left: 50%;
+  width: 340px;
+  height: 340px;
 
-  width: 155px;
-  height: 155px;
-
-  border: 4px solid #272229;
+  top: -160px;
+  right: -80px;
 
   border-radius: 50%;
 
-  background: #C4B2CF;
-
-  transform: translateX(-50%);
+  background:
+    rgba(255, 132, 170, 0.14);
 }
 
-.moon span {
-  position: absolute;
+.paid-top {
+  position: relative;
 
-  border: 3px solid rgba(72, 58, 77, 0.25);
+  z-index: 5;
 
-  border-radius: 50%;
+  display: grid;
+
+  grid-template-columns: 1.25fr 0.75fr;
+
+  gap: 40px;
+
+  padding: 27px 36px 0;
 }
 
-.moon span:first-child {
-  top: 30px;
-  left: 27px;
+.paid-label {
+  margin-bottom: 11px;
 
-  width: 39px;
-  height: 21px;
+  color: #efc4d2;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  letter-spacing: 0.18em;
+
+  text-transform: uppercase;
 }
 
-.moon span:last-child {
-  right: 25px;
-  bottom: 36px;
-
-  width: 27px;
-  height: 36px;
-}
-
-.orbit {
-  position: absolute;
-
-  left: 50%;
-
-  border: 1px solid rgba(247, 243, 240, 0.22);
-
-  border-radius: 50%;
-}
-
-.orbit-one {
-  top: 85px;
-
-  width: 470px;
-  height: 135px;
-
-  transform: translateX(-50%) rotate(-12deg);
-}
-
-.orbit-two {
-  top: 92px;
-
-  width: 430px;
-  height: 145px;
-
-  transform: translateX(-50%) rotate(16deg);
-}
-
-.star {
-  position: absolute;
-
-  color: #E5B14B;
-
-  font-size: 22px;
-}
-
-.star-one {
-  top: 55px;
-  left: 16%;
-}
-
-.star-two {
-  top: 72px;
-  right: 20%;
-
-  color: #F7F3F0;
-
-  font-size: 27px;
-}
-
-.star-three {
-  top: 145px;
-  right: 10%;
-
-  color: #CB6E8D;
-
-  font-size: 17px;
-}
-
-.ground {
-  position: absolute;
-
-  left: -12%;
-  right: -12%;
-  bottom: -165px;
-
-  height: 275px;
-
-  border-radius: 50% 50% 0 0;
-
-  background: #81718D;
-}
-
-.heart {
-  position: absolute;
-
-  z-index: 12;
-
-  top: 177px;
-  left: 50%;
-
-  color: #D04F79;
-
-  font-size: 28px;
-
-  transform: translateX(-50%);
-}
-
-.art-note {
-  position: absolute;
-
-  z-index: 20;
-
-  right: 18px;
-  bottom: 16px;
-
-  padding: 8px 11px;
-
-  background: #F7F3F0;
-
-  color: #373036;
+.paid-title h2 {
+  margin: 0;
 
   font-family:
     Georgia,
     "Times New Roman",
     serif;
 
+  font-size: 43px;
+  font-weight: 400;
+
+  line-height: 0.94;
+
+  letter-spacing: -0.055em;
+}
+
+.paid-benefits {
+  display: flex;
+  flex-direction: column;
+
+  gap: 15px;
+
+  padding-top: 9px;
+}
+
+.benefit {
+  display: grid;
+
+  grid-template-columns: 24px 1fr;
+
+  gap: 10px;
+
+  align-items: start;
+}
+
+.benefit-icon {
+  color: #ffd0dc;
+
   font-size: 12px;
+
+  padding-top: 2px;
 }
 
-/* ASTRONAUT */
+.benefit-text {
+  color: #fff8fa;
 
-.astronaut {
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+/* FAIRYTALE */
+
+.fairytale {
   position: absolute;
 
-  z-index: 10;
+  z-index: 1;
 
-  bottom: 36px;
+  left: 0;
+  bottom: 0;
 
-  width: 135px;
-  height: 205px;
+  width: 63%;
+  height: 285px;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(135, 31, 70, 0) 0%,
+      rgba(75, 27, 55, 0.45) 100%
+    );
 }
 
-.astronaut.left {
-  left: calc(50% - 145px);
-
-  transform: scale(0.86) rotate(2deg);
-}
-
-.astronaut.right {
-  right: calc(50% - 145px);
-
-  transform: scale(0.86) rotate(-2deg);
-}
-
-.backpack {
+.pixel-moon {
   position: absolute;
 
-  top: 75px;
-  left: 3px;
+  top: 35px;
+  left: 49%;
 
-  width: 48px;
+  width: 83px;
   height: 83px;
-
-  border: 4px solid #29242C;
-
-  border-radius: 17px;
-
-  background: #B45B7A;
-}
-
-.helmet {
-  position: absolute;
-
-  z-index: 6;
-
-  top: 0;
-  left: 50%;
-
-  width: 94px;
-  height: 90px;
-
-  border: 4px solid #29242C;
-
-  border-radius: 47%;
-
-  background: #F0E7DD;
-
-  transform: translateX(-50%);
-}
-
-.visor {
-  position: absolute;
-
-  top: 17px;
-  left: 14px;
-
-  width: 59px;
-  height: 47px;
-
-  border: 4px solid #29242C;
-
-  border-radius: 45%;
-
-  background: #665B70;
-}
-
-.visor i {
-  position: absolute;
-
-  top: 17px;
-
-  width: 5px;
-  height: 5px;
 
   border-radius: 50%;
 
-  background: #F2D4A5;
+  background:
+    #ffd0a9;
+
+  box-shadow:
+    0 0 0 7px rgba(255, 209, 170, 0.06),
+    0 0 38px rgba(255, 213, 178, 0.35);
 }
 
-.visor i:first-child {
-  left: 16px;
-}
-
-.visor i:nth-child(2) {
-  right: 16px;
-}
-
-.visor span {
-  position: absolute;
-
-  left: 50%;
-  bottom: 8px;
-
-  width: 18px;
-  height: 7px;
-
-  border-bottom: 2px solid #F2D4A5;
-
-  border-radius: 0 0 50% 50%;
-
-  transform: translateX(-50%);
-}
-
-.astronaut-body {
-  position: absolute;
-
-  z-index: 5;
-
-  top: 76px;
-  left: 50%;
-
-  width: 88px;
-  height: 88px;
-
-  border: 4px solid #29242C;
-
-  border-radius: 14px 14px 27px 27px;
-
-  background: #F0E7DD;
-
-  transform: translateX(-50%);
-}
-
-.panel {
-  position: absolute;
-
-  top: 25px;
-  left: 50%;
-
-  width: 38px;
-  height: 26px;
-
-  border: 3px solid #29242C;
-
-  background: #C35078;
-
-  transform: translateX(-50%);
-}
-
-.panel i {
-  position: absolute;
-
-  top: 7px;
-
-  width: 6px;
-  height: 6px;
-}
-
-.panel i:first-child {
-  left: 7px;
-
-  background: #E5AF49;
-}
-
-.panel i:last-child {
-  right: 7px;
-
-  background: #7E6C91;
-}
-
-.arm {
-  position: absolute;
-
-  z-index: 4;
-
-  top: 97px;
-
-  width: 61px;
-  height: 25px;
-
-  border: 4px solid #29242C;
-
-  border-radius: 14px;
-
-  background: #F0E7DD;
-}
-
-.astronaut.left .arm-out {
-  left: -20px;
-
-  transform: rotate(27deg);
-}
-
-.astronaut.left .arm-in {
-  right: -34px;
-
-  width: 76px;
-
-  transform: rotate(-11deg);
-}
-
-.astronaut.right .arm-out {
-  right: -20px;
-
-  transform: rotate(-27deg);
-}
-
-.astronaut.right .arm-in {
-  left: -34px;
-
-  width: 76px;
-
-  transform: rotate(11deg);
-}
-
-.leg {
+.sky-stars i {
   position: absolute;
 
   z-index: 3;
 
-  bottom: 0;
+  color: #ffc56e;
 
-  width: 39px;
-  height: 64px;
-
-  border: 4px solid #29242C;
-
-  border-radius: 10px 10px 18px 18px;
-
-  background: #F0E7DD;
+  font-style: normal;
 }
 
-.leg-left {
-  left: 25px;
-
-  transform: rotate(5deg);
+.s1 {
+  top: 30px;
+  left: 22%;
 }
 
-.leg-right {
-  right: 25px;
-
-  transform: rotate(-5deg);
+.s2 {
+  top: 67px;
+  left: 34%;
 }
 
-/* PAYWALL */
-
-.paywall {
-  padding: 68px 0 62px;
-
-  background: #2D282E;
-
-  color: #F7F3F0;
+.s3 {
+  top: 48px;
+  left: 70%;
 }
 
-.paywall-inner {
-  position: relative;
+.s4 {
+  top: 95px;
+  left: 58%;
 }
 
-.paywall-heading {
-  max-width: 500px;
+.s5 {
+  top: 85px;
+  left: 12%;
 }
 
-.paywall-heading > span {
-  color: #D67294;
-}
-
-.paywall-heading h2 {
-  color: #F7F3F0;
-
-  font-size: 51px;
-  line-height: 0.96;
-}
-
-.paywall-heading p {
-  max-width: 390px;
-
-  margin: 17px 0 0;
-
-  color: #BDB4B9;
-
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.locked-list {
-  display: grid;
-
-  grid-template-columns: 1fr 1fr;
-
-  gap: 10px 28px;
-
-  margin-top: 32px;
-}
-
-.locked-item {
-  display: grid;
-
-  grid-template-columns: 17px 1fr;
-
-  gap: 11px;
-
-  align-items: start;
-
-  padding: 10px 0;
-}
-
-.lock-dot {
-  position: relative;
-
-  width: 16px;
-  height: 16px;
-
-  margin-top: 1px;
-
-  border: 1px solid #716971;
-
-  border-radius: 50%;
-}
-
-.lock-dot span {
+.mountain {
   position: absolute;
 
-  top: 50%;
-  left: 50%;
+  bottom: 50px;
 
-  width: 4px;
-  height: 4px;
+  width: 220px;
+  height: 100px;
 
-  border-radius: 50%;
+  background: #76264a;
 
-  background: #D67294;
-
-  transform: translate(-50%, -50%);
+  clip-path:
+    polygon(
+      0 100%,
+      28% 35%,
+      44% 68%,
+      61% 20%,
+      100% 100%
+    );
 }
 
-.locked-item p {
-  margin: 0;
+.mountain-one {
+  left: -20px;
+}
 
-  color: #EEE7EA;
+.mountain-two {
+  left: 160px;
 
-  font-size: 13px;
-  line-height: 1.35;
+  opacity: 0.8;
+}
+
+.mountain-three {
+  left: 330px;
+
+  opacity: 0.65;
+}
+
+/* CASTLE */
+
+.castle {
+  position: absolute;
+
+  right: 17px;
+  bottom: 58px;
+
+  width: 90px;
+  height: 115px;
+}
+
+.castle-body {
+  position: absolute;
+
+  bottom: 0;
+  left: 17px;
+
+  width: 60px;
+  height: 65px;
+
+  background: #302434;
+
+  box-shadow:
+    inset 0 0 0 3px #211a24;
+}
+
+.castle-body i {
+  position: absolute;
+
+  width: 6px;
+  height: 10px;
+
+  background: #ffc26c;
+}
+
+.castle-body i:nth-child(1) {
+  top: 15px;
+  left: 10px;
+}
+
+.castle-body i:nth-child(2) {
+  top: 15px;
+  right: 10px;
+}
+
+.castle-body i:nth-child(3) {
+  bottom: 11px;
+  left: 27px;
+}
+
+.tower {
+  position: absolute;
+
+  bottom: 0;
+
+  width: 22px;
+
+  background: #2c2130;
+}
+
+.tower::before {
+  content: "";
+
+  position: absolute;
+
+  left: -5px;
+  top: -21px;
+
+  width: 0;
+  height: 0;
+
+  border-left: 16px solid transparent;
+  border-right: 16px solid transparent;
+  border-bottom: 24px solid #2c2130;
+}
+
+.tower-left {
+  left: 0;
+
+  height: 82px;
+}
+
+.tower-middle {
+  left: 34px;
+
+  height: 108px;
+}
+
+.tower-right {
+  right: 0;
+
+  height: 78px;
+}
+
+.tower span {
+  position: absolute;
+
+  top: 18px;
+  left: 8px;
+
+  width: 6px;
+  height: 10px;
+
+  background: #ffbe66;
+}
+
+/* GROUND */
+
+.ground-shape {
+  position: absolute;
+
+  left: -5%;
+  right: -5%;
+  bottom: -58px;
+
+  height: 140px;
+
+  border-radius: 50% 50% 0 0;
+
+  background: #392739;
+}
+
+/* CHARACTERS */
+
+.characters {
+  position: absolute;
+
+  z-index: 6;
+
+  left: 72px;
+  bottom: 28px;
+
+  width: 220px;
+  height: 180px;
+}
+
+.knight,
+.princess {
+  position: absolute;
+
+  bottom: 0;
+}
+
+.knight {
+  left: 0;
+}
+
+.princess {
+  right: 10px;
+}
+
+.knight-head,
+.princess-head {
+  position: absolute;
+
+  width: 50px;
+  height: 53px;
+
+  border: 5px solid #2a2028;
+
+  border-radius: 46% 46% 43% 43%;
+
+  background: #e9b28d;
+}
+
+.knight-head {
+  top: 10px;
+  left: 40px;
+}
+
+.princess-head {
+  top: 5px;
+  right: 45px;
+}
+
+.knight-hair,
+.princess-hair {
+  position: absolute;
+
+  top: -5px;
+  left: -5px;
+
+  width: 53px;
+  height: 22px;
+
+  border-radius: 50% 50% 20% 20%;
+
+  background: #3b2727;
+}
+
+.princess-hair {
+  height: 63px;
+
+  background: #d39b43;
+
+  z-index: -1;
+}
+
+.knight-body {
+  position: absolute;
+
+  top: 57px;
+  left: 28px;
+
+  width: 72px;
+  height: 92px;
+
+  border: 5px solid #292029;
+
+  border-radius: 15px;
+
+  background: #77727b;
+}
+
+.knight-cape {
+  position: absolute;
+
+  left: -30px;
+  top: 3px;
+
+  width: 50px;
+  height: 95px;
+
+  border: 5px solid #292029;
+
+  border-radius: 40% 0 0 40%;
+
+  background: #8d244d;
+
+  z-index: -1;
+}
+
+.knight-arm {
+  position: absolute;
+
+  right: -40px;
+  top: 31px;
+
+  width: 48px;
+  height: 18px;
+
+  border: 5px solid #292029;
+
+  border-radius: 10px;
+
+  background: #77727b;
+
+  transform: rotate(-8deg);
+}
+
+.princess-body {
+  position: absolute;
+
+  top: 52px;
+  right: 22px;
+
+  width: 80px;
+  height: 104px;
+}
+
+.princess-dress {
+  position: absolute;
+
+  left: 50%;
+  bottom: 0;
+
+  width: 93px;
+  height: 97px;
+
+  border: 5px solid #2a2028;
+
+  background: #d96d91;
+
+  clip-path:
+    polygon(
+      34% 0,
+      66% 0,
+      100% 100%,
+      0 100%
+    );
+
+  transform: translateX(-50%);
+}
+
+.crown {
+  position: absolute;
+
+  z-index: 10;
+
+  top: -20px;
+  right: 56px;
+
+  color: #ffd25f;
+
+  font-size: 27px;
+}
+
+.pixel-heart {
+  position: absolute;
+
+  z-index: 10;
+
+  left: 49%;
+  bottom: 124px;
+
+  color: #ff7ca6;
+
+  font-size: 18px;
+}
+
+/* BUTTON */
+
+.paid-bottom {
+  position: absolute;
+
+  z-index: 20;
+
+  right: 28px;
+  bottom: 22px;
+
+  width: 49%;
 }
 
 .buy-button {
   width: 100%;
 
-  display: flex;
+  display: grid;
+
+  grid-template-columns:
+    1fr auto auto;
+
+  gap: 15px;
 
   align-items: center;
-  justify-content: space-between;
 
-  gap: 20px;
-
-  margin-top: 30px;
-
-  padding: 19px 22px;
+  padding: 16px 18px;
 
   border: 0;
-  border-radius: 2px;
+  border-radius: 12px;
 
-  background: #B0476C;
+  background: #fffaf7;
 
-  color: #FFFFFF;
+  color: #181316;
 
   cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease;
 }
 
 .buy-button:hover {
-  background: #BC5075;
+  transform: translateY(-2px);
+
+  background: #ffffff;
 }
 
 .buy-button span {
-  font-size: 15px;
+  text-align: left;
+
+  font-size: 12px;
   font-weight: 700;
 }
 
 .buy-button strong {
-  white-space: nowrap;
-
-  font-size: 16px;
-}
-
-.buy-note {
-  margin-top: 9px;
-
-  color: #8D858B;
-
-  font-size: 11px;
-
-  text-align: center;
-}
-
-.personal-hook {
-  margin-top: 25px;
-
-  color: #D7CDD2;
+  color: #b52056;
 
   font-family:
     Georgia,
     "Times New Roman",
     serif;
 
-  font-size: 17px;
+  font-size: 18px;
+  font-weight: 400;
+
+  white-space: nowrap;
+}
+
+.buy-button i {
+  color: #bd285d;
+
+  font-size: 21px;
+  font-style: normal;
+}
+
+.paid-note {
+  margin-top: 9px;
+
+  color: #dda4b8;
+
+  font-size: 9px;
 
   text-align: center;
 }
 
-/* STATES */
+/* STATE */
 
 .state-page {
   min-height: 100svh;
@@ -1633,226 +1811,230 @@ const styles = `
 
   padding: 30px;
 
-  background: #F7F3F0;
+  background: #faf7f4;
 
   text-align: center;
 }
 
-.state-page h1 {
-  margin-top: 24px;
+.state-brand {
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
 
-  font-size: 42px;
+  font-size: 23px;
+  font-weight: 700;
+}
+
+.state-page h1 {
+  max-width: 420px;
+
+  margin: 25px 0 0;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 38px;
+  font-weight: 400;
+
+  line-height: 1;
 }
 
 .state-page p {
-  color: #837A7E;
+  margin-top: 13px;
 
-  font-size: 14px;
+  color: #8a8285;
+
+  font-size: 13px;
 }
 
-.loader-circles {
+.loader {
   display: flex;
 
   margin-bottom: 25px;
 }
 
-.loader-circles span {
-  width: 55px;
-  height: 55px;
+.loader span {
+  width: 52px;
+  height: 52px;
 
   border-radius: 50%;
 
-  background: #DDB1C1;
+  background: #e2b4c4;
 }
 
-.loader-circles span:last-child {
+.loader span:last-child {
   margin-left: -14px;
 
-  background: #AE627E;
+  background: #b36380;
 }
 
 /* MOBILE */
 
-@media (max-width: 600px) {
+@media (max-width: 650px) {
 
   .shell {
-    width: calc(100% - 32px);
+    width: calc(100% - 30px);
   }
 
   .header {
-    height: 64px;
+    height: 66px;
   }
 
   .brand {
-    font-size: 19px;
-  }
-
-  .names {
-    font-size: 9px;
-  }
-
-  .hero {
-    padding: 36px 0 47px;
-  }
-
-  .eyebrow,
-  .type-heading > span,
-  .paywall-heading > span {
-    margin-bottom: 13px;
-
-    font-size: 9px;
-  }
-
-  .hero-result {
-    grid-template-columns: 1fr;
-
-    gap: 17px;
-  }
-
-  .score {
-    font-size: 91px;
-  }
-
-  .hero-copy h1 {
-    max-width: 330px;
-
-    font-size: 35px;
-  }
-
-  .hero-copy p {
-    margin-top: 11px;
-
-    font-size: 13px;
-  }
-
-  .breakdown {
-    padding: 14px 0 54px;
-  }
-
-  .section-intro {
-    grid-template-columns: 1fr;
-
-    gap: 11px;
-
-    margin-bottom: 29px;
-  }
-
-  .section-intro h2 {
-    font-size: 41px;
-  }
-
-  .section-intro p {
-    font-size: 13px;
-  }
-
-  .dimensions {
-    gap: 24px;
-  }
-
-  .dimension-text h3 {
     font-size: 20px;
   }
 
-  .dimension-text p {
-    max-width: 240px;
-
-    font-size: 11px;
+  .couple-names {
+    font-size: 9px;
   }
 
-  .dimension-top strong {
-    font-size: 22px;
+  .scores {
+    padding-top: 9px;
+    padding-bottom: 25px;
   }
 
-  .type-section {
-    padding-bottom: 55px;
+  .score-row {
+    padding: 11px 0 10px;
   }
 
-  .type-heading h2 {
-    font-size: 43px;
+  .score-copy h2 {
+    font-size: 24px;
   }
 
-  .type-heading p {
-    font-size: 13px;
-  }
-
-  .art {
-    height: 280px;
-  }
-
-  .moon {
-    width: 125px;
-    height: 125px;
-  }
-
-  .astronaut {
-    bottom: 20px;
-  }
-
-  .astronaut.left {
-    left: calc(50% - 116px);
-
-    transform: scale(0.7) rotate(2deg);
-  }
-
-  .astronaut.right {
-    right: calc(50% - 116px);
-
-    transform: scale(0.7) rotate(-2deg);
-  }
-
-  .heart {
-    top: 143px;
-  }
-
-  .art-note {
-    right: 11px;
-    bottom: 11px;
-
+  .score-copy p {
     font-size: 10px;
   }
 
-  .paywall {
-    padding: 52px 0 47px;
+  .score-number {
+    min-width: 62px;
   }
 
-  .paywall-heading h2 {
-    font-size: 43px;
+  .score-number strong {
+    font-size: 37px;
   }
 
-  .paywall-heading p {
-    font-size: 13px;
+  .score-number span {
+    font-size: 17px;
   }
 
-  .locked-list {
+  .score-track {
+    height: 6px;
+    margin-top: 9px;
+  }
+
+  .forecast {
+    padding:
+      27px 0
+      30px;
+  }
+
+  .forecast-grid {
     grid-template-columns: 1fr;
 
-    gap: 2px;
-
-    margin-top: 24px;
+    gap: 22px;
   }
 
-  .locked-item {
-    padding: 8px 0;
+  .forecast-copy h2 {
+    font-size: 34px;
+  }
+
+  .forecast-copy p {
+    font-size: 11px;
+  }
+
+  .years {
+    font-size: 61px;
+  }
+
+  .years span {
+    font-size: 37px;
+  }
+
+  .forecast-result {
+    padding: 0;
+  }
+
+  .paid-section {
+    padding-top: 5px;
+    padding-bottom: 30px;
+  }
+
+  .paid-card {
+    min-height: 630px;
+
+    border-radius: 15px;
+  }
+
+  .paid-top {
+    grid-template-columns: 1fr;
+
+    gap: 20px;
+
+    padding:
+      25px 24px
+      0;
+  }
+
+  .paid-title h2 {
+    font-size: 40px;
+  }
+
+  .paid-benefits {
+    display: grid;
+
+    grid-template-columns:
+      1fr 1fr;
+
+    gap: 12px 15px;
+
+    padding: 0;
+  }
+
+  .benefit-text {
+    font-size: 10px;
+  }
+
+  .fairytale {
+    width: 100%;
+    height: 280px;
+
+    bottom: 80px;
+  }
+
+  .characters {
+    left: 26px;
+
+    transform: scale(0.86);
+    transform-origin: bottom left;
+  }
+
+  .castle {
+    right: 14px;
+
+    transform: scale(0.82);
+    transform-origin: bottom right;
+  }
+
+  .paid-bottom {
+    right: 18px;
+    bottom: 17px;
+
+    width: calc(100% - 36px);
   }
 
   .buy-button {
-    margin-top: 23px;
-
-    padding: 17px;
+    padding: 15px 14px;
   }
 
   .buy-button span {
-    font-size: 13px;
+    font-size: 11px;
   }
 
   .buy-button strong {
-    font-size: 14px;
-  }
-
-  .personal-hook {
-    margin-top: 20px;
-
-    font-size: 15px;
+    font-size: 17px;
   }
 
 }
