@@ -498,19 +498,20 @@ function Benefit({
 function PixelFairytale() {
     return (
         <div className="fairytale">
-            <div className="sky-stars">
-                <i className="s1">✦</i>
-                <i className="s2">·</i>
-                <i className="s3">✦</i>
-                <i className="s4">·</i>
-                <i className="s5">✦</i>
-            </div>
-
             <div className="pixel-moon" />
 
-            <div className="mountain mountain-one" />
-            <div className="mountain mountain-two" />
-            <div className="mountain mountain-three" />
+            <div className="sky-stars">
+                <i className="s1">✦</i>
+                <i className="s2">✦</i>
+                <i className="s3">·</i>
+                <i className="s4">♥</i>
+            </div>
+
+            <div className="mountains">
+                <div className="mountain mountain-one" />
+                <div className="mountain mountain-two" />
+                <div className="mountain mountain-three" />
+            </div>
 
             <div className="castle">
                 <div className="tower tower-left">
@@ -546,10 +547,10 @@ function PixelFairytale() {
                     </div>
                 </div>
 
+                <div className="pixel-heart">♥</div>
+
                 <div className="princess">
-                    <div className="crown">
-                        ♛
-                    </div>
+                    <div className="crown">♛</div>
 
                     <div className="princess-head">
                         <div className="princess-hair" />
@@ -559,10 +560,6 @@ function PixelFairytale() {
                         <div className="princess-dress" />
                     </div>
                 </div>
-            </div>
-
-            <div className="pixel-heart">
-                ♥
             </div>
         </div>
     );
