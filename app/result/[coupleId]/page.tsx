@@ -27,9 +27,7 @@ type Dimensions = {
 
 type ResultData = {
     waiting?: boolean;
-
     couple: Couple;
-
     comparisons?: Comparison[];
 
     scores?: {
@@ -56,11 +54,9 @@ type DimensionItem = {
 };
 
 export default function ResultPage() {
-    const params = useParams<{
-        coupleId: string;
-    }>();
-
+    const params = useParams<{ coupleId: string }>();
     const router = useRouter();
+
     const coupleId = params.coupleId;
 
     const [data, setData] = useState<ResultData | null>(null);
@@ -100,8 +96,10 @@ export default function ResultPage() {
     if (error) {
         return (
             <>
-                <main className="state-page">
-                    <div className="state-brand">между нами</div>
+                <main className="result-state">
+                    <div className="result-state-brand">
+                        между нами
+                    </div>
 
                     <h1>
                         что-то пошло
@@ -112,9 +110,8 @@ export default function ResultPage() {
                     <p>{error}</p>
                 </main>
 
-                <style jsx global>
-                    {styles}
-                </style>
+                <GlobalStyles />
+                <style jsx>{styles}</style>
             </>
         );
     }
@@ -122,21 +119,22 @@ export default function ResultPage() {
     if (!data) {
         return (
             <>
-                <main className="loading-page">
-                    <div className="loading-symbol">
+                <main className="result-state">
+                    <div className="result-loader">
                         <span />
                         <i>♥</i>
                         <span />
                     </div>
 
-                    <div className="state-brand">между нами</div>
+                    <div className="result-state-brand">
+                        между нами
+                    </div>
 
                     <p>собираем вас двоих</p>
                 </main>
 
-                <style jsx global>
-                    {styles}
-                </style>
+                <GlobalStyles />
+                <style jsx>{styles}</style>
             </>
         );
     }
@@ -200,26 +198,30 @@ export default function ResultPage() {
 
     return (
         <>
-            <main className="page">
+            <main className="result-page">
 
-                <header className="header shell">
-                    <div className="brand">
+                {/* HEADER */}
+
+                <header className="result-header result-shell">
+                    <div className="result-brand">
                         между нами
                     </div>
 
-                    <div className="header-couple">
+                    <div className="result-names">
                         <span>{nameA}</span>
                         <b>×</b>
                         <span>{nameB}</span>
                     </div>
                 </header>
 
-                <section className="intro shell">
-                    <div className="kicker">
+                {/* INTRO */}
+
+                <section className="result-intro result-shell">
+                    <div className="result-kicker">
                         ВАШ РЕЗУЛЬТАТ
                     </div>
 
-                    <div className="intro-grid">
+                    <div className="result-intro-grid">
                         <h1>
                             Вот как
                             <br />
@@ -233,7 +235,9 @@ export default function ResultPage() {
                     </div>
                 </section>
 
-                <section className="dimensions shell">
+                {/* DIMENSIONS */}
+
+                <section className="result-dimensions result-shell">
                     {dimensionItems.map((item) => (
                         <DimensionCard
                             key={item.kind}
@@ -242,10 +246,13 @@ export default function ResultPage() {
                     ))}
                 </section>
 
-                <section className="type-section shell">
-                    <div className="type-heading">
+                {/* TYPE */}
+
+                <section className="result-type result-shell">
+                    <div className="result-type-heading">
+
                         <div>
-              <span className="kicker">
+              <span className="result-kicker">
                 ВАШ ТИП ПАРЫ
               </span>
 
@@ -257,34 +264,40 @@ export default function ResultPage() {
                             </h2>
                         </div>
 
-                        <span className="type-number">
+                        <span className="result-type-number">
               №{getTypeNumber(archetype.id)}
             </span>
+
                     </div>
 
-                    <div className="poster">
+                    <div className="result-poster">
+
                         <CoupleArtwork
                             archetypeId={archetype.id}
                         />
 
-                        <div className="poster-info">
-                            <div className="poster-caption">
-                <span>
-                  ПАРА №{getTypeNumber(archetype.id)}
-                </span>
+                        <div className="result-poster-footer">
 
-                                <p>
-                                    {getArchetypeShortCopy(archetype.id)}
-                                </p>
-                            </div>
+              <span>
+                ПАРА №{getTypeNumber(archetype.id)}
+              </span>
+
+                            <p>
+                                {getArchetypeShortCopy(archetype.id)}
+                            </p>
+
                         </div>
+
                     </div>
                 </section>
 
-                <section className="paywall">
-                    <div className="paywall-inner shell">
+                {/* PAYWALL */}
 
-                        <div className="paywall-topline">
+                <section className="result-paywall">
+
+                    <div className="result-shell">
+
+                        <div className="result-paywall-label">
               <span>
                 ЭТО ТОЛЬКО ПОВЕРХНОСТЬ
               </span>
@@ -292,9 +305,9 @@ export default function ResultPage() {
                             <b>✦</b>
                         </div>
 
-                        <div className="paywall-grid">
+                        <div className="result-paywall-grid">
 
-                            <div className="paywall-copy">
+                            <div className="result-paywall-title">
                                 <h2>
                                     А где вы
                                     <br />
@@ -310,9 +323,9 @@ export default function ResultPage() {
                                 </p>
                             </div>
 
-                            <div className="teaser">
+                            <div className="result-teaser">
 
-                                <div className="finding-count">
+                                <div className="result-found">
                                     <span>МЫ НАШЛИ</span>
 
                                     <strong>
@@ -350,6 +363,7 @@ export default function ResultPage() {
                                 </LockedFinding>
 
                                 <button
+                                    className="result-buy"
                                     type="button"
                                     onClick={() =>
                                         router.push(`/report/${coupleId}`)
@@ -366,48 +380,60 @@ export default function ResultPage() {
                                     <b>→</b>
                                 </button>
 
-                                <div className="paywall-footnote">
+                                <div className="result-footnote">
                                     один разбор · для вас двоих
                                 </div>
 
                             </div>
 
                         </div>
+
                     </div>
+
                 </section>
 
             </main>
 
-            <style jsx global>
-                {styles}
-            </style>
+            <GlobalStyles />
+
+            <style jsx>{styles}</style>
         </>
     );
 }
 
-function calculateFallback(
-    comparisons: Comparison[]
-) {
-    if (comparisons.length === 0) {
-        return 0;
-    }
+/* ============================================================
+   GLOBAL
+============================================================ */
 
-    let points = 0;
+function GlobalStyles() {
+    return (
+        <style jsx global>{`
+      html,
+      body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #f4efe9 !important;
+      }
 
-    for (const item of comparisons) {
-        if (item.similarity === 'same') {
-            points += 1;
-        }
+      body {
+        color: #292329;
+        font-family:
+          "Trebuchet MS",
+          "Helvetica Neue",
+          Arial,
+          sans-serif;
+      }
 
-        if (item.similarity === 'close') {
-            points += 0.5;
-        }
-    }
-
-    return Math.round(
-        (points / comparisons.length) * 100
+      * {
+        box-sizing: border-box;
+      }
+    `}</style>
     );
 }
+
+/* ============================================================
+   DIMENSION
+============================================================ */
 
 function DimensionCard({
                            item,
@@ -415,18 +441,18 @@ function DimensionCard({
     item: DimensionItem;
 }) {
     return (
-        <article className="dimension-card">
+        <article className="result-dimension">
 
-            <div className="dimension-icon-wrap">
+            <div className="result-dimension-icon">
                 <DimensionIcon kind={item.kind} />
             </div>
 
-            <div className="dimension-content">
+            <div className="result-dimension-body">
 
-                <div className="dimension-top">
+                <div className="result-dimension-top">
 
                     <div>
-            <span className="dimension-eyebrow">
+            <span className="result-dimension-label">
               {item.eyebrow}
             </span>
 
@@ -454,6 +480,267 @@ function DimensionCard({
             </div>
 
         </article>
+    );
+}
+
+function SegmentBar({
+                        value,
+                    }: {
+    value: number;
+}) {
+    const active = Math.round(value / 10);
+
+    return (
+        <div className="result-segments">
+            {Array.from({ length: 10 }).map(
+                (_, index) => (
+                    <span
+                        key={index}
+                        className={
+                            index < active
+                                ? 'active'
+                                : ''
+                        }
+                    />
+                )
+            )}
+        </div>
+    );
+}
+
+/* ============================================================
+   ICONS
+============================================================ */
+
+function DimensionIcon({
+                           kind,
+                       }: {
+    kind: DimensionKind;
+}) {
+    if (kind === 'views') {
+        return (
+            <div className="result-mini-art result-views-art">
+        <span className="result-eye">
+          <i />
+        </span>
+
+                <span className="result-eye result-eye-second">
+          <i />
+        </span>
+            </div>
+        );
+    }
+
+    if (kind === 'care') {
+        return (
+            <div className="result-mini-art result-care-art">
+                <span className="result-hand result-hand-left" />
+                <i>♥</i>
+                <span className="result-hand result-hand-right" />
+            </div>
+        );
+    }
+
+    if (kind === 'communication') {
+        return (
+            <div className="result-mini-art result-talk-art">
+                <span />
+                <span />
+                <i>··</i>
+            </div>
+        );
+    }
+
+    if (kind === 'rhythm') {
+        return (
+            <div className="result-mini-art result-rhythm-art">
+                <svg
+                    viewBox="0 0 90 60"
+                    aria-hidden="true"
+                >
+                    <path
+                        d="M5 35 C16 5 27 5 38 35 C49 65 60 65 71 35 C78 16 83 13 87 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="5"
+                        strokeLinecap="round"
+                    />
+
+                    <circle
+                        cx="5"
+                        cy="35"
+                        r="4"
+                        fill="#B43D69"
+                    />
+
+                    <circle
+                        cx="87"
+                        cy="24"
+                        r="4"
+                        fill="#E4AE49"
+                    />
+                </svg>
+            </div>
+        );
+    }
+
+    return (
+        <div className="result-mini-art result-space-art">
+            <span className="result-planet result-planet-one" />
+            <span className="result-planet result-planet-two" />
+            <i />
+        </div>
+    );
+}
+
+/* ============================================================
+   ARTWORK
+============================================================ */
+
+function CoupleArtwork({
+                           archetypeId,
+                       }: {
+    archetypeId: string;
+}) {
+    return (
+        <div className="result-art">
+
+            <i className="result-spark result-spark-one">
+                ✦
+            </i>
+
+            <i className="result-spark result-spark-two">
+                ✦
+            </i>
+
+            <i className="result-spark result-spark-three">
+                +
+            </i>
+
+            <span className="result-orbit result-orbit-one" />
+            <span className="result-orbit result-orbit-two" />
+
+            <div className="result-big-planet">
+                <i />
+                <i />
+                <i />
+            </div>
+
+            <div className="result-ground">
+                <i />
+                <i />
+                <i />
+            </div>
+
+            <Character side="left" />
+            <Character side="right" />
+
+            <div className="result-heart">
+                ♥
+            </div>
+
+            <div className="result-art-tag">
+                {getArtTag(archetypeId)}
+            </div>
+
+        </div>
+    );
+}
+
+function Character({
+                       side,
+                   }: {
+    side: 'left' | 'right';
+}) {
+    return (
+        <div className={`result-character ${side}`}>
+
+            <div className="result-backpack" />
+
+            <div className="result-helmet">
+                <div className="result-visor">
+                    <i />
+                    <i />
+                    <span />
+                </div>
+            </div>
+
+            <div className="result-body">
+                <div className="result-panel">
+                    <i />
+                    <i />
+                </div>
+            </div>
+
+            <div className="result-arm result-arm-outside" />
+            <div className="result-arm result-arm-inside" />
+
+            <div className="result-leg result-leg-one" />
+            <div className="result-leg result-leg-two" />
+
+        </div>
+    );
+}
+
+/* ============================================================
+   PAYWALL
+============================================================ */
+
+function LockedFinding({
+                           children,
+                       }: {
+    children: ReactNode;
+}) {
+    return (
+        <div className="result-locked">
+
+            <div className="result-lock">
+                ↗
+            </div>
+
+            <div>
+        <span>
+          НАЙДЕНО В ВАШИХ ОТВЕТАХ
+        </span>
+
+                <p>
+                    {children}
+                </p>
+            </div>
+
+            <b>
+                закрыто
+            </b>
+
+        </div>
+    );
+}
+
+/* ============================================================
+   HELPERS
+============================================================ */
+
+function calculateFallback(
+    comparisons: Comparison[]
+) {
+    if (!comparisons.length) {
+        return 0;
+    }
+
+    let points = 0;
+
+    for (const item of comparisons) {
+        if (item.similarity === 'same') {
+            points += 1;
+        }
+
+        if (item.similarity === 'close') {
+            points += 0.5;
+        }
+    }
+
+    return Math.round(
+        (points / comparisons.length) * 100
     );
 }
 
@@ -520,112 +807,6 @@ function getDimensionCopy(
     return 'Потребность быть рядом и потребность побыть отдельно у вас заметно различаются.';
 }
 
-function SegmentBar({
-                        value,
-                    }: {
-    value: number;
-}) {
-    const active = Math.round(value / 10);
-
-    return (
-        <div className="segments">
-            {Array.from({ length: 10 }).map(
-                (_, index) => (
-                    <span
-                        key={index}
-                        className={
-                            index < active
-                                ? 'active'
-                                : ''
-                        }
-                    />
-                )
-            )}
-        </div>
-    );
-}
-
-function DimensionIcon({
-                           kind,
-                       }: {
-    kind: DimensionKind;
-}) {
-    if (kind === 'views') {
-        return (
-            <div className="mini-art views-art">
-        <span className="eye-shape eye-one">
-          <i />
-        </span>
-
-                <span className="eye-shape eye-two">
-          <i />
-        </span>
-            </div>
-        );
-    }
-
-    if (kind === 'care') {
-        return (
-            <div className="mini-art care-art">
-                <span className="hand hand-one" />
-                <i>♥</i>
-                <span className="hand hand-two" />
-            </div>
-        );
-    }
-
-    if (kind === 'communication') {
-        return (
-            <div className="mini-art talk-art">
-                <span />
-                <span />
-                <i>··</i>
-            </div>
-        );
-    }
-
-    if (kind === 'rhythm') {
-        return (
-            <div className="mini-art rhythm-art">
-                <svg
-                    viewBox="0 0 90 60"
-                    aria-hidden="true"
-                >
-                    <path
-                        d="M5 35 C16 5 27 5 38 35 C49 65 60 65 71 35 C78 16 83 13 87 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="5"
-                        strokeLinecap="round"
-                    />
-
-                    <circle
-                        cx="5"
-                        cy="35"
-                        r="4"
-                        fill="#B43D69"
-                    />
-
-                    <circle
-                        cx="87"
-                        cy="24"
-                        r="4"
-                        fill="#E4AE49"
-                    />
-                </svg>
-            </div>
-        );
-    }
-
-    return (
-        <div className="mini-art space-art">
-            <span className="planet-one" />
-            <span className="planet-two" />
-            <i />
-        </div>
-    );
-}
-
 function getTypeNumber(id: string) {
     const map: Record<string, string> = {
         knight_princess: '01',
@@ -686,95 +867,7 @@ function getArchetypeShortCopy(id: string) {
             'Своё место. Свой человек.',
     };
 
-    return (
-        map[id] ??
-        'Два человека. Одна история.'
-    );
-}
-
-function CoupleArtwork({
-                           archetypeId,
-                       }: {
-    archetypeId: string;
-}) {
-    return (
-        <div
-            className={`couple-art art-${archetypeId}`}
-        >
-            <div className="sky-decoration">
-                <i className="spark spark-one">
-                    ✦
-                </i>
-
-                <i className="spark spark-two">
-                    ✦
-                </i>
-
-                <i className="spark spark-three">
-                    +
-                </i>
-
-                <span className="orbit-line orbit-line-one" />
-                <span className="orbit-line orbit-line-two" />
-            </div>
-
-            <div className="big-planet">
-                <i />
-                <i />
-                <i />
-            </div>
-
-            <div className="ground">
-                <i className="crater crater-one" />
-                <i className="crater crater-two" />
-                <i className="crater crater-three" />
-            </div>
-
-            <Character side="left" />
-            <Character side="right" />
-
-            <div className="art-love">
-                ♥
-            </div>
-
-            <div className="art-tag">
-                {getArtTag(archetypeId)}
-            </div>
-        </div>
-    );
-}
-
-function Character({
-                       side,
-                   }: {
-    side: 'left' | 'right';
-}) {
-    return (
-        <div className={`character ${side}`}>
-            <div className="backpack" />
-
-            <div className="helmet">
-                <div className="visor">
-                    <i />
-                    <i />
-                    <span />
-                </div>
-            </div>
-
-            <div className="body">
-                <div className="panel">
-                    <i />
-                    <i />
-                </div>
-            </div>
-
-            <div className="arm arm-outside" />
-            <div className="arm arm-inside" />
-
-            <div className="leg leg-one" />
-            <div className="leg leg-two" />
-        </div>
-    );
+    return map[id] ?? 'Два человека. Одна история.';
 }
 
 function getArtTag(id: string) {
@@ -812,174 +905,110 @@ function getFindingText(
     close: number
 ) {
     if (different > 0) {
-        return pluralizeFinding(different);
+        return different === 1
+            ? 'место, где ваши ответы особенно расходятся'
+            : 'места, где ваши ответы особенно расходятся';
     }
 
     if (close > 0) {
-        return pluralizeNuance(close);
+        return 'неочевидных различия в ваших ответах';
     }
 
-    return 'важные детали, которые не видно на поверхности';
+    return 'важные детали, которых не видно на поверхности';
 }
 
-function pluralizeFinding(count: number) {
-    const mod10 = count % 10;
-    const mod100 = count % 100;
-
-    if (
-        mod10 === 1 &&
-        mod100 !== 11
-    ) {
-        return 'место, где ваши ответы особенно расходятся';
-    }
-
-    if (
-        mod10 >= 2 &&
-        mod10 <= 4 &&
-        !(mod100 >= 12 && mod100 <= 14)
-    ) {
-        return 'места, где ваши ответы особенно расходятся';
-    }
-
-    return 'мест, где ваши ответы особенно расходятся';
-}
-
-function pluralizeNuance(count: number) {
-    const mod10 = count % 10;
-    const mod100 = count % 100;
-
-    if (
-        mod10 === 1 &&
-        mod100 !== 11
-    ) {
-        return 'неочевидное различие между вашими ответами';
-    }
-
-    if (
-        mod10 >= 2 &&
-        mod10 <= 4 &&
-        !(mod100 >= 12 && mod100 <= 14)
-    ) {
-        return 'неочевидных различия между вашими ответами';
-    }
-
-    return 'неочевидных различий между вашими ответами';
-}
-
-function LockedFinding({
-                           children,
-                       }: {
-    children: ReactNode;
-}) {
-    return (
-        <div className="locked-finding">
-            <div className="lock">
-                ↗
-            </div>
-
-            <div>
-        <span>
-          НАЙДЕНО В ВАШИХ ОТВЕТАХ
-        </span>
-
-                <p>
-                    {children}
-                </p>
-            </div>
-
-            <b>
-                закрыто
-            </b>
-        </div>
-    );
-}
+/* ============================================================
+   STYLES
+============================================================ */
 
 const styles = `
 
-* {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  margin: 0;
+.result-page {
+  display: block !important;
+  width: 100% !important;
+  min-height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
   background: #F4EFE9;
-  color: #292329;
-
-  font-family:
-    "Trebuchet MS",
-    "Helvetica Neue",
-    Arial,
-    sans-serif;
-}
-
-button {
-  font: inherit;
-}
-
-.page {
-  min-height: 100svh;
   overflow: hidden;
 }
 
-.shell {
-  width: min(
-    calc(100% - 36px),
-    760px
-  );
-
-  margin: 0 auto;
+.result-shell {
+  display: block;
+  width: min(calc(100% - 36px), 760px);
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* HEADER */
 
-.header {
-  height: 58px;
+.result-header {
+  position: relative !important;
+  inset: auto !important;
 
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  width: min(calc(100% - 36px), 760px) !important;
 
-  border-bottom:
-    1px solid #D8D0CD;
+  height: 58px !important;
+  min-height: 58px !important;
+  max-height: 58px !important;
+
+  margin: 0 auto !important;
+  padding: 0 !important;
+
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+
+  border-bottom: 1px solid #D8D0CD;
+
+  background: transparent !important;
+
+  transform: none !important;
 }
 
-.brand {
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+.result-brand {
+  margin: 0 !important;
+  padding: 0 !important;
 
+  font-family: Georgia, "Times New Roman", serif;
   font-size: 22px;
   font-style: italic;
   font-weight: 700;
+  line-height: 1;
 
   letter-spacing: -0.055em;
 }
 
-.header-couple {
+.result-names {
   display: flex;
   align-items: center;
-
   gap: 8px;
+
+  margin: 0;
+  padding: 0;
 
   color: #857A80;
 
   font-size: 8px;
   font-weight: 900;
+  line-height: 1;
 
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
-.header-couple b {
+.result-names b {
   color: #B43D69;
 }
 
-.kicker {
+/* INTRO */
+
+.result-intro {
+  padding: 28px 0 18px;
+}
+
+.result-kicker {
   color: #B43D69;
 
   font-size: 8px;
@@ -989,21 +1018,10 @@ button {
   text-transform: uppercase;
 }
 
-/* INTRO */
-
-.intro {
-  padding:
-    30px
-    0
-    19px;
-}
-
-.intro-grid {
+.result-intro-grid {
   display: grid;
 
-  grid-template-columns:
-    1fr
-    180px;
+  grid-template-columns: 1fr 180px;
 
   align-items: end;
 
@@ -1012,20 +1030,13 @@ button {
   margin-top: 8px;
 }
 
-.intro h1 {
+.result-intro h1 {
   margin: 0;
+  padding: 0;
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-family: Georgia, "Times New Roman", serif;
 
-  font-size:
-    clamp(
-      43px,
-      7vw,
-      61px
-    );
+  font-size: clamp(43px, 7vw, 61px);
 
   font-style: italic;
   font-weight: 400;
@@ -1035,14 +1046,13 @@ button {
   letter-spacing: -0.065em;
 }
 
-.intro p {
+.result-intro p {
   margin: 0 0 3px;
+  padding: 0;
 
   color: #8D8388;
 
-  font-family:
-    Georgia,
-    serif;
+  font-family: Georgia, serif;
 
   font-size: 10px;
   font-style: italic;
@@ -1052,55 +1062,48 @@ button {
 
 /* DIMENSIONS */
 
-.dimensions {
-  padding-bottom: 30px;
+.result-dimensions {
+  padding: 0 0 26px;
 }
 
-.dimension-card {
+.result-dimension {
   display: grid;
 
-  grid-template-columns:
-    67px
-    1fr;
+  grid-template-columns: 67px 1fr;
 
   gap: 17px;
 
-  padding:
-    16px
-    0;
+  margin: 0;
+  padding: 15px 0;
 
-  border-top:
-    1px solid #D8D0CD;
+  border-top: 1px solid #D8D0CD;
 }
 
-.dimension-card:last-child {
-  border-bottom:
-    1px solid #D8D0CD;
+.result-dimension:last-child {
+  border-bottom: 1px solid #D8D0CD;
 }
 
-.dimension-icon-wrap {
+.result-dimension-icon {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.dimension-content {
+.result-dimension-body {
   min-width: 0;
 }
 
-.dimension-top {
+.result-dimension-top {
   display: grid;
 
-  grid-template-columns:
-    1fr
-    auto;
+  grid-template-columns: 1fr auto;
 
   align-items: end;
 
   gap: 18px;
 }
 
-.dimension-eyebrow {
+.result-dimension-label {
   display: block;
 
   margin-bottom: 3px;
@@ -1113,12 +1116,11 @@ button {
   letter-spacing: 0.19em;
 }
 
-.dimension-top h3 {
+.result-dimension-top h3 {
   margin: 0;
+  padding: 0;
 
-  font-family:
-    Georgia,
-    serif;
+  font-family: Georgia, serif;
 
   font-size: 19px;
   font-style: italic;
@@ -1129,12 +1131,10 @@ button {
   letter-spacing: -0.025em;
 }
 
-.dimension-top strong {
+.result-dimension-top strong {
   color: #B43D69;
 
-  font-family:
-    Georgia,
-    serif;
+  font-family: Georgia, serif;
 
   font-size: 30px;
   font-style: italic;
@@ -1143,42 +1143,34 @@ button {
   line-height: 0.8;
 }
 
-.dimension-top strong sup {
-  margin-left: 1px;
-
+.result-dimension-top sup {
   font-size: 0.48em;
 }
 
-.segments {
+.result-segments {
   display: grid;
 
-  grid-template-columns:
-    repeat(10, 1fr);
+  grid-template-columns: repeat(10, 1fr);
 
   gap: 4px;
 
   margin-top: 10px;
 }
 
-.segments span {
+.result-segments span {
   height: 5px;
 
-  border-radius: 20px;
+  border-radius: 30px;
 
   background: #DED7D4;
 }
 
-.segments span.active {
+.result-segments span.active {
   background: #B43D69;
 }
 
-.dimension-content > p {
-  max-width: 540px;
-
-  margin:
-    7px
-    0
-    0;
+.result-dimension-body > p {
+  margin: 7px 0 0;
 
   color: #776D72;
 
@@ -1188,7 +1180,7 @@ button {
 
 /* MINI ART */
 
-.mini-art {
+.result-mini-art {
   position: relative;
 
   width: 58px;
@@ -1197,7 +1189,7 @@ button {
   transform: scale(0.84);
 }
 
-.views-art {
+.result-views-art {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1205,25 +1197,22 @@ button {
   gap: 4px;
 }
 
-.eye-shape {
+.result-eye {
   position: relative;
 
   width: 30px;
   height: 19px;
 
-  border:
-    2px solid #332D33;
+  border: 2px solid #332D33;
 
-  border-radius:
-    70% 30% 70% 30%;
+  border-radius: 70% 30% 70% 30%;
 }
 
-.eye-two {
-  border-radius:
-    30% 70% 30% 70%;
+.result-eye-second {
+  border-radius: 30% 70% 30% 70%;
 }
 
-.eye-shape i {
+.result-eye i {
   position: absolute;
 
   top: 50%;
@@ -1236,11 +1225,10 @@ button {
 
   background: #B43D69;
 
-  transform:
-    translate(-50%, -50%);
+  transform: translate(-50%, -50%);
 }
 
-.care-art i {
+.result-care-art > i {
   position: absolute;
 
   top: 2px;
@@ -1249,14 +1237,13 @@ button {
   color: #B43D69;
 
   font-family: Georgia, serif;
-
   font-size: 24px;
   font-style: normal;
 
   transform: translateX(-50%);
 }
 
-.hand {
+.result-hand {
   position: absolute;
 
   bottom: 4px;
@@ -1264,81 +1251,71 @@ button {
   width: 35px;
   height: 18px;
 
-  border-bottom:
-    2px solid #332D33;
+  border-bottom: 2px solid #332D33;
 }
 
-.hand-one {
+.result-hand-left {
   left: -3px;
 
-  border-radius:
-    0 0 100% 0;
+  border-radius: 0 0 100% 0;
 
   transform: rotate(10deg);
 }
 
-.hand-two {
+.result-hand-right {
   right: -3px;
 
-  border-radius:
-    0 0 0 100%;
+  border-radius: 0 0 0 100%;
 
   transform: rotate(-10deg);
 }
 
-.talk-art span {
+.result-talk-art span {
   position: absolute;
 
   width: 36px;
   height: 24px;
 
-  border:
-    2px solid #332D33;
+  border: 2px solid #332D33;
 
   border-radius: 50%;
 }
 
-.talk-art span:first-child {
+.result-talk-art span:first-child {
   top: 0;
   left: 0;
 }
 
-.talk-art span:nth-child(2) {
+.result-talk-art span:nth-child(2) {
   right: 0;
   bottom: 0;
 
   border-color: #B43D69;
 }
 
-.talk-art i {
+.result-talk-art i {
   position: absolute;
 
   top: 10px;
   left: 18px;
 
-  z-index: 3;
-
   color: #332D33;
 
   font-family: Georgia, serif;
-
   font-size: 13px;
   font-style: normal;
 }
 
-.rhythm-art {
+.result-rhythm-art {
   display: flex;
   align-items: center;
 }
 
-.rhythm-art svg {
+.result-rhythm-art svg {
   width: 60px;
 }
 
-.space-art
-.planet-one,
-.space-art
-.planet-two {
+.result-planet {
   position: absolute;
 
   top: 50%;
@@ -1346,26 +1323,24 @@ button {
   width: 28px;
   height: 28px;
 
-  border:
-    2px solid #332D33;
+  border: 2px solid #332D33;
 
   border-radius: 50%;
 
-  transform:
-    translateY(-50%);
+  transform: translateY(-50%);
 }
 
-.planet-one {
+.result-planet-one {
   left: 0;
   background: #E5AF49;
 }
 
-.planet-two {
+.result-planet-two {
   right: 0;
   background: #927DA1;
 }
 
-.space-art i {
+.result-space-art > i {
   position: absolute;
 
   top: 50%;
@@ -1378,45 +1353,33 @@ button {
 
   background: #B43D69;
 
-  transform:
-    translate(-50%, -50%);
+  transform: translate(-50%, -50%);
 }
 
 /* TYPE */
 
-.type-section {
-  padding:
-    5px
-    0
-    35px;
+.result-type {
+  padding: 0 0 32px;
 }
 
-.type-heading {
+.result-type-heading {
   display: flex;
+
   align-items: flex-end;
   justify-content: space-between;
 
   gap: 20px;
 
-  margin-bottom: 12px;
+  margin: 0 0 12px;
 }
 
-.type-heading h2 {
-  margin:
-    5px
-    0
-    0;
+.result-type-heading h2 {
+  margin: 5px 0 0;
+  padding: 0;
 
-  font-family:
-    Georgia,
-    serif;
+  font-family: Georgia, serif;
 
-  font-size:
-    clamp(
-      33px,
-      5vw,
-      45px
-    );
+  font-size: clamp(33px, 5vw, 45px);
 
   font-style: italic;
   font-weight: 400;
@@ -1426,565 +1389,39 @@ button {
   letter-spacing: -0.055em;
 }
 
-.type-number {
+.result-type-number {
   flex-shrink: 0;
 
   color: #B43D69;
 
-  font-family:
-    Georgia,
-    serif;
+  font-family: Georgia, serif;
 
   font-size: 24px;
   font-style: italic;
 }
 
-.poster {
+.result-poster {
   overflow: hidden;
 
-  border:
-    1px solid #312B31;
+  border: 1px solid #312B31;
 
   background: #F8F2EC;
 
-  box-shadow:
-    6px 6px 0 #DACBD0;
+  box-shadow: 6px 6px 0 #DACBD0;
 }
 
-/* ART */
-
-.couple-art {
-  position: relative;
-
-  height: 295px;
-
-  overflow: hidden;
-
-  background: #393440;
-}
-
-.sky-decoration {
-  position: absolute;
-  inset: 0;
-}
-
-.spark {
-  position: absolute;
-
-  color: #E5AF49;
-
-  font-style: normal;
-}
-
-.spark-one {
-  top: 12%;
-  left: 13%;
-
-  font-size: 23px;
-}
-
-.spark-two {
-  top: 21%;
-  right: 12%;
-
-  color: #C36C8B;
-
-  font-size: 17px;
-}
-
-.spark-three {
-  top: 40%;
-  left: 7%;
-
-  color: #907C9E;
-
-  font-size: 18px;
-}
-
-.orbit-line {
-  position: absolute;
-
-  left: 50%;
-
-  border:
-    1px solid
-    rgba(241, 225, 211, 0.24);
-
-  border-radius: 50%;
-}
-
-.orbit-line-one {
-  top: 67px;
-
-  width: 490px;
-  height: 125px;
-
-  transform:
-    translateX(-50%)
-    rotate(-13deg);
-}
-
-.orbit-line-two {
-  top: 79px;
-
-  width: 430px;
-  height: 145px;
-
-  transform:
-    translateX(-50%)
-    rotate(17deg);
-}
-
-.big-planet {
-  position: absolute;
-
-  top: 29px;
-  left: 50%;
-
-  width: 135px;
-  height: 135px;
-
-  border:
-    4px solid #29242C;
-
-  border-radius: 50%;
-
-  background: #C2B0CF;
-
-  box-shadow:
-    7px 7px 0
-    rgba(28, 24, 31, 0.22);
-
-  transform:
-    translateX(-50%);
-}
-
-.big-planet i {
-  position: absolute;
-
-  border:
-    3px solid
-    rgba(70, 57, 75, 0.28);
-
-  border-radius: 50%;
-}
-
-.big-planet i:first-child {
-  top: 24px;
-  left: 21px;
-
-  width: 33px;
-  height: 18px;
-}
-
-.big-planet i:nth-child(2) {
-  top: 65px;
-  right: 18px;
-
-  width: 23px;
-  height: 30px;
-}
-
-.big-planet i:nth-child(3) {
-  bottom: 19px;
-  left: 51px;
-
-  width: 22px;
-  height: 15px;
-}
-
-.ground {
-  position: absolute;
-
-  left: -9%;
-  right: -9%;
-  bottom: -139px;
-
-  height: 240px;
-
-  border:
-    4px solid #29242C;
-
-  border-radius:
-    50% 50% 0 0;
-
-  background: #81718C;
-}
-
-.crater {
-  position: absolute;
-
-  border:
-    3px solid #554A5E;
-
-  border-radius: 50%;
-
-  background: #695C73;
-}
-
-.crater-one {
-  top: 28px;
-  left: 17%;
-
-  width: 55px;
-  height: 30px;
-}
-
-.crater-two {
-  top: 65px;
-  left: 47%;
-
-  width: 80px;
-  height: 35px;
-}
-
-.crater-three {
-  top: 27px;
-  right: 16%;
-
-  width: 45px;
-  height: 25px;
-}
-
-/* CHARACTERS */
-
-.character {
-  position: absolute;
-
-  z-index: 5;
-
-  bottom: 28px;
-
-  width: 135px;
-  height: 205px;
-
-  transform-origin:
-    bottom center;
-}
-
-.character.left {
-  left:
-    calc(50% - 142px);
-
-  transform:
-    scale(0.82)
-    rotate(2deg);
-}
-
-.character.right {
-  right:
-    calc(50% - 142px);
-
-  transform:
-    scale(0.82)
-    rotate(-2deg);
-}
-
-.backpack {
-  position: absolute;
-
-  top: 75px;
-  left: 4px;
-
-  width: 48px;
-  height: 84px;
-
-  border:
-    4px solid #29242C;
-
-  border-radius: 17px;
-
-  background: #B45B7A;
-}
-
-.helmet {
-  position: absolute;
-
-  z-index: 6;
-
-  top: 0;
-  left: 50%;
-
-  width: 94px;
-  height: 90px;
-
-  border:
-    4px solid #29242C;
-
-  border-radius: 47%;
-
-  background: #F0E7DD;
-
-  transform:
-    translateX(-50%);
-}
-
-.visor {
-  position: absolute;
-
-  top: 17px;
-  left: 14px;
-
-  width: 59px;
-  height: 47px;
-
-  border:
-    4px solid #29242C;
-
-  border-radius: 45%;
-
-  background: #665B70;
-}
-
-.visor i {
-  position: absolute;
-
-  top: 17px;
-
-  width: 5px;
-  height: 5px;
-
-  border-radius: 50%;
-
-  background: #F2D4A5;
-}
-
-.visor i:first-child {
-  left: 16px;
-}
-
-.visor i:nth-child(2) {
-  right: 16px;
-}
-
-.visor span {
-  position: absolute;
-
-  left: 50%;
-  bottom: 8px;
-
-  width: 18px;
-  height: 7px;
-
-  border-bottom:
-    2px solid #F2D4A5;
-
-  border-radius:
-    0 0 50% 50%;
-
-  transform:
-    translateX(-50%);
-}
-
-.body {
-  position: absolute;
-
-  z-index: 5;
-
-  top: 76px;
-  left: 50%;
-
-  width: 88px;
-  height: 88px;
-
-  border:
-    4px solid #29242C;
-
-  border-radius:
-    14px 14px 27px 27px;
-
-  background: #F0E7DD;
-
-  transform:
-    translateX(-50%);
-}
-
-.panel {
-  position: absolute;
-
-  top: 25px;
-  left: 50%;
-
-  width: 38px;
-  height: 26px;
-
-  border:
-    3px solid #29242C;
-
-  background: #C35078;
-
-  transform:
-    translateX(-50%);
-}
-
-.panel i {
-  position: absolute;
-
-  top: 7px;
-
-  width: 6px;
-  height: 6px;
-}
-
-.panel i:first-child {
-  left: 7px;
-  background: #E5AF49;
-}
-
-.panel i:last-child {
-  right: 7px;
-  background: #7E6C91;
-}
-
-.arm {
-  position: absolute;
-
-  z-index: 4;
-
-  top: 97px;
-
-  width: 61px;
-  height: 25px;
-
-  border:
-    4px solid #29242C;
-
-  border-radius: 14px;
-
-  background: #F0E7DD;
-}
-
-.character.left .arm-outside {
-  left: -20px;
-  transform: rotate(27deg);
-}
-
-.character.left .arm-inside {
-  right: -34px;
-  width: 76px;
-  transform: rotate(-11deg);
-}
-
-.character.right .arm-outside {
-  right: -20px;
-  transform: rotate(-27deg);
-}
-
-.character.right .arm-inside {
-  left: -34px;
-  width: 76px;
-  transform: rotate(11deg);
-}
-
-.leg {
-  position: absolute;
-
-  z-index: 3;
-
-  bottom: 0;
-
-  width: 39px;
-  height: 64px;
-
-  border:
-    4px solid #29242C;
-
-  border-radius:
-    10px 10px 18px 18px;
-
-  background: #F0E7DD;
-}
-
-.leg-one {
-  left: 25px;
-  transform: rotate(5deg);
-}
-
-.leg-two {
-  right: 25px;
-  transform: rotate(-5deg);
-}
-
-.art-love {
-  position: absolute;
-
-  z-index: 10;
-
-  top: 141px;
-  left: 50%;
-
-  color: #D04F78;
-
-  font-family: Georgia, serif;
-
-  font-size: 27px;
-
-  transform:
-    translateX(-50%);
-}
-
-.art-tag {
-  position: absolute;
-
-  z-index: 15;
-
-  right: 12px;
-  bottom: 10px;
-
-  padding:
-    6px 9px;
-
-  border:
-    1px solid #302A30;
-
-  background: #F6EEE7;
-
-  font-family: Georgia, serif;
-
-  font-size: 9px;
-  font-style: italic;
-
-  transform: rotate(-2deg);
-}
-
-.art-sun_moon .big-planet {
-  background: #C4B1D1;
-}
-
-.art-pirates .big-planet {
-  background: #D98E5E;
-}
-
-.art-wizards .big-planet {
-  background: #9983AE;
-}
-
-.art-dragon_keeper .big-planet {
-  background: #CB6968;
-}
-
-.art-homekeepers .big-planet {
-  background: #CDA679;
-}
-
-/* POSTER BOTTOM */
-
-.poster-info {
-  padding:
-    13px
-    18px
-    15px;
-}
-
-.poster-caption {
+.result-poster-footer {
   display: flex;
+
   align-items: center;
   justify-content: space-between;
 
   gap: 24px;
+
+  padding: 12px 17px;
 }
 
-.poster-caption span {
+.result-poster-footer span {
   flex-shrink: 0;
 
   color: #B43D69;
@@ -1995,9 +1432,7 @@ button {
   letter-spacing: 0.16em;
 }
 
-.poster-caption p {
-  max-width: 430px;
-
+.result-poster-footer p {
   margin: 0;
 
   color: #6F666B;
@@ -2012,29 +1447,480 @@ button {
   text-align: right;
 }
 
+/* ART */
+
+.result-art {
+  position: relative;
+
+  height: 290px;
+
+  overflow: hidden;
+
+  background: #393440;
+}
+
+.result-spark {
+  position: absolute;
+
+  z-index: 2;
+
+  color: #E5AF49;
+
+  font-style: normal;
+}
+
+.result-spark-one {
+  top: 12%;
+  left: 13%;
+
+  font-size: 23px;
+}
+
+.result-spark-two {
+  top: 21%;
+  right: 12%;
+
+  color: #C36C8B;
+
+  font-size: 17px;
+}
+
+.result-spark-three {
+  top: 40%;
+  left: 7%;
+
+  color: #907C9E;
+
+  font-size: 18px;
+}
+
+.result-orbit {
+  position: absolute;
+
+  left: 50%;
+
+  border: 1px solid rgba(241,225,211,0.24);
+
+  border-radius: 50%;
+}
+
+.result-orbit-one {
+  top: 67px;
+
+  width: 490px;
+  height: 125px;
+
+  transform: translateX(-50%) rotate(-13deg);
+}
+
+.result-orbit-two {
+  top: 79px;
+
+  width: 430px;
+  height: 145px;
+
+  transform: translateX(-50%) rotate(17deg);
+}
+
+.result-big-planet {
+  position: absolute;
+
+  top: 29px;
+  left: 50%;
+
+  width: 135px;
+  height: 135px;
+
+  border: 4px solid #29242C;
+
+  border-radius: 50%;
+
+  background: #C2B0CF;
+
+  box-shadow: 7px 7px 0 rgba(28,24,31,0.22);
+
+  transform: translateX(-50%);
+}
+
+.result-big-planet i {
+  position: absolute;
+
+  border: 3px solid rgba(70,57,75,0.28);
+
+  border-radius: 50%;
+}
+
+.result-big-planet i:first-child {
+  top: 24px;
+  left: 21px;
+
+  width: 33px;
+  height: 18px;
+}
+
+.result-big-planet i:nth-child(2) {
+  top: 65px;
+  right: 18px;
+
+  width: 23px;
+  height: 30px;
+}
+
+.result-big-planet i:nth-child(3) {
+  bottom: 19px;
+  left: 51px;
+
+  width: 22px;
+  height: 15px;
+}
+
+.result-ground {
+  position: absolute;
+
+  left: -9%;
+  right: -9%;
+  bottom: -139px;
+
+  height: 240px;
+
+  border: 4px solid #29242C;
+
+  border-radius: 50% 50% 0 0;
+
+  background: #81718C;
+}
+
+.result-ground i {
+  position: absolute;
+
+  border: 3px solid #554A5E;
+
+  border-radius: 50%;
+
+  background: #695C73;
+}
+
+.result-ground i:first-child {
+  top: 28px;
+  left: 17%;
+
+  width: 55px;
+  height: 30px;
+}
+
+.result-ground i:nth-child(2) {
+  top: 65px;
+  left: 47%;
+
+  width: 80px;
+  height: 35px;
+}
+
+.result-ground i:nth-child(3) {
+  top: 27px;
+  right: 16%;
+
+  width: 45px;
+  height: 25px;
+}
+
+/* CHARACTERS */
+
+.result-character {
+  position: absolute;
+
+  z-index: 5;
+
+  bottom: 25px;
+
+  width: 135px;
+  height: 205px;
+
+  transform-origin: bottom center;
+}
+
+.result-character.left {
+  left: calc(50% - 142px);
+
+  transform: scale(0.82) rotate(2deg);
+}
+
+.result-character.right {
+  right: calc(50% - 142px);
+
+  transform: scale(0.82) rotate(-2deg);
+}
+
+.result-backpack {
+  position: absolute;
+
+  top: 75px;
+  left: 4px;
+
+  width: 48px;
+  height: 84px;
+
+  border: 4px solid #29242C;
+
+  border-radius: 17px;
+
+  background: #B45B7A;
+}
+
+.result-helmet {
+  position: absolute;
+
+  z-index: 6;
+
+  top: 0;
+  left: 50%;
+
+  width: 94px;
+  height: 90px;
+
+  border: 4px solid #29242C;
+
+  border-radius: 47%;
+
+  background: #F0E7DD;
+
+  transform: translateX(-50%);
+}
+
+.result-visor {
+  position: absolute;
+
+  top: 17px;
+  left: 14px;
+
+  width: 59px;
+  height: 47px;
+
+  border: 4px solid #29242C;
+
+  border-radius: 45%;
+
+  background: #665B70;
+}
+
+.result-visor i {
+  position: absolute;
+
+  top: 17px;
+
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+
+  background: #F2D4A5;
+}
+
+.result-visor i:first-child {
+  left: 16px;
+}
+
+.result-visor i:nth-child(2) {
+  right: 16px;
+}
+
+.result-visor span {
+  position: absolute;
+
+  left: 50%;
+  bottom: 8px;
+
+  width: 18px;
+  height: 7px;
+
+  border-bottom: 2px solid #F2D4A5;
+
+  border-radius: 0 0 50% 50%;
+
+  transform: translateX(-50%);
+}
+
+.result-body {
+  position: absolute;
+
+  z-index: 5;
+
+  top: 76px;
+  left: 50%;
+
+  width: 88px;
+  height: 88px;
+
+  border: 4px solid #29242C;
+
+  border-radius: 14px 14px 27px 27px;
+
+  background: #F0E7DD;
+
+  transform: translateX(-50%);
+}
+
+.result-panel {
+  position: absolute;
+
+  top: 25px;
+  left: 50%;
+
+  width: 38px;
+  height: 26px;
+
+  border: 3px solid #29242C;
+
+  background: #C35078;
+
+  transform: translateX(-50%);
+}
+
+.result-panel i {
+  position: absolute;
+
+  top: 7px;
+
+  width: 6px;
+  height: 6px;
+}
+
+.result-panel i:first-child {
+  left: 7px;
+  background: #E5AF49;
+}
+
+.result-panel i:last-child {
+  right: 7px;
+  background: #7E6C91;
+}
+
+.result-arm {
+  position: absolute;
+
+  z-index: 4;
+
+  top: 97px;
+
+  width: 61px;
+  height: 25px;
+
+  border: 4px solid #29242C;
+
+  border-radius: 14px;
+
+  background: #F0E7DD;
+}
+
+.result-character.left .result-arm-outside {
+  left: -20px;
+  transform: rotate(27deg);
+}
+
+.result-character.left .result-arm-inside {
+  right: -34px;
+  width: 76px;
+  transform: rotate(-11deg);
+}
+
+.result-character.right .result-arm-outside {
+  right: -20px;
+  transform: rotate(-27deg);
+}
+
+.result-character.right .result-arm-inside {
+  left: -34px;
+  width: 76px;
+  transform: rotate(11deg);
+}
+
+.result-leg {
+  position: absolute;
+
+  z-index: 3;
+
+  bottom: 0;
+
+  width: 39px;
+  height: 64px;
+
+  border: 4px solid #29242C;
+
+  border-radius: 10px 10px 18px 18px;
+
+  background: #F0E7DD;
+}
+
+.result-leg-one {
+  left: 25px;
+  transform: rotate(5deg);
+}
+
+.result-leg-two {
+  right: 25px;
+  transform: rotate(-5deg);
+}
+
+.result-heart {
+  position: absolute;
+
+  z-index: 10;
+
+  top: 141px;
+  left: 50%;
+
+  color: #D04F78;
+
+  font-family: Georgia, serif;
+
+  font-size: 27px;
+
+  transform: translateX(-50%);
+}
+
+.result-art-tag {
+  position: absolute;
+
+  z-index: 15;
+
+  right: 12px;
+  bottom: 10px;
+
+  padding: 6px 9px;
+
+  border: 1px solid #302A30;
+
+  background: #F6EEE7;
+
+  font-family: Georgia, serif;
+
+  font-size: 9px;
+  font-style: italic;
+
+  transform: rotate(-2deg);
+}
+
 /* PAYWALL */
 
-.paywall {
-  padding:
-    34px
-    0
-    38px;
+.result-paywall {
+  margin: 0 !important;
+
+  padding: 31px 0 35px !important;
 
   background: #2E2931;
 
   color: #F8F1EB;
 }
 
-.paywall-topline {
+.result-paywall-label {
   display: flex;
+
   align-items: center;
   justify-content: space-between;
 
-  padding-bottom: 11px;
+  padding-bottom: 10px;
 
-  border-bottom:
-    1px solid
-    rgba(255,255,255,0.15);
+  border-bottom: 1px solid rgba(255,255,255,0.15);
 
   color: #DD829F;
 
@@ -2044,36 +1930,29 @@ button {
   letter-spacing: 0.21em;
 }
 
-.paywall-topline b {
+.result-paywall-label b {
   color: #E8B54D;
 
   font-size: 17px;
   font-weight: 400;
 }
 
-.paywall-grid {
+.result-paywall-grid {
   display: grid;
 
-  grid-template-columns:
-    0.82fr
-    1.18fr;
+  grid-template-columns: 0.82fr 1.18fr;
 
   gap: 35px;
 
-  padding-top: 24px;
+  padding-top: 22px;
 }
 
-.paywall-copy h2 {
+.result-paywall-title h2 {
   margin: 0;
 
   font-family: Georgia, serif;
 
-  font-size:
-    clamp(
-      39px,
-      6vw,
-      54px
-    );
+  font-size: clamp(39px, 6vw, 54px);
 
   font-style: italic;
   font-weight: 400;
@@ -2083,13 +1962,10 @@ button {
   letter-spacing: -0.06em;
 }
 
-.paywall-copy p {
+.result-paywall-title p {
   max-width: 220px;
 
-  margin:
-    14px
-    0
-    0;
+  margin: 13px 0 0;
 
   color: #ADA2A8;
 
@@ -2097,12 +1973,10 @@ button {
   line-height: 1.45;
 }
 
-.finding-count {
+.result-found {
   display: grid;
 
-  grid-template-columns:
-    auto
-    1fr;
+  grid-template-columns: auto 1fr;
 
   grid-template-areas:
     "label label"
@@ -2112,19 +1986,16 @@ button {
 
   column-gap: 15px;
 
-  margin-bottom: 7px;
+  margin-bottom: 6px;
 
-  padding:
-    12px
-    15px;
+  padding: 11px 14px;
 
-  border:
-    1px solid #D37A99;
+  border: 1px solid #D37A99;
 
   background: #3B323D;
 }
 
-.finding-count > span {
+.result-found > span {
   grid-area: label;
 
   color: #D9829F;
@@ -2135,27 +2006,24 @@ button {
   letter-spacing: 0.18em;
 }
 
-.finding-count strong {
+.result-found strong {
   grid-area: number;
 
   color: #F4C05C;
 
   font-family: Georgia, serif;
 
-  font-size: 48px;
+  font-size: 46px;
   font-style: italic;
   font-weight: 400;
 
   line-height: 0.9;
 }
 
-.finding-count p {
+.result-found p {
   grid-area: copy;
 
-  margin:
-    0
-    0
-    3px;
+  margin: 0 0 3px;
 
   color: #E7DDE2;
 
@@ -2167,28 +2035,21 @@ button {
   line-height: 1.2;
 }
 
-.locked-finding {
+.result-locked {
   display: grid;
 
-  grid-template-columns:
-    24px
-    1fr
-    auto;
+  grid-template-columns: 24px 1fr auto;
 
   align-items: center;
 
   gap: 9px;
 
-  padding:
-    9px
-    0;
+  padding: 8px 0;
 
-  border-bottom:
-    1px solid
-    rgba(255,255,255,0.11);
+  border-bottom: 1px solid rgba(255,255,255,0.11);
 }
 
-.lock {
+.result-lock {
   width: 19px;
   height: 19px;
 
@@ -2196,8 +2057,7 @@ button {
   align-items: center;
   justify-content: center;
 
-  border:
-    1px solid #D47A99;
+  border: 1px solid #D47A99;
 
   border-radius: 50%;
 
@@ -2208,7 +2068,7 @@ button {
   transform: rotate(45deg);
 }
 
-.locked-finding span {
+.result-locked span {
   color: #7F747D;
 
   font-size: 5px;
@@ -2217,11 +2077,8 @@ button {
   letter-spacing: 0.12em;
 }
 
-.locked-finding p {
-  margin:
-    2px
-    0
-    0;
+.result-locked p {
+  margin: 2px 0 0;
 
   color: #F0E7EC;
 
@@ -2233,7 +2090,7 @@ button {
   line-height: 1.2;
 }
 
-.locked-finding > b {
+.result-locked > b {
   color: #776C75;
 
   font-size: 6px;
@@ -2242,30 +2099,22 @@ button {
   text-transform: uppercase;
 }
 
-/* CTA */
-
-.teaser button {
+.result-buy {
   width: 100%;
 
   display: grid;
 
-  grid-template-columns:
-    1fr
-    auto
-    auto;
+  grid-template-columns: 1fr auto auto;
 
   align-items: center;
 
   gap: 12px;
 
-  margin-top: 14px;
+  margin: 13px 0 0;
 
-  padding:
-    14px
-    15px;
+  padding: 14px 15px;
 
-  border:
-    1px solid #F0B1C7;
+  border: 1px solid #F0B1C7;
 
   background: #B43D69;
 
@@ -2274,35 +2123,26 @@ button {
   cursor: pointer;
 
   text-align: left;
-
-  transition:
-    transform 160ms ease,
-    background 160ms ease;
 }
 
-.teaser button:hover {
-  background: #C84977;
-  transform: translateY(-2px);
-}
-
-.teaser button span {
+.result-buy span {
   font-family: Georgia, serif;
 
   font-size: 13px;
   font-style: italic;
 }
 
-.teaser button strong {
+.result-buy strong {
   white-space: nowrap;
 
   font-size: 13px;
 }
 
-.teaser button b {
+.result-buy b {
   font-size: 18px;
 }
 
-.paywall-footnote {
+.result-footnote {
   margin-top: 6px;
 
   color: #776D75;
@@ -2316,15 +2156,17 @@ button {
 
 /* STATES */
 
-.loading-page,
-.state-page {
+.result-state {
+  width: 100%;
   min-height: 100svh;
 
   display: flex;
   flex-direction: column;
+
   align-items: center;
   justify-content: center;
 
+  margin: 0;
   padding: 30px;
 
   background: #F4EFE9;
@@ -2332,7 +2174,7 @@ button {
   text-align: center;
 }
 
-.state-brand {
+.result-state-brand {
   font-family: Georgia, serif;
 
   font-size: 24px;
@@ -2340,21 +2182,8 @@ button {
   font-weight: 700;
 }
 
-.loading-page p,
-.state-page p {
-  color: #8D8288;
-
-  font-family: Georgia, serif;
-
-  font-size: 11px;
-  font-style: italic;
-}
-
-.state-page h1 {
-  margin:
-    25px
-    0
-    10px;
+.result-state h1 {
+  margin: 25px 0 10px;
 
   font-family: Georgia, serif;
 
@@ -2365,28 +2194,37 @@ button {
   line-height: 0.95;
 }
 
-.loading-symbol {
+.result-state p {
+  color: #8D8288;
+
+  font-family: Georgia, serif;
+
+  font-size: 11px;
+  font-style: italic;
+}
+
+.result-loader {
   display: flex;
+
   align-items: center;
 
   margin-bottom: 25px;
 }
 
-.loading-symbol span {
+.result-loader span {
   width: 48px;
   height: 48px;
 
-  border:
-    2px solid #302A30;
+  border: 2px solid #302A30;
 
   border-radius: 50%;
 }
 
-.loading-symbol span:last-child {
+.result-loader span:last-child {
   margin-left: -12px;
 }
 
-.loading-symbol i {
+.result-loader i {
   position: relative;
 
   z-index: 2;
@@ -2404,240 +2242,207 @@ button {
 
 @media (max-width: 650px) {
 
-  .shell {
-    width:
-      calc(100% - 26px);
+  .result-shell {
+    width: calc(100% - 26px);
   }
 
-  .header {
-    height: 54px;
+  .result-header {
+    width: calc(100% - 26px) !important;
+
+    height: 52px !important;
+    min-height: 52px !important;
+    max-height: 52px !important;
   }
 
-  .brand {
+  .result-brand {
     font-size: 19px;
   }
 
-  .header-couple {
-    max-width: 145px;
+  .result-names {
+    max-width: 150px;
 
     overflow: hidden;
 
     font-size: 7px;
 
-    text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  .intro {
-    padding:
-      25px
-      0
-      15px;
+  .result-intro {
+    padding: 22px 0 14px;
   }
 
-  .intro-grid {
+  .result-intro-grid {
     grid-template-columns: 1fr;
 
-    gap: 9px;
+    gap: 7px;
 
     margin-top: 7px;
   }
 
-  .intro h1 {
-    font-size:
-      clamp(
-        42px,
-        13vw,
-        55px
-      );
+  .result-intro h1 {
+    font-size: clamp(42px, 13vw, 55px);
   }
 
-  .intro p {
-    max-width: 270px;
+  .result-intro p {
+    max-width: 260px;
   }
 
-  .dimensions {
-    padding-bottom: 22px;
+  .result-dimensions {
+    padding-bottom: 20px;
   }
 
-  .dimension-card {
-    grid-template-columns:
-      48px
-      1fr;
+  .result-dimension {
+    grid-template-columns: 48px 1fr;
 
-    gap: 10px;
+    gap: 9px;
 
-    padding:
-      14px
-      0;
+    padding: 13px 0;
   }
 
-  .dimension-icon-wrap {
+  .result-dimension-icon {
     justify-content: flex-start;
   }
 
-  .mini-art {
+  .result-mini-art {
     transform: scale(0.68);
     transform-origin: left center;
   }
 
-  .dimension-top {
-    gap: 10px;
+  .result-dimension-top {
+    gap: 8px;
   }
 
-  .dimension-top h3 {
-    max-width: 200px;
+  .result-dimension-top h3 {
+    max-width: 205px;
 
     font-size: 17px;
   }
 
-  .dimension-top strong {
+  .result-dimension-top strong {
     font-size: 26px;
   }
 
-  .segments {
+  .result-segments {
     gap: 3px;
 
     margin-top: 8px;
   }
 
-  .segments span {
+  .result-segments span {
     height: 4px;
   }
 
-  .dimension-content > p {
-    margin-top: 6px;
+  .result-dimension-body > p {
+    margin-top: 5px;
 
     font-size: 9px;
   }
 
-  .type-section {
-    padding:
-      2px
-      0
-      27px;
+  .result-type {
+    padding-bottom: 25px;
   }
 
-  .type-heading {
-    margin-bottom: 10px;
+  .result-type-heading {
+    margin-bottom: 9px;
   }
 
-  .type-heading h2 {
-    font-size: 34px;
+  .result-type-heading h2 {
+    font-size: 33px;
   }
 
-  .type-number {
+  .result-type-number {
     font-size: 20px;
   }
 
-  .couple-art {
-    height: 245px;
+  .result-art {
+    height: 235px;
   }
 
-  .big-planet {
-    top: 25px;
+  .result-big-planet {
+    top: 23px;
 
     width: 108px;
     height: 108px;
   }
 
-  .character {
-    bottom: 16px;
+  .result-character {
+    bottom: 13px;
   }
 
-  .character.left {
-    left:
-      calc(50% - 110px);
+  .result-character.left {
+    left: calc(50% - 110px);
 
-    transform:
-      scale(0.68)
-      rotate(2deg);
+    transform: scale(0.68) rotate(2deg);
   }
 
-  .character.right {
-    right:
-      calc(50% - 110px);
+  .result-character.right {
+    right: calc(50% - 110px);
 
-    transform:
-      scale(0.68)
-      rotate(-2deg);
+    transform: scale(0.68) rotate(-2deg);
   }
 
-  .art-love {
-    top: 120px;
+  .result-heart {
+    top: 116px;
 
     font-size: 23px;
   }
 
-  .art-tag {
+  .result-art-tag {
     right: 7px;
     bottom: 7px;
 
     font-size: 7px;
   }
 
-  .poster-info {
-    padding:
-      11px
-      13px
-      12px;
+  .result-poster-footer {
+    gap: 10px;
+
+    padding: 10px 12px;
   }
 
-  .poster-caption {
-    gap: 12px;
-  }
-
-  .poster-caption p {
+  .result-poster-footer p {
     font-size: 9px;
   }
 
-  .paywall {
-    padding:
-      28px
-      0
-      31px;
+  .result-paywall {
+    padding: 25px 0 28px !important;
   }
 
-  .paywall-grid {
+  .result-paywall-grid {
     grid-template-columns: 1fr;
 
-    gap: 19px;
+    gap: 17px;
 
-    padding-top: 19px;
+    padding-top: 17px;
   }
 
-  .paywall-copy h2 {
-    font-size: 43px;
-  }
-
-  .paywall-copy p {
-    margin-top: 10px;
-  }
-
-  .finding-count strong {
+  .result-paywall-title h2 {
     font-size: 42px;
   }
 
-  .locked-finding {
-    grid-template-columns:
-      22px
-      1fr;
-
-    padding:
-      8px
-      0;
+  .result-paywall-title p {
+    margin-top: 9px;
   }
 
-  .locked-finding > b {
+  .result-found strong {
+    font-size: 41px;
+  }
+
+  .result-locked {
+    grid-template-columns: 22px 1fr;
+
+    padding: 8px 0;
+  }
+
+  .result-locked > b {
     display: none;
   }
 
-  .teaser button {
-    margin-top: 12px;
+  .result-buy {
+    margin-top: 11px;
 
-    padding:
-      13px
-      13px;
+    padding: 13px;
   }
 
 }
