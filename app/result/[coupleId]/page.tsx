@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import type { ReactNode } from 'react';
 
 import type { Comparison } from '../../../lib/archetypes';
 
@@ -267,10 +268,9 @@ export default function ResultPage() {
     return (
         <>
             <main className="page">
-
                 {/* HEADER */}
 
-                <header className="header shell">
+                <header className="header result-shell">
                     <div className="brand">
                         между нами.
                     </div>
@@ -284,7 +284,7 @@ export default function ResultPage() {
 
                 {/* SCORES */}
 
-                <section className="scores shell">
+                <section className="scores result-shell">
                     {categories.map((category) => (
                         <ScoreRow
                             key={category.id}
@@ -295,14 +295,12 @@ export default function ResultPage() {
 
                 {/* FORECAST */}
 
-                <section className="forecast shell">
-
+                <section className="forecast result-shell">
                     <div className="forecast-label">
                         прогноз
                     </div>
 
                     <div className="forecast-grid">
-
                         <div className="forecast-copy">
                             <h2>
                                 Вы можете быть
@@ -317,9 +315,9 @@ export default function ResultPage() {
                         </div>
 
                         <div className="forecast-result">
-
                             <div className="years">
                                 {yearsTogether}
+
                                 <span>
                   {getYearWord(yearsTogether)}
                 </span>
@@ -351,23 +349,16 @@ export default function ResultPage() {
                                     <span>вся жизнь</span>
                                 </div>
                             </div>
-
                         </div>
-
                     </div>
-
                 </section>
 
                 {/* PAID REPORT */}
 
-                <section className="paid-section shell">
-
+                <section className="paid-section result-shell">
                     <div className="paid-card">
-
                         <div className="paid-top">
-
                             <div className="paid-title">
-
                                 <div className="paid-label">
                                     полный разбор
                                 </div>
@@ -377,11 +368,9 @@ export default function ResultPage() {
                                     <br />
                                     и надолго.
                                 </h2>
-
                             </div>
 
                             <div className="paid-benefits">
-
                                 <Benefit>
                                     Где вы можете
                                     <br />
@@ -405,15 +394,12 @@ export default function ResultPage() {
                                     <br />
                                     пару крепче
                                 </Benefit>
-
                             </div>
-
                         </div>
 
                         <PixelFairytale />
 
                         <div className="paid-bottom">
-
                             <button
                                 type="button"
                                 className="buy-button"
@@ -435,13 +421,9 @@ export default function ResultPage() {
                             <div className="paid-note">
                                 один разбор · для вас двоих · сразу после оплаты
                             </div>
-
                         </div>
-
                     </div>
-
                 </section>
-
             </main>
 
             <GlobalStyles />
@@ -462,9 +444,7 @@ function ScoreRow({
 }) {
     return (
         <article className="score-row">
-
             <div className="score-header">
-
                 <div className="score-copy">
                     <h2>{category.title}</h2>
 
@@ -475,7 +455,6 @@ function ScoreRow({
                     <strong>{category.score}</strong>
                     <span>/10</span>
                 </div>
-
             </div>
 
             <div className="score-track">
@@ -486,7 +465,6 @@ function ScoreRow({
                     }}
                 />
             </div>
-
         </article>
     );
 }
@@ -498,11 +476,10 @@ function ScoreRow({
 function Benefit({
                      children,
                  }: {
-    children: React.ReactNode;
+    children: ReactNode;
 }) {
     return (
         <div className="benefit">
-
             <div className="benefit-icon">
                 ♥
             </div>
@@ -510,7 +487,6 @@ function Benefit({
             <div className="benefit-text">
                 {children}
             </div>
-
         </div>
     );
 }
@@ -522,7 +498,6 @@ function Benefit({
 function PixelFairytale() {
     return (
         <div className="fairytale">
-
             <div className="sky-stars">
                 <i className="s1">✦</i>
                 <i className="s2">·</i>
@@ -560,7 +535,6 @@ function PixelFairytale() {
             <div className="ground-shape" />
 
             <div className="characters">
-
                 <div className="knight">
                     <div className="knight-head">
                         <div className="knight-hair" />
@@ -585,13 +559,11 @@ function PixelFairytale() {
                         <div className="princess-dress" />
                     </div>
                 </div>
-
             </div>
 
             <div className="pixel-heart">
                 ♥
             </div>
-
         </div>
     );
 }
@@ -743,9 +715,8 @@ function percentToTen(percent: number) {
 /*
   Это развлекательный индекс, а не статистический прогноз
   продолжительности отношений.
-
-  Значение намеренно не используется как "вероятность".
 */
+
 function calculateYearsTogether(
     categories: Category[],
     overallPercent: number
@@ -860,6 +831,7 @@ function GlobalStyles() {
 const styles = `
 
 .page {
+  width: 100%;
   min-height: 100vh;
 
   overflow: hidden;
@@ -875,19 +847,38 @@ const styles = `
   color: #171315;
 }
 
-.shell {
+/*
+  ВАЖНО:
+  НЕ называем этот класс .shell.
+
+  В globals.css уже существует глобальный .shell
+  с min-height: 100svh и display:flex.
+
+  Именно он раньше растягивал каждую секцию
+  результата на высоту целого экрана.
+*/
+
+.result-shell {
   width: min(calc(100% - 40px), 720px);
-  margin: 0 auto;
+  margin-left: auto;
+  margin-right: auto;
+
+  min-height: 0;
+  height: auto;
+
+  display: block;
 }
 
 /* HEADER */
 
 .header {
-  height: 82px;
+  height: 76px;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  padding: 0;
 }
 
 .brand {
@@ -925,11 +916,11 @@ const styles = `
 /* SCORES */
 
 .scores {
-  padding: 18px 0 34px;
+  padding: 14px 0 28px;
 }
 
 .score-row {
-  padding: 12px 0 11px;
+  padding: 11px 0;
 }
 
 .score-header {
@@ -1034,7 +1025,7 @@ const styles = `
 .forecast {
   position: relative;
 
-  padding: 30px 10px 34px;
+  padding: 28px 0 34px;
 
   border-top: 1px solid #ded8d6;
 }
@@ -1323,8 +1314,7 @@ const styles = `
 
   border-radius: 50%;
 
-  background:
-    #ffd0a9;
+  background: #ffd0a9;
 
   box-shadow:
     0 0 0 7px rgba(255, 209, 170, 0.06),
@@ -1874,8 +1864,7 @@ const styles = `
 /* MOBILE */
 
 @media (max-width: 650px) {
-
-  .shell {
+  .result-shell {
     width: calc(100% - 30px);
   }
 
@@ -2036,7 +2025,6 @@ const styles = `
   .buy-button strong {
     font-size: 17px;
   }
-
 }
 
 `;

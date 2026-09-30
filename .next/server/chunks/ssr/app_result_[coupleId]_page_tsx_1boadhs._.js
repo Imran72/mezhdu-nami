@@ -1,6 +1,7 @@
 module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131),e=a.i(50944);let f={friendship:{title:"Дружба",subtitle:"хорошо ли вам просто вдвоём",keywords:["friend","fun","humor","laugh","together","free_saturday","normal_evening","weekend","weekend_plan","extra_hour"]},partnership:{title:"Партнёрство",subtitle:"вы команда или каждый сам за себя",keywords:["team","partner","support","decision","future","plan","responsibility","keep_in_year","relationship_button","want_more"]},sex:{title:"Секс",subtitle:"совпадает ли ваше представление о близости",keywords:["sex","sexual","intimacy","physical","touch","affection","closeness","romance"]},money:{title:"Деньги",subtitle:"одинаково ли вы смотрите на траты",keywords:["money","finance","spend","saving","budget","unexpected_money","purchase"]},care:{title:"Забота",subtitle:"понимаете ли вы «я рядом» одинаково",keywords:["care","support","help","hard_day","reunion","care_signal","emotion","attention","comfort"]},home:{title:"Быт",subtitle:"как вам живётся в обычный вторник",keywords:["home","house","routine","daily","chores","clean","food","sleep","normal_evening","weekend_plan"]}};function g({category:a}){return(0,b.jsxs)("article",{className:"score-row",children:[(0,b.jsxs)("div",{className:"score-header",children:[(0,b.jsxs)("div",{className:"score-copy",children:[(0,b.jsx)("h2",{children:a.title}),(0,b.jsx)("p",{children:a.subtitle})]}),(0,b.jsxs)("div",{className:"score-number",children:[(0,b.jsx)("strong",{children:a.score}),(0,b.jsx)("span",{children:"/10"})]})]}),(0,b.jsx)("div",{className:"score-track",children:(0,b.jsx)("div",{className:"score-fill",style:{width:`${10*a.score}%`}})})]})}function h({children:a}){return(0,b.jsxs)("div",{className:"benefit",children:[(0,b.jsx)("div",{className:"benefit-icon",children:"♥"}),(0,b.jsx)("div",{className:"benefit-text",children:a})]})}function i(){return(0,b.jsxs)("div",{className:"fairytale",children:[(0,b.jsxs)("div",{className:"sky-stars",children:[(0,b.jsx)("i",{className:"s1",children:"✦"}),(0,b.jsx)("i",{className:"s2",children:"·"}),(0,b.jsx)("i",{className:"s3",children:"✦"}),(0,b.jsx)("i",{className:"s4",children:"·"}),(0,b.jsx)("i",{className:"s5",children:"✦"})]}),(0,b.jsx)("div",{className:"pixel-moon"}),(0,b.jsx)("div",{className:"mountain mountain-one"}),(0,b.jsx)("div",{className:"mountain mountain-two"}),(0,b.jsx)("div",{className:"mountain mountain-three"}),(0,b.jsxs)("div",{className:"castle",children:[(0,b.jsx)("div",{className:"tower tower-left",children:(0,b.jsx)("span",{})}),(0,b.jsx)("div",{className:"tower tower-middle",children:(0,b.jsx)("span",{})}),(0,b.jsx)("div",{className:"tower tower-right",children:(0,b.jsx)("span",{})}),(0,b.jsxs)("div",{className:"castle-body",children:[(0,b.jsx)("i",{}),(0,b.jsx)("i",{}),(0,b.jsx)("i",{})]})]}),(0,b.jsx)("div",{className:"ground-shape"}),(0,b.jsxs)("div",{className:"characters",children:[(0,b.jsxs)("div",{className:"knight",children:[(0,b.jsx)("div",{className:"knight-head",children:(0,b.jsx)("div",{className:"knight-hair"})}),(0,b.jsxs)("div",{className:"knight-body",children:[(0,b.jsx)("div",{className:"knight-cape"}),(0,b.jsx)("div",{className:"knight-arm"})]})]}),(0,b.jsxs)("div",{className:"princess",children:[(0,b.jsx)("div",{className:"crown",children:"♛"}),(0,b.jsx)("div",{className:"princess-head",children:(0,b.jsx)("div",{className:"princess-hair"})}),(0,b.jsx)("div",{className:"princess-body",children:(0,b.jsx)("div",{className:"princess-dress"})})]})]}),(0,b.jsx)("div",{className:"pixel-heart",children:"♥"})]})}function j(a){return 4+92*Math.max(0,Math.min(1,a/55))}function k(){return(0,b.jsx)(c.default,{id:"df369a7dd53f1493",children:"html,body{background:#faf7f4!important;margin:0!important;padding:0!important}body{color:#171315;font-family:Arial,Helvetica,sans-serif}*{box-sizing:border-box}button{font:inherit}"})}let l=`
 
 .page {
+  width: 100%;
   min-height: 100vh;
 
   overflow: hidden;
@@ -16,19 +17,38 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
   color: #171315;
 }
 
-.shell {
+/*
+  ВАЖНО:
+  НЕ называем этот класс .shell.
+
+  В globals.css уже существует глобальный .shell
+  с min-height: 100svh и display:flex.
+
+  Именно он раньше растягивал каждую секцию
+  результата на высоту целого экрана.
+*/
+
+.result-shell {
   width: min(calc(100% - 40px), 720px);
-  margin: 0 auto;
+  margin-left: auto;
+  margin-right: auto;
+
+  min-height: 0;
+  height: auto;
+
+  display: block;
 }
 
 /* HEADER */
 
 .header {
-  height: 82px;
+  height: 76px;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  padding: 0;
 }
 
 .brand {
@@ -66,11 +86,11 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
 /* SCORES */
 
 .scores {
-  padding: 18px 0 34px;
+  padding: 14px 0 28px;
 }
 
 .score-row {
-  padding: 12px 0 11px;
+  padding: 11px 0;
 }
 
 .score-header {
@@ -175,7 +195,7 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
 .forecast {
   position: relative;
 
-  padding: 30px 10px 34px;
+  padding: 28px 0 34px;
 
   border-top: 1px solid #ded8d6;
 }
@@ -464,8 +484,7 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
 
   border-radius: 50%;
 
-  background:
-    #ffd0a9;
+  background: #ffd0a9;
 
   box-shadow:
     0 0 0 7px rgba(255, 209, 170, 0.06),
@@ -1015,8 +1034,7 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
 /* MOBILE */
 
 @media (max-width: 650px) {
-
-  .shell {
+  .result-shell {
     width: calc(100% - 30px);
   }
 
@@ -1177,9 +1195,8 @@ module.exports=[66248,a=>{"use strict";var b=a.i(87924),c=a.i(31626),d=a.i(72131
   .buy-button strong {
     font-size: 17px;
   }
-
 }
 
-`;a.s(["default",0,function(){var a;let m,n,o=(0,e.useParams)(),p=(0,e.useRouter)(),q=o.coupleId,[r,s]=(0,d.useState)(null),[t,u]=(0,d.useState)("");(0,d.useEffect)(()=>{let a=!1;return async function(){try{let b=await fetch(`/api/report?id=${encodeURIComponent(q)}`,{cache:"no-store"});if(!b.ok)throw Error("Не удалось загрузить результат");let c=await b.json();if(a)return;if(c.waiting)return void p.replace(`/waiting/${q}`);s(c)}catch(b){console.error(b),a||u("Не получилось загрузить результат.")}}(),()=>{a=!0}},[q,p]);let v=(0,d.useMemo)(()=>r?.comparisons??[],[r]),w=(0,d.useMemo)(()=>{var a,b;return"number"==typeof r?.scores?.overall?Number.isFinite(a=r.scores.overall)?a>=0&&a<=1?Math.round(100*a):Math.round(Math.max(0,Math.min(100,a))):0:(b=v).length?Math.round(b.reduce((a,b)=>"same"===b.similarity?a+1:"close"===b.similarity?a+.55:a,0)/b.length*100):50},[r,v]),x=(0,d.useMemo)(()=>{var a,b;return a=v,b=w,["friendship","partnership","sex","money","care","home"].map(c=>{var d;let e=f[c],g=a.filter(a=>{var b,c;let d;return b=a,c=e.keywords,d=[b.questionId,b.question,...b.traitsA??[],...b.traitsB??[],...b.sharedTraits??[]].join(" ").toLowerCase(),c.some(a=>d.includes(a.toLowerCase()))}),h=g.length>0?g:a,i=h.length>0?(d=h).length?Math.round(d.reduce((a,b)=>"same"===b.similarity?a+1:"close"===b.similarity?a+.55:a,0)/d.length*100):50:b;return{id:c,title:e.title,subtitle:e.subtitle,score:Math.max(0,Math.min(10,Math.round(i/10)))}})},[v,w]),y=(0,d.useMemo)(()=>{var a,b;return a=x,b=w,a.length?Math.max(1,Math.min(55,Math.round(1+54*Math.pow((.6*(a.reduce((a,b)=>a+b.score,0)/a.length)+.2*Math.min(...a.map(a=>a.score))+.1*Math.max(...a.map(a=>a.score))+b/10*.1)/10,1.55)))):1},[x,w]);if(t)return(0,b.jsxs)(b.Fragment,{children:[(0,b.jsxs)("main",{className:`jsx-${l.__hash} state-page`,children:[(0,b.jsx)("div",{className:`jsx-${l.__hash} state-brand`,children:"между нами."}),(0,b.jsx)("h1",{className:`jsx-${l.__hash}`,children:"не получилось открыть результат"}),(0,b.jsx)("p",{className:`jsx-${l.__hash}`,children:t})]}),(0,b.jsx)(k,{}),(0,b.jsx)(c.default,{id:l.__hash,children:l})]});if(!r)return(0,b.jsxs)(b.Fragment,{children:[(0,b.jsxs)("main",{className:`jsx-${l.__hash} state-page`,children:[(0,b.jsxs)("div",{className:`jsx-${l.__hash} loader`,children:[(0,b.jsx)("span",{className:`jsx-${l.__hash}`}),(0,b.jsx)("span",{className:`jsx-${l.__hash}`})]}),(0,b.jsx)("div",{className:`jsx-${l.__hash} state-brand`,children:"между нами."}),(0,b.jsx)("p",{className:`jsx-${l.__hash}`,children:"собираем ваши ответы"})]}),(0,b.jsx)(k,{}),(0,b.jsx)(c.default,{id:l.__hash,children:l})]});let z=r.couple.partner_a_name,A=r.couple.partner_b_name;return(0,b.jsxs)(b.Fragment,{children:[(0,b.jsxs)("main",{className:`jsx-${l.__hash} page`,children:[(0,b.jsxs)("header",{className:`jsx-${l.__hash} header shell`,children:[(0,b.jsx)("div",{className:`jsx-${l.__hash} brand`,children:"между нами."}),(0,b.jsxs)("div",{className:`jsx-${l.__hash} couple-names`,children:[(0,b.jsx)("span",{className:`jsx-${l.__hash}`,children:z}),(0,b.jsx)("b",{className:`jsx-${l.__hash}`,children:"×"}),(0,b.jsx)("span",{className:`jsx-${l.__hash}`,children:A})]})]}),(0,b.jsx)("section",{className:`jsx-${l.__hash} scores shell`,children:x.map(a=>(0,b.jsx)(g,{category:a},a.id))}),(0,b.jsxs)("section",{className:`jsx-${l.__hash} forecast shell`,children:[(0,b.jsx)("div",{className:`jsx-${l.__hash} forecast-label`,children:"прогноз"}),(0,b.jsxs)("div",{className:`jsx-${l.__hash} forecast-grid`,children:[(0,b.jsxs)("div",{className:`jsx-${l.__hash} forecast-copy`,children:[(0,b.jsxs)("h2",{className:`jsx-${l.__hash}`,children:["Вы можете быть",(0,b.jsx)("br",{className:`jsx-${l.__hash}`}),"вместе очень долго"]}),(0,b.jsx)("p",{className:`jsx-${l.__hash}`,children:"На основе ваших ответов мы оценили, сколько лет вы можете быть вместе."})]}),(0,b.jsxs)("div",{className:`jsx-${l.__hash} forecast-result`,children:[(0,b.jsxs)("div",{className:`jsx-${l.__hash} years`,children:[y,(0,b.jsx)("span",{className:`jsx-${l.__hash}`,children:(m=(a=y)%100,n=a%10,m>=11&&m<=14?"лет":1===n?"год":n>=2&&n<=4?"года":"лет")})]}),(0,b.jsxs)("div",{className:`jsx-${l.__hash} forecast-scale`,children:[(0,b.jsxs)("div",{className:`jsx-${l.__hash} forecast-line`,children:[(0,b.jsx)("div",{style:{width:`${j(y)}%`},className:`jsx-${l.__hash} forecast-progress`}),(0,b.jsx)("div",{style:{left:`${j(y)}%`},className:`jsx-${l.__hash} forecast-dot`})]}),(0,b.jsxs)("div",{className:`jsx-${l.__hash} forecast-scale-labels`,children:[(0,b.jsx)("span",{className:`jsx-${l.__hash}`,children:"1 месяц"}),(0,b.jsx)("span",{className:`jsx-${l.__hash}`,children:"вся жизнь"})]})]})]})]})]}),(0,b.jsx)("section",{className:`jsx-${l.__hash} paid-section shell`,children:(0,b.jsxs)("div",{className:`jsx-${l.__hash} paid-card`,children:[(0,b.jsxs)("div",{className:`jsx-${l.__hash} paid-top`,children:[(0,b.jsxs)("div",{className:`jsx-${l.__hash} paid-title`,children:[(0,b.jsx)("div",{className:`jsx-${l.__hash} paid-label`,children:"полный разбор"}),(0,b.jsxs)("h2",{className:`jsx-${l.__hash}`,children:["Чтобы вместе —",(0,b.jsx)("br",{className:`jsx-${l.__hash}`}),"и надолго."]})]}),(0,b.jsxs)("div",{className:`jsx-${l.__hash} paid-benefits`,children:[(0,b.jsxs)(h,{children:["Где вы можете",(0,b.jsx)("br",{className:`jsx-${l.__hash}`}),"не понимать друг друга"]}),(0,b.jsxs)(h,{children:["Что каждый ждёт",(0,b.jsx)("br",{className:`jsx-${l.__hash}`}),"от отношений"]}),(0,b.jsxs)(h,{children:["Что может стать",(0,b.jsx)("br",{className:`jsx-${l.__hash}`}),"причиной ссор"]}),(0,b.jsxs)(h,{children:["Как сделать вашу",(0,b.jsx)("br",{className:`jsx-${l.__hash}`}),"пару крепче"]})]})]}),(0,b.jsx)(i,{}),(0,b.jsxs)("div",{className:`jsx-${l.__hash} paid-bottom`,children:[(0,b.jsxs)("button",{type:"button",onClick:()=>p.push(`/report/${q}`),className:`jsx-${l.__hash} buy-button`,children:[(0,b.jsx)("span",{className:`jsx-${l.__hash}`,children:"Открыть полный разбор"}),(0,b.jsx)("strong",{className:`jsx-${l.__hash}`,children:"299 ₽"}),(0,b.jsx)("i",{className:`jsx-${l.__hash}`,children:"→"})]}),(0,b.jsx)("div",{className:`jsx-${l.__hash} paid-note`,children:"один разбор · для вас двоих · сразу после оплаты"})]})]})})]}),(0,b.jsx)(k,{}),(0,b.jsx)(c.default,{id:l.__hash,children:l})]})}])}];
+`;a.s(["default",0,function(){var a;let m,n,o=(0,e.useParams)(),p=(0,e.useRouter)(),q=o.coupleId,[r,s]=(0,d.useState)(null),[t,u]=(0,d.useState)("");(0,d.useEffect)(()=>{let a=!1;return async function(){try{let b=await fetch(`/api/report?id=${encodeURIComponent(q)}`,{cache:"no-store"});if(!b.ok)throw Error("Не удалось загрузить результат");let c=await b.json();if(a)return;if(c.waiting)return void p.replace(`/waiting/${q}`);s(c)}catch(b){console.error(b),a||u("Не получилось загрузить результат.")}}(),()=>{a=!0}},[q,p]);let v=(0,d.useMemo)(()=>r?.comparisons??[],[r]),w=(0,d.useMemo)(()=>{var a,b;return"number"==typeof r?.scores?.overall?Number.isFinite(a=r.scores.overall)?a>=0&&a<=1?Math.round(100*a):Math.round(Math.max(0,Math.min(100,a))):0:(b=v).length?Math.round(b.reduce((a,b)=>"same"===b.similarity?a+1:"close"===b.similarity?a+.55:a,0)/b.length*100):50},[r,v]),x=(0,d.useMemo)(()=>{var a,b;return a=v,b=w,["friendship","partnership","sex","money","care","home"].map(c=>{var d;let e=f[c],g=a.filter(a=>{var b,c;let d;return b=a,c=e.keywords,d=[b.questionId,b.question,...b.traitsA??[],...b.traitsB??[],...b.sharedTraits??[]].join(" ").toLowerCase(),c.some(a=>d.includes(a.toLowerCase()))}),h=g.length>0?g:a,i=h.length>0?(d=h).length?Math.round(d.reduce((a,b)=>"same"===b.similarity?a+1:"close"===b.similarity?a+.55:a,0)/d.length*100):50:b;return{id:c,title:e.title,subtitle:e.subtitle,score:Math.max(0,Math.min(10,Math.round(i/10)))}})},[v,w]),y=(0,d.useMemo)(()=>{var a,b;return a=x,b=w,a.length?Math.max(1,Math.min(55,Math.round(1+54*Math.pow((.6*(a.reduce((a,b)=>a+b.score,0)/a.length)+.2*Math.min(...a.map(a=>a.score))+.1*Math.max(...a.map(a=>a.score))+b/10*.1)/10,1.55)))):1},[x,w]);if(t)return(0,b.jsxs)(b.Fragment,{children:[(0,b.jsxs)("main",{className:`jsx-${l.__hash} state-page`,children:[(0,b.jsx)("div",{className:`jsx-${l.__hash} state-brand`,children:"между нами."}),(0,b.jsx)("h1",{className:`jsx-${l.__hash}`,children:"не получилось открыть результат"}),(0,b.jsx)("p",{className:`jsx-${l.__hash}`,children:t})]}),(0,b.jsx)(k,{}),(0,b.jsx)(c.default,{id:l.__hash,children:l})]});if(!r)return(0,b.jsxs)(b.Fragment,{children:[(0,b.jsxs)("main",{className:`jsx-${l.__hash} state-page`,children:[(0,b.jsxs)("div",{className:`jsx-${l.__hash} loader`,children:[(0,b.jsx)("span",{className:`jsx-${l.__hash}`}),(0,b.jsx)("span",{className:`jsx-${l.__hash}`})]}),(0,b.jsx)("div",{className:`jsx-${l.__hash} state-brand`,children:"между нами."}),(0,b.jsx)("p",{className:`jsx-${l.__hash}`,children:"собираем ваши ответы"})]}),(0,b.jsx)(k,{}),(0,b.jsx)(c.default,{id:l.__hash,children:l})]});let z=r.couple.partner_a_name,A=r.couple.partner_b_name;return(0,b.jsxs)(b.Fragment,{children:[(0,b.jsxs)("main",{className:`jsx-${l.__hash} page`,children:[(0,b.jsxs)("header",{className:`jsx-${l.__hash} header result-shell`,children:[(0,b.jsx)("div",{className:`jsx-${l.__hash} brand`,children:"между нами."}),(0,b.jsxs)("div",{className:`jsx-${l.__hash} couple-names`,children:[(0,b.jsx)("span",{className:`jsx-${l.__hash}`,children:z}),(0,b.jsx)("b",{className:`jsx-${l.__hash}`,children:"×"}),(0,b.jsx)("span",{className:`jsx-${l.__hash}`,children:A})]})]}),(0,b.jsx)("section",{className:`jsx-${l.__hash} scores result-shell`,children:x.map(a=>(0,b.jsx)(g,{category:a},a.id))}),(0,b.jsxs)("section",{className:`jsx-${l.__hash} forecast result-shell`,children:[(0,b.jsx)("div",{className:`jsx-${l.__hash} forecast-label`,children:"прогноз"}),(0,b.jsxs)("div",{className:`jsx-${l.__hash} forecast-grid`,children:[(0,b.jsxs)("div",{className:`jsx-${l.__hash} forecast-copy`,children:[(0,b.jsxs)("h2",{className:`jsx-${l.__hash}`,children:["Вы можете быть",(0,b.jsx)("br",{className:`jsx-${l.__hash}`}),"вместе очень долго"]}),(0,b.jsx)("p",{className:`jsx-${l.__hash}`,children:"На основе ваших ответов мы оценили, сколько лет вы можете быть вместе."})]}),(0,b.jsxs)("div",{className:`jsx-${l.__hash} forecast-result`,children:[(0,b.jsxs)("div",{className:`jsx-${l.__hash} years`,children:[y,(0,b.jsx)("span",{className:`jsx-${l.__hash}`,children:(m=(a=y)%100,n=a%10,m>=11&&m<=14?"лет":1===n?"год":n>=2&&n<=4?"года":"лет")})]}),(0,b.jsxs)("div",{className:`jsx-${l.__hash} forecast-scale`,children:[(0,b.jsxs)("div",{className:`jsx-${l.__hash} forecast-line`,children:[(0,b.jsx)("div",{style:{width:`${j(y)}%`},className:`jsx-${l.__hash} forecast-progress`}),(0,b.jsx)("div",{style:{left:`${j(y)}%`},className:`jsx-${l.__hash} forecast-dot`})]}),(0,b.jsxs)("div",{className:`jsx-${l.__hash} forecast-scale-labels`,children:[(0,b.jsx)("span",{className:`jsx-${l.__hash}`,children:"1 месяц"}),(0,b.jsx)("span",{className:`jsx-${l.__hash}`,children:"вся жизнь"})]})]})]})]})]}),(0,b.jsx)("section",{className:`jsx-${l.__hash} paid-section result-shell`,children:(0,b.jsxs)("div",{className:`jsx-${l.__hash} paid-card`,children:[(0,b.jsxs)("div",{className:`jsx-${l.__hash} paid-top`,children:[(0,b.jsxs)("div",{className:`jsx-${l.__hash} paid-title`,children:[(0,b.jsx)("div",{className:`jsx-${l.__hash} paid-label`,children:"полный разбор"}),(0,b.jsxs)("h2",{className:`jsx-${l.__hash}`,children:["Чтобы вместе —",(0,b.jsx)("br",{className:`jsx-${l.__hash}`}),"и надолго."]})]}),(0,b.jsxs)("div",{className:`jsx-${l.__hash} paid-benefits`,children:[(0,b.jsxs)(h,{children:["Где вы можете",(0,b.jsx)("br",{className:`jsx-${l.__hash}`}),"не понимать друг друга"]}),(0,b.jsxs)(h,{children:["Что каждый ждёт",(0,b.jsx)("br",{className:`jsx-${l.__hash}`}),"от отношений"]}),(0,b.jsxs)(h,{children:["Что может стать",(0,b.jsx)("br",{className:`jsx-${l.__hash}`}),"причиной ссор"]}),(0,b.jsxs)(h,{children:["Как сделать вашу",(0,b.jsx)("br",{className:`jsx-${l.__hash}`}),"пару крепче"]})]})]}),(0,b.jsx)(i,{}),(0,b.jsxs)("div",{className:`jsx-${l.__hash} paid-bottom`,children:[(0,b.jsxs)("button",{type:"button",onClick:()=>p.push(`/report/${q}`),className:`jsx-${l.__hash} buy-button`,children:[(0,b.jsx)("span",{className:`jsx-${l.__hash}`,children:"Открыть полный разбор"}),(0,b.jsx)("strong",{className:`jsx-${l.__hash}`,children:"299 ₽"}),(0,b.jsx)("i",{className:`jsx-${l.__hash}`,children:"→"})]}),(0,b.jsx)("div",{className:`jsx-${l.__hash} paid-note`,children:"один разбор · для вас двоих · сразу после оплаты"})]})]})})]}),(0,b.jsx)(k,{}),(0,b.jsx)(c.default,{id:l.__hash,children:l})]})}])}];
 
 //# sourceMappingURL=app_result_%5BcoupleId%5D_page_tsx_1boadhs._.js.map
