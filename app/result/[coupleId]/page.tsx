@@ -89,6 +89,7 @@ export default function ResultPage() {
                     router.replace(
                         `/waiting/${coupleId}`
                     );
+
                     return;
                 }
 
@@ -112,14 +113,17 @@ export default function ResultPage() {
     const categories =
         useMemo<CategoryScore[]>(() => {
             const same =
-                data?.scores?.sameAnswers ?? 0;
+                data?.scores?.sameAnswers ??
+                0;
 
             const close =
-                data?.scores?.closeAnswers ?? 0;
+                data?.scores?.closeAnswers ??
+                0;
 
             const different =
                 data?.scores
-                    ?.differentAnswers ?? 0;
+                    ?.differentAnswers ??
+                0;
 
             const total = Math.max(
                 same +
@@ -128,12 +132,13 @@ export default function ResultPage() {
                 1
             );
 
-            const base = Math.round(
-                ((same +
-                        close * 0.5) /
-                    total) *
-                MAX_SCORE
-            );
+            const base =
+                Math.round(
+                    ((same +
+                            close * 0.5) /
+                        total) *
+                    MAX_SCORE
+                );
 
             const clamp = (
                 value: number
@@ -198,23 +203,29 @@ export default function ResultPage() {
                 data?.scores?.overall ??
                 50;
 
-            if (overall >= 85)
+            if (overall >= 85) {
                 return 45;
+            }
 
-            if (overall >= 75)
+            if (overall >= 75) {
                 return 28;
+            }
 
-            if (overall >= 65)
+            if (overall >= 65) {
                 return 16;
+            }
 
-            if (overall >= 55)
+            if (overall >= 55) {
                 return 10;
+            }
 
-            if (overall >= 45)
+            if (overall >= 45) {
                 return 6;
+            }
 
-            if (overall >= 35)
+            if (overall >= 35) {
                 return 3;
+            }
 
             return 1;
         }, [data]);
@@ -256,7 +267,9 @@ export default function ResultPage() {
                         min-height: 100vh;
                         display: grid;
                         place-items: center;
-                        background: #f8f4f1;
+
+                        background:
+                            #f8f4f1;
                     }
 
                     .state-brand {
@@ -264,6 +277,7 @@ export default function ResultPage() {
                             Georgia,
                             "Times New Roman",
                             serif;
+
                         font-size: 30px;
                         font-weight: 700;
                     }
@@ -281,10 +295,15 @@ export default function ResultPage() {
                 <style jsx>{`
                     .state {
                         min-height: 100vh;
+
                         display: grid;
                         place-items: center;
+
                         padding: 24px;
-                        background: #f8f4f1;
+
+                        background:
+                            #f8f4f1;
+
                         font-family:
                             Arial,
                             Helvetica,
@@ -298,7 +317,13 @@ export default function ResultPage() {
     return (
         <main className="page">
 
+            {/* =====================================================
+                MAIN RESULT
+            ===================================================== */}
+
             <div className="content-shell">
+
+                {/* HEADER */}
 
                 <header className="header">
 
@@ -321,6 +346,8 @@ export default function ResultPage() {
                     </div>
 
                 </header>
+
+                {/* RESULTS */}
 
                 <section className="results">
 
@@ -353,6 +380,8 @@ export default function ResultPage() {
 
                 </section>
 
+                {/* FORECAST */}
+
                 <section className="forecast">
 
                     <div>
@@ -384,9 +413,7 @@ export default function ResultPage() {
                         <div className="years">
 
                             <strong>
-                                {
-                                    yearsForecast
-                                }
+                                {yearsForecast}
                             </strong>
 
                             <span>
@@ -418,6 +445,7 @@ export default function ResultPage() {
                             </div>
 
                             <div className="scale-labels">
+
                                 <span>
                                     1 месяц
                                 </span>
@@ -425,6 +453,7 @@ export default function ResultPage() {
                                 <span>
                                     вся жизнь
                                 </span>
+
                             </div>
 
                         </div>
@@ -481,19 +510,29 @@ export default function ResultPage() {
 
                     <div className="paid-content">
 
+                        {/* TITLE */}
+
                         <div className="paid-copy">
 
-                            <div className="paid-label">
-                                ПОЛНЫЙ РАЗБОР
+                            <div className="copy-softness" />
+
+                            <div className="paid-copy-inner">
+
+                                <div className="paid-label">
+                                    ПОЛНЫЙ РАЗБОР
+                                </div>
+
+                                <h2>
+                                    Чтобы вместе —
+                                    <br />
+                                    и надолго.
+                                </h2>
+
                             </div>
 
-                            <h2>
-                                Чтобы вместе —
-                                <br />
-                                и надолго.
-                            </h2>
-
                         </div>
+
+                        {/* BENEFITS */}
 
                         <div className="benefits">
 
@@ -544,6 +583,8 @@ export default function ResultPage() {
 
                         </div>
 
+                        {/* CTA */}
+
                         <button
                             type="button"
                             className="paid-cta"
@@ -586,15 +627,22 @@ export default function ResultPage() {
 
             <style jsx>{`
 
+                /* =====================================================
+                   GLOBAL
+                ===================================================== */
+
                 :global(*) {
                     box-sizing:
                         border-box;
                 }
 
                 :global(body) {
-                    margin: 0;
+                    margin:
+                        0;
+
                     background:
                         #f8f4f1;
+
                     color:
                         #201c1e;
                 }
@@ -627,9 +675,9 @@ export default function ResultPage() {
                         0 auto;
                 }
 
-                /* ==============================
+                /* =====================================================
                    HEADER
-                ============================== */
+                ===================================================== */
 
                 .header {
                     min-height:
@@ -704,9 +752,9 @@ export default function ResultPage() {
                         #c2215a;
                 }
 
-                /* ==============================
+                /* =====================================================
                    RESULTS
-                ============================== */
+                ===================================================== */
 
                 .results {
                     padding:
@@ -759,9 +807,9 @@ export default function ResultPage() {
                         -2.5px;
                 }
 
-                /* ==============================
+                /* =====================================================
                    FORECAST
-                ============================== */
+                ===================================================== */
 
                 .forecast {
                     padding:
@@ -953,9 +1001,9 @@ export default function ResultPage() {
                         11px;
                 }
 
-                /* ==============================
-                   PAID
-                ============================== */
+                /* =====================================================
+                   PAID CARD
+                ===================================================== */
 
                 .paid-section {
                     width:
@@ -991,9 +1039,9 @@ export default function ResultPage() {
                         isolate;
                 }
 
-                /* ==============================
-                   DESKTOP ART
-                ============================== */
+                /* =====================================================
+                   ART
+                ===================================================== */
 
                 .art {
                     position:
@@ -1012,7 +1060,7 @@ export default function ResultPage() {
                         0;
 
                     width:
-                        69%;
+                        70%;
 
                     overflow:
                         hidden;
@@ -1049,15 +1097,6 @@ export default function ResultPage() {
                         1;
                 }
 
-                /*
-                 * BLUR ЕСТЬ ТОЛЬКО У ПРАВОГО КРАЯ.
-                 *
-                 * Поэтому он физически
-                 * не может превратиться
-                 * в прямоугольную шторку
-                 * через всю карточку.
-                 */
-
                 .art-blurred {
                     z-index:
                         2;
@@ -1071,52 +1110,64 @@ export default function ResultPage() {
                     mask-image:
                         linear-gradient(
                             90deg,
-                            transparent 48%,
+
+                            transparent 47%,
+
                             rgba(
                                 0,
                                 0,
                                 0,
                                 .05
-                            ) 54%,
+                            ) 55%,
+
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .2
-                            ) 61%,
+                                .22
+                            ) 64%,
+
                             rgba(
                                 0,
                                 0,
                                 0,
                                 .55
-                            ) 70%,
-                            black 82%,
+                            ) 73%,
+
+                            black 84%,
+
                             black 100%
                         );
 
                     -webkit-mask-image:
                         linear-gradient(
                             90deg,
-                            transparent 48%,
+
+                            transparent 47%,
+
                             rgba(
                                 0,
                                 0,
                                 0,
                                 .05
-                            ) 54%,
+                            ) 55%,
+
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .2
-                            ) 61%,
+                                .22
+                            ) 64%,
+
                             rgba(
                                 0,
                                 0,
                                 0,
                                 .55
-                            ) 70%,
-                            black 82%,
+                            ) 73%,
+
+                            black 84%,
+
                             black 100%
                         );
                 }
@@ -1131,50 +1182,47 @@ export default function ResultPage() {
                     inset:
                         0;
 
-                    pointer-events:
-                        none;
-
                     background:
                         linear-gradient(
                             90deg,
-                            transparent 46%,
+
+                            transparent 45%,
+
                             rgba(
                                 167,
                                 15,
                                 77,
                                 .03
-                            ) 53%,
+                            ) 54%,
+
                             rgba(
                                 167,
                                 15,
                                 77,
-                                .12
-                            ) 61%,
+                                .15
+                            ) 64%,
+
                             rgba(
                                 167,
                                 15,
                                 77,
-                                .32
-                            ) 70%,
+                                .39
+                            ) 75%,
+
                             rgba(
                                 167,
                                 15,
                                 77,
-                                .62
-                            ) 80%,
-                            rgba(
-                                167,
-                                15,
-                                77,
-                                .88
-                            ) 90%,
+                                .72
+                            ) 86%,
+
                             #a70f4d 100%
                         );
                 }
 
-                /* ==============================
-                   DESKTOP CONTENT
-                ============================== */
+                /* =====================================================
+                   CONTENT
+                ===================================================== */
 
                 .paid-content {
                     position:
@@ -1187,38 +1235,121 @@ export default function ResultPage() {
                         500px;
                 }
 
-                /*
-                 * На desktop больше НЕ кладём
-                 * title поверх персонажей.
-                 *
-                 * Он находится в спокойной
-                 * зоне справа.
-                 */
+                /* =====================================================
+                   COPY / TITLE
+                ===================================================== */
 
                 .paid-copy {
                     position:
                         absolute;
 
+                    /*
+                     * Главное изменение:
+                     *
+                     * заголовок теперь находится
+                     * прямо в blur-переходе.
+                     */
+
                     top:
-                        47px;
+                        48px;
 
                     left:
-                        57%;
+                        53%;
 
                     width:
-                        36%;
+                        42%;
+
+                    max-width:
+                        490px;
+
+                    isolation:
+                        isolate;
+                }
+
+                /*
+                 * Не плашка.
+                 *
+                 * Очень мягкая дымка,
+                 * чтобы текст естественно
+                 * читался поверх изображения.
+                 */
+
+                .copy-softness {
+                    position:
+                        absolute;
+
+                    z-index:
+                        -1;
+
+                    top:
+                        -38px;
+
+                    right:
+                        -42px;
+
+                    bottom:
+                        -40px;
+
+                    left:
+                        -45px;
+
+                    pointer-events:
+                        none;
+
+                    background:
+                        radial-gradient(
+                            ellipse
+                            at
+                            46%
+                            48%,
+
+                            rgba(
+                                92,
+                                0,
+                                39,
+                                .22
+                            )
+                            0%,
+
+                            rgba(
+                                125,
+                                2,
+                                55,
+                                .13
+                            )
+                            38%,
+
+                            rgba(
+                                125,
+                                2,
+                                55,
+                                0
+                            )
+                            76%
+                        );
+
+                    filter:
+                        blur(7px);
+                }
+
+                .paid-copy-inner {
+                    position:
+                        relative;
+
+                    z-index:
+                        2;
                 }
 
                 .paid-label {
                     margin-bottom:
-                        13px;
+                        15px;
 
                     color:
                         rgba(
                             255,
-                            244,
+                            245,
                             247,
-                            .8
+                            .76
                         );
 
                     font-family:
@@ -1227,13 +1358,16 @@ export default function ResultPage() {
                         sans-serif;
 
                     font-size:
-                        10px;
+                        9px;
+
+                    line-height:
+                        1;
 
                     font-weight:
                         700;
 
                     letter-spacing:
-                        2px;
+                        2.25px;
                 }
 
                 .paid-copy h2 {
@@ -1250,33 +1384,49 @@ export default function ResultPage() {
 
                     font-size:
                         clamp(
-                            38px,
-                            3.5vw,
-                            49px
+                            39px,
+                            3.55vw,
+                            48px
                         );
 
                     line-height:
-                        .97;
+                        .99;
 
                     font-weight:
                         400;
 
                     letter-spacing:
-                        -2px;
+                        -1.9px;
+
+                    text-wrap:
+                        balance;
+
+                    text-shadow:
+                        0 2px 18px
+                        rgba(
+                            52,
+                            0,
+                            25,
+                            .18
+                        );
                 }
+
+                /* =====================================================
+                   BENEFITS
+                ===================================================== */
 
                 .benefits {
                     position:
                         absolute;
 
                     top:
-                        184px;
-
-                    left:
-                        66%;
+                        205px;
 
                     right:
-                        46px;
+                        54px;
+
+                    width:
+                        305px;
 
                     display:
                         grid;
@@ -1285,8 +1435,12 @@ export default function ResultPage() {
                         1fr;
 
                     gap:
-                        22px;
+                        19px;
                 }
+
+                /* =====================================================
+                   CTA
+                ===================================================== */
 
                 .paid-cta {
                     position:
@@ -1299,7 +1453,7 @@ export default function ResultPage() {
                         51px;
 
                     width:
-                        55%;
+                        56%;
 
                     height:
                         72px;
@@ -1406,7 +1560,7 @@ export default function ResultPage() {
                         21px;
 
                     width:
-                        55%;
+                        56%;
 
                     text-align:
                         center;
@@ -1428,9 +1582,85 @@ export default function ResultPage() {
                         9px;
                 }
 
-                /* ==============================
+                /* =====================================================
+                   TABLET
+                ===================================================== */
+
+                @media (
+                    max-width:
+                    1000px
+                ) {
+
+                    .paid-card,
+                    .paid-content {
+                        min-height:
+                            470px;
+                    }
+
+                    .art {
+                        width:
+                            69%;
+                    }
+
+                    .paid-copy {
+                        left:
+                            51%;
+
+                        top:
+                            40px;
+
+                        width:
+                            44%;
+                    }
+
+                    .paid-copy h2 {
+                        font-size:
+                            41px;
+                    }
+
+                    .benefits {
+                        top:
+                            187px;
+
+                        right:
+                            34px;
+
+                        width:
+                            28%;
+
+                        gap:
+                            18px;
+                    }
+
+                    .paid-cta {
+                        right:
+                            28px;
+
+                        bottom:
+                            43px;
+
+                        width:
+                            56%;
+
+                        height:
+                            68px;
+                    }
+
+                    .paid-note {
+                        right:
+                            28px;
+
+                        bottom:
+                            18px;
+
+                        width:
+                            56%;
+                    }
+                }
+
+                /* =====================================================
                    MOBILE
-                ============================== */
+                ===================================================== */
 
                 @media (
                     max-width:
@@ -1522,30 +1752,24 @@ export default function ResultPage() {
                             0;
                     }
 
-                    /*
-                     * Полностью отдельная
-                     * MOBILE композиция.
-                     */
+                    /* =============================================
+                       CARD
+                    ============================================= */
+
+                    .paid-card,
+                    .paid-content {
+                        min-height:
+                            665px;
+                    }
 
                     .paid-card {
-                        min-height:
-                            690px;
-
                         border-radius:
                             22px;
                     }
 
-                    .paid-content {
-                        min-height:
-                            690px;
-                    }
-
-                    /*
-                     * КАРТИНКА
-                     *
-                     * Не растягивается
-                     * на всю карточку.
-                     */
+                    /* =============================================
+                       IMAGE
+                    ============================================= */
 
                     .art {
                         top:
@@ -1564,7 +1788,7 @@ export default function ResultPage() {
                             100%;
 
                         height:
-                            330px;
+                            335px;
 
                         overflow:
                             hidden;
@@ -1572,124 +1796,131 @@ export default function ResultPage() {
 
                     .art img {
                         object-position:
-                            center
-                            center;
+                            center center;
                     }
-
-                    /*
-                     * BLUR только в нижней
-                     * трети картинки.
-                     */
 
                     .art-blurred {
                         filter:
-                            blur(18px);
+                            blur(19px);
 
                         transform:
-                            scale(1.06);
+                            scale(1.07);
 
                         mask-image:
                             linear-gradient(
                                 180deg,
-                                transparent 50%,
+
+                                transparent 47%,
+
                                 rgba(
                                     0,
                                     0,
                                     0,
-                                    .08
-                                ) 60%,
+                                    .06
+                                ) 58%,
+
                                 rgba(
                                     0,
                                     0,
                                     0,
-                                    .3
-                                ) 70%,
+                                    .25
+                                ) 69%,
+
                                 rgba(
                                     0,
                                     0,
                                     0,
-                                    .72
-                                ) 82%,
-                                black 94%,
+                                    .58
+                                ) 80%,
+
+                                black 91%,
+
                                 black 100%
                             );
 
                         -webkit-mask-image:
                             linear-gradient(
                                 180deg,
-                                transparent 50%,
+
+                                transparent 47%,
+
                                 rgba(
                                     0,
                                     0,
                                     0,
-                                    .08
-                                ) 60%,
+                                    .06
+                                ) 58%,
+
                                 rgba(
                                     0,
                                     0,
                                     0,
-                                    .3
-                                ) 70%,
+                                    .25
+                                ) 69%,
+
                                 rgba(
                                     0,
                                     0,
                                     0,
-                                    .72
-                                ) 82%,
-                                black 94%,
+                                    .58
+                                ) 80%,
+
+                                black 91%,
+
                                 black 100%
                             );
                     }
-
-                    /*
-                     * Fade тоже ограничен
-                     * самой картинкой.
-                     */
 
                     .art-gradient {
                         background:
                             linear-gradient(
                                 180deg,
-                                transparent 47%,
+
+                                transparent 45%,
+
                                 rgba(
                                     167,
                                     15,
                                     77,
-                                    .05
-                                ) 59%,
+                                    .04
+                                ) 57%,
+
                                 rgba(
                                     167,
                                     15,
                                     77,
-                                    .18
-                                ) 70%,
+                                    .16
+                                ) 68%,
+
                                 rgba(
                                     167,
                                     15,
                                     77,
-                                    .45
-                                ) 81%,
+                                    .43
+                                ) 79%,
+
                                 rgba(
                                     167,
                                     15,
                                     77,
-                                    .78
-                                ) 91%,
+                                    .76
+                                ) 90%,
+
                                 #a70f4d 100%
                             );
                     }
 
-                    /*
-                     * TITLE уже НЕ находится
-                     * поверх дерева,
-                     * сердец и персонажей.
-                     *
-                     * Он начинается после картинки.
-                     */
+                    /* =============================================
+                       TITLE
+
+                       Самое важное изменение:
+                       текст начинается ещё ВНУТРИ
+                       blur-перехода.
+                    ============================================= */
 
                     .paid-copy {
                         top:
-                            313px;
+                            273px;
 
                         left:
                             26px;
@@ -1700,19 +1931,76 @@ export default function ResultPage() {
                                 52px
                             );
 
-                        padding-top:
-                            21px;
+                        max-width:
+                            none;
+                    }
+
+                    .copy-softness {
+                        top:
+                            -28px;
+
+                        right:
+                            -15px;
+
+                        bottom:
+                            -24px;
+
+                        left:
+                            -22px;
+
+                        background:
+                            radial-gradient(
+                                ellipse
+                                at
+                                35%
+                                50%,
+
+                                rgba(
+                                    92,
+                                    0,
+                                    39,
+                                    .32
+                                )
+                                0%,
+
+                                rgba(
+                                    128,
+                                    4,
+                                    56,
+                                    .18
+                                )
+                                44%,
+
+                                rgba(
+                                    128,
+                                    4,
+                                    56,
+                                    0
+                                )
+                                82%
+                            );
+
+                        filter:
+                            blur(8px);
                     }
 
                     .paid-label {
                         margin-bottom:
-                            9px;
+                            10px;
 
                         font-size:
                             8px;
 
                         letter-spacing:
-                            1.8px;
+                            1.9px;
+
+                        color:
+                            rgba(
+                                255,
+                                244,
+                                247,
+                                .78
+                            );
                     }
 
                     .paid-copy h2 {
@@ -1723,24 +2011,34 @@ export default function ResultPage() {
                             .98;
 
                         letter-spacing:
-                            -1.5px;
+                            -1.45px;
+
+                        text-shadow:
+                            0 2px 15px
+                            rgba(
+                                43,
+                                0,
+                                22,
+                                .25
+                            );
                     }
 
-                    /*
-                     * Benefits на чистом фоне,
-                     * поэтому теперь всё
-                     * гораздо аккуратнее читается.
-                     */
+                    /* =============================================
+                       BENEFITS
+                    ============================================= */
 
                     .benefits {
                         top:
-                            425px;
+                            389px;
 
                         left:
                             26px;
 
                         right:
                             26px;
+
+                        width:
+                            auto;
 
                         display:
                             grid;
@@ -1760,6 +2058,10 @@ export default function ResultPage() {
                         row-gap:
                             18px;
                     }
+
+                    /* =============================================
+                       CTA
+                    ============================================= */
 
                     .paid-cta {
                         left:
@@ -1818,15 +2120,16 @@ export default function ResultPage() {
                             20px;
 
                         width:
-                            calc(
-                                100% -
-                                40px
-                            );
+                            auto;
 
                         font-size:
                             8px;
                     }
                 }
+
+                /* =====================================================
+                   SMALL MOBILE
+                ===================================================== */
 
                 @media (
                     max-width:
@@ -1836,17 +2139,17 @@ export default function ResultPage() {
                     .paid-card,
                     .paid-content {
                         min-height:
-                            665px;
+                            645px;
                     }
 
                     .art {
                         height:
-                            310px;
+                            320px;
                     }
 
                     .paid-copy {
                         top:
-                            293px;
+                            260px;
 
                         left:
                             22px;
@@ -1865,7 +2168,7 @@ export default function ResultPage() {
 
                     .benefits {
                         top:
-                            399px;
+                            370px;
 
                         left:
                             22px;
@@ -1897,12 +2200,6 @@ export default function ResultPage() {
 
                         right:
                             16px;
-
-                        width:
-                            calc(
-                                100% -
-                                32px
-                            );
                     }
                 }
 
@@ -1949,9 +2246,7 @@ function CategoryRow({
                 <div className="category-score">
 
                     <strong>
-                        {
-                            safeValue
-                        }
+                        {safeValue}
                     </strong>
 
                     <span>
