@@ -261,18 +261,20 @@ export default function ResultPage() {
     return (
         <main className="page">
 
-            {/* =====================================================
-                RESULT PAGE
-            ===================================================== */}
-
             <div className="content-shell">
 
+                {/* =================================================
+                    HEADER
+                ================================================= */}
+
                 <header className="header">
+
                     <div className="brand">
                         между нами.
                     </div>
 
                     <div className="couple-names">
+
                         <span className="person-name">
                             {nameA}
                         </span>
@@ -284,7 +286,9 @@ export default function ResultPage() {
                         <span className="person-name">
                             {nameB}
                         </span>
+
                     </div>
+
                 </header>
 
                 {/* =================================================
@@ -304,6 +308,7 @@ export default function ResultPage() {
                     </h1>
 
                     <div className="category-list">
+
                         {categories.map(
                             (category) => (
                                 <CategoryRow
@@ -312,6 +317,7 @@ export default function ResultPage() {
                                 />
                             )
                         )}
+
                     </div>
 
                 </section>
@@ -381,6 +387,7 @@ export default function ResultPage() {
                             </div>
 
                             <div className="scale-labels">
+
                                 <span>
                                     1 месяц
                                 </span>
@@ -388,6 +395,7 @@ export default function ResultPage() {
                                 <span>
                                     вся жизнь
                                 </span>
+
                             </div>
 
                         </div>
@@ -407,15 +415,32 @@ export default function ResultPage() {
                 <div className="paid-card">
 
                     {/* =================================================
-                        ART
-
-                        Здесь только картинка.
-                        Никакого текста внутри изображения.
+                        ORIGINAL ART
                     ================================================= */}
 
                     <div className="art">
 
                         <img
+                            className="art-image"
+                            src={PAID_IMAGE}
+                            alt=""
+                            draggable={false}
+                        />
+
+                        {/* =================================================
+                            BLURRED COPY
+
+                            Это принципиально.
+
+                            Мы не пытаемся получить blur
+                            через один gradient.
+
+                            Здесь реальная вторая копия
+                            изображения с filter: blur().
+                        ================================================= */}
+
+                        <img
+                            className="art-image art-image-blur"
                             src={PAID_IMAGE}
                             alt=""
                             draggable={false}
@@ -424,21 +449,15 @@ export default function ResultPage() {
                     </div>
 
                     {/* =================================================
-                        ART FADE
+                        FADE
 
-                        Desktop:
-                        горизонтальный fade вправо.
-
-                        Mobile:
-                        вертикальный fade вниз.
-
-                        В результате картинка не имеет
-                        жёсткой прямой границы.
+                        Отдельный слой затемняет blur
+                        и постепенно переводит его
+                        в цвет карточки.
                     ================================================= */}
 
                     <div className="art-fade" />
 
-                    {/* Дополнительное лёгкое затемнение */}
                     <div className="card-overlay" />
 
                     {/* =================================================
@@ -447,7 +466,9 @@ export default function ResultPage() {
 
                     <div className="paid-content">
 
-                        {/* TITLE */}
+                        {/* =================================================
+                            TITLE
+                        ================================================= */}
 
                         <div className="paid-title">
 
@@ -589,8 +610,11 @@ export default function ResultPage() {
                 .page {
                     width: 100%;
                     min-height: 100vh;
+
                     overflow-x: hidden;
+
                     background: #f8f4f1;
+
                     padding-bottom: 80px;
                 }
 
@@ -634,7 +658,8 @@ export default function ResultPage() {
 
                     font-weight: 700;
 
-                    letter-spacing: -1.1px;
+                    letter-spacing:
+                        -1.1px;
                 }
 
                 .couple-names {
@@ -653,21 +678,28 @@ export default function ResultPage() {
                         sans-serif;
 
                     font-size: 10px;
+
                     font-weight: 700;
 
-                    letter-spacing: 1.2px;
+                    letter-spacing:
+                        1.2px;
 
-                    text-transform: uppercase;
+                    text-transform:
+                        uppercase;
                 }
 
                 .person-name {
                     overflow: hidden;
+
                     text-overflow: ellipsis;
-                    white-space: nowrap;
+
+                    white-space:
+                        nowrap;
                 }
 
                 .couple-cross {
                     flex-shrink: 0;
+
                     color: #c2215a;
                 }
 
@@ -676,7 +708,9 @@ export default function ResultPage() {
                 ===================================================== */
 
                 .results {
-                    padding: 42px 0 45px;
+                    padding:
+                        42px 0
+                        45px;
                 }
 
                 .section-label {
@@ -694,11 +728,13 @@ export default function ResultPage() {
 
                     font-weight: 800;
 
-                    letter-spacing: 2.2px;
+                    letter-spacing:
+                        2.2px;
                 }
 
                 .results-title {
-                    margin: 0 0 32px;
+                    margin:
+                        0 0 32px;
 
                     font-family:
                         Georgia,
@@ -710,7 +746,8 @@ export default function ResultPage() {
 
                     font-weight: 400;
 
-                    letter-spacing: -2.5px;
+                    letter-spacing:
+                        -2.5px;
                 }
 
                 .category-list {
@@ -723,7 +760,9 @@ export default function ResultPage() {
                 ===================================================== */
 
                 .forecast {
-                    padding: 38px 0 46px;
+                    padding:
+                        38px 0
+                        46px;
 
                     display: grid;
 
@@ -759,13 +798,15 @@ export default function ResultPage() {
 
                     font-weight: 400;
 
-                    letter-spacing: -2.2px;
+                    letter-spacing:
+                        -2.2px;
                 }
 
                 .forecast-description {
                     max-width: 520px;
 
-                    margin: 15px 0 0;
+                    margin:
+                        15px 0 0;
 
                     color: #8d8587;
 
@@ -795,7 +836,8 @@ export default function ResultPage() {
                         "Times New Roman",
                         serif;
 
-                    white-space: nowrap;
+                    white-space:
+                        nowrap;
                 }
 
                 .years strong {
@@ -804,7 +846,8 @@ export default function ResultPage() {
 
                     font-weight: 400;
 
-                    letter-spacing: -4px;
+                    letter-spacing:
+                        -4px;
                 }
 
                 .years span {
@@ -813,7 +856,8 @@ export default function ResultPage() {
                     font-size: 39px;
                     line-height: 1;
 
-                    letter-spacing: -1.5px;
+                    letter-spacing:
+                        -1.5px;
                 }
 
                 .forecast-scale {
@@ -826,19 +870,24 @@ export default function ResultPage() {
 
                     height: 9px;
 
-                    border-radius: 999px;
+                    border-radius:
+                        999px;
 
-                    background: #e5dfe0;
+                    background:
+                        #e5dfe0;
                 }
 
                 .scale-fill {
                     position: absolute;
 
-                    inset: 0 auto 0 0;
+                    inset:
+                        0 auto 0 0;
 
-                    border-radius: inherit;
+                    border-radius:
+                        inherit;
 
-                    background: #e99ab5;
+                    background:
+                        #e99ab5;
                 }
 
                 .scale-dot {
@@ -849,9 +898,11 @@ export default function ResultPage() {
                     width: 22px;
                     height: 22px;
 
-                    border-radius: 50%;
+                    border-radius:
+                        50%;
 
-                    background: #c21856;
+                    background:
+                        #c21856;
 
                     transform:
                         translate(
@@ -862,7 +913,8 @@ export default function ResultPage() {
 
                 .scale-labels {
                     display: flex;
-                    justify-content: space-between;
+                    justify-content:
+                        space-between;
 
                     margin-top: 12px;
 
@@ -887,7 +939,8 @@ export default function ResultPage() {
                         calc(100% - 40px)
                     );
 
-                    margin: 8px auto 0;
+                    margin:
+                        8px auto 0;
                 }
 
                 /* =====================================================
@@ -909,26 +962,21 @@ export default function ResultPage() {
                         linear-gradient(
                             90deg,
                             #9e104c 0%,
-                            #a60f4d 50%,
-                            #a90e4e 100%
+                            #a50f4c 48%,
+                            #aa0e4f 100%
                         );
 
                     isolation: isolate;
                 }
 
                 /* =====================================================
-                   IMAGE
+                   ART
 
-                   Картинка сама по себе чистая.
+                   Desktop image deliberately ends BEFORE
+                   the actual edge of the card.
 
-                   На desktop она занимает примерно 72%
-                   ширины карточки.
-
-                   Очень важно:
-                   height: 100%;
-                   object-fit: cover;
-
-                   Поэтому картинка не растягивается.
+                   The blur copy continues visually into
+                   the right side.
                 ===================================================== */
 
                 .art {
@@ -936,14 +984,15 @@ export default function ResultPage() {
 
                     z-index: 1;
 
-                    inset: 0 auto 0 0;
+                    inset:
+                        0 auto 0 0;
 
-                    width: 72%;
+                    width: 68%;
 
-                    overflow: hidden;
+                    overflow: visible;
                 }
 
-                .art img {
+                .art-image {
                     position: absolute;
 
                     inset: 0;
@@ -955,32 +1004,64 @@ export default function ResultPage() {
 
                     object-fit: cover;
 
-                    /*
-                     * Центр композиции.
-                     *
-                     * Пара находится в нижней
-                     * левой/центральной части исходника.
-                     *
-                     * 50% оставляет их вместе.
-                     */
-                    object-position: 50% 50%;
+                    object-position:
+                        50% 50%;
 
                     user-select: none;
+
                     pointer-events: none;
                 }
 
                 /* =====================================================
-                   FADE
+                   BLURRED IMAGE COPY
 
-                   Ключевой элемент всей композиции.
+                   Основной blur.
 
-                   Не будет:
+                   Он находится поверх оригинала,
+                   но постепенно появляется только
+                   ближе к краю.
+                ===================================================== */
 
-                   IMAGE | SOLID COLOR
+                .art-image-blur {
+                    z-index: 2;
 
-                   Будет:
+                    filter:
+                        blur(18px);
 
-                   IMAGE → softened image → blur → color
+                    transform:
+                        scale(1.045);
+
+                    opacity: 0.95;
+
+                    mask-image:
+                        linear-gradient(
+                            90deg,
+                            transparent 45%,
+                            rgba(0,0,0,0.10) 53%,
+                            rgba(0,0,0,0.35) 61%,
+                            rgba(0,0,0,0.65) 69%,
+                            black 78%,
+                            black 100%
+                        );
+
+                    -webkit-mask-image:
+                        linear-gradient(
+                            90deg,
+                            transparent 45%,
+                            rgba(0,0,0,0.10) 53%,
+                            rgba(0,0,0,0.35) 61%,
+                            rgba(0,0,0,0.65) 69%,
+                            black 78%,
+                            black 100%
+                        );
+                }
+
+                /* =====================================================
+                   DESKTOP FADE
+
+                   Теперь fade начинается значительно раньше.
+
+                   Никакой вертикальной стены.
                 ===================================================== */
 
                 .art-fade {
@@ -1001,102 +1082,63 @@ export default function ResultPage() {
                                 15,
                                 77,
                                 0
-                            ) 42%,
+                            ) 40%,
 
                             rgba(
                                 166,
                                 15,
                                 77,
-                                0.04
-                            ) 50%,
+                                0.025
+                            ) 47%,
 
                             rgba(
                                 166,
                                 15,
                                 77,
-                                0.14
-                            ) 57%,
+                                0.10
+                            ) 55%,
 
                             rgba(
                                 166,
                                 15,
                                 77,
-                                0.30
-                            ) 64%,
+                                0.24
+                            ) 63%,
 
                             rgba(
                                 166,
                                 15,
                                 77,
-                                0.52
+                                0.43
                             ) 71%,
 
                             rgba(
                                 166,
                                 15,
                                 77,
-                                0.73
+                                0.64
                             ) 78%,
 
                             rgba(
                                 166,
                                 15,
                                 77,
-                                0.90
+                                0.83
                             ) 85%,
 
                             rgba(
                                 166,
                                 15,
                                 77,
-                                0.98
+                                0.95
                             ) 92%,
 
-                            #a60f4d 100%
-                        );
-                }
-
-                /*
-                 * Дополнительный blur-слой.
-
-                 * Он имитирует тот самый
-                 * мягкий "уход" изображения.
-                 */
-
-                .art-fade::after {
-                    content: "";
-
-                    position: absolute;
-
-                    inset: 0 0 0 48%;
-
-                    backdrop-filter:
-                        blur(12px);
-
-                    -webkit-backdrop-filter:
-                        blur(12px);
-
-                    opacity: 0.48;
-
-                    mask-image:
-                        linear-gradient(
-                            90deg,
-                            transparent 0%,
-                            black 45%,
-                            black 100%
-                        );
-
-                    -webkit-mask-image:
-                        linear-gradient(
-                            90deg,
-                            transparent 0%,
-                            black 45%,
-                            black 100%
+                            #a50f4c 100%
                         );
                 }
 
                 /* =====================================================
-                   OVERLAY
+                   CARD OVERLAY
                 ===================================================== */
 
                 .card-overlay {
@@ -1115,7 +1157,7 @@ export default function ResultPage() {
                                 35,
                                 0,
                                 20,
-                                0.03
+                                0.02
                             ) 0%,
 
                             rgba(
@@ -1123,19 +1165,19 @@ export default function ResultPage() {
                                 0,
                                 20,
                                 0
-                            ) 45%,
+                            ) 55%,
 
                             rgba(
                                 35,
                                 0,
                                 20,
-                                0.10
+                                0.08
                             ) 100%
                         );
                 }
 
                 /* =====================================================
-                   PAID CONTENT
+                   CONTENT
                 ===================================================== */
 
                 .paid-content {
@@ -1150,22 +1192,23 @@ export default function ResultPage() {
 
                 /* =====================================================
                    TITLE
+
+                   Теперь чуть меньше и выше,
+                   но не залезает так сильно
+                   на левый край.
                 ===================================================== */
 
                 .paid-title {
                     position: absolute;
 
-                    top: 40px;
+                    top: 38px;
                     left: 68px;
 
-                    width: min(
-                        520px,
-                        47%
-                    );
+                    width: 480px;
                 }
 
                 .paid-label {
-                    margin-bottom: 14px;
+                    margin-bottom: 13px;
 
                     color:
                         rgba(
@@ -1185,70 +1228,75 @@ export default function ResultPage() {
 
                     font-weight: 700;
 
-                    letter-spacing: 2.1px;
+                    letter-spacing:
+                        2.15px;
                 }
 
                 .paid-title h2 {
                     margin: 0;
 
-                    color: #fff9f6;
+                    color:
+                        #fff9f6;
 
                     font-family:
                         Georgia,
                         "Times New Roman",
                         serif;
 
-                    /*
-                     * Размер зависит от ширины экрана,
-                     * но не становится огромным.
-                     */
-                    font-size: clamp(
-                        42px,
-                        4.2vw,
-                        56px
-                    );
+                    font-size:
+                        clamp(
+                            40px,
+                            3.65vw,
+                            52px
+                        );
 
-                    line-height: 0.95;
+                    line-height:
+                        0.97;
 
                     font-weight: 400;
 
-                    letter-spacing: -2.5px;
+                    letter-spacing:
+                        -2.25px;
 
                     text-shadow:
                         0 2px 16px
                         rgba(
-                            50,
+                            40,
                             0,
-                            25,
+                            20,
                             0.12
                         );
                 }
 
                 /* =====================================================
                    BENEFITS
+
+                   Чуть ниже.
+                   Не прямо у верхнего края.
                 ===================================================== */
 
                 .benefits {
                     position: absolute;
 
-                    top: 48px;
-                    right: 64px;
+                    top: 63px;
+                    right: 72px;
 
-                    width: min(
-                        310px,
-                        27%
-                    );
+                    width: 290px;
 
                     display: grid;
 
                     grid-template-columns:
                         1fr;
 
-                    gap: 25px;
+                    gap: 27px;
                 }
 
                 /* =====================================================
                    CTA
+
+                   Чуть выше нижнего края.
+                   Центрируем относительно
+                   правой части.
                 ===================================================== */
 
                 .paid-cta {
@@ -1256,30 +1304,40 @@ export default function ResultPage() {
 
                     z-index: 20;
 
-                    right: 36px;
-                    bottom: 51px;
+                    right: 38px;
 
-                    width: min(
-                        638px,
-                        55%
-                    );
+                    bottom: 50px;
+
+                    width:
+                        min(
+                            640px,
+                            55%
+                        );
 
                     height: 72px;
 
-                    padding: 0 28px;
+                    padding:
+                        0 28px;
 
                     display: flex;
+
                     align-items: center;
-                    justify-content: space-between;
+
+                    justify-content:
+                        space-between;
 
                     gap: 20px;
 
                     border: 0;
-                    border-radius: 15px;
 
-                    background: #fffaf7;
+                    border-radius:
+                        15px;
 
-                    color: #201d1e;
+                    background:
+                        #fffaf7;
+
+                    color:
+                        #201d1e;
 
                     cursor: pointer;
 
@@ -1293,8 +1351,10 @@ export default function ResultPage() {
                         );
 
                     transition:
-                        transform 160ms ease,
-                        box-shadow 160ms ease;
+                        transform
+                        160ms ease,
+                        box-shadow
+                        160ms ease;
                 }
 
                 .paid-cta:hover {
@@ -1327,16 +1387,20 @@ export default function ResultPage() {
 
                     font-weight: 600;
 
-                    white-space: nowrap;
+                    white-space:
+                        nowrap;
                 }
 
                 .cta-right {
                     display: flex;
-                    align-items: center;
+
+                    align-items:
+                        center;
 
                     gap: 22px;
 
-                    color: #c51b58;
+                    color:
+                        #c51b58;
                 }
 
                 .price {
@@ -1350,7 +1414,8 @@ export default function ResultPage() {
 
                     font-weight: 400;
 
-                    white-space: nowrap;
+                    white-space:
+                        nowrap;
                 }
 
                 .arrow {
@@ -1370,13 +1435,15 @@ export default function ResultPage() {
 
                     z-index: 20;
 
-                    right: 36px;
-                    bottom: 22px;
+                    right: 38px;
 
-                    width: min(
-                        638px,
-                        55%
-                    );
+                    bottom: 21px;
+
+                    width:
+                        min(
+                            640px,
+                            55%
+                        );
 
                     color:
                         rgba(
@@ -1394,57 +1461,73 @@ export default function ResultPage() {
                     font-size: 9px;
                     line-height: 1;
 
-                    text-align: center;
+                    text-align:
+                        center;
                 }
 
                 /* =====================================================
-                   TABLET / NARROW DESKTOP
+                   TABLET
                 ===================================================== */
 
                 @media (max-width: 1000px) {
 
                     .paid-card {
-                        min-height: 470px;
+                        min-height:
+                            470px;
                     }
 
                     .paid-content {
-                        min-height: 470px;
+                        min-height:
+                            470px;
+                    }
+
+                    .art {
+                        width:
+                            67%;
                     }
 
                     .paid-title {
                         top: 34px;
                         left: 46px;
 
-                        width: 46%;
+                        width:
+                            43%;
                     }
 
                     .paid-title h2 {
-                        font-size: 43px;
+                        font-size:
+                            43px;
                     }
 
                     .benefits {
-                        top: 42px;
+                        top: 53px;
                         right: 35px;
 
-                        width: 28%;
+                        width:
+                            28%;
 
                         gap: 21px;
                     }
 
                     .paid-cta {
                         right: 28px;
+
                         bottom: 43px;
 
-                        width: 54%;
+                        width:
+                            54%;
 
-                        height: 68px;
+                        height:
+                            68px;
                     }
 
                     .paid-note {
                         right: 28px;
+
                         bottom: 18px;
 
-                        width: 54%;
+                        width:
+                            54%;
                     }
                 }
 
@@ -1462,24 +1545,31 @@ export default function ResultPage() {
                     }
 
                     .content-shell {
-                        width: 100%;
+                        width:
+                            100%;
                     }
 
                     .header {
-                        min-height: 64px;
+                        min-height:
+                            64px;
+
                         gap: 12px;
                     }
 
                     .brand {
-                        font-size: 21px;
+                        font-size:
+                            21px;
                     }
 
                     .couple-names {
-                        max-width: 52%;
+                        max-width:
+                            52%;
 
-                        gap: 5px;
+                        gap:
+                            5px;
 
-                        font-size: 8px;
+                        font-size:
+                            8px;
 
                         letter-spacing:
                             0.65px;
@@ -1496,19 +1586,25 @@ export default function ResultPage() {
                     }
 
                     .section-label {
-                        margin-bottom: 11px;
+                        margin-bottom:
+                            11px;
 
-                        font-size: 9px;
+                        font-size:
+                            9px;
 
                         letter-spacing:
                             1.8px;
                     }
 
                     .results-title {
-                        margin-bottom: 24px;
+                        margin-bottom:
+                            24px;
 
-                        font-size: 37px;
-                        line-height: 1;
+                        font-size:
+                            37px;
+
+                        line-height:
+                            1;
 
                         letter-spacing:
                             -1.8px;
@@ -1523,70 +1619,94 @@ export default function ResultPage() {
                             29px 0
                             37px;
 
-                        display: block;
+                        display:
+                            block;
                     }
 
                     .forecast-title {
-                        max-width: 100%;
+                        max-width:
+                            100%;
 
-                        font-size: 34px;
-                        line-height: 1.01;
+                        font-size:
+                            34px;
+
+                        line-height:
+                            1.01;
 
                         letter-spacing:
                             -1.55px;
                     }
 
                     .forecast-description {
-                        max-width: 100%;
+                        max-width:
+                            100%;
 
-                        margin-top: 13px;
+                        margin-top:
+                            13px;
 
-                        font-size: 12px;
-                        line-height: 1.45;
+                        font-size:
+                            12px;
+
+                        line-height:
+                            1.45;
                     }
 
                     .desktop-break {
-                        display: none;
+                        display:
+                            none;
                     }
 
                     .forecast-result {
-                        width: 100%;
+                        width:
+                            100%;
 
-                        margin-top: 25px;
+                        margin-top:
+                            25px;
                     }
 
                     .years strong {
-                        font-size: 64px;
+                        font-size:
+                            64px;
+
                         letter-spacing:
                             -3px;
                     }
 
                     .years span {
-                        margin-left: 7px;
+                        margin-left:
+                            7px;
 
-                        font-size: 34px;
+                        font-size:
+                            34px;
 
                         letter-spacing:
                             -1px;
                     }
 
                     .forecast-scale {
-                        margin-top: 20px;
+                        margin-top:
+                            20px;
                     }
 
                     .scale-track {
-                        height: 7px;
+                        height:
+                            7px;
                     }
 
                     .scale-dot {
-                        width: 19px;
-                        height: 19px;
+                        width:
+                            19px;
+
+                        height:
+                            19px;
                     }
 
                     .scale-labels {
-                        margin-top: 10px;
+                        margin-top:
+                            10px;
 
-                        font-size: 9px;
+                        font-size:
+                            9px;
                     }
 
                     /* =============================================
@@ -1594,20 +1714,19 @@ export default function ResultPage() {
                     ============================================= */
 
                     .paid-section {
-                        width: 100%;
-                        margin-top: 0;
+                        width:
+                            100%;
+
+                        margin-top:
+                            0;
                     }
 
-                    /* =============================================
-                       PAID CARD
-
-                       Теперь это вертикальная композиция.
-                    ============================================= */
-
                     .paid-card {
-                        min-height: 650px;
+                        min-height:
+                            650px;
 
-                        border-radius: 22px;
+                        border-radius:
+                            22px;
 
                         background:
                             linear-gradient(
@@ -1618,18 +1737,15 @@ export default function ResultPage() {
                     }
 
                     .paid-content {
-                        min-height: 650px;
+                        min-height:
+                            650px;
                     }
 
                     /* =============================================
-                       IMAGE
+                       MOBILE ART
 
-                       Изображение занимает верх.
-
-                       Оно НЕ пытается вместить
-                       desktop-композицию.
-
-                       Пара остаётся в центре.
+                       Картинка остаётся достаточно большой,
+                       но fade начинается ДО её нижней границы.
                     ============================================= */
 
                     .art {
@@ -1639,58 +1755,83 @@ export default function ResultPage() {
                             auto
                             0;
 
-                        width: 100%;
-                        height: 390px;
+                        width:
+                            100%;
+
+                        height:
+                            395px;
+
+                        overflow:
+                            visible;
                     }
 
-                    .art img {
-                        width: 100%;
-                        height: 100%;
+                    .art-image {
+                        object-fit:
+                            cover;
 
-                        object-fit: cover;
-
-                        /*
-                         * Именно эта точка позволяет
-                         * удерживать пару вместе.
-
-                         * Не ставим left/right отдельно.
-                         */
                         object-position:
                             50%
                             50%;
                     }
 
-                    /* =============================================
-                       MOBILE FADE
+                    /*
+                     * На мобильном blur должен быть
+                     * намного сильнее.
+                     */
 
-                       Вместо:
+                    .art-image-blur {
+                        filter:
+                            blur(20px);
 
-                       КАРТИНКА
-                       --------
-                       ФОН
+                        transform:
+                            scale(1.07);
 
-                       получаем:
+                        mask-image:
+                            linear-gradient(
+                                180deg,
+                                transparent 40%,
+                                rgba(0,0,0,0.06) 47%,
+                                rgba(0,0,0,0.20) 56%,
+                                rgba(0,0,0,0.45) 65%,
+                                rgba(0,0,0,0.72) 74%,
+                                black 84%,
+                                black 100%
+                            );
 
-                       КАРТИНКА
-                       ↓
-                       мягкое изображение
-                       ↓
-                       blur
-                       ↓
-                       бордовый
-                    ============================================= */
+                        -webkit-mask-image:
+                            linear-gradient(
+                                180deg,
+                                transparent 40%,
+                                rgba(0,0,0,0.06) 47%,
+                                rgba(0,0,0,0.20) 56%,
+                                rgba(0,0,0,0.45) 65%,
+                                rgba(0,0,0,0.72) 74%,
+                                black 84%,
+                                black 100%
+                            );
+                    }
+
+                    /*
+                     * ВАЖНО:
+                     * fade теперь начинается прямо
+                     * поверх нижней части картинки.
+                     */
 
                     .art-fade {
-                        z-index: 3;
+                        z-index:
+                            3;
 
                         inset:
+                            0
+                            0
                             auto
-                            0
-                            0
                             0;
 
-                        width: 100%;
-                        height: 205px;
+                        width:
+                            100%;
+
+                        height:
+                            245px;
 
                         background:
                             linear-gradient(
@@ -1707,65 +1848,83 @@ export default function ResultPage() {
                                     163,
                                     14,
                                     77,
-                                    0.05
-                                ) 15%,
+                                    0.02
+                                ) 17%,
 
                                 rgba(
                                     163,
                                     14,
                                     77,
-                                    0.14
-                                ) 30%,
+                                    0.07
+                                ) 31%,
+
+                                rgba(
+                                    163,
+                                    14,
+                                    77,
+                                    0.17
+                                ) 45%,
 
                                 rgba(
                                     163,
                                     14,
                                     77,
                                     0.32
-                                ) 48%,
+                                ) 58%,
 
                                 rgba(
                                     163,
                                     14,
                                     77,
-                                    0.56
-                                ) 65%,
+                                    0.52
+                                ) 70%,
 
                                 rgba(
                                     163,
                                     14,
                                     77,
-                                    0.80
-                                ) 80%,
+                                    0.73
+                                ) 81%,
 
                                 rgba(
                                     163,
                                     14,
                                     77,
-                                    0.95
-                                ) 93%,
+                                    0.90
+                                ) 92%,
 
                                 #a30e4d 100%
                             );
                     }
 
+                    /*
+                     * Дополнительный blur самого перехода.
+                     */
+
                     .art-fade::after {
+                        content:
+                            "";
+
+                        position:
+                            absolute;
+
                         inset:
-                            0;
+                            30% 0 0 0;
 
                         backdrop-filter:
-                            blur(16px);
+                            blur(12px);
 
                         -webkit-backdrop-filter:
-                            blur(16px);
+                            blur(12px);
 
-                        opacity: 0.42;
+                        opacity:
+                            0.55;
 
                         mask-image:
                             linear-gradient(
                                 180deg,
                                 transparent 0%,
-                                black 65%,
+                                black 55%,
                                 black 100%
                             );
 
@@ -1773,42 +1932,43 @@ export default function ResultPage() {
                             linear-gradient(
                                 180deg,
                                 transparent 0%,
-                                black 65%,
+                                black 55%,
                                 black 100%
                             );
                     }
 
                     /* =============================================
                        TITLE
-
-                       Теперь текст НЕ привязан
-                       к картинке.
-
-                       Он всегда будет сверху
-                       в одинаковом месте.
                     ============================================= */
 
                     .paid-title {
-                        top: 31px;
-                        left: 28px;
+                        top:
+                            31px;
+
+                        left:
+                            28px;
 
                         width:
                             calc(100% - 56px);
                     }
 
                     .paid-label {
-                        margin-bottom: 13px;
+                        margin-bottom:
+                            13px;
 
-                        font-size: 9px;
+                        font-size:
+                            9px;
 
                         letter-spacing:
                             1.9px;
                     }
 
                     .paid-title h2 {
-                        font-size: 38px;
+                        font-size:
+                            38px;
 
-                        line-height: 0.96;
+                        line-height:
+                            0.96;
 
                         letter-spacing:
                             -1.8px;
@@ -1816,26 +1976,38 @@ export default function ResultPage() {
 
                     /* =============================================
                        BENEFITS
-
-                       Уже находятся ПОСЛЕ картинки.
                     ============================================= */
 
                     .benefits {
-                        top: 402px;
+                        top:
+                            405px;
 
-                        left: 28px;
-                        right: 28px;
+                        left:
+                            28px;
+
+                        right:
+                            28px;
 
                         width:
                             calc(100% - 56px);
 
-                        display: grid;
+                        display:
+                            grid;
 
                         grid-template-columns:
-                            repeat(2, minmax(0, 1fr));
+                            repeat(
+                                2,
+                                minmax(
+                                    0,
+                                    1fr
+                                )
+                            );
 
-                        column-gap: 22px;
-                        row-gap: 19px;
+                        column-gap:
+                            22px;
+
+                        row-gap:
+                            20px;
                     }
 
                     /* =============================================
@@ -1843,100 +2015,142 @@ export default function ResultPage() {
                     ============================================= */
 
                     .paid-cta {
-                        left: 20px;
-                        right: 20px;
-                        bottom: 48px;
+                        left:
+                            20px;
+
+                        right:
+                            20px;
+
+                        bottom:
+                            48px;
 
                         width:
                             calc(100% - 40px);
 
-                        height: 58px;
+                        height:
+                            58px;
 
-                        min-width: 0;
+                        min-width:
+                            0;
 
                         padding:
                             0 18px;
 
-                        border-radius: 14px;
+                        border-radius:
+                            14px;
                     }
 
                     .cta-title {
-                        font-size: 13px;
+                        font-size:
+                            13px;
                     }
 
                     .cta-right {
-                        gap: 13px;
+                        gap:
+                            13px;
                     }
 
                     .price {
-                        font-size: 24px;
+                        font-size:
+                            24px;
                     }
 
                     .arrow {
-                        font-size: 23px;
+                        font-size:
+                            23px;
                     }
 
                     .paid-note {
-                        left: 20px;
-                        right: 20px;
-                        bottom: 20px;
+                        left:
+                            20px;
+
+                        right:
+                            20px;
+
+                        bottom:
+                            20px;
 
                         width:
                             calc(100% - 40px);
 
-                        font-size: 8px;
+                        font-size:
+                            8px;
                     }
                 }
 
                 /* =====================================================
                    SMALL MOBILE
-
-                   iPhone SE / узкие Android.
                 ===================================================== */
 
                 @media (max-width: 390px) {
 
                     .paid-card {
-                        min-height: 620px;
+                        min-height:
+                            620px;
                     }
 
                     .paid-content {
-                        min-height: 620px;
+                        min-height:
+                            620px;
                     }
 
                     .art {
-                        height: 370px;
+                        height:
+                            375px;
+                    }
+
+                    .art-image-blur {
+                        filter:
+                            blur(19px);
+                    }
+
+                    .art-fade {
+                        height:
+                            235px;
                     }
 
                     .paid-title {
-                        top: 27px;
+                        top:
+                            27px;
 
-                        left: 24px;
+                        left:
+                            24px;
 
                         width:
                             calc(100% - 48px);
                     }
 
                     .paid-title h2 {
-                        font-size: 35px;
+                        font-size:
+                            35px;
                     }
 
                     .benefits {
-                        top: 382px;
+                        top:
+                            388px;
 
-                        left: 24px;
-                        right: 24px;
+                        left:
+                            24px;
+
+                        right:
+                            24px;
 
                         width:
                             calc(100% - 48px);
 
-                        column-gap: 16px;
-                        row-gap: 16px;
+                        column-gap:
+                            16px;
+
+                        row-gap:
+                            17px;
                     }
 
                     .paid-cta {
-                        left: 16px;
-                        right: 16px;
+                        left:
+                            16px;
+
+                        right:
+                            16px;
 
                         width:
                             calc(100% - 32px);
@@ -1946,8 +2160,11 @@ export default function ResultPage() {
                     }
 
                     .paid-note {
-                        left: 16px;
-                        right: 16px;
+                        left:
+                            16px;
+
+                        right:
+                            16px;
 
                         width:
                             calc(100% - 32px);
@@ -1955,35 +2172,34 @@ export default function ResultPage() {
                 }
 
                 /* =====================================================
-                   VERY NARROW PHONES
-
-                   Не ломаем CTA и текст.
+                   VERY NARROW
                 ===================================================== */
 
                 @media (max-width: 350px) {
 
                     .paid-title h2 {
-                        font-size: 32px;
+                        font-size:
+                            32px;
                     }
 
                     .benefits {
-                        column-gap: 10px;
-                    }
-
-                    .benefit-text {
-                        font-size: 11px !important;
+                        column-gap:
+                            10px;
                     }
 
                     .cta-title {
-                        font-size: 12px;
+                        font-size:
+                            12px;
                     }
 
                     .price {
-                        font-size: 22px;
+                        font-size:
+                            22px;
                     }
 
                     .arrow {
-                        font-size: 21px;
+                        font-size:
+                            21px;
                     }
                 }
 
@@ -2063,22 +2279,27 @@ function CategoryRow({
                 }
 
                 .category-row:first-child {
-                    padding-top: 0;
+                    padding-top:
+                        0;
                 }
 
                 .category-top {
-                    display: flex;
+                    display:
+                        flex;
 
-                    align-items: flex-end;
+                    align-items:
+                        flex-end;
 
                     justify-content:
                         space-between;
 
-                    gap: 24px;
+                    gap:
+                        24px;
                 }
 
                 .category-copy {
-                    min-width: 0;
+                    min-width:
+                        0;
                 }
 
                 .category-title {
@@ -2087,38 +2308,50 @@ function CategoryRow({
                         "Times New Roman",
                         serif;
 
-                    font-size: 29px;
-                    line-height: 1;
+                    font-size:
+                        29px;
+
+                    line-height:
+                        1;
 
                     letter-spacing:
                         -1.2px;
                 }
 
                 .category-subtitle {
-                    margin-top: 5px;
+                    margin-top:
+                        5px;
 
-                    color: #8e8688;
+                    color:
+                        #8e8688;
 
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
 
-                    font-size: 12px;
-                    line-height: 1.3;
+                    font-size:
+                        12px;
 
-                    font-weight: 500;
+                    line-height:
+                        1.3;
+
+                    font-weight:
+                        500;
                 }
 
                 .category-score {
-                    display: flex;
+                    display:
+                        flex;
 
                     align-items:
                         baseline;
 
-                    flex-shrink: 0;
+                    flex-shrink:
+                        0;
 
-                    color: #7f7679;
+                    color:
+                        #7f7679;
 
                     font-family:
                         Georgia,
@@ -2127,40 +2360,56 @@ function CategoryRow({
                 }
 
                 .category-score strong {
-                    color: #c21856;
+                    color:
+                        #c21856;
 
-                    font-size: 42px;
-                    line-height: 0.8;
+                    font-size:
+                        42px;
 
-                    font-weight: 400;
+                    line-height:
+                        0.8;
+
+                    font-weight:
+                        400;
 
                     letter-spacing:
                         -1.8px;
                 }
 
                 .category-score span {
-                    margin-left: 3px;
-                    font-size: 18px;
+                    margin-left:
+                        3px;
+
+                    font-size:
+                        18px;
                 }
 
                 .category-track {
-                    height: 6px;
+                    height:
+                        6px;
 
-                    margin-top: 11px;
+                    margin-top:
+                        11px;
 
-                    overflow: hidden;
+                    overflow:
+                        hidden;
 
-                    border-radius: 999px;
+                    border-radius:
+                        999px;
 
-                    background: #e5dfdf;
+                    background:
+                        #e5dfdf;
                 }
 
                 .category-fill {
-                    height: 100%;
+                    height:
+                        100%;
 
-                    border-radius: inherit;
+                    border-radius:
+                        inherit;
 
-                    background: #cb3a6d;
+                    background:
+                        #cb3a6d;
                 }
 
                 @media (max-width: 640px) {
@@ -2172,32 +2421,42 @@ function CategoryRow({
                     }
 
                     .category-top {
-                        gap: 15px;
+                        gap:
+                            15px;
                     }
 
                     .category-title {
-                        font-size: 24px;
+                        font-size:
+                            24px;
                     }
 
                     .category-subtitle {
-                        max-width: 250px;
+                        max-width:
+                            250px;
 
-                        margin-top: 4px;
+                        margin-top:
+                            4px;
 
-                        font-size: 10px;
+                        font-size:
+                            10px;
                     }
 
                     .category-score strong {
-                        font-size: 34px;
+                        font-size:
+                            34px;
                     }
 
                     .category-score span {
-                        font-size: 14px;
+                        font-size:
+                            14px;
                     }
 
                     .category-track {
-                        height: 5px;
-                        margin-top: 10px;
+                        height:
+                            5px;
+
+                        margin-top:
+                            10px;
                     }
                 }
 
@@ -2223,7 +2482,9 @@ function Benefit({
         <div className="benefit">
 
             <div className="benefit-icon">
-                <BenefitSvg type={icon} />
+                <BenefitSvg
+                    type={icon}
+                />
             </div>
 
             <div className="benefit-text">
@@ -2233,26 +2494,35 @@ function Benefit({
             <style jsx>{`
 
                 .benefit {
-                    display: grid;
+                    display:
+                        grid;
 
                     grid-template-columns:
                         22px
-                        minmax(0, 1fr);
+                        minmax(
+                            0,
+                            1fr
+                        );
 
-                    gap: 11px;
+                    gap:
+                        11px;
 
                     align-items:
                         start;
 
-                    color: #fff8f6;
+                    color:
+                        #fff8f6;
                 }
 
                 .benefit-icon {
-                    width: 20px;
+                    width:
+                        20px;
 
-                    padding-top: 1px;
+                    padding-top:
+                        1px;
 
-                    color: #ffd8e1;
+                    color:
+                        #ffd8e1;
                 }
 
                 .benefit-text {
@@ -2261,11 +2531,14 @@ function Benefit({
                         Helvetica,
                         sans-serif;
 
-                    font-size: 14px;
+                    font-size:
+                        14px;
 
-                    line-height: 1.28;
+                    line-height:
+                        1.28;
 
-                    font-weight: 500;
+                    font-weight:
+                        500;
 
                     letter-spacing:
                         -0.1px;
@@ -2285,19 +2558,26 @@ function Benefit({
                     .benefit {
                         grid-template-columns:
                             21px
-                            minmax(0, 1fr);
+                            minmax(
+                                0,
+                                1fr
+                            );
 
-                        gap: 8px;
+                        gap:
+                            8px;
                     }
 
                     .benefit-icon {
-                        width: 18px;
+                        width:
+                            18px;
                     }
 
                     .benefit-text {
-                        font-size: 12px;
+                        font-size:
+                            12px;
 
-                        line-height: 1.25;
+                        line-height:
+                            1.25;
                     }
                 }
 
