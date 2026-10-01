@@ -53,7 +53,10 @@ export default function ResultPage() {
         useState(true);
 
     useEffect(() => {
-        if (!coupleId) return;
+        if (!coupleId) {
+            setLoading(false);
+            return;
+        }
 
         let cancelled = false;
 
@@ -75,7 +78,9 @@ export default function ResultPage() {
                 const result =
                     (await response.json()) as ApiResponse;
 
-                if (cancelled) return;
+                if (cancelled) {
+                    return;
+                }
 
                 if (result.waiting) {
                     router.replace(
@@ -198,7 +203,8 @@ export default function ResultPage() {
         data?.couple?.partner_a_name || "Вы";
 
     const nameB =
-        data?.couple?.partner_b_name || "Партнёр";
+        data?.couple?.partner_b_name ||
+        "Партнёр";
 
     if (loading) {
         return (
@@ -254,11 +260,12 @@ export default function ResultPage() {
 
     return (
         <main className="page">
-            <div className="content-shell">
 
-                {/* =====================================================
-                    HEADER
-                ===================================================== */}
+            {/* =====================================================
+                RESULT PAGE
+            ===================================================== */}
+
+            <div className="content-shell">
 
                 <header className="header">
                     <div className="brand">
@@ -280,12 +287,12 @@ export default function ResultPage() {
                     </div>
                 </header>
 
-
-                {/* =====================================================
+                {/* =================================================
                     RESULTS
-                ===================================================== */}
+                ================================================= */}
 
                 <section className="results">
+
                     <div className="section-label">
                         ВАШ РЕЗУЛЬТАТ
                     </div>
@@ -300,20 +307,18 @@ export default function ResultPage() {
                         {categories.map(
                             (category) => (
                                 <CategoryRow
-                                    key={
-                                        category.title
-                                    }
+                                    key={category.title}
                                     {...category}
                                 />
                             )
                         )}
                     </div>
+
                 </section>
 
-
-                {/* =====================================================
+                {/* =================================================
                     FORECAST
-                ===================================================== */}
+                ================================================= */}
 
                 <section className="forecast">
 
@@ -332,18 +337,17 @@ export default function ResultPage() {
                         </h2>
 
                         <p className="forecast-description">
-                            На основе ваших ответов
-                            мы оценили ориентировочный
-                            сценарий длительности
-                            ваших отношений.
+                            На основе ваших ответов мы оценили
+                            ориентировочный сценарий
+                            длительности ваших отношений.
                         </p>
 
                     </div>
 
-
                     <div className="forecast-result">
 
                         <div className="years">
+
                             <strong>
                                 {yearsForecast}
                             </strong>
@@ -353,6 +357,7 @@ export default function ResultPage() {
                                     yearsForecast
                                 )}
                             </span>
+
                         </div>
 
                         <div className="forecast-scale">
@@ -393,48 +398,48 @@ export default function ResultPage() {
 
             </div>
 
-
-            {/* =========================================================
+            {/* =====================================================
                 PAID REPORT
-            ========================================================= */}
+            ===================================================== */}
 
-            <section className="paid-shell">
+            <section className="paid-section">
 
                 <div className="paid-card">
 
                     {/* =================================================
-                        FULL IMAGE
+                        ART
+
+                        Здесь только картинка.
+                        Никакого текста внутри изображения.
                     ================================================= */}
 
-                    <div className="paid-art-layer">
+                    <div className="art">
 
                         <img
-                            className="paid-art"
                             src={PAID_IMAGE}
                             alt=""
                             draggable={false}
                         />
 
-                        {/* ---------------------------------------------
-                            Основной мягкий переход.
-
-                            НЕ обрезаем картинку на 73%.
-                            Blur начинается только там,
-                            где сцена должна раствориться.
-                        --------------------------------------------- */}
-
-                        <div className="art-transition" />
-
-                        {/* ---------------------------------------------
-                            Дополнительная цветовая дымка.
-                            Она очень мягкая и не создаёт
-                            вертикальной границы.
-                        --------------------------------------------- */}
-
-                        <div className="art-color-fade" />
-
                     </div>
 
+                    {/* =================================================
+                        ART FADE
+
+                        Desktop:
+                        горизонтальный fade вправо.
+
+                        Mobile:
+                        вертикальный fade вниз.
+
+                        В результате картинка не имеет
+                        жёсткой прямой границы.
+                    ================================================= */}
+
+                    <div className="art-fade" />
+
+                    {/* Дополнительное лёгкое затемнение */}
+                    <div className="card-overlay" />
 
                     {/* =================================================
                         CONTENT
@@ -444,7 +449,7 @@ export default function ResultPage() {
 
                         {/* TITLE */}
 
-                        <div className="paid-heading">
+                        <div className="paid-title">
 
                             <div className="paid-label">
                                 ПОЛНЫЙ РАЗБОР
@@ -458,10 +463,11 @@ export default function ResultPage() {
 
                         </div>
 
+                        {/* =================================================
+                            BENEFITS
+                        ================================================= */}
 
-                        {/* BENEFITS */}
-
-                        <div className="paid-benefits">
+                        <div className="benefits">
 
                             <Benefit
                                 icon="heart"
@@ -509,8 +515,9 @@ export default function ResultPage() {
 
                         </div>
 
-
-                        {/* CTA */}
+                        {/* =================================================
+                            CTA
+                        ================================================= */}
 
                         <button
                             type="button"
@@ -540,7 +547,6 @@ export default function ResultPage() {
 
                         </button>
 
-
                         <div className="paid-note">
                             один разбор · для вас двоих ·
                             сразу после оплаты
@@ -552,15 +558,10 @@ export default function ResultPage() {
 
             </section>
 
-
-            {/* =========================================================
-                STYLES
-            ========================================================= */}
-
             <style jsx>{`
 
                 /* =====================================================
-                   BASE
+                   GLOBAL
                 ===================================================== */
 
                 :global(*) {
@@ -581,7 +582,6 @@ export default function ResultPage() {
                     font: inherit;
                 }
 
-
                 /* =====================================================
                    PAGE
                 ===================================================== */
@@ -589,29 +589,19 @@ export default function ResultPage() {
                 .page {
                     width: 100%;
                     min-height: 100vh;
-
-                    padding:
-                        0
-                        28px
-                        72px;
-
                     overflow-x: hidden;
-
                     background: #f8f4f1;
+                    padding-bottom: 80px;
                 }
 
                 .content-shell {
-                    width:
-                        min(
-                            920px,
-                            100%
-                        );
+                    width: min(
+                        920px,
+                        calc(100% - 56px)
+                    );
 
-                    margin:
-                        0
-                        auto;
+                    margin: 0 auto;
                 }
-
 
                 /* =====================================================
                    HEADER
@@ -667,17 +657,13 @@ export default function ResultPage() {
 
                     letter-spacing: 1.2px;
 
-                    text-transform:
-                        uppercase;
+                    text-transform: uppercase;
                 }
 
                 .person-name {
                     overflow: hidden;
-
                     text-overflow: ellipsis;
-
-                    white-space:
-                        nowrap;
+                    white-space: nowrap;
                 }
 
                 .couple-cross {
@@ -685,16 +671,12 @@ export default function ResultPage() {
                     color: #c2215a;
                 }
 
-
                 /* =====================================================
                    RESULTS
                 ===================================================== */
 
                 .results {
-                    padding:
-                        42px
-                        0
-                        45px;
+                    padding: 42px 0 45px;
                 }
 
                 .section-label {
@@ -716,10 +698,7 @@ export default function ResultPage() {
                 }
 
                 .results-title {
-                    margin:
-                        0
-                        0
-                        32px;
+                    margin: 0 0 32px;
 
                     font-family:
                         Georgia,
@@ -734,16 +713,17 @@ export default function ResultPage() {
                     letter-spacing: -2.5px;
                 }
 
+                .category-list {
+                    display: flex;
+                    flex-direction: column;
+                }
 
                 /* =====================================================
                    FORECAST
                 ===================================================== */
 
                 .forecast {
-                    padding:
-                        38px
-                        0
-                        46px;
+                    padding: 38px 0 46px;
 
                     display: grid;
 
@@ -765,7 +745,7 @@ export default function ResultPage() {
                 }
 
                 .forecast-title {
-                    max-width: 560px;
+                    max-width: 520px;
 
                     margin: 0;
 
@@ -783,12 +763,9 @@ export default function ResultPage() {
                 }
 
                 .forecast-description {
-                    max-width: 560px;
+                    max-width: 520px;
 
-                    margin:
-                        15px
-                        0
-                        0;
+                    margin: 15px 0 0;
 
                     color: #8d8587;
 
@@ -818,8 +795,7 @@ export default function ResultPage() {
                         "Times New Roman",
                         serif;
 
-                    white-space:
-                        nowrap;
+                    white-space: nowrap;
                 }
 
                 .years strong {
@@ -842,7 +818,6 @@ export default function ResultPage() {
 
                 .forecast-scale {
                     width: 100%;
-
                     margin-top: 23px;
                 }
 
@@ -859,11 +834,7 @@ export default function ResultPage() {
                 .scale-fill {
                     position: absolute;
 
-                    inset:
-                        0
-                        auto
-                        0
-                        0;
+                    inset: 0 auto 0 0;
 
                     border-radius: inherit;
 
@@ -891,9 +862,7 @@ export default function ResultPage() {
 
                 .scale-labels {
                     display: flex;
-
-                    justify-content:
-                        space-between;
+                    justify-content: space-between;
 
                     margin-top: 12px;
 
@@ -905,31 +874,24 @@ export default function ResultPage() {
                         sans-serif;
 
                     font-size: 11px;
-
                     font-weight: 600;
                 }
 
-
                 /* =====================================================
-                   PAID SHELL
+                   PAID SECTION
                 ===================================================== */
 
-                .paid-shell {
-                    width:
-                        min(
-                            1180px,
-                            100%
-                        );
+                .paid-section {
+                    width: min(
+                        1180px,
+                        calc(100% - 40px)
+                    );
 
-                    margin:
-                        8px
-                        auto
-                        0;
+                    margin: 8px auto 0;
                 }
 
-
                 /* =====================================================
-                   PAID CARD
+                   CARD
                 ===================================================== */
 
                 .paid-card {
@@ -941,37 +903,47 @@ export default function ResultPage() {
 
                     overflow: hidden;
 
-                    border-radius: 25px;
+                    border-radius: 24px;
 
                     background:
                         linear-gradient(
                             90deg,
-                            #971047 0%,
-                            #a80e4d 52%,
-                            #aa104f 100%
+                            #9e104c 0%,
+                            #a60f4d 50%,
+                            #a90e4e 100%
                         );
 
                     isolation: isolate;
                 }
 
-
                 /* =====================================================
                    IMAGE
+
+                   Картинка сама по себе чистая.
+
+                   На desktop она занимает примерно 72%
+                   ширины карточки.
+
+                   Очень важно:
+                   height: 100%;
+                   object-fit: cover;
+
+                   Поэтому картинка не растягивается.
                 ===================================================== */
 
-                .paid-art-layer {
+                .art {
                     position: absolute;
 
-                    inset: 0;
+                    z-index: 1;
 
-                    z-index: 0;
+                    inset: 0 auto 0 0;
+
+                    width: 72%;
 
                     overflow: hidden;
-
-                    pointer-events: none;
                 }
 
-                .paid-art {
+                .art img {
                     position: absolute;
 
                     inset: 0;
@@ -981,100 +953,42 @@ export default function ResultPage() {
 
                     display: block;
 
-                    /*
-                     * Главное отличие от старого варианта:
-                     *
-                     * Картинка теперь НЕ 73%.
-                     * Она является полноценным фоном
-                     * всей карточки.
-                     */
-
                     object-fit: cover;
 
                     /*
-                     * Исходник уже нарисован так,
-                     * чтобы пара была слева,
-                     * замок ближе к центру,
-                     * а справа был berry-background.
+                     * Центр композиции.
+                     *
+                     * Пара находится в нижней
+                     * левой/центральной части исходника.
+                     *
+                     * 50% оставляет их вместе.
                      */
-
-                    object-position:
-                        center
-                        center;
+                    object-position: 50% 50%;
 
                     user-select: none;
-                }
-
-
-                /* =====================================================
-                   REAL BLUR TRANSITION
-                ===================================================== */
-
-                .art-transition {
-                    position: absolute;
-
-                    top: 0;
-                    bottom: 0;
-
-                    left: 45%;
-
-                    width: 28%;
-
-                    z-index: 2;
-
                     pointer-events: none;
-
-                    /*
-                     * Реальный blur содержимого,
-                     * а не просто цветной overlay.
-                     */
-
-                    backdrop-filter:
-                        blur(9px);
-
-                    -webkit-backdrop-filter:
-                        blur(9px);
-
-                    /*
-                     * Mask делает blur видимым
-                     * только в середине перехода.
-                     */
-
-                    -webkit-mask-image:
-                        linear-gradient(
-                            90deg,
-                            transparent 0%,
-                            black 24%,
-                            black 70%,
-                            transparent 100%
-                        );
-
-                    mask-image:
-                        linear-gradient(
-                            90deg,
-                            transparent 0%,
-                            black 24%,
-                            black 70%,
-                            transparent 100%
-                        );
                 }
 
-
                 /* =====================================================
-                   COLOR FADE
+                   FADE
+
+                   Ключевой элемент всей композиции.
+
+                   Не будет:
+
+                   IMAGE | SOLID COLOR
+
+                   Будет:
+
+                   IMAGE → softened image → blur → color
                 ===================================================== */
 
-                .art-color-fade {
+                .art-fade {
                     position: absolute;
-
-                    top: 0;
-                    bottom: 0;
-
-                    left: 38%;
-
-                    width: 38%;
 
                     z-index: 3;
+
+                    inset: 0;
 
                     pointer-events: none;
 
@@ -1083,61 +997,145 @@ export default function ResultPage() {
                             90deg,
 
                             rgba(
-                                164,
-                                14,
+                                166,
+                                15,
                                 77,
                                 0
-                            ) 0%,
+                            ) 42%,
 
                             rgba(
-                                164,
-                                14,
+                                166,
+                                15,
                                 77,
-                                0.025
-                            ) 15%,
+                                0.04
+                            ) 50%,
 
                             rgba(
-                                164,
-                                14,
+                                166,
+                                15,
                                 77,
-                                0.08
-                            ) 30%,
+                                0.14
+                            ) 57%,
 
                             rgba(
-                                164,
-                                14,
+                                166,
+                                15,
                                 77,
-                                0.22
-                            ) 45%,
+                                0.30
+                            ) 64%,
 
                             rgba(
-                                164,
-                                14,
+                                166,
+                                15,
                                 77,
-                                0.43
-                            ) 60%,
+                                0.52
+                            ) 71%,
 
                             rgba(
-                                164,
-                                14,
+                                166,
+                                15,
                                 77,
-                                0.67
-                            ) 74%,
+                                0.73
+                            ) 78%,
 
                             rgba(
-                                164,
-                                14,
+                                166,
+                                15,
                                 77,
-                                0.87
-                            ) 88%,
+                                0.90
+                            ) 85%,
 
-                            #a40e4d 100%
+                            rgba(
+                                166,
+                                15,
+                                77,
+                                0.98
+                            ) 92%,
+
+                            #a60f4d 100%
                         );
                 }
 
+                /*
+                 * Дополнительный blur-слой.
+
+                 * Он имитирует тот самый
+                 * мягкий "уход" изображения.
+                 */
+
+                .art-fade::after {
+                    content: "";
+
+                    position: absolute;
+
+                    inset: 0 0 0 48%;
+
+                    backdrop-filter:
+                        blur(12px);
+
+                    -webkit-backdrop-filter:
+                        blur(12px);
+
+                    opacity: 0.48;
+
+                    mask-image:
+                        linear-gradient(
+                            90deg,
+                            transparent 0%,
+                            black 45%,
+                            black 100%
+                        );
+
+                    -webkit-mask-image:
+                        linear-gradient(
+                            90deg,
+                            transparent 0%,
+                            black 45%,
+                            black 100%
+                        );
+                }
 
                 /* =====================================================
-                   CONTENT
+                   OVERLAY
+                ===================================================== */
+
+                .card-overlay {
+                    position: absolute;
+
+                    z-index: 4;
+
+                    inset: 0;
+
+                    pointer-events: none;
+
+                    background:
+                        linear-gradient(
+                            180deg,
+                            rgba(
+                                35,
+                                0,
+                                20,
+                                0.03
+                            ) 0%,
+
+                            rgba(
+                                35,
+                                0,
+                                20,
+                                0
+                            ) 45%,
+
+                            rgba(
+                                35,
+                                0,
+                                20,
+                                0.10
+                            ) 100%
+                        );
+                }
+
+                /* =====================================================
+                   PAID CONTENT
                 ===================================================== */
 
                 .paid-content {
@@ -1150,18 +1148,20 @@ export default function ResultPage() {
                     width: 100%;
                 }
 
-
                 /* =====================================================
                    TITLE
                 ===================================================== */
 
-                .paid-heading {
+                .paid-title {
                     position: absolute;
 
-                    top: 39px;
-                    left: 70px;
+                    top: 40px;
+                    left: 68px;
 
-                    width: 500px;
+                    width: min(
+                        520px,
+                        47%
+                    );
                 }
 
                 .paid-label {
@@ -1172,7 +1172,7 @@ export default function ResultPage() {
                             255,
                             244,
                             247,
-                            0.92
+                            0.88
                         );
 
                     font-family:
@@ -1188,7 +1188,7 @@ export default function ResultPage() {
                     letter-spacing: 2.1px;
                 }
 
-                .paid-heading h2 {
+                .paid-title h2 {
                     margin: 0;
 
                     color: #fff9f6;
@@ -1199,13 +1199,13 @@ export default function ResultPage() {
                         serif;
 
                     /*
-                     * Размер близкий к референсу.
+                     * Размер зависит от ширины экрана,
+                     * но не становится огромным.
                      */
-
                     font-size: clamp(
-                        46px,
+                        42px,
                         4.2vw,
-                        57px
+                        56px
                     );
 
                     line-height: 0.95;
@@ -1214,41 +1214,38 @@ export default function ResultPage() {
 
                     letter-spacing: -2.5px;
 
-                    /*
-                     * Благодаря тени текст
-                     * не выглядит приклеенным сверху.
-                     */
-
                     text-shadow:
                         0 2px 16px
                         rgba(
-                            48,
+                            50,
                             0,
-                            23,
-                            0.22
+                            25,
+                            0.12
                         );
                 }
-
 
                 /* =====================================================
                    BENEFITS
                 ===================================================== */
 
-                .paid-benefits {
+                .benefits {
                     position: absolute;
 
                     top: 48px;
-                    right: 67px;
+                    right: 64px;
 
-                    width: 315px;
+                    width: min(
+                        310px,
+                        27%
+                    );
 
-                    display: flex;
+                    display: grid;
 
-                    flex-direction: column;
+                    grid-template-columns:
+                        1fr;
 
-                    gap: 24px;
+                    gap: 25px;
                 }
-
 
                 /* =====================================================
                    CTA
@@ -1257,33 +1254,28 @@ export default function ResultPage() {
                 .paid-cta {
                     position: absolute;
 
-                    right: 36px;
-                    bottom: 52px;
+                    z-index: 20;
 
-                    width:
-                        min(
-                            638px,
-                            55%
-                        );
+                    right: 36px;
+                    bottom: 51px;
+
+                    width: min(
+                        638px,
+                        55%
+                    );
 
                     height: 72px;
 
-                    padding:
-                        0
-                        26px;
+                    padding: 0 28px;
 
                     display: flex;
-
                     align-items: center;
-
-                    justify-content:
-                        space-between;
+                    justify-content: space-between;
 
                     gap: 20px;
 
                     border: 0;
-
-                    border-radius: 16px;
+                    border-radius: 15px;
 
                     background: #fffaf7;
 
@@ -1335,13 +1327,11 @@ export default function ResultPage() {
 
                     font-weight: 600;
 
-                    white-space:
-                        nowrap;
+                    white-space: nowrap;
                 }
 
                 .cta-right {
                     display: flex;
-
                     align-items: center;
 
                     gap: 22px;
@@ -1360,8 +1350,7 @@ export default function ResultPage() {
 
                     font-weight: 400;
 
-                    white-space:
-                        nowrap;
+                    white-space: nowrap;
                 }
 
                 .arrow {
@@ -1370,7 +1359,7 @@ export default function ResultPage() {
                         Helvetica,
                         sans-serif;
 
-                    font-size: 27px;
+                    font-size: 26px;
                     line-height: 1;
 
                     font-weight: 300;
@@ -1379,21 +1368,22 @@ export default function ResultPage() {
                 .paid-note {
                     position: absolute;
 
+                    z-index: 20;
+
                     right: 36px;
                     bottom: 22px;
 
-                    width:
-                        min(
-                            638px,
-                            55%
-                        );
+                    width: min(
+                        638px,
+                        55%
+                    );
 
                     color:
                         rgba(
                             255,
                             238,
                             243,
-                            0.72
+                            0.68
                         );
 
                     font-family:
@@ -1404,25 +1394,14 @@ export default function ResultPage() {
                     font-size: 9px;
                     line-height: 1;
 
-                    font-weight: 400;
-
                     text-align: center;
                 }
 
-
                 /* =====================================================
-                   TABLET
+                   TABLET / NARROW DESKTOP
                 ===================================================== */
 
                 @media (max-width: 1000px) {
-
-                    .content-shell {
-                        width:
-                            min(
-                                820px,
-                                100%
-                            );
-                    }
 
                     .paid-card {
                         min-height: 470px;
@@ -1432,21 +1411,22 @@ export default function ResultPage() {
                         min-height: 470px;
                     }
 
-                    .paid-heading {
-                        left: 48px;
+                    .paid-title {
                         top: 34px;
+                        left: 46px;
 
-                        width: 430px;
+                        width: 46%;
                     }
 
-                    .paid-heading h2 {
-                        font-size: 45px;
+                    .paid-title h2 {
+                        font-size: 43px;
                     }
 
-                    .paid-benefits {
-                        right: 38px;
+                    .benefits {
+                        top: 42px;
+                        right: 35px;
 
-                        width: 275px;
+                        width: 28%;
 
                         gap: 21px;
                     }
@@ -1455,7 +1435,7 @@ export default function ResultPage() {
                         right: 28px;
                         bottom: 43px;
 
-                        width: 52%;
+                        width: 54%;
 
                         height: 68px;
                     }
@@ -1464,10 +1444,9 @@ export default function ResultPage() {
                         right: 28px;
                         bottom: 18px;
 
-                        width: 52%;
+                        width: 54%;
                     }
                 }
-
 
                 /* =====================================================
                    MOBILE
@@ -1479,19 +1458,15 @@ export default function ResultPage() {
                         padding:
                             0
                             12px
-                            32px;
+                            36px;
                     }
 
                     .content-shell {
                         width: 100%;
                     }
 
-
-                    /* HEADER */
-
                     .header {
                         min-height: 64px;
-
                         gap: 12px;
                     }
 
@@ -1510,13 +1485,13 @@ export default function ResultPage() {
                             0.65px;
                     }
 
-
-                    /* RESULTS */
+                    /* =============================================
+                       RESULTS
+                    ============================================= */
 
                     .results {
                         padding:
-                            29px
-                            0
+                            29px 0
                             33px;
                     }
 
@@ -1533,20 +1508,19 @@ export default function ResultPage() {
                         margin-bottom: 24px;
 
                         font-size: 37px;
-
                         line-height: 1;
 
                         letter-spacing:
                             -1.8px;
                     }
 
-
-                    /* FORECAST */
+                    /* =============================================
+                       FORECAST
+                    ============================================= */
 
                     .forecast {
                         padding:
-                            29px
-                            0
+                            29px 0
                             37px;
 
                         display: block;
@@ -1556,7 +1530,6 @@ export default function ResultPage() {
                         max-width: 100%;
 
                         font-size: 34px;
-
                         line-height: 1.01;
 
                         letter-spacing:
@@ -1569,7 +1542,6 @@ export default function ResultPage() {
                         margin-top: 13px;
 
                         font-size: 12px;
-
                         line-height: 1.45;
                     }
 
@@ -1585,7 +1557,6 @@ export default function ResultPage() {
 
                     .years strong {
                         font-size: 64px;
-
                         letter-spacing:
                             -3px;
                     }
@@ -1618,131 +1589,108 @@ export default function ResultPage() {
                         font-size: 9px;
                     }
 
+                    /* =============================================
+                       PAID SECTION
+                    ============================================= */
 
-                    /* =================================================
-                       MOBILE PAID CARD
-
-                       Здесь НЕ используем desktop
-                       композицию.
-
-                       Верхняя часть — исходная
-                       сцена.
-
-                       Потом мягкий blur/fade.
-
-                       Потом benefits.
-
-                    ================================================= */
-
-                    .paid-shell {
+                    .paid-section {
                         width: 100%;
-
                         margin-top: 0;
                     }
 
+                    /* =============================================
+                       PAID CARD
+
+                       Теперь это вертикальная композиция.
+                    ============================================= */
+
                     .paid-card {
-                        min-height: 620px;
+                        min-height: 650px;
 
                         border-radius: 22px;
 
                         background:
                             linear-gradient(
                                 180deg,
-                                #a30e4d 0%,
-                                #a90f4e 100%
+                                #a20e4d 0%,
+                                #aa104f 100%
                             );
                     }
 
                     .paid-content {
-                        min-height: 620px;
+                        min-height: 650px;
                     }
 
+                    /* =============================================
+                       IMAGE
 
-                    /* =================================================
-                       MOBILE IMAGE
+                       Изображение занимает верх.
 
-                       Пара должна быть вместе.
+                       Оно НЕ пытается вместить
+                       desktop-композицию.
 
-                       Не растягиваем картинку
-                       на всю вертикальную карточку.
-                    ================================================= */
+                       Пара остаётся в центре.
+                    ============================================= */
 
-                    .paid-art {
-                        left: 0;
-                        top: 0;
+                    .art {
+                        inset:
+                            0
+                            0
+                            auto
+                            0;
 
                         width: 100%;
+                        height: 390px;
+                    }
 
-                        /*
-                         * На телефоне высота сцены
-                         * контролируется отдельно.
-                         */
-
-                        height: 385px;
+                    .art img {
+                        width: 100%;
+                        height: 100%;
 
                         object-fit: cover;
 
                         /*
-                         * Сдвигаем фокус немного влево,
-                         * чтобы парень + девушка
-                         * оставались в кадре вместе.
+                         * Именно эта точка позволяет
+                         * удерживать пару вместе.
+
+                         * Не ставим left/right отдельно.
                          */
-
                         object-position:
-                            42%
-                            center;
+                            50%
+                            50%;
                     }
 
-                    .paid-art-layer {
-                        height: 420px;
-                    }
+                    /* =============================================
+                       MOBILE FADE
 
+                       Вместо:
 
-                    /* =================================================
-                       MOBILE BLUR
+                       КАРТИНКА
+                       --------
+                       ФОН
 
-                       Теперь переход идёт вниз,
-                       а не вправо.
-                    ================================================= */
+                       получаем:
 
-                    .art-transition {
-                        top: 220px;
-                        left: 0;
+                       КАРТИНКА
+                       ↓
+                       мягкое изображение
+                       ↓
+                       blur
+                       ↓
+                       бордовый
+                    ============================================= */
+
+                    .art-fade {
+                        z-index: 3;
+
+                        inset:
+                            auto
+                            0
+                            0
+                            0;
 
                         width: 100%;
-                        height: 200px;
-
-                        backdrop-filter:
-                            blur(8px);
-
-                        -webkit-backdrop-filter:
-                            blur(8px);
-
-                        -webkit-mask-image:
-                            linear-gradient(
-                                180deg,
-                                transparent 0%,
-                                black 25%,
-                                black 72%,
-                                transparent 100%
-                            );
-
-                        mask-image:
-                            linear-gradient(
-                                180deg,
-                                transparent 0%,
-                                black 25%,
-                                black 72%,
-                                transparent 100%
-                            );
-                    }
-
-                    .art-color-fade {
-                        top: 235px;
-                        left: 0;
-
-                        width: 100%;
-                        height: 190px;
+                        height: 205px;
 
                         background:
                             linear-gradient(
@@ -1760,47 +1708,92 @@ export default function ResultPage() {
                                     14,
                                     77,
                                     0.05
-                                ) 17%,
+                                ) 15%,
 
                                 rgba(
                                     163,
                                     14,
                                     77,
-                                    0.18
-                                ) 36%,
+                                    0.14
+                                ) 30%,
 
                                 rgba(
                                     163,
                                     14,
                                     77,
-                                    0.42
-                                ) 56%,
+                                    0.32
+                                ) 48%,
 
                                 rgba(
                                     163,
                                     14,
                                     77,
-                                    0.72
-                                ) 76%,
+                                    0.56
+                                ) 65%,
+
+                                rgba(
+                                    163,
+                                    14,
+                                    77,
+                                    0.80
+                                ) 80%,
+
+                                rgba(
+                                    163,
+                                    14,
+                                    77,
+                                    0.95
+                                ) 93%,
 
                                 #a30e4d 100%
                             );
                     }
 
+                    .art-fade::after {
+                        inset:
+                            0;
 
-                    /* =================================================
-                       MOBILE TITLE
-                    ================================================= */
+                        backdrop-filter:
+                            blur(16px);
 
-                    .paid-heading {
+                        -webkit-backdrop-filter:
+                            blur(16px);
+
+                        opacity: 0.42;
+
+                        mask-image:
+                            linear-gradient(
+                                180deg,
+                                transparent 0%,
+                                black 65%,
+                                black 100%
+                            );
+
+                        -webkit-mask-image:
+                            linear-gradient(
+                                180deg,
+                                transparent 0%,
+                                black 65%,
+                                black 100%
+                            );
+                    }
+
+                    /* =============================================
+                       TITLE
+
+                       Теперь текст НЕ привязан
+                       к картинке.
+
+                       Он всегда будет сверху
+                       в одинаковом месте.
+                    ============================================= */
+
+                    .paid-title {
                         top: 31px;
-
                         left: 28px;
 
                         width:
-                            calc(
-                                100% - 56px
-                            );
+                            calc(100% - 56px);
                     }
 
                     .paid-label {
@@ -1812,79 +1805,57 @@ export default function ResultPage() {
                             1.9px;
                     }
 
-                    .paid-heading h2 {
+                    .paid-title h2 {
                         font-size: 38px;
 
                         line-height: 0.96;
 
                         letter-spacing:
                             -1.8px;
-
-                        text-shadow:
-                            0
-                            2px
-                            14px
-                            rgba(
-                                49,
-                                0,
-                                25,
-                                0.22
-                            );
                     }
 
+                    /* =============================================
+                       BENEFITS
 
-                    /* =================================================
-                       MOBILE BENEFITS
+                       Уже находятся ПОСЛЕ картинки.
+                    ============================================= */
 
-                       В референсе они идут
-                       уже на berry-фоне.
-                    ================================================= */
-
-                    .paid-benefits {
-                        top: 397px;
+                    .benefits {
+                        top: 402px;
 
                         left: 28px;
                         right: 28px;
 
                         width:
-                            calc(
-                                100% - 56px
-                            );
+                            calc(100% - 56px);
 
                         display: grid;
 
                         grid-template-columns:
-                            1fr
-                            1fr;
+                            repeat(2, minmax(0, 1fr));
 
                         column-gap: 22px;
-
-                        row-gap: 18px;
+                        row-gap: 19px;
                     }
 
-
-                    /* =================================================
-                       MOBILE CTA
-                    ================================================= */
+                    /* =============================================
+                       CTA
+                    ============================================= */
 
                     .paid-cta {
                         left: 20px;
                         right: 20px;
-
-                        bottom: 47px;
+                        bottom: 48px;
 
                         width:
-                            calc(
-                                100% - 40px
-                            );
-
-                        min-width: 0;
+                            calc(100% - 40px);
 
                         height: 58px;
 
+                        min-width: 0;
+
                         padding:
-                            0
-                            18px;
+                            0 18px;
 
                         border-radius: 14px;
                     }
@@ -1908,73 +1879,58 @@ export default function ResultPage() {
                     .paid-note {
                         left: 20px;
                         right: 20px;
-
-                        bottom: 19px;
+                        bottom: 20px;
 
                         width:
-                            calc(
-                                100% - 40px
-                            );
+                            calc(100% - 40px);
 
                         font-size: 8px;
                     }
                 }
 
-
                 /* =====================================================
                    SMALL MOBILE
+
+                   iPhone SE / узкие Android.
                 ===================================================== */
 
                 @media (max-width: 390px) {
 
                     .paid-card {
-                        min-height: 600px;
+                        min-height: 620px;
                     }
 
                     .paid-content {
-                        min-height: 600px;
+                        min-height: 620px;
                     }
 
-                    .paid-art {
-                        height: 365px;
-
-                        object-position:
-                            42%
-                            center;
+                    .art {
+                        height: 370px;
                     }
 
-                    .paid-art-layer {
-                        height: 400px;
-                    }
-
-                    .paid-heading {
-                        top: 28px;
+                    .paid-title {
+                        top: 27px;
 
                         left: 24px;
 
                         width:
-                            calc(
-                                100% - 48px
-                            );
+                            calc(100% - 48px);
                     }
 
-                    .paid-heading h2 {
+                    .paid-title h2 {
                         font-size: 35px;
                     }
 
-                    .paid-benefits {
-                        top: 377px;
+                    .benefits {
+                        top: 382px;
 
                         left: 24px;
                         right: 24px;
 
                         width:
-                            calc(
-                                100% - 48px
-                            );
+                            calc(100% - 48px);
 
-                        column-gap: 15px;
-
+                        column-gap: 16px;
                         row-gap: 16px;
                     }
 
@@ -1983,13 +1939,10 @@ export default function ResultPage() {
                         right: 16px;
 
                         width:
-                            calc(
-                                100% - 32px
-                            );
+                            calc(100% - 32px);
 
                         padding:
-                            0
-                            16px;
+                            0 16px;
                     }
 
                     .paid-note {
@@ -1997,9 +1950,40 @@ export default function ResultPage() {
                         right: 16px;
 
                         width:
-                            calc(
-                                100% - 32px
-                            );
+                            calc(100% - 32px);
+                    }
+                }
+
+                /* =====================================================
+                   VERY NARROW PHONES
+
+                   Не ломаем CTA и текст.
+                ===================================================== */
+
+                @media (max-width: 350px) {
+
+                    .paid-title h2 {
+                        font-size: 32px;
+                    }
+
+                    .benefits {
+                        column-gap: 10px;
+                    }
+
+                    .benefit-text {
+                        font-size: 11px !important;
+                    }
+
+                    .cta-title {
+                        font-size: 12px;
+                    }
+
+                    .price {
+                        font-size: 22px;
+                    }
+
+                    .arrow {
+                        font-size: 21px;
                     }
                 }
 
@@ -2007,7 +1991,6 @@ export default function ResultPage() {
         </main>
     );
 }
-
 
 /* ============================================================
    CATEGORY ROW
@@ -2019,14 +2002,10 @@ function CategoryRow({
                          value,
                      }: CategoryScore) {
 
-    const safeValue =
-        Math.max(
-            0,
-            Math.min(
-                MAX_SCORE,
-                value
-            )
-        );
+    const safeValue = Math.max(
+        0,
+        Math.min(MAX_SCORE, value)
+    );
 
     return (
         <div className="category-row">
@@ -2059,7 +2038,6 @@ function CategoryRow({
 
             </div>
 
-
             <div className="category-track">
 
                 <div
@@ -2072,13 +2050,11 @@ function CategoryRow({
 
             </div>
 
-
             <style jsx>{`
 
                 .category-row {
                     padding:
-                        16px
-                        0
+                        16px 0
                         18px;
 
                     border-bottom:
@@ -2093,8 +2069,7 @@ function CategoryRow({
                 .category-top {
                     display: flex;
 
-                    align-items:
-                        flex-end;
+                    align-items: flex-end;
 
                     justify-content:
                         space-between;
@@ -2113,7 +2088,6 @@ function CategoryRow({
                         serif;
 
                     font-size: 29px;
-
                     line-height: 1;
 
                     letter-spacing:
@@ -2131,7 +2105,6 @@ function CategoryRow({
                         sans-serif;
 
                     font-size: 12px;
-
                     line-height: 1.3;
 
                     font-weight: 500;
@@ -2157,7 +2130,6 @@ function CategoryRow({
                     color: #c21856;
 
                     font-size: 42px;
-
                     line-height: 0.8;
 
                     font-weight: 400;
@@ -2168,7 +2140,6 @@ function CategoryRow({
 
                 .category-score span {
                     margin-left: 3px;
-
                     font-size: 18px;
                 }
 
@@ -2196,8 +2167,7 @@ function CategoryRow({
 
                     .category-row {
                         padding:
-                            13px
-                            0
+                            13px 0
                             15px;
                     }
 
@@ -2227,7 +2197,6 @@ function CategoryRow({
 
                     .category-track {
                         height: 5px;
-
                         margin-top: 10px;
                     }
                 }
@@ -2237,7 +2206,6 @@ function CategoryRow({
         </div>
     );
 }
-
 
 /* ============================================================
    BENEFIT
@@ -2255,15 +2223,12 @@ function Benefit({
         <div className="benefit">
 
             <div className="benefit-icon">
-                <BenefitSvg
-                    type={icon}
-                />
+                <BenefitSvg type={icon} />
             </div>
 
             <div className="benefit-text">
                 {text}
             </div>
-
 
             <style jsx>{`
 
@@ -2271,10 +2236,10 @@ function Benefit({
                     display: grid;
 
                     grid-template-columns:
-                        24px
+                        22px
                         minmax(0, 1fr);
 
-                    gap: 12px;
+                    gap: 11px;
 
                     align-items:
                         start;
@@ -2283,7 +2248,7 @@ function Benefit({
                 }
 
                 .benefit-icon {
-                    width: 21px;
+                    width: 20px;
 
                     padding-top: 1px;
 
@@ -2306,14 +2271,12 @@ function Benefit({
                         -0.1px;
 
                     text-shadow:
-                        0
-                        1px
-                        8px
+                        0 1px 8px
                         rgba(
                             65,
                             0,
                             27,
-                            0.18
+                            0.08
                         );
                 }
 
@@ -2321,14 +2284,14 @@ function Benefit({
 
                     .benefit {
                         grid-template-columns:
-                            22px
+                            21px
                             minmax(0, 1fr);
 
-                        gap: 9px;
+                        gap: 8px;
                     }
 
                     .benefit-icon {
-                        width: 19px;
+                        width: 18px;
                     }
 
                     .benefit-text {
@@ -2343,7 +2306,6 @@ function Benefit({
         </div>
     );
 }
-
 
 /* ============================================================
    BENEFIT ICONS
@@ -2368,19 +2330,30 @@ function BenefitSvg({
                 <path
                     d="
                         M12 21
-                        C10.9 19.9 5.4 15.2 3.1 12.3
-                        C0.6 9.2 1.3 5.1 4.7 3.5
-                        C7.2 2.3 10.1 3.1 12 5.3
-                        C13.9 3.1 16.8 2.3 19.3 3.5
-                        C22.7 5.1 23.4 9.2 20.9 12.3
-                        C18.6 15.2 13.1 19.9 12 21
+                        C10.9 19.9
+                        5.4 15.2
+                        3.1 12.3
+                        C0.6 9.2
+                        1.3 5.1
+                        4.7 3.5
+                        C7.2 2.3
+                        10.1 3.1
+                        12 5.3
+                        C13.9 3.1
+                        16.8 2.3
+                        19.3 3.5
+                        C22.7 5.1
+                        23.4 9.2
+                        20.9 12.3
+                        C18.6 15.2
+                        13.1 19.9
+                        12 21
                         Z
                     "
                 />
             </svg>
         );
     }
-
 
     if (type === "message") {
 
@@ -2396,23 +2369,30 @@ function BenefitSvg({
                     d="
                         M6 3
                         H18
-                        C20.2 3 22 4.8 22 7
+                        C20.2 3
+                        22 4.8
+                        22 7
                         V14
-                        C22 16.2 20.2 18 18 18
+                        C22 16.2
+                        20.2 18
+                        18 18
                         H12
                         L7 22
                         L8 18
                         H6
-                        C3.8 18 2 16.2 2 14
+                        C3.8 18
+                        2 16.2
+                        2 14
                         V7
-                        C2 4.8 3.8 3 6 3
+                        C2 4.8
+                        3.8 3
+                        6 3
                         Z
                     "
                 />
             </svg>
         );
     }
-
 
     if (type === "lightning") {
 
@@ -2438,7 +2418,6 @@ function BenefitSvg({
             </svg>
         );
     }
-
 
     return (
         <svg
@@ -2475,18 +2454,14 @@ function BenefitSvg({
     );
 }
 
-
 /* ============================================================
    YEAR WORD
 ============================================================ */
 
 function getYearWord(value: number) {
 
-    const mod100 =
-        value % 100;
-
-    const mod10 =
-        value % 10;
+    const mod100 = value % 100;
+    const mod10 = value % 10;
 
     if (
         mod100 >= 11 &&
