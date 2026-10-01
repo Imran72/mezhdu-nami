@@ -78,7 +78,9 @@ export default function ResultPage() {
                 if (cancelled) return;
 
                 if (result.waiting) {
-                    router.replace(`/waiting/${coupleId}`);
+                    router.replace(
+                        `/waiting/${coupleId}`
+                    );
                     return;
                 }
 
@@ -253,6 +255,7 @@ export default function ResultPage() {
     return (
         <main className="page">
             <div className="content-shell">
+
                 {/* =====================================================
                     HEADER
                 ===================================================== */}
@@ -277,6 +280,7 @@ export default function ResultPage() {
                     </div>
                 </header>
 
+
                 {/* =====================================================
                     RESULTS
                 ===================================================== */}
@@ -293,21 +297,28 @@ export default function ResultPage() {
                     </h1>
 
                     <div className="category-list">
-                        {categories.map((category) => (
-                            <CategoryRow
-                                key={category.title}
-                                {...category}
-                            />
-                        ))}
+                        {categories.map(
+                            (category) => (
+                                <CategoryRow
+                                    key={
+                                        category.title
+                                    }
+                                    {...category}
+                                />
+                            )
+                        )}
                     </div>
                 </section>
+
 
                 {/* =====================================================
                     FORECAST
                 ===================================================== */}
 
                 <section className="forecast">
+
                     <div className="forecast-copy">
+
                         <div className="section-label">
                             ПРОГНОЗ
                         </div>
@@ -321,13 +332,17 @@ export default function ResultPage() {
                         </h2>
 
                         <p className="forecast-description">
-                            На основе ваших ответов мы оценили
-                            ориентировочный сценарий
-                            длительности ваших отношений.
+                            На основе ваших ответов
+                            мы оценили ориентировочный
+                            сценарий длительности
+                            ваших отношений.
                         </p>
+
                     </div>
 
+
                     <div className="forecast-result">
+
                         <div className="years">
                             <strong>
                                 {yearsForecast}
@@ -341,7 +356,9 @@ export default function ResultPage() {
                         </div>
 
                         <div className="forecast-scale">
+
                             <div className="scale-track">
+
                                 <div
                                     className="scale-fill"
                                     style={{
@@ -355,38 +372,42 @@ export default function ResultPage() {
                                         left: `${forecastPosition}%`,
                                     }}
                                 />
+
                             </div>
 
                             <div className="scale-labels">
-                                <span>1 месяц</span>
-                                <span>вся жизнь</span>
+                                <span>
+                                    1 месяц
+                                </span>
+
+                                <span>
+                                    вся жизнь
+                                </span>
                             </div>
+
                         </div>
+
                     </div>
+
                 </section>
+
             </div>
+
 
             {/* =========================================================
                 PAID REPORT
-
-                Здесь больше НЕТ фиксированного canvas 1180x500.
-
-                Desktop:
-                изображение + плавный fade + текст + CTA.
-
-                Mobile:
-                изображение сверху + плавное растворение вниз +
-                текст/benefits + CTA.
             ========================================================= */}
 
             <section className="paid-shell">
+
                 <div className="paid-card">
 
                     {/* =================================================
-                        ART
+                        FULL IMAGE
                     ================================================= */}
 
                     <div className="paid-art-layer">
+
                         <img
                             className="paid-art"
                             src={PAID_IMAGE}
@@ -394,15 +415,26 @@ export default function ResultPage() {
                             draggable={false}
                         />
 
-                        <div className="desktop-art-fade" />
-                        <div className="mobile-art-fade" />
+                        {/* ---------------------------------------------
+                            Основной мягкий переход.
+
+                            НЕ обрезаем картинку на 73%.
+                            Blur начинается только там,
+                            где сцена должна раствориться.
+                        --------------------------------------------- */}
+
+                        <div className="art-transition" />
+
+                        {/* ---------------------------------------------
+                            Дополнительная цветовая дымка.
+                            Она очень мягкая и не создаёт
+                            вертикальной границы.
+                        --------------------------------------------- */}
+
+                        <div className="art-color-fade" />
+
                     </div>
 
-                    {/* =================================================
-                        Общая лёгкая дымка
-                    ================================================= */}
-
-                    <div className="paid-vignette" />
 
                     {/* =================================================
                         CONTENT
@@ -413,6 +445,7 @@ export default function ResultPage() {
                         {/* TITLE */}
 
                         <div className="paid-heading">
+
                             <div className="paid-label">
                                 ПОЛНЫЙ РАЗБОР
                             </div>
@@ -422,7 +455,9 @@ export default function ResultPage() {
                                 <br />
                                 и надолго.
                             </h2>
+
                         </div>
+
 
                         {/* BENEFITS */}
 
@@ -474,6 +509,7 @@ export default function ResultPage() {
 
                         </div>
 
+
                         {/* CTA */}
 
                         <button
@@ -485,11 +521,13 @@ export default function ResultPage() {
                                 )
                             }
                         >
+
                             <span className="cta-title">
                                 Открыть полный разбор
                             </span>
 
                             <span className="cta-right">
+
                                 <span className="price">
                                     299 ₽
                                 </span>
@@ -497,16 +535,27 @@ export default function ResultPage() {
                                 <span className="arrow">
                                     →
                                 </span>
+
                             </span>
+
                         </button>
+
 
                         <div className="paid-note">
                             один разбор · для вас двоих ·
                             сразу после оплаты
                         </div>
+
                     </div>
+
                 </div>
+
             </section>
+
+
+            {/* =========================================================
+                STYLES
+            ========================================================= */}
 
             <style jsx>{`
 
@@ -532,18 +581,37 @@ export default function ResultPage() {
                     font: inherit;
                 }
 
+
+                /* =====================================================
+                   PAGE
+                ===================================================== */
+
                 .page {
                     width: 100%;
                     min-height: 100vh;
-                    padding: 0 28px 72px;
+
+                    padding:
+                        0
+                        28px
+                        72px;
+
                     overflow-x: hidden;
+
                     background: #f8f4f1;
                 }
 
                 .content-shell {
-                    width: min(920px, 100%);
-                    margin: 0 auto;
+                    width:
+                        min(
+                            920px,
+                            100%
+                        );
+
+                    margin:
+                        0
+                        auto;
                 }
+
 
                 /* =====================================================
                    HEADER
@@ -551,45 +619,65 @@ export default function ResultPage() {
 
                 .header {
                     min-height: 78px;
+
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
+
                     gap: 24px;
-                    border-bottom: 1px solid #ddd5d2;
+
+                    border-bottom:
+                        1px solid
+                        #ddd5d2;
                 }
 
                 .brand {
                     flex-shrink: 0;
+
                     font-family:
                         Georgia,
                         "Times New Roman",
                         serif;
+
                     font-size: 24px;
                     line-height: 1;
+
                     font-weight: 700;
+
                     letter-spacing: -1.1px;
                 }
 
                 .couple-names {
                     min-width: 0;
+
                     display: flex;
                     align-items: center;
+
                     gap: 9px;
+
                     color: #8f8588;
+
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
+
                     font-size: 10px;
                     font-weight: 700;
+
                     letter-spacing: 1.2px;
-                    text-transform: uppercase;
+
+                    text-transform:
+                        uppercase;
                 }
 
                 .person-name {
                     overflow: hidden;
+
                     text-overflow: ellipsis;
-                    white-space: nowrap;
+
+                    white-space:
+                        nowrap;
                 }
 
                 .couple-cross {
@@ -597,57 +685,79 @@ export default function ResultPage() {
                     color: #c2215a;
                 }
 
+
                 /* =====================================================
                    RESULTS
                 ===================================================== */
 
                 .results {
-                    padding: 42px 0 45px;
+                    padding:
+                        42px
+                        0
+                        45px;
                 }
 
                 .section-label {
                     margin-bottom: 13px;
+
                     color: #c2215a;
+
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
+
                     font-size: 10px;
                     line-height: 1;
+
                     font-weight: 800;
+
                     letter-spacing: 2.2px;
                 }
 
                 .results-title {
-                    margin: 0 0 32px;
+                    margin:
+                        0
+                        0
+                        32px;
+
                     font-family:
                         Georgia,
                         "Times New Roman",
                         serif;
+
                     font-size: 48px;
                     line-height: 0.98;
+
                     font-weight: 400;
+
                     letter-spacing: -2.5px;
                 }
 
-                .category-list {
-                    display: flex;
-                    flex-direction: column;
-                }
 
                 /* =====================================================
                    FORECAST
                 ===================================================== */
 
                 .forecast {
-                    padding: 38px 0 46px;
+                    padding:
+                        38px
+                        0
+                        46px;
+
                     display: grid;
+
                     grid-template-columns:
                         minmax(0, 1.15fr)
                         minmax(280px, 0.85fr);
+
                     gap: 55px;
+
                     align-items: center;
-                    border-top: 1px solid #dcd4d1;
+
+                    border-top:
+                        1px solid
+                        #dcd4d1;
                 }
 
                 .forecast-copy {
@@ -655,28 +765,41 @@ export default function ResultPage() {
                 }
 
                 .forecast-title {
-                    max-width: 520px;
+                    max-width: 560px;
+
                     margin: 0;
+
                     font-family:
                         Georgia,
                         "Times New Roman",
                         serif;
+
                     font-size: 43px;
                     line-height: 1.01;
+
                     font-weight: 400;
+
                     letter-spacing: -2.2px;
                 }
 
                 .forecast-description {
-                    max-width: 520px;
-                    margin: 15px 0 0;
+                    max-width: 560px;
+
+                    margin:
+                        15px
+                        0
+                        0;
+
                     color: #8d8587;
+
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
+
                     font-size: 14px;
                     line-height: 1.5;
+
                     font-weight: 500;
                 }
 
@@ -687,78 +810,123 @@ export default function ResultPage() {
                 .years {
                     display: flex;
                     align-items: baseline;
+
                     color: #c21856;
+
                     font-family:
                         Georgia,
                         "Times New Roman",
                         serif;
-                    white-space: nowrap;
+
+                    white-space:
+                        nowrap;
                 }
 
                 .years strong {
                     font-size: 76px;
                     line-height: 0.88;
+
                     font-weight: 400;
+
                     letter-spacing: -4px;
                 }
 
                 .years span {
                     margin-left: 9px;
+
                     font-size: 39px;
                     line-height: 1;
+
                     letter-spacing: -1.5px;
                 }
 
                 .forecast-scale {
                     width: 100%;
+
                     margin-top: 23px;
                 }
 
                 .scale-track {
                     position: relative;
+
                     height: 9px;
+
                     border-radius: 999px;
+
                     background: #e5dfe0;
                 }
 
                 .scale-fill {
                     position: absolute;
-                    inset: 0 auto 0 0;
+
+                    inset:
+                        0
+                        auto
+                        0
+                        0;
+
                     border-radius: inherit;
+
                     background: #e99ab5;
                 }
 
                 .scale-dot {
                     position: absolute;
+
                     top: 50%;
+
                     width: 22px;
                     height: 22px;
+
                     border-radius: 50%;
+
                     background: #c21856;
-                    transform: translate(-50%, -50%);
+
+                    transform:
+                        translate(
+                            -50%,
+                            -50%
+                        );
                 }
 
                 .scale-labels {
                     display: flex;
-                    justify-content: space-between;
+
+                    justify-content:
+                        space-between;
+
                     margin-top: 12px;
+
                     color: #8d8587;
+
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
+
                     font-size: 11px;
+
                     font-weight: 600;
                 }
+
 
                 /* =====================================================
                    PAID SHELL
                 ===================================================== */
 
                 .paid-shell {
-                    width: min(1180px, 100%);
-                    margin: 8px auto 0;
+                    width:
+                        min(
+                            1180px,
+                            100%
+                        );
+
+                    margin:
+                        8px
+                        auto
+                        0;
                 }
+
 
                 /* =====================================================
                    PAID CARD
@@ -766,36 +934,34 @@ export default function ResultPage() {
 
                 .paid-card {
                     position: relative;
+
                     width: 100%;
+
                     min-height: 500px;
 
                     overflow: hidden;
 
-                    border-radius: 24px;
+                    border-radius: 25px;
 
                     background:
                         linear-gradient(
                             90deg,
-                            #9c124c 0%,
-                            #a70e4c 48%,
-                            #a70f4d 100%
+                            #971047 0%,
+                            #a80e4d 52%,
+                            #aa104f 100%
                         );
 
                     isolation: isolate;
                 }
 
+
                 /* =====================================================
-                   ART LAYER
-
-                   ВАЖНО:
-                   Картинка занимает большую часть карточки.
-
-                   Мы НЕ режем её вертикальной границей.
-                   Вместо этого поверх неё идёт длинный gradient.
+                   IMAGE
                 ===================================================== */
 
                 .paid-art-layer {
                     position: absolute;
+
                     inset: 0;
 
                     z-index: 0;
@@ -808,91 +974,167 @@ export default function ResultPage() {
                 .paid-art {
                     position: absolute;
 
-                    left: 0;
-                    top: 0;
+                    inset: 0;
 
-                    width: 73%;
+                    width: 100%;
                     height: 100%;
 
                     display: block;
 
+                    /*
+                     * Главное отличие от старого варианта:
+                     *
+                     * Картинка теперь НЕ 73%.
+                     * Она является полноценным фоном
+                     * всей карточки.
+                     */
+
                     object-fit: cover;
 
                     /*
-                     * Главная настройка композиции.
-                     *
-                     * Пара остаётся слева.
-                     * Замок остаётся ближе к центру.
+                     * Исходник уже нарисован так,
+                     * чтобы пара была слева,
+                     * замок ближе к центру,
+                     * а справа был berry-background.
                      */
-                    object-position: 43% center;
+
+                    object-position:
+                        center
+                        center;
 
                     user-select: none;
-                    pointer-events: none;
                 }
 
-                /*
-                 * DESKTOP FADE
-                 *
-                 * Самое важное изменение:
-                 * картинка НЕ заканчивается резкой
-                 * вертикальной линией.
-                 *
-                 * Она постепенно растворяется
-                 * в цвет правой части карточки.
-                 */
 
-                .desktop-art-fade {
+                /* =====================================================
+                   REAL BLUR TRANSITION
+                ===================================================== */
+
+                .art-transition {
                     position: absolute;
-                    z-index: 2;
 
                     top: 0;
+                    bottom: 0;
+
+                    left: 45%;
+
+                    width: 28%;
+
+                    z-index: 2;
+
+                    pointer-events: none;
+
+                    /*
+                     * Реальный blur содержимого,
+                     * а не просто цветной overlay.
+                     */
+
+                    backdrop-filter:
+                        blur(9px);
+
+                    -webkit-backdrop-filter:
+                        blur(9px);
+
+                    /*
+                     * Mask делает blur видимым
+                     * только в середине перехода.
+                     */
+
+                    -webkit-mask-image:
+                        linear-gradient(
+                            90deg,
+                            transparent 0%,
+                            black 24%,
+                            black 70%,
+                            transparent 100%
+                        );
+
+                    mask-image:
+                        linear-gradient(
+                            90deg,
+                            transparent 0%,
+                            black 24%,
+                            black 70%,
+                            transparent 100%
+                        );
+                }
+
+
+                /* =====================================================
+                   COLOR FADE
+                ===================================================== */
+
+                .art-color-fade {
+                    position: absolute;
+
+                    top: 0;
+                    bottom: 0;
+
                     left: 38%;
 
                     width: 38%;
-                    height: 100%;
+
+                    z-index: 3;
 
                     pointer-events: none;
 
                     background:
                         linear-gradient(
                             90deg,
-                            rgba(166, 18, 77, 0) 0%,
-                            rgba(166, 18, 77, 0.03) 10%,
-                            rgba(166, 18, 77, 0.12) 24%,
-                            rgba(166, 18, 77, 0.28) 38%,
-                            rgba(166, 18, 77, 0.50) 53%,
-                            rgba(166, 18, 77, 0.72) 67%,
-                            rgba(166, 18, 77, 0.88) 80%,
-                            rgba(166, 18, 77, 0.97) 91%,
-                            #a6124d 100%
+
+                            rgba(
+                                164,
+                                14,
+                                77,
+                                0
+                            ) 0%,
+
+                            rgba(
+                                164,
+                                14,
+                                77,
+                                0.025
+                            ) 15%,
+
+                            rgba(
+                                164,
+                                14,
+                                77,
+                                0.08
+                            ) 30%,
+
+                            rgba(
+                                164,
+                                14,
+                                77,
+                                0.22
+                            ) 45%,
+
+                            rgba(
+                                164,
+                                14,
+                                77,
+                                0.43
+                            ) 60%,
+
+                            rgba(
+                                164,
+                                14,
+                                77,
+                                0.67
+                            ) 74%,
+
+                            rgba(
+                                164,
+                                14,
+                                77,
+                                0.87
+                            ) 88%,
+
+                            #a40e4d 100%
                         );
                 }
 
-                .mobile-art-fade {
-                    display: none;
-                }
-
-                /* =====================================================
-                   VIGNETTE
-                ===================================================== */
-
-                .paid-vignette {
-                    position: absolute;
-                    z-index: 3;
-
-                    inset: 0;
-
-                    pointer-events: none;
-
-                    background:
-                        linear-gradient(
-                            180deg,
-                            rgba(40, 0, 20, 0.05) 0%,
-                            rgba(40, 0, 20, 0) 28%,
-                            rgba(40, 0, 20, 0) 74%,
-                            rgba(40, 0, 20, 0.08) 100%
-                        );
-                }
 
                 /* =====================================================
                    CONTENT
@@ -900,12 +1142,14 @@ export default function ResultPage() {
 
                 .paid-content {
                     position: relative;
+
                     z-index: 10;
 
                     min-height: 500px;
 
                     width: 100%;
                 }
+
 
                 /* =====================================================
                    TITLE
@@ -914,10 +1158,10 @@ export default function ResultPage() {
                 .paid-heading {
                     position: absolute;
 
-                    top: 38px;
+                    top: 39px;
                     left: 70px;
 
-                    width: 490px;
+                    width: 500px;
                 }
 
                 .paid-label {
@@ -928,7 +1172,7 @@ export default function ResultPage() {
                             255,
                             244,
                             247,
-                            0.88
+                            0.92
                         );
 
                     font-family:
@@ -938,6 +1182,7 @@ export default function ResultPage() {
 
                     font-size: 10px;
                     line-height: 1;
+
                     font-weight: 700;
 
                     letter-spacing: 2.1px;
@@ -953,26 +1198,37 @@ export default function ResultPage() {
                         "Times New Roman",
                         serif;
 
+                    /*
+                     * Размер близкий к референсу.
+                     */
+
                     font-size: clamp(
-                        44px,
+                        46px,
                         4.2vw,
-                        55px
+                        57px
                     );
 
                     line-height: 0.95;
+
                     font-weight: 400;
 
-                    letter-spacing: -2.4px;
+                    letter-spacing: -2.5px;
+
+                    /*
+                     * Благодаря тени текст
+                     * не выглядит приклеенным сверху.
+                     */
 
                     text-shadow:
                         0 2px 16px
                         rgba(
-                            59,
+                            48,
                             0,
-                            27,
-                            0.1
+                            23,
+                            0.22
                         );
                 }
+
 
                 /* =====================================================
                    BENEFITS
@@ -982,15 +1238,17 @@ export default function ResultPage() {
                     position: absolute;
 
                     top: 48px;
-                    right: 68px;
+                    right: 67px;
 
-                    width: 305px;
+                    width: 315px;
 
                     display: flex;
+
                     flex-direction: column;
 
-                    gap: 25px;
+                    gap: 24px;
                 }
+
 
                 /* =====================================================
                    CTA
@@ -1002,26 +1260,30 @@ export default function ResultPage() {
                     right: 36px;
                     bottom: 52px;
 
-                    width: min(
-                        638px,
-                        calc(100% - 600px)
-                    );
-
-                    min-width: 500px;
+                    width:
+                        min(
+                            638px,
+                            55%
+                        );
 
                     height: 72px;
 
                     padding:
-                        0 26px;
+                        0
+                        26px;
 
                     display: flex;
+
                     align-items: center;
-                    justify-content: space-between;
+
+                    justify-content:
+                        space-between;
 
                     gap: 20px;
 
                     border: 0;
-                    border-radius: 15px;
+
+                    border-radius: 16px;
 
                     background: #fffaf7;
 
@@ -1044,7 +1306,8 @@ export default function ResultPage() {
                 }
 
                 .paid-cta:hover {
-                    transform: translateY(-2px);
+                    transform:
+                        translateY(-2px);
 
                     box-shadow:
                         0 13px 30px
@@ -1057,7 +1320,8 @@ export default function ResultPage() {
                 }
 
                 .paid-cta:active {
-                    transform: translateY(0);
+                    transform:
+                        translateY(0);
                 }
 
                 .cta-title {
@@ -1071,14 +1335,13 @@ export default function ResultPage() {
 
                     font-weight: 600;
 
-                    letter-spacing:
-                        -0.1px;
-
-                    white-space: nowrap;
+                    white-space:
+                        nowrap;
                 }
 
                 .cta-right {
                     display: flex;
+
                     align-items: center;
 
                     gap: 22px;
@@ -1097,7 +1360,8 @@ export default function ResultPage() {
 
                     font-weight: 400;
 
-                    white-space: nowrap;
+                    white-space:
+                        nowrap;
                 }
 
                 .arrow {
@@ -1106,7 +1370,7 @@ export default function ResultPage() {
                         Helvetica,
                         sans-serif;
 
-                    font-size: 26px;
+                    font-size: 27px;
                     line-height: 1;
 
                     font-weight: 300;
@@ -1118,19 +1382,18 @@ export default function ResultPage() {
                     right: 36px;
                     bottom: 22px;
 
-                    width: min(
-                        638px,
-                        calc(100% - 600px)
-                    );
-
-                    min-width: 500px;
+                    width:
+                        min(
+                            638px,
+                            55%
+                        );
 
                     color:
                         rgba(
                             255,
                             238,
                             243,
-                            0.68
+                            0.72
                         );
 
                     font-family:
@@ -1146,6 +1409,7 @@ export default function ResultPage() {
                     text-align: center;
                 }
 
+
                 /* =====================================================
                    TABLET
                 ===================================================== */
@@ -1153,7 +1417,11 @@ export default function ResultPage() {
                 @media (max-width: 1000px) {
 
                     .content-shell {
-                        width: min(820px, 100%);
+                        width:
+                            min(
+                                820px,
+                                100%
+                            );
                     }
 
                     .paid-card {
@@ -1167,6 +1435,7 @@ export default function ResultPage() {
                     .paid-heading {
                         left: 48px;
                         top: 34px;
+
                         width: 430px;
                     }
 
@@ -1176,37 +1445,32 @@ export default function ResultPage() {
 
                     .paid-benefits {
                         right: 38px;
+
                         width: 275px;
+
                         gap: 21px;
                     }
 
                     .paid-cta {
                         right: 28px;
                         bottom: 43px;
-                        min-width: 430px;
+
                         width: 52%;
+
+                        height: 68px;
                     }
 
                     .paid-note {
                         right: 28px;
                         bottom: 18px;
-                        min-width: 430px;
+
                         width: 52%;
                     }
                 }
 
+
                 /* =====================================================
                    MOBILE
-
-                   Здесь уже НЕ scale desktop.
-
-                   Это отдельная композиция:
-                   картинка сверху,
-                   пара остаётся вместе,
-                   изображение постепенно растворяется
-                   в berry-фон,
-                   benefits ниже,
-                   CTA внизу.
                 ===================================================== */
 
                 @media (max-width: 640px) {
@@ -1222,8 +1486,12 @@ export default function ResultPage() {
                         width: 100%;
                     }
 
+
+                    /* HEADER */
+
                     .header {
                         min-height: 64px;
+
                         gap: 12px;
                     }
 
@@ -1233,41 +1501,52 @@ export default function ResultPage() {
 
                     .couple-names {
                         max-width: 52%;
+
                         gap: 5px;
+
                         font-size: 8px;
-                        letter-spacing: 0.65px;
+
+                        letter-spacing:
+                            0.65px;
                     }
 
-                    /* ---------------------------------------------
-                       RESULTS
-                    --------------------------------------------- */
+
+                    /* RESULTS */
 
                     .results {
                         padding:
-                            29px 0
+                            29px
+                            0
                             33px;
                     }
 
                     .section-label {
                         margin-bottom: 11px;
+
                         font-size: 9px;
-                        letter-spacing: 1.8px;
+
+                        letter-spacing:
+                            1.8px;
                     }
 
                     .results-title {
                         margin-bottom: 24px;
+
                         font-size: 37px;
+
                         line-height: 1;
-                        letter-spacing: -1.8px;
+
+                        letter-spacing:
+                            -1.8px;
                     }
 
-                    /* ---------------------------------------------
-                       FORECAST
-                    --------------------------------------------- */
+
+                    /* FORECAST */
 
                     .forecast {
                         padding:
-                            29px 0
+                            29px
+                            0
                             37px;
 
                         display: block;
@@ -1277,14 +1556,20 @@ export default function ResultPage() {
                         max-width: 100%;
 
                         font-size: 34px;
+
                         line-height: 1.01;
-                        letter-spacing: -1.55px;
+
+                        letter-spacing:
+                            -1.55px;
                     }
 
                     .forecast-description {
                         max-width: 100%;
+
                         margin-top: 13px;
+
                         font-size: 12px;
+
                         line-height: 1.45;
                     }
 
@@ -1294,18 +1579,24 @@ export default function ResultPage() {
 
                     .forecast-result {
                         width: 100%;
+
                         margin-top: 25px;
                     }
 
                     .years strong {
                         font-size: 64px;
-                        letter-spacing: -3px;
+
+                        letter-spacing:
+                            -3px;
                     }
 
                     .years span {
                         margin-left: 7px;
+
                         font-size: 34px;
-                        letter-spacing: -1px;
+
+                        letter-spacing:
+                            -1px;
                     }
 
                     .forecast-scale {
@@ -1323,24 +1614,31 @@ export default function ResultPage() {
 
                     .scale-labels {
                         margin-top: 10px;
+
                         font-size: 9px;
                     }
 
-                    /* ---------------------------------------------
-                       PAID SHELL
-                    --------------------------------------------- */
+
+                    /* =================================================
+                       MOBILE PAID CARD
+
+                       Здесь НЕ используем desktop
+                       композицию.
+
+                       Верхняя часть — исходная
+                       сцена.
+
+                       Потом мягкий blur/fade.
+
+                       Потом benefits.
+
+                    ================================================= */
 
                     .paid-shell {
                         width: 100%;
+
                         margin-top: 0;
                     }
-
-                    /* ---------------------------------------------
-                       PAID CARD
-
-                       Height специально больше,
-                       чтобы mobile композиция была вертикальной.
-                    --------------------------------------------- */
 
                     .paid-card {
                         min-height: 620px;
@@ -1351,7 +1649,7 @@ export default function ResultPage() {
                             linear-gradient(
                                 180deg,
                                 #a30e4d 0%,
-                                #aa104f 100%
+                                #a90f4e 100%
                             );
                     }
 
@@ -1359,64 +1657,97 @@ export default function ResultPage() {
                         min-height: 620px;
                     }
 
-                    /* ---------------------------------------------
-                       MOBILE ART
 
-                       Изображение занимает верхнюю часть.
-                       Используем почти всю ширину.
+                    /* =================================================
+                       MOBILE IMAGE
 
-                       object-position 43%:
-                       парень + девушка остаются рядом.
-                    --------------------------------------------- */
+                       Пара должна быть вместе.
+
+                       Не растягиваем картинку
+                       на всю вертикальную карточку.
+                    ================================================= */
 
                     .paid-art {
-                        left: -4%;
+                        left: 0;
                         top: 0;
 
-                        width: 108%;
-                        height: 370px;
+                        width: 100%;
+
+                        /*
+                         * На телефоне высота сцены
+                         * контролируется отдельно.
+                         */
+
+                        height: 385px;
 
                         object-fit: cover;
 
+                        /*
+                         * Сдвигаем фокус немного влево,
+                         * чтобы парень + девушка
+                         * оставались в кадре вместе.
+                         */
+
                         object-position:
-                            43%
+                            42%
                             center;
                     }
 
                     .paid-art-layer {
-                        height: 410px;
+                        height: 420px;
                     }
 
-                    /*
-                     * На mobile горизонтальный fade НЕ нужен.
-                     */
 
-                    .desktop-art-fade {
-                        display: none;
-                    }
+                    /* =================================================
+                       MOBILE BLUR
 
-                    /*
-                     * Вместо него картинка растворяется
-                     * вниз в berry-фон.
+                       Теперь переход идёт вниз,
+                       а не вправо.
+                    ================================================= */
 
-                     * Именно это должно дать тот эффект,
-                     * который был в референсе.
-                     */
-
-                    .mobile-art-fade {
-                        display: block;
-
-                        position: absolute;
-
+                    .art-transition {
+                        top: 220px;
                         left: 0;
-                        right: 0;
-                        bottom: 0;
 
+                        width: 100%;
+                        height: 200px;
+
+                        backdrop-filter:
+                            blur(8px);
+
+                        -webkit-backdrop-filter:
+                            blur(8px);
+
+                        -webkit-mask-image:
+                            linear-gradient(
+                                180deg,
+                                transparent 0%,
+                                black 25%,
+                                black 72%,
+                                transparent 100%
+                            );
+
+                        mask-image:
+                            linear-gradient(
+                                180deg,
+                                transparent 0%,
+                                black 25%,
+                                black 72%,
+                                transparent 100%
+                            );
+                    }
+
+                    .art-color-fade {
+                        top: 235px;
+                        left: 0;
+
+                        width: 100%;
                         height: 190px;
 
                         background:
                             linear-gradient(
                                 180deg,
+
                                 rgba(
                                     163,
                                     14,
@@ -1428,105 +1759,132 @@ export default function ResultPage() {
                                     163,
                                     14,
                                     77,
-                                    0.08
-                                ) 18%,
+                                    0.05
+                                ) 17%,
 
                                 rgba(
                                     163,
                                     14,
                                     77,
-                                    0.28
-                                ) 38%,
+                                    0.18
+                                ) 36%,
 
                                 rgba(
                                     163,
                                     14,
                                     77,
-                                    0.52
-                                ) 58%,
+                                    0.42
+                                ) 56%,
 
                                 rgba(
                                     163,
                                     14,
                                     77,
-                                    0.78
+                                    0.72
                                 ) 76%,
 
                                 #a30e4d 100%
                             );
                     }
 
-                    /* ---------------------------------------------
+
+                    /* =================================================
                        MOBILE TITLE
-                    --------------------------------------------- */
+                    ================================================= */
 
                     .paid-heading {
                         top: 31px;
+
                         left: 28px;
 
                         width:
-                            calc(100% - 56px);
+                            calc(
+                                100% - 56px
+                            );
                     }
 
                     .paid-label {
                         margin-bottom: 13px;
 
                         font-size: 9px;
-                        letter-spacing: 1.9px;
+
+                        letter-spacing:
+                            1.9px;
                     }
 
                     .paid-heading h2 {
                         font-size: 38px;
-                        line-height: 0.96;
-                        letter-spacing: -1.8px;
 
-                        /*
-                         * Очень лёгкая тень,
-                         * как в референсе.
-                         */
+                        line-height: 0.96;
+
+                        letter-spacing:
+                            -1.8px;
+
                         text-shadow:
-                            0 2px 14px
+                            0
+                            2px
+                            14px
                             rgba(
                                 49,
                                 0,
                                 25,
-                                0.16
+                                0.22
                             );
                     }
 
-                    /* ---------------------------------------------
+
+                    /* =================================================
                        MOBILE BENEFITS
-                    --------------------------------------------- */
+
+                       В референсе они идут
+                       уже на berry-фоне.
+                    ================================================= */
 
                     .paid-benefits {
-                        top: 385px;
+                        top: 397px;
+
                         left: 28px;
                         right: 28px;
 
                         width:
-                            calc(100% - 56px);
+                            calc(
+                                100% - 56px
+                            );
 
-                        gap: 18px;
+                        display: grid;
+
+                        grid-template-columns:
+                            1fr
+                            1fr;
+
+                        column-gap: 22px;
+
+                        row-gap: 18px;
                     }
 
-                    /* ---------------------------------------------
+
+                    /* =================================================
                        MOBILE CTA
-                    --------------------------------------------- */
+                    ================================================= */
 
                     .paid-cta {
                         left: 20px;
                         right: 20px;
-                        bottom: 48px;
+
+                        bottom: 47px;
 
                         width:
-                            calc(100% - 40px);
+                            calc(
+                                100% - 40px
+                            );
 
                         min-width: 0;
 
                         height: 58px;
 
                         padding:
-                            0 18px;
+                            0
+                            18px;
 
                         border-radius: 14px;
                     }
@@ -1550,21 +1908,21 @@ export default function ResultPage() {
                     .paid-note {
                         left: 20px;
                         right: 20px;
-                        bottom: 20px;
+
+                        bottom: 19px;
 
                         width:
-                            calc(100% - 40px);
-
-                        min-width: 0;
+                            calc(
+                                100% - 40px
+                            );
 
                         font-size: 8px;
                     }
                 }
 
+
                 /* =====================================================
                    SMALL MOBILE
-
-                   iPhone SE / маленькие Android.
                 ===================================================== */
 
                 @media (max-width: 390px) {
@@ -1578,20 +1936,26 @@ export default function ResultPage() {
                     }
 
                     .paid-art {
-                        height: 355px;
-                        object-position: 43% center;
+                        height: 365px;
+
+                        object-position:
+                            42%
+                            center;
                     }
 
                     .paid-art-layer {
-                        height: 395px;
+                        height: 400px;
                     }
 
                     .paid-heading {
                         top: 28px;
+
                         left: 24px;
 
                         width:
-                            calc(100% - 48px);
+                            calc(
+                                100% - 48px
+                            );
                     }
 
                     .paid-heading h2 {
@@ -1599,15 +1963,19 @@ export default function ResultPage() {
                     }
 
                     .paid-benefits {
-                        top: 370px;
+                        top: 377px;
 
                         left: 24px;
                         right: 24px;
 
                         width:
-                            calc(100% - 48px);
+                            calc(
+                                100% - 48px
+                            );
 
-                        gap: 16px;
+                        column-gap: 15px;
+
+                        row-gap: 16px;
                     }
 
                     .paid-cta {
@@ -1615,10 +1983,13 @@ export default function ResultPage() {
                         right: 16px;
 
                         width:
-                            calc(100% - 32px);
+                            calc(
+                                100% - 32px
+                            );
 
                         padding:
-                            0 16px;
+                            0
+                            16px;
                     }
 
                     .paid-note {
@@ -1626,7 +1997,9 @@ export default function ResultPage() {
                         right: 16px;
 
                         width:
-                            calc(100% - 32px);
+                            calc(
+                                100% - 32px
+                            );
                     }
                 }
 
@@ -1635,8 +2008,9 @@ export default function ResultPage() {
     );
 }
 
+
 /* ============================================================
-   CATEGORY
+   CATEGORY ROW
 ============================================================ */
 
 function CategoryRow({
@@ -1644,15 +2018,23 @@ function CategoryRow({
                          subtitle,
                          value,
                      }: CategoryScore) {
-    const safeValue = Math.max(
-        0,
-        Math.min(MAX_SCORE, value)
-    );
+
+    const safeValue =
+        Math.max(
+            0,
+            Math.min(
+                MAX_SCORE,
+                value
+            )
+        );
 
     return (
         <div className="category-row">
+
             <div className="category-top">
+
                 <div className="category-copy">
+
                     <div className="category-title">
                         {title}
                     </div>
@@ -1660,30 +2042,43 @@ function CategoryRow({
                     <div className="category-subtitle">
                         {subtitle}
                     </div>
+
                 </div>
 
                 <div className="category-score">
+
                     <strong>
                         {safeValue}
                     </strong>
 
-                    <span>/10</span>
+                    <span>
+                        /10
+                    </span>
+
                 </div>
+
             </div>
 
+
             <div className="category-track">
+
                 <div
                     className="category-fill"
                     style={{
-                        width: `${safeValue * 10}%`,
+                        width:
+                            `${safeValue * 10}%`,
                     }}
                 />
+
             </div>
 
+
             <style jsx>{`
+
                 .category-row {
                     padding:
-                        16px 0
+                        16px
+                        0
                         18px;
 
                     border-bottom:
@@ -1697,8 +2092,12 @@ function CategoryRow({
 
                 .category-top {
                     display: flex;
-                    align-items: flex-end;
-                    justify-content: space-between;
+
+                    align-items:
+                        flex-end;
+
+                    justify-content:
+                        space-between;
 
                     gap: 24px;
                 }
@@ -1714,6 +2113,7 @@ function CategoryRow({
                         serif;
 
                     font-size: 29px;
+
                     line-height: 1;
 
                     letter-spacing:
@@ -1731,6 +2131,7 @@ function CategoryRow({
                         sans-serif;
 
                     font-size: 12px;
+
                     line-height: 1.3;
 
                     font-weight: 500;
@@ -1738,7 +2139,9 @@ function CategoryRow({
 
                 .category-score {
                     display: flex;
-                    align-items: baseline;
+
+                    align-items:
+                        baseline;
 
                     flex-shrink: 0;
 
@@ -1754,6 +2157,7 @@ function CategoryRow({
                     color: #c21856;
 
                     font-size: 42px;
+
                     line-height: 0.8;
 
                     font-weight: 400;
@@ -1764,6 +2168,7 @@ function CategoryRow({
 
                 .category-score span {
                     margin-left: 3px;
+
                     font-size: 18px;
                 }
 
@@ -1791,7 +2196,8 @@ function CategoryRow({
 
                     .category-row {
                         padding:
-                            13px 0
+                            13px
+                            0
                             15px;
                     }
 
@@ -1821,13 +2227,17 @@ function CategoryRow({
 
                     .category-track {
                         height: 5px;
+
                         margin-top: 10px;
                     }
                 }
+
             `}</style>
+
         </div>
     );
 }
+
 
 /* ============================================================
    BENEFIT
@@ -1840,17 +2250,23 @@ function Benefit({
     icon: BenefitIcon;
     text: ReactNode;
 }) {
+
     return (
         <div className="benefit">
+
             <div className="benefit-icon">
-                <BenefitSvg type={icon} />
+                <BenefitSvg
+                    type={icon}
+                />
             </div>
 
             <div className="benefit-text">
                 {text}
             </div>
 
+
             <style jsx>{`
+
                 .benefit {
                     display: grid;
 
@@ -1860,7 +2276,8 @@ function Benefit({
 
                     gap: 12px;
 
-                    align-items: start;
+                    align-items:
+                        start;
 
                     color: #fff8f6;
                 }
@@ -1880,6 +2297,7 @@ function Benefit({
                         sans-serif;
 
                     font-size: 14px;
+
                     line-height: 1.28;
 
                     font-weight: 500;
@@ -1888,12 +2306,14 @@ function Benefit({
                         -0.1px;
 
                     text-shadow:
-                        0 1px 8px
+                        0
+                        1px
+                        8px
                         rgba(
                             65,
                             0,
                             27,
-                            0.08
+                            0.18
                         );
                 }
 
@@ -1904,7 +2324,7 @@ function Benefit({
                             22px
                             minmax(0, 1fr);
 
-                        gap: 10px;
+                        gap: 9px;
                     }
 
                     .benefit-icon {
@@ -1912,14 +2332,18 @@ function Benefit({
                     }
 
                     .benefit-text {
-                        font-size: 13px;
+                        font-size: 12px;
+
                         line-height: 1.25;
                     }
                 }
+
             `}</style>
+
         </div>
     );
 }
+
 
 /* ============================================================
    BENEFIT ICONS
@@ -1930,7 +2354,9 @@ function BenefitSvg({
                     }: {
     type: BenefitIcon;
 }) {
+
     if (type === "heart") {
+
         return (
             <svg
                 viewBox="0 0 24 24"
@@ -1955,7 +2381,9 @@ function BenefitSvg({
         );
     }
 
+
     if (type === "message") {
+
         return (
             <svg
                 viewBox="0 0 24 24"
@@ -1985,7 +2413,9 @@ function BenefitSvg({
         );
     }
 
+
     if (type === "lightning") {
+
         return (
             <svg
                 viewBox="0 0 24 24"
@@ -2008,6 +2438,7 @@ function BenefitSvg({
             </svg>
         );
     }
+
 
     return (
         <svg
@@ -2044,13 +2475,18 @@ function BenefitSvg({
     );
 }
 
+
 /* ============================================================
    YEAR WORD
 ============================================================ */
 
 function getYearWord(value: number) {
-    const mod100 = value % 100;
-    const mod10 = value % 10;
+
+    const mod100 =
+        value % 100;
+
+    const mod10 =
+        value % 10;
 
     if (
         mod100 >= 11 &&
