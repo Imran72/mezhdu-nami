@@ -8,14 +8,11 @@ type Couple = {
     id: string;
     partner_a_name?: string | null;
     partner_b_name?: string | null;
-    partner_a_completed?: boolean;
-    partner_b_completed?: boolean;
 };
 
 type ApiResponse = {
     waiting?: boolean;
     couple?: Couple;
-    comparisons?: unknown[];
     scores?: {
         overall?: number;
         sameAnswers?: number;
@@ -38,13 +35,16 @@ type BenefitIcon =
 
 const MAX_SCORE = 10;
 
-const PAID_IMAGE = "/images/full-report-couple.png";
+const PAID_IMAGE =
+    "/images/full-report-couple.png";
 
 export default function ResultPage() {
     const params = useParams();
     const router = useRouter();
 
-    const coupleId = String(params.coupleId ?? "");
+    const coupleId = String(
+        params.coupleId ?? ""
+    );
 
     const [data, setData] =
         useState<ApiResponse | null>(null);
@@ -62,12 +62,15 @@ export default function ResultPage() {
 
         async function loadResult() {
             try {
-                const response = await fetch(
-                    `/api/report?id=${encodeURIComponent(coupleId)}`,
-                    {
-                        cache: "no-store",
-                    }
-                );
+                const response =
+                    await fetch(
+                        `/api/report?id=${encodeURIComponent(
+                            coupleId
+                        )}`,
+                        {
+                            cache: "no-store",
+                        }
+                    );
 
                 if (!response.ok) {
                     throw new Error(
@@ -123,14 +126,20 @@ export default function ResultPage() {
             );
 
             const base = Math.round(
-                ((same + close * 0.5) / total) *
+                ((same + close * 0.5) /
+                    total) *
                 MAX_SCORE
             );
 
-            const clamp = (value: number) =>
+            const clamp = (
+                value: number
+            ) =>
                 Math.max(
                     0,
-                    Math.min(MAX_SCORE, value)
+                    Math.min(
+                        MAX_SCORE,
+                        value
+                    )
                 );
 
             return [
@@ -173,34 +182,39 @@ export default function ResultPage() {
             ];
         }, [data]);
 
-    const yearsForecast = useMemo(() => {
-        const overall =
-            data?.scores?.overall ?? 50;
+    const yearsForecast =
+        useMemo(() => {
+            const overall =
+                data?.scores?.overall ?? 50;
 
-        if (overall >= 85) return 45;
-        if (overall >= 75) return 28;
-        if (overall >= 65) return 16;
-        if (overall >= 55) return 10;
-        if (overall >= 45) return 6;
-        if (overall >= 35) return 3;
+            if (overall >= 85) return 45;
+            if (overall >= 75) return 28;
+            if (overall >= 65) return 16;
+            if (overall >= 55) return 10;
+            if (overall >= 45) return 6;
+            if (overall >= 35) return 3;
 
-        return 1;
-    }, [data]);
+            return 1;
+        }, [data]);
 
-    const forecastPosition = useMemo(() => {
-        const maxYears = 60;
+    const forecastPosition =
+        useMemo(() => {
+            const maxYears = 60;
 
-        return Math.max(
-            4,
-            Math.min(
-                96,
-                (yearsForecast / maxYears) * 100
-            )
-        );
-    }, [yearsForecast]);
+            return Math.max(
+                4,
+                Math.min(
+                    96,
+                    (yearsForecast /
+                        maxYears) *
+                    100
+                )
+            );
+        }, [yearsForecast]);
 
     const nameA =
-        data?.couple?.partner_a_name || "Вы";
+        data?.couple?.partner_a_name ||
+        "Вы";
 
     const nameB =
         data?.couple?.partner_b_name ||
@@ -208,21 +222,20 @@ export default function ResultPage() {
 
     if (loading) {
         return (
-            <main className="loading-screen">
-                <div className="loading-brand">
+            <main className="state">
+                <div className="state-brand">
                     между нами.
                 </div>
 
                 <style jsx>{`
-                    .loading-screen {
+                    .state {
                         min-height: 100vh;
                         display: grid;
                         place-items: center;
                         background: #f8f4f1;
-                        color: #211d1f;
                     }
 
-                    .loading-brand {
+                    .state-brand {
                         font-family:
                             Georgia,
                             "Times New Roman",
@@ -237,17 +250,16 @@ export default function ResultPage() {
 
     if (!data) {
         return (
-            <main className="error-screen">
+            <main className="state">
                 Не получилось загрузить результат.
 
                 <style jsx>{`
-                    .error-screen {
+                    .state {
                         min-height: 100vh;
                         display: grid;
                         place-items: center;
                         padding: 24px;
                         background: #f8f4f1;
-                        color: #211d1f;
                         font-family:
                             Arial,
                             Helvetica,
@@ -262,34 +274,32 @@ export default function ResultPage() {
         <main className="page">
 
             {/* =====================================================
-                RESULT PAGE
+                RESULT
             ===================================================== */}
 
             <div className="content-shell">
 
                 <header className="header">
+
                     <div className="brand">
                         между нами.
                     </div>
 
                     <div className="couple-names">
-                        <span className="person-name">
+
+                        <span>
                             {nameA}
                         </span>
 
-                        <span className="couple-cross">
-                            ×
-                        </span>
+                        <b>×</b>
 
-                        <span className="person-name">
+                        <span>
                             {nameB}
                         </span>
-                    </div>
-                </header>
 
-                {/* =================================================
-                    RESULTS
-                ================================================= */}
+                    </div>
+
+                </header>
 
                 <section className="results">
 
@@ -297,13 +307,14 @@ export default function ResultPage() {
                         ВАШ РЕЗУЛЬТАТ
                     </div>
 
-                    <h1 className="results-title">
+                    <h1>
                         Вот что
                         <br />
                         получилось
                     </h1>
 
                     <div className="category-list">
+
                         {categories.map(
                             (category) => (
                                 <CategoryRow
@@ -312,39 +323,37 @@ export default function ResultPage() {
                                 />
                             )
                         )}
+
                     </div>
 
                 </section>
 
-                {/* =================================================
-                    FORECAST
-                ================================================= */}
-
                 <section className="forecast">
 
-                    <div className="forecast-copy">
+                    <div>
 
                         <div className="section-label">
                             ПРОГНОЗ
                         </div>
 
-                        <h2 className="forecast-title">
+                        <h2>
                             Ориентировочная
                             <br />
                             длительность
-                            <br className="desktop-break" />
+                            <br />
                             ваших отношений
                         </h2>
 
-                        <p className="forecast-description">
-                            На основе ваших ответов мы оценили
-                            ориентировочный сценарий
-                            длительности ваших отношений.
+                        <p>
+                            На основе ваших ответов
+                            мы оценили ориентировочный
+                            сценарий длительности
+                            ваших отношений.
                         </p>
 
                     </div>
 
-                    <div className="forecast-result">
+                    <div className="forecast-right">
 
                         <div className="years">
 
@@ -362,10 +371,10 @@ export default function ResultPage() {
 
                         <div className="forecast-scale">
 
-                            <div className="scale-track">
+                            <div className="scale">
 
                                 <div
-                                    className="scale-fill"
+                                    className="scale-progress"
                                     style={{
                                         width: `${forecastPosition}%`,
                                     }}
@@ -381,6 +390,7 @@ export default function ResultPage() {
                             </div>
 
                             <div className="scale-labels">
+
                                 <span>
                                     1 месяц
                                 </span>
@@ -388,6 +398,7 @@ export default function ResultPage() {
                                 <span>
                                     вся жизнь
                                 </span>
+
                             </div>
 
                         </div>
@@ -399,7 +410,7 @@ export default function ResultPage() {
             </div>
 
             {/* =====================================================
-                PAID REPORT
+                FULL REPORT CARD
             ===================================================== */}
 
             <section className="paid-section">
@@ -408,38 +419,33 @@ export default function ResultPage() {
 
                     {/* =================================================
                         ART
-
-                        Здесь только картинка.
-                        Никакого текста внутри изображения.
                     ================================================= */}
 
-                    <div className="art">
+                    <div className="paid-art">
+
+                        {/* обычная картинка */}
 
                         <img
+                            className="art-main"
                             src={PAID_IMAGE}
                             alt=""
                             draggable={false}
                         />
 
+                        {/* та же картинка, но blur */}
+
+                        <img
+                            className="art-blur"
+                            src={PAID_IMAGE}
+                            alt=""
+                            draggable={false}
+                        />
+
+                        {/* переход в berry */}
+
+                        <div className="art-color-fade" />
+
                     </div>
-
-                    {/* =================================================
-                        ART FADE
-
-                        Desktop:
-                        горизонтальный fade вправо.
-
-                        Mobile:
-                        вертикальный fade вниз.
-
-                        В результате картинка не имеет
-                        жёсткой прямой границы.
-                    ================================================= */}
-
-                    <div className="art-fade" />
-
-                    {/* Дополнительное лёгкое затемнение */}
-                    <div className="card-overlay" />
 
                     {/* =================================================
                         CONTENT
@@ -447,9 +453,7 @@ export default function ResultPage() {
 
                     <div className="paid-content">
 
-                        {/* TITLE */}
-
-                        <div className="paid-title">
+                        <div className="paid-copy">
 
                             <div className="paid-label">
                                 ПОЛНЫЙ РАЗБОР
@@ -462,10 +466,6 @@ export default function ResultPage() {
                             </h2>
 
                         </div>
-
-                        {/* =================================================
-                            BENEFITS
-                        ================================================= */}
 
                         <div className="benefits">
 
@@ -515,10 +515,6 @@ export default function ResultPage() {
 
                         </div>
 
-                        {/* =================================================
-                            CTA
-                        ================================================= */}
-
                         <button
                             type="button"
                             className="paid-cta"
@@ -535,13 +531,13 @@ export default function ResultPage() {
 
                             <span className="cta-right">
 
-                                <span className="price">
+                                <strong>
                                     299 ₽
-                                </span>
+                                </strong>
 
-                                <span className="arrow">
+                                <b>
                                     →
-                                </span>
+                                </b>
 
                             </span>
 
@@ -568,30 +564,17 @@ export default function ResultPage() {
                     box-sizing: border-box;
                 }
 
-                :global(html) {
-                    background: #f8f4f1;
-                }
-
                 :global(body) {
                     margin: 0;
                     background: #f8f4f1;
                     color: #201c1e;
                 }
 
-                button {
-                    font: inherit;
-                }
-
-                /* =====================================================
-                   PAGE
-                ===================================================== */
-
                 .page {
-                    width: 100%;
                     min-height: 100vh;
+                    padding-bottom: 80px;
                     overflow-x: hidden;
                     background: #f8f4f1;
-                    padding-bottom: 80px;
                 }
 
                 .content-shell {
@@ -614,7 +597,7 @@ export default function ResultPage() {
                     align-items: center;
                     justify-content: space-between;
 
-                    gap: 24px;
+                    gap: 20px;
 
                     border-bottom:
                         1px solid
@@ -622,30 +605,22 @@ export default function ResultPage() {
                 }
 
                 .brand {
-                    flex-shrink: 0;
-
                     font-family:
                         Georgia,
                         "Times New Roman",
                         serif;
 
                     font-size: 24px;
-                    line-height: 1;
-
                     font-weight: 700;
 
                     letter-spacing: -1.1px;
                 }
 
                 .couple-names {
-                    min-width: 0;
-
                     display: flex;
-                    align-items: center;
-
                     gap: 9px;
 
-                    color: #8f8588;
+                    align-items: center;
 
                     font-family:
                         Arial,
@@ -655,19 +630,14 @@ export default function ResultPage() {
                     font-size: 10px;
                     font-weight: 700;
 
-                    letter-spacing: 1.2px;
+                    letter-spacing: 1px;
+
+                    color: #8f8588;
 
                     text-transform: uppercase;
                 }
 
-                .person-name {
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                }
-
-                .couple-cross {
-                    flex-shrink: 0;
+                .couple-names b {
                     color: #c2215a;
                 }
 
@@ -690,14 +660,12 @@ export default function ResultPage() {
                         sans-serif;
 
                     font-size: 10px;
-                    line-height: 1;
-
                     font-weight: 800;
 
                     letter-spacing: 2.2px;
                 }
 
-                .results-title {
+                .results h1 {
                     margin: 0 0 32px;
 
                     font-family:
@@ -706,16 +674,11 @@ export default function ResultPage() {
                         serif;
 
                     font-size: 48px;
-                    line-height: 0.98;
+                    line-height: .98;
 
                     font-weight: 400;
 
                     letter-spacing: -2.5px;
-                }
-
-                .category-list {
-                    display: flex;
-                    flex-direction: column;
                 }
 
                 /* =====================================================
@@ -728,8 +691,8 @@ export default function ResultPage() {
                     display: grid;
 
                     grid-template-columns:
-                        minmax(0, 1.15fr)
-                        minmax(280px, 0.85fr);
+                        minmax(0, 1.1fr)
+                        minmax(280px, .9fr);
 
                     gap: 55px;
 
@@ -740,13 +703,7 @@ export default function ResultPage() {
                         #dcd4d1;
                 }
 
-                .forecast-copy {
-                    min-width: 0;
-                }
-
-                .forecast-title {
-                    max-width: 520px;
-
+                .forecast h2 {
                     margin: 0;
 
                     font-family:
@@ -762,8 +719,8 @@ export default function ResultPage() {
                     letter-spacing: -2.2px;
                 }
 
-                .forecast-description {
-                    max-width: 520px;
+                .forecast p {
+                    max-width: 500px;
 
                     margin: 15px 0 0;
 
@@ -776,12 +733,6 @@ export default function ResultPage() {
 
                     font-size: 14px;
                     line-height: 1.5;
-
-                    font-weight: 500;
-                }
-
-                .forecast-result {
-                    min-width: 0;
                 }
 
                 .years {
@@ -794,13 +745,11 @@ export default function ResultPage() {
                         Georgia,
                         "Times New Roman",
                         serif;
-
-                    white-space: nowrap;
                 }
 
                 .years strong {
                     font-size: 76px;
-                    line-height: 0.88;
+                    line-height: .88;
 
                     font-weight: 400;
 
@@ -811,17 +760,13 @@ export default function ResultPage() {
                     margin-left: 9px;
 
                     font-size: 39px;
-                    line-height: 1;
-
-                    letter-spacing: -1.5px;
                 }
 
                 .forecast-scale {
-                    width: 100%;
                     margin-top: 23px;
                 }
 
-                .scale-track {
+                .scale {
                     position: relative;
 
                     height: 9px;
@@ -831,10 +776,8 @@ export default function ResultPage() {
                     background: #e5dfe0;
                 }
 
-                .scale-fill {
-                    position: absolute;
-
-                    inset: 0 auto 0 0;
+                .scale-progress {
+                    height: 100%;
 
                     border-radius: inherit;
 
@@ -854,17 +797,14 @@ export default function ResultPage() {
                     background: #c21856;
 
                     transform:
-                        translate(
-                            -50%,
-                            -50%
-                        );
+                        translate(-50%, -50%);
                 }
 
                 .scale-labels {
+                    margin-top: 12px;
+
                     display: flex;
                     justify-content: space-between;
-
-                    margin-top: 12px;
 
                     color: #8d8587;
 
@@ -874,11 +814,10 @@ export default function ResultPage() {
                         sans-serif;
 
                     font-size: 11px;
-                    font-weight: 600;
                 }
 
                 /* =====================================================
-                   PAID SECTION
+                   FULL REPORT
                 ===================================================== */
 
                 .paid-section {
@@ -890,100 +829,203 @@ export default function ResultPage() {
                     margin: 8px auto 0;
                 }
 
-                /* =====================================================
-                   CARD
-                ===================================================== */
+                /*
+                 * ВАЖНО:
+                 *
+                 * Блок выше предыдущей версии.
+                 * Это приближает его к твоему
+                 * второму референсу.
+                 */
 
                 .paid-card {
                     position: relative;
 
                     width: 100%;
 
-                    min-height: 500px;
+                    min-height: 640px;
 
                     overflow: hidden;
 
                     border-radius: 24px;
 
-                    background:
-                        linear-gradient(
-                            90deg,
-                            #9e104c 0%,
-                            #a60f4d 50%,
-                            #a90e4e 100%
-                        );
+                    background: #ad194a;
 
                     isolation: isolate;
                 }
 
                 /* =====================================================
-                   IMAGE
+                   DESKTOP ART
 
-                   Картинка сама по себе чистая.
+                   Твоя картинка 870×756.
+                   Это почти квадрат.
 
-                   На desktop она занимает примерно 72%
-                   ширины карточки.
+                   Поэтому НЕ растягиваем её
+                   на весь широкий блок.
 
-                   Очень важно:
-                   height: 100%;
-                   object-fit: cover;
-
-                   Поэтому картинка не растягивается.
+                   Она занимает только левую часть.
                 ===================================================== */
 
-                .art {
+                .paid-art {
                     position: absolute;
 
                     z-index: 1;
 
-                    inset: 0 auto 0 0;
+                    top: 0;
+                    bottom: 0;
+                    left: 0;
 
-                    width: 72%;
+                    width: 66%;
 
                     overflow: hidden;
                 }
 
-                .art img {
+                /*
+                 * CRISP ART
+                 */
+
+                .art-main {
                     position: absolute;
+
+                    z-index: 1;
 
                     inset: 0;
 
-                    width: 100%;
+                    width: 88%;
                     height: 100%;
-
-                    display: block;
 
                     object-fit: cover;
 
                     /*
-                     * Центр композиции.
-                     *
-                     * Пара находится в нижней
-                     * левой/центральной части исходника.
-                     *
-                     * 50% оставляет их вместе.
+                     * У квадратной картинки
+                     * держим пару ближе к центру-низу.
                      */
-                    object-position: 50% 50%;
+                    object-position:
+                        50%
+                        54%;
 
-                    user-select: none;
+                    display: block;
+
                     pointer-events: none;
+                    user-select: none;
                 }
 
-                /* =====================================================
-                   FADE
+                /*
+                 * BLURRED COPY
 
-                   Ключевой элемент всей композиции.
+                 * Она совпадает по геометрии
+                 * с основной картинкой,
+                 * но появляется только справа.
+                 */
 
-                   Не будет:
+                .art-blur {
+                    position: absolute;
 
-                   IMAGE | SOLID COLOR
+                    z-index: 2;
 
-                   Будет:
+                    inset: 0;
 
-                   IMAGE → softened image → blur → color
-                ===================================================== */
+                    width: 91%;
+                    height: 100%;
 
-                .art-fade {
+                    object-fit: cover;
+
+                    object-position:
+                        50%
+                        54%;
+
+                    filter:
+                        blur(22px);
+
+                    transform:
+                        scale(1.07);
+
+                    opacity: .96;
+
+                    pointer-events: none;
+
+                    mask-image:
+                        linear-gradient(
+                            90deg,
+
+                            transparent 50%,
+
+                            rgba(
+                                0,
+                                0,
+                                0,
+                                .08
+                            ) 58%,
+
+                            rgba(
+                                0,
+                                0,
+                                0,
+                                .25
+                            ) 66%,
+
+                            rgba(
+                                0,
+                                0,
+                                0,
+                                .58
+                            ) 74%,
+
+                            rgba(
+                                0,
+                                0,
+                                0,
+                                .88
+                            ) 84%,
+
+                            black 100%
+                        );
+
+                    -webkit-mask-image:
+                        linear-gradient(
+                            90deg,
+
+                            transparent 50%,
+
+                            rgba(
+                                0,
+                                0,
+                                0,
+                                .08
+                            ) 58%,
+
+                            rgba(
+                                0,
+                                0,
+                                0,
+                                .25
+                            ) 66%,
+
+                            rgba(
+                                0,
+                                0,
+                                0,
+                                .58
+                            ) 74%,
+
+                            rgba(
+                                0,
+                                0,
+                                0,
+                                .88
+                            ) 84%,
+
+                            black 100%
+                        );
+                }
+
+                /*
+                 * BLUR → BERRY
+
+                 * Это уже не резкая линия,
+                 * а длинный плавный переход.
+                 */
+
+                .art-color-fade {
                     position: absolute;
 
                     z-index: 3;
@@ -996,146 +1038,56 @@ export default function ResultPage() {
                         linear-gradient(
                             90deg,
 
-                            rgba(
-                                166,
-                                15,
-                                77,
-                                0
-                            ) 42%,
+                            transparent 44%,
 
                             rgba(
-                                166,
-                                15,
-                                77,
-                                0.04
-                            ) 50%,
+                                173,
+                                25,
+                                74,
+                                .02
+                            ) 52%,
 
                             rgba(
-                                166,
-                                15,
-                                77,
-                                0.14
-                            ) 57%,
+                                173,
+                                25,
+                                74,
+                                .09
+                            ) 59%,
 
                             rgba(
-                                166,
-                                15,
-                                77,
-                                0.30
-                            ) 64%,
+                                173,
+                                25,
+                                74,
+                                .22
+                            ) 66%,
 
                             rgba(
-                                166,
-                                15,
-                                77,
-                                0.52
-                            ) 71%,
+                                173,
+                                25,
+                                74,
+                                .43
+                            ) 73%,
 
                             rgba(
-                                166,
-                                15,
-                                77,
-                                0.73
-                            ) 78%,
+                                173,
+                                25,
+                                74,
+                                .68
+                            ) 80%,
 
                             rgba(
-                                166,
-                                15,
-                                77,
-                                0.90
-                            ) 85%,
+                                173,
+                                25,
+                                74,
+                                .88
+                            ) 89%,
 
-                            rgba(
-                                166,
-                                15,
-                                77,
-                                0.98
-                            ) 92%,
-
-                            #a60f4d 100%
-                        );
-                }
-
-                /*
-                 * Дополнительный blur-слой.
-
-                 * Он имитирует тот самый
-                 * мягкий "уход" изображения.
-                 */
-
-                .art-fade::after {
-                    content: "";
-
-                    position: absolute;
-
-                    inset: 0 0 0 48%;
-
-                    backdrop-filter:
-                        blur(12px);
-
-                    -webkit-backdrop-filter:
-                        blur(12px);
-
-                    opacity: 0.48;
-
-                    mask-image:
-                        linear-gradient(
-                            90deg,
-                            transparent 0%,
-                            black 45%,
-                            black 100%
-                        );
-
-                    -webkit-mask-image:
-                        linear-gradient(
-                            90deg,
-                            transparent 0%,
-                            black 45%,
-                            black 100%
+                            #ad194a 100%
                         );
                 }
 
                 /* =====================================================
-                   OVERLAY
-                ===================================================== */
-
-                .card-overlay {
-                    position: absolute;
-
-                    z-index: 4;
-
-                    inset: 0;
-
-                    pointer-events: none;
-
-                    background:
-                        linear-gradient(
-                            180deg,
-                            rgba(
-                                35,
-                                0,
-                                20,
-                                0.03
-                            ) 0%,
-
-                            rgba(
-                                35,
-                                0,
-                                20,
-                                0
-                            ) 45%,
-
-                            rgba(
-                                35,
-                                0,
-                                20,
-                                0.10
-                            ) 100%
-                        );
-                }
-
-                /* =====================================================
-                   PAID CONTENT
+                   CONTENT
                 ===================================================== */
 
                 .paid-content {
@@ -1143,36 +1095,34 @@ export default function ResultPage() {
 
                     z-index: 10;
 
-                    min-height: 500px;
-
-                    width: 100%;
+                    min-height: 640px;
                 }
 
                 /* =====================================================
                    TITLE
                 ===================================================== */
 
-                .paid-title {
+                .paid-copy {
                     position: absolute;
 
-                    top: 40px;
-                    left: 68px;
+                    top: 62px;
 
-                    width: min(
-                        520px,
-                        47%
-                    );
+                    left: 57.5%;
+
+                    width: 38%;
+
+                    max-width: 450px;
                 }
 
                 .paid-label {
-                    margin-bottom: 14px;
+                    margin-bottom: 16px;
 
                     color:
                         rgba(
                             255,
                             244,
                             247,
-                            0.88
+                            .78
                         );
 
                     font-family:
@@ -1185,10 +1135,10 @@ export default function ResultPage() {
 
                     font-weight: 700;
 
-                    letter-spacing: 2.1px;
+                    letter-spacing: 2.35px;
                 }
 
-                .paid-title h2 {
+                .paid-copy h2 {
                     margin: 0;
 
                     color: #fff9f6;
@@ -1198,29 +1148,26 @@ export default function ResultPage() {
                         "Times New Roman",
                         serif;
 
-                    /*
-                     * Размер зависит от ширины экрана,
-                     * но не становится огромным.
-                     */
-                    font-size: clamp(
-                        42px,
-                        4.2vw,
-                        56px
-                    );
+                    font-size:
+                        clamp(
+                            45px,
+                            4.1vw,
+                            58px
+                        );
 
-                    line-height: 0.95;
+                    line-height: .99;
 
                     font-weight: 400;
 
-                    letter-spacing: -2.5px;
+                    letter-spacing: -2px;
 
                     text-shadow:
-                        0 2px 16px
+                        0 2px 18px
                         rgba(
-                            50,
+                            64,
                             0,
-                            25,
-                            0.12
+                            28,
+                            .18
                         );
                 }
 
@@ -1231,20 +1178,18 @@ export default function ResultPage() {
                 .benefits {
                     position: absolute;
 
-                    top: 48px;
-                    right: 64px;
+                    top: 262px;
 
-                    width: min(
-                        310px,
-                        27%
-                    );
+                    left: 64%;
+
+                    right: 52px;
 
                     display: grid;
 
                     grid-template-columns:
                         1fr;
 
-                    gap: 25px;
+                    gap: 24px;
                 }
 
                 /* =====================================================
@@ -1256,26 +1201,27 @@ export default function ResultPage() {
 
                     z-index: 20;
 
-                    right: 36px;
-                    bottom: 51px;
+                    right: 32px;
 
-                    width: min(
-                        638px,
-                        55%
-                    );
+                    bottom: 68px;
 
-                    height: 72px;
+                    width: 53%;
 
-                    padding: 0 28px;
+                    height: 82px;
+
+                    padding: 0 30px;
 
                     display: flex;
+
                     align-items: center;
+
                     justify-content: space-between;
 
                     gap: 20px;
 
                     border: 0;
-                    border-radius: 15px;
+
+                    border-radius: 18px;
 
                     background: #fffaf7;
 
@@ -1284,17 +1230,19 @@ export default function ResultPage() {
                     cursor: pointer;
 
                     box-shadow:
-                        0 9px 25px
+                        0 12px 32px
                         rgba(
-                            65,
+                            67,
                             0,
-                            27,
-                            0.13
+                            29,
+                            .12
                         );
 
                     transition:
-                        transform 160ms ease,
-                        box-shadow 160ms ease;
+                        transform
+                        160ms ease,
+                        box-shadow
+                        160ms ease;
                 }
 
                 .paid-cta:hover {
@@ -1302,18 +1250,13 @@ export default function ResultPage() {
                         translateY(-2px);
 
                     box-shadow:
-                        0 13px 30px
+                        0 16px 35px
                         rgba(
-                            65,
+                            67,
                             0,
-                            27,
-                            0.17
+                            29,
+                            .16
                         );
-                }
-
-                .paid-cta:active {
-                    transform:
-                        translateY(0);
                 }
 
                 .cta-title {
@@ -1322,30 +1265,28 @@ export default function ResultPage() {
                         Helvetica,
                         sans-serif;
 
-                    font-size: 15px;
-                    line-height: 1;
-
+                    font-size: 16px;
                     font-weight: 600;
 
-                    white-space: nowrap;
+                    letter-spacing: -.1px;
                 }
 
                 .cta-right {
                     display: flex;
                     align-items: center;
 
-                    gap: 22px;
+                    gap: 24px;
 
-                    color: #c51b58;
+                    color: #c71e57;
                 }
 
-                .price {
+                .cta-right strong {
                     font-family:
                         Georgia,
                         "Times New Roman",
                         serif;
 
-                    font-size: 29px;
+                    font-size: 31px;
                     line-height: 1;
 
                     font-weight: 400;
@@ -1353,13 +1294,13 @@ export default function ResultPage() {
                     white-space: nowrap;
                 }
 
-                .arrow {
+                .cta-right b {
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
 
-                    font-size: 26px;
+                    font-size: 29px;
                     line-height: 1;
 
                     font-weight: 300;
@@ -1368,22 +1309,18 @@ export default function ResultPage() {
                 .paid-note {
                     position: absolute;
 
-                    z-index: 20;
+                    right: 32px;
 
-                    right: 36px;
-                    bottom: 22px;
+                    bottom: 29px;
 
-                    width: min(
-                        638px,
-                        55%
-                    );
+                    width: 53%;
 
                     color:
                         rgba(
                             255,
-                            238,
-                            243,
-                            0.68
+                            240,
+                            244,
+                            .65
                         );
 
                     font-family:
@@ -1392,59 +1329,64 @@ export default function ResultPage() {
                         sans-serif;
 
                     font-size: 9px;
-                    line-height: 1;
 
                     text-align: center;
                 }
 
                 /* =====================================================
-                   TABLET / NARROW DESKTOP
+                   TABLET
                 ===================================================== */
 
-                @media (max-width: 1000px) {
+                @media (
+                    max-width: 1000px
+                ) {
 
-                    .paid-card {
-                        min-height: 470px;
-                    }
-
+                    .paid-card,
                     .paid-content {
-                        min-height: 470px;
+                        min-height: 560px;
                     }
 
-                    .paid-title {
-                        top: 34px;
-                        left: 46px;
-
-                        width: 46%;
+                    .paid-art {
+                        width: 67%;
                     }
 
-                    .paid-title h2 {
-                        font-size: 43px;
+                    .paid-copy {
+                        top: 50px;
+                        left: 55%;
+
+                        width: 41%;
+                    }
+
+                    .paid-copy h2 {
+                        font-size: 45px;
                     }
 
                     .benefits {
-                        top: 42px;
-                        right: 35px;
+                        top: 225px;
 
-                        width: 28%;
+                        left: 63%;
 
-                        gap: 21px;
+                        right: 34px;
+
+                        gap: 19px;
                     }
 
                     .paid-cta {
-                        right: 28px;
-                        bottom: 43px;
+                        right: 26px;
 
-                        width: 54%;
+                        bottom: 58px;
 
-                        height: 68px;
+                        width: 56%;
+
+                        height: 72px;
                     }
 
                     .paid-note {
-                        right: 28px;
-                        bottom: 18px;
+                        right: 26px;
 
-                        width: 54%;
+                        bottom: 25px;
+
+                        width: 56%;
                     }
                 }
 
@@ -1452,13 +1394,13 @@ export default function ResultPage() {
                    MOBILE
                 ===================================================== */
 
-                @media (max-width: 640px) {
+                @media (
+                    max-width: 640px
+                ) {
 
                     .page {
                         padding:
-                            0
-                            12px
-                            36px;
+                            0 12px 36px;
                     }
 
                     .content-shell {
@@ -1467,7 +1409,6 @@ export default function ResultPage() {
 
                     .header {
                         min-height: 64px;
-                        gap: 12px;
                     }
 
                     .brand {
@@ -1476,388 +1417,324 @@ export default function ResultPage() {
 
                     .couple-names {
                         max-width: 52%;
-
-                        gap: 5px;
-
                         font-size: 8px;
-
-                        letter-spacing:
-                            0.65px;
                     }
-
-                    /* =============================================
-                       RESULTS
-                    ============================================= */
 
                     .results {
                         padding:
-                            29px 0
-                            33px;
+                            29px 0 33px;
                     }
 
-                    .section-label {
-                        margin-bottom: 11px;
-
-                        font-size: 9px;
-
-                        letter-spacing:
-                            1.8px;
-                    }
-
-                    .results-title {
-                        margin-bottom: 24px;
-
+                    .results h1 {
                         font-size: 37px;
-                        line-height: 1;
-
-                        letter-spacing:
-                            -1.8px;
+                        letter-spacing: -1.8px;
                     }
-
-                    /* =============================================
-                       FORECAST
-                    ============================================= */
 
                     .forecast {
-                        padding:
-                            29px 0
-                            37px;
-
                         display: block;
+
+                        padding:
+                            29px 0 37px;
                     }
 
-                    .forecast-title {
-                        max-width: 100%;
-
+                    .forecast h2 {
                         font-size: 34px;
-                        line-height: 1.01;
-
-                        letter-spacing:
-                            -1.55px;
                     }
 
-                    .forecast-description {
-                        max-width: 100%;
-
-                        margin-top: 13px;
-
+                    .forecast p {
                         font-size: 12px;
-                        line-height: 1.45;
                     }
 
-                    .desktop-break {
-                        display: none;
-                    }
-
-                    .forecast-result {
-                        width: 100%;
-
+                    .forecast-right {
                         margin-top: 25px;
                     }
 
                     .years strong {
                         font-size: 64px;
-                        letter-spacing:
-                            -3px;
                     }
 
                     .years span {
-                        margin-left: 7px;
-
                         font-size: 34px;
-
-                        letter-spacing:
-                            -1px;
                     }
-
-                    .forecast-scale {
-                        margin-top: 20px;
-                    }
-
-                    .scale-track {
-                        height: 7px;
-                    }
-
-                    .scale-dot {
-                        width: 19px;
-                        height: 19px;
-                    }
-
-                    .scale-labels {
-                        margin-top: 10px;
-
-                        font-size: 9px;
-                    }
-
-                    /* =============================================
-                       PAID SECTION
-                    ============================================= */
 
                     .paid-section {
                         width: 100%;
-                        margin-top: 0;
+                        margin: 0;
                     }
 
                     /* =============================================
-                       PAID CARD
-
-                       Теперь это вертикальная композиция.
+                       MOBILE CARD
                     ============================================= */
+
+                    .paid-card,
+                    .paid-content {
+                        min-height: 760px;
+                    }
 
                     .paid-card {
-                        min-height: 650px;
-
                         border-radius: 22px;
-
-                        background:
-                            linear-gradient(
-                                180deg,
-                                #a20e4d 0%,
-                                #aa104f 100%
-                            );
-                    }
-
-                    .paid-content {
-                        min-height: 650px;
                     }
 
                     /* =============================================
-                       IMAGE
-
-                       Изображение занимает верх.
-
-                       Оно НЕ пытается вместить
-                       desktop-композицию.
-
-                       Пара остаётся в центре.
+                       MOBILE IMAGE
                     ============================================= */
 
-                    .art {
-                        inset:
-                            0
-                            0
-                            auto
-                            0;
+                    .paid-art {
+                        top: 0;
+                        left: 0;
 
                         width: 100%;
-                        height: 390px;
+                        height: 405px;
+
+                        bottom: auto;
                     }
 
-                    .art img {
+                    /*
+                     * На mobile квадратная картинка
+                     * почти идеально подходит по ширине.
+                     */
+
+                    .art-main {
                         width: 100%;
                         height: 100%;
 
                         object-fit: cover;
 
-                        /*
-                         * Именно эта точка позволяет
-                         * удерживать пару вместе.
-
-                         * Не ставим left/right отдельно.
-                         */
                         object-position:
                             50%
                             50%;
                     }
 
-                    /* =============================================
-                       MOBILE FADE
+                    /*
+                     * Blur начинается только
+                     * в нижней части картинки.
+                     */
 
-                       Вместо:
-
-                       КАРТИНКА
-                       --------
-                       ФОН
-
-                       получаем:
-
-                       КАРТИНКА
-                       ↓
-                       мягкое изображение
-                       ↓
-                       blur
-                       ↓
-                       бордовый
-                    ============================================= */
-
-                    .art-fade {
-                        z-index: 3;
-
-                        inset:
-                            auto
-                            0
-                            0
-                            0;
-
+                    .art-blur {
                         width: 100%;
-                        height: 205px;
+                        height: 100%;
 
-                        background:
-                            linear-gradient(
-                                180deg,
+                        object-position:
+                            50%
+                            50%;
 
-                                rgba(
-                                    163,
-                                    14,
-                                    77,
-                                    0
-                                ) 0%,
+                        filter:
+                            blur(19px);
 
-                                rgba(
-                                    163,
-                                    14,
-                                    77,
-                                    0.05
-                                ) 15%,
-
-                                rgba(
-                                    163,
-                                    14,
-                                    77,
-                                    0.14
-                                ) 30%,
-
-                                rgba(
-                                    163,
-                                    14,
-                                    77,
-                                    0.32
-                                ) 48%,
-
-                                rgba(
-                                    163,
-                                    14,
-                                    77,
-                                    0.56
-                                ) 65%,
-
-                                rgba(
-                                    163,
-                                    14,
-                                    77,
-                                    0.80
-                                ) 80%,
-
-                                rgba(
-                                    163,
-                                    14,
-                                    77,
-                                    0.95
-                                ) 93%,
-
-                                #a30e4d 100%
-                            );
-                    }
-
-                    .art-fade::after {
-                        inset:
-                            0;
-
-                        backdrop-filter:
-                            blur(16px);
-
-                        -webkit-backdrop-filter:
-                            blur(16px);
-
-                        opacity: 0.42;
+                        transform:
+                            scale(1.07);
 
                         mask-image:
                             linear-gradient(
                                 180deg,
-                                transparent 0%,
-                                black 65%,
+
+                                transparent 52%,
+
+                                rgba(
+                                    0,
+                                    0,
+                                    0,
+                                    .06
+                                ) 61%,
+
+                                rgba(
+                                    0,
+                                    0,
+                                    0,
+                                    .22
+                                ) 70%,
+
+                                rgba(
+                                    0,
+                                    0,
+                                    0,
+                                    .52
+                                ) 79%,
+
+                                rgba(
+                                    0,
+                                    0,
+                                    0,
+                                    .82
+                                ) 89%,
+
                                 black 100%
                             );
 
                         -webkit-mask-image:
                             linear-gradient(
                                 180deg,
-                                transparent 0%,
-                                black 65%,
+
+                                transparent 52%,
+
+                                rgba(
+                                    0,
+                                    0,
+                                    0,
+                                    .06
+                                ) 61%,
+
+                                rgba(
+                                    0,
+                                    0,
+                                    0,
+                                    .22
+                                ) 70%,
+
+                                rgba(
+                                    0,
+                                    0,
+                                    0,
+                                    .52
+                                ) 79%,
+
+                                rgba(
+                                    0,
+                                    0,
+                                    0,
+                                    .82
+                                ) 89%,
+
                                 black 100%
                             );
                     }
 
+                    .art-color-fade {
+                        background:
+                            linear-gradient(
+                                180deg,
+
+                                transparent 51%,
+
+                                rgba(
+                                    173,
+                                    25,
+                                    74,
+                                    .03
+                                ) 61%,
+
+                                rgba(
+                                    173,
+                                    25,
+                                    74,
+                                    .12
+                                ) 70%,
+
+                                rgba(
+                                    173,
+                                    25,
+                                    74,
+                                    .33
+                                ) 79%,
+
+                                rgba(
+                                    173,
+                                    25,
+                                    74,
+                                    .62
+                                ) 88%,
+
+                                rgba(
+                                    173,
+                                    25,
+                                    74,
+                                    .88
+                                ) 95%,
+
+                                #ad194a 100%
+                            );
+                    }
+
                     /* =============================================
-                       TITLE
+                       MOBILE COPY
 
-                       Теперь текст НЕ привязан
-                       к картинке.
-
-                       Он всегда будет сверху
-                       в одинаковом месте.
+                       Заголовок немного заходит
+                       на размытую часть картинки.
                     ============================================= */
 
-                    .paid-title {
-                        top: 31px;
-                        left: 28px;
+                    .paid-copy {
+                        top: 335px;
+
+                        left: 27px;
 
                         width:
-                            calc(100% - 56px);
+                            calc(100% - 54px);
+
+                        max-width: none;
                     }
 
                     .paid-label {
-                        margin-bottom: 13px;
+                        margin-bottom: 11px;
 
-                        font-size: 9px;
+                        font-size: 8px;
 
-                        letter-spacing:
-                            1.9px;
+                        letter-spacing: 1.9px;
                     }
 
-                    .paid-title h2 {
-                        font-size: 38px;
+                    .paid-copy h2 {
+                        font-size: 35px;
 
-                        line-height: 0.96;
+                        line-height: .99;
 
-                        letter-spacing:
-                            -1.8px;
+                        letter-spacing: -1.5px;
+
+                        text-shadow:
+                            0 2px 15px
+                            rgba(
+                                55,
+                                0,
+                                26,
+                                .25
+                            );
                     }
 
                     /* =============================================
-                       BENEFITS
-
-                       Уже находятся ПОСЛЕ картинки.
+                       MOBILE BENEFITS
                     ============================================= */
 
                     .benefits {
-                        top: 402px;
+                        top: 454px;
 
-                        left: 28px;
-                        right: 28px;
+                        left: 27px;
 
-                        width:
-                            calc(100% - 56px);
+                        right: 27px;
 
-                        display: grid;
+                        width: auto;
 
                         grid-template-columns:
-                            repeat(2, minmax(0, 1fr));
+                            repeat(
+                                2,
+                                minmax(
+                                    0,
+                                    1fr
+                                )
+                            );
 
                         column-gap: 22px;
-                        row-gap: 19px;
+                        row-gap: 20px;
                     }
 
                     /* =============================================
-                       CTA
+                       MOBILE CTA
                     ============================================= */
 
                     .paid-cta {
                         left: 20px;
                         right: 20px;
-                        bottom: 48px;
+
+                        bottom: 50px;
 
                         width:
-                            calc(100% - 40px);
+                            calc(
+                                100% - 40px
+                            );
 
-                        height: 58px;
-
-                        min-width: 0;
+                        height: 61px;
 
                         padding:
                             0 18px;
 
-                        border-radius: 14px;
+                        border-radius: 15px;
                     }
 
                     .cta-title {
@@ -1865,24 +1742,24 @@ export default function ResultPage() {
                     }
 
                     .cta-right {
-                        gap: 13px;
+                        gap: 14px;
                     }
 
-                    .price {
+                    .cta-right strong {
+                        font-size: 25px;
+                    }
+
+                    .cta-right b {
                         font-size: 24px;
-                    }
-
-                    .arrow {
-                        font-size: 23px;
                     }
 
                     .paid-note {
                         left: 20px;
                         right: 20px;
-                        bottom: 20px;
 
-                        width:
-                            calc(100% - 40px);
+                        bottom: 21px;
+
+                        width: auto;
 
                         font-size: 8px;
                     }
@@ -1890,48 +1767,44 @@ export default function ResultPage() {
 
                 /* =====================================================
                    SMALL MOBILE
-
-                   iPhone SE / узкие Android.
                 ===================================================== */
 
-                @media (max-width: 390px) {
+                @media (
+                    max-width: 390px
+                ) {
 
-                    .paid-card {
-                        min-height: 620px;
-                    }
-
+                    .paid-card,
                     .paid-content {
-                        min-height: 620px;
+                        min-height: 720px;
                     }
 
-                    .art {
-                        height: 370px;
+                    .paid-art {
+                        height: 380px;
                     }
 
-                    .paid-title {
-                        top: 27px;
+                    .paid-copy {
+                        top: 315px;
 
-                        left: 24px;
+                        left: 23px;
 
                         width:
-                            calc(100% - 48px);
+                            calc(
+                                100% - 46px
+                            );
                     }
 
-                    .paid-title h2 {
-                        font-size: 35px;
+                    .paid-copy h2 {
+                        font-size: 32px;
                     }
 
                     .benefits {
-                        top: 382px;
+                        top: 425px;
 
-                        left: 24px;
-                        right: 24px;
+                        left: 23px;
 
-                        width:
-                            calc(100% - 48px);
+                        right: 23px;
 
-                        column-gap: 16px;
-                        row-gap: 16px;
+                        column-gap: 14px;
                     }
 
                     .paid-cta {
@@ -1939,51 +1812,14 @@ export default function ResultPage() {
                         right: 16px;
 
                         width:
-                            calc(100% - 32px);
-
-                        padding:
-                            0 16px;
+                            calc(
+                                100% - 32px
+                            );
                     }
 
                     .paid-note {
                         left: 16px;
                         right: 16px;
-
-                        width:
-                            calc(100% - 32px);
-                    }
-                }
-
-                /* =====================================================
-                   VERY NARROW PHONES
-
-                   Не ломаем CTA и текст.
-                ===================================================== */
-
-                @media (max-width: 350px) {
-
-                    .paid-title h2 {
-                        font-size: 32px;
-                    }
-
-                    .benefits {
-                        column-gap: 10px;
-                    }
-
-                    .benefit-text {
-                        font-size: 11px !important;
-                    }
-
-                    .cta-title {
-                        font-size: 12px;
-                    }
-
-                    .price {
-                        font-size: 22px;
-                    }
-
-                    .arrow {
-                        font-size: 21px;
                     }
                 }
 
@@ -1993,7 +1829,7 @@ export default function ResultPage() {
 }
 
 /* ============================================================
-   CATEGORY ROW
+   CATEGORY
 ============================================================ */
 
 function CategoryRow({
@@ -2001,18 +1837,21 @@ function CategoryRow({
                          subtitle,
                          value,
                      }: CategoryScore) {
-
-    const safeValue = Math.max(
-        0,
-        Math.min(MAX_SCORE, value)
-    );
+    const safeValue =
+        Math.max(
+            0,
+            Math.min(
+                MAX_SCORE,
+                value
+            )
+        );
 
     return (
         <div className="category-row">
 
-            <div className="category-top">
+            <div className="category-head">
 
-                <div className="category-copy">
+                <div>
 
                     <div className="category-title">
                         {title}
@@ -2038,10 +1877,9 @@ function CategoryRow({
 
             </div>
 
-            <div className="category-track">
+            <div className="category-line">
 
                 <div
-                    className="category-fill"
                     style={{
                         width:
                             `${safeValue * 10}%`,
@@ -2054,8 +1892,7 @@ function CategoryRow({
 
                 .category-row {
                     padding:
-                        16px 0
-                        18px;
+                        16px 0 18px;
 
                     border-bottom:
                         1px solid
@@ -2066,7 +1903,7 @@ function CategoryRow({
                     padding-top: 0;
                 }
 
-                .category-top {
+                .category-head {
                     display: flex;
 
                     align-items: flex-end;
@@ -2074,11 +1911,7 @@ function CategoryRow({
                     justify-content:
                         space-between;
 
-                    gap: 24px;
-                }
-
-                .category-copy {
-                    min-width: 0;
+                    gap: 20px;
                 }
 
                 .category-title {
@@ -2088,10 +1921,8 @@ function CategoryRow({
                         serif;
 
                     font-size: 29px;
-                    line-height: 1;
 
-                    letter-spacing:
-                        -1.2px;
+                    letter-spacing: -1.2px;
                 }
 
                 .category-subtitle {
@@ -2105,18 +1936,12 @@ function CategoryRow({
                         sans-serif;
 
                     font-size: 12px;
-                    line-height: 1.3;
-
-                    font-weight: 500;
                 }
 
                 .category-score {
                     display: flex;
 
-                    align-items:
-                        baseline;
-
-                    flex-shrink: 0;
+                    align-items: baseline;
 
                     color: #7f7679;
 
@@ -2130,12 +1955,7 @@ function CategoryRow({
                     color: #c21856;
 
                     font-size: 42px;
-                    line-height: 0.8;
-
                     font-weight: 400;
-
-                    letter-spacing:
-                        -1.8px;
                 }
 
                 .category-score span {
@@ -2143,7 +1963,7 @@ function CategoryRow({
                     font-size: 18px;
                 }
 
-                .category-track {
+                .category-line {
                     height: 6px;
 
                     margin-top: 11px;
@@ -2155,7 +1975,7 @@ function CategoryRow({
                     background: #e5dfdf;
                 }
 
-                .category-fill {
+                .category-line div {
                     height: 100%;
 
                     border-radius: inherit;
@@ -2163,16 +1983,13 @@ function CategoryRow({
                     background: #cb3a6d;
                 }
 
-                @media (max-width: 640px) {
+                @media (
+                    max-width: 640px
+                ) {
 
                     .category-row {
                         padding:
-                            13px 0
-                            15px;
-                    }
-
-                    .category-top {
-                        gap: 15px;
+                            13px 0 15px;
                     }
 
                     .category-title {
@@ -2180,11 +1997,9 @@ function CategoryRow({
                     }
 
                     .category-subtitle {
-                        max-width: 250px;
-
-                        margin-top: 4px;
-
                         font-size: 10px;
+
+                        max-width: 250px;
                     }
 
                     .category-score strong {
@@ -2195,9 +2010,8 @@ function CategoryRow({
                         font-size: 14px;
                     }
 
-                    .category-track {
+                    .category-line {
                         height: 5px;
-                        margin-top: 10px;
                     }
                 }
 
@@ -2218,12 +2032,13 @@ function Benefit({
     icon: BenefitIcon;
     text: ReactNode;
 }) {
-
     return (
         <div className="benefit">
 
             <div className="benefit-icon">
-                <BenefitSvg type={icon} />
+                <BenefitSvg
+                    type={icon}
+                />
             </div>
 
             <div className="benefit-text">
@@ -2237,12 +2052,14 @@ function Benefit({
 
                     grid-template-columns:
                         22px
-                        minmax(0, 1fr);
+                        minmax(
+                            0,
+                            1fr
+                        );
 
-                    gap: 11px;
+                    gap: 10px;
 
-                    align-items:
-                        start;
+                    align-items: start;
 
                     color: #fff8f6;
                 }
@@ -2263,41 +2080,34 @@ function Benefit({
 
                     font-size: 14px;
 
-                    line-height: 1.28;
+                    line-height: 1.3;
 
                     font-weight: 500;
-
-                    letter-spacing:
-                        -0.1px;
-
-                    text-shadow:
-                        0 1px 8px
-                        rgba(
-                            65,
-                            0,
-                            27,
-                            0.08
-                        );
                 }
 
-                @media (max-width: 640px) {
+                @media (
+                    max-width: 640px
+                ) {
 
                     .benefit {
                         grid-template-columns:
-                            21px
-                            minmax(0, 1fr);
+                            19px
+                            minmax(
+                                0,
+                                1fr
+                            );
 
                         gap: 8px;
                     }
 
                     .benefit-icon {
-                        width: 18px;
+                        width: 17px;
                     }
 
                     .benefit-text {
-                        font-size: 12px;
+                        font-size: 11.5px;
 
-                        line-height: 1.25;
+                        line-height: 1.27;
                     }
                 }
 
@@ -2308,7 +2118,7 @@ function Benefit({
 }
 
 /* ============================================================
-   BENEFIT ICONS
+   ICONS
 ============================================================ */
 
 function BenefitSvg({
@@ -2316,14 +2126,11 @@ function BenefitSvg({
                     }: {
     type: BenefitIcon;
 }) {
-
     if (type === "heart") {
-
         return (
             <svg
                 viewBox="0 0 24 24"
                 width="100%"
-                height="auto"
                 fill="currentColor"
                 aria-hidden="true"
             >
@@ -2355,13 +2162,14 @@ function BenefitSvg({
         );
     }
 
-    if (type === "message") {
-
+    if (
+        type ===
+        "message"
+    ) {
         return (
             <svg
                 viewBox="0 0 24 24"
                 width="100%"
-                height="auto"
                 fill="currentColor"
                 aria-hidden="true"
             >
@@ -2394,13 +2202,14 @@ function BenefitSvg({
         );
     }
 
-    if (type === "lightning") {
-
+    if (
+        type ===
+        "lightning"
+    ) {
         return (
             <svg
                 viewBox="0 0 24 24"
                 width="100%"
-                height="auto"
                 fill="currentColor"
                 aria-hidden="true"
             >
@@ -2423,7 +2232,6 @@ function BenefitSvg({
         <svg
             viewBox="0 0 24 24"
             width="100%"
-            height="auto"
             fill="currentColor"
             aria-hidden="true"
         >
@@ -2458,10 +2266,14 @@ function BenefitSvg({
    YEAR WORD
 ============================================================ */
 
-function getYearWord(value: number) {
+function getYearWord(
+    value: number
+) {
+    const mod100 =
+        value % 100;
 
-    const mod100 = value % 100;
-    const mod10 = value % 10;
+    const mod10 =
+        value % 10;
 
     if (
         mod100 >= 11 &&
