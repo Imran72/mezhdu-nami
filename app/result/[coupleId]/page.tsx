@@ -1,8 +1,19 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import type { ReactNode } from "react";
+import {
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
+
+import {
+    useParams,
+    useRouter,
+} from "next/navigation";
+
+import type {
+    ReactNode,
+} from "react";
 
 type Couple = {
     id: string;
@@ -12,7 +23,9 @@ type Couple = {
 
 type ApiResponse = {
     waiting?: boolean;
+
     couple?: Couple;
+
     scores?: {
         overall?: number;
         sameAnswers?: number;
@@ -40,6 +53,7 @@ const PAID_IMAGE =
 
 export default function ResultPage() {
     const params = useParams();
+
     const router = useRouter();
 
     const coupleId = String(
@@ -47,7 +61,9 @@ export default function ResultPage() {
     );
 
     const [data, setData] =
-        useState<ApiResponse | null>(null);
+        useState<ApiResponse | null>(
+            null
+        );
 
     const [loading, setLoading] =
         useState(true);
@@ -55,6 +71,7 @@ export default function ResultPage() {
     useEffect(() => {
         if (!coupleId) {
             setLoading(false);
+
             return;
         }
 
@@ -68,7 +85,8 @@ export default function ResultPage() {
                             coupleId
                         )}`,
                         {
-                            cache: "no-store",
+                            cache:
+                                "no-store",
                         }
                     );
 
@@ -85,19 +103,28 @@ export default function ResultPage() {
                     return;
                 }
 
-                if (result.waiting) {
+                if (
+                    result.waiting
+                ) {
                     router.replace(
                         `/waiting/${coupleId}`
                     );
+
                     return;
                 }
 
                 setData(result);
             } catch (error) {
-                console.error(error);
+                console.error(
+                    error
+                );
             } finally {
-                if (!cancelled) {
-                    setLoading(false);
+                if (
+                    !cancelled
+                ) {
+                    setLoading(
+                        false
+                    );
                 }
             }
         }
@@ -107,29 +134,50 @@ export default function ResultPage() {
         return () => {
             cancelled = true;
         };
-    }, [coupleId, router]);
+    }, [
+        coupleId,
+        router,
+    ]);
 
     const categories =
-        useMemo<CategoryScore[]>(() => {
+        useMemo<
+            CategoryScore[]
+        >(() => {
             const same =
-                data?.scores?.sameAnswers ?? 0;
+                data?.scores
+                    ?.sameAnswers ??
+                0;
 
             const close =
-                data?.scores?.closeAnswers ?? 0;
+                data?.scores
+                    ?.closeAnswers ??
+                0;
 
             const different =
-                data?.scores?.differentAnswers ?? 0;
+                data?.scores
+                    ?.differentAnswers ??
+                0;
 
-            const total = Math.max(
-                same + close + different,
-                1
-            );
+            const total =
+                Math.max(
+                    same +
+                    close +
+                    different,
+                    1
+                );
 
-            const base = Math.round(
-                ((same + close * 0.5) /
-                    total) *
-                MAX_SCORE
-            );
+            const base =
+                Math.round(
+                    (
+                        (
+                            same +
+                            close *
+                            0.5
+                        ) /
+                        total
+                    ) *
+                    MAX_SCORE
+                );
 
             const clamp = (
                 value: number
@@ -144,40 +192,86 @@ export default function ResultPage() {
 
             return [
                 {
-                    title: "Дружба",
+                    title:
+                        "Дружба",
+
                     subtitle:
                         "хорошо ли вам просто вдвоём",
-                    value: clamp(base + 1),
+
+                    value:
+                        clamp(
+                            base +
+                            1
+                        ),
                 },
+
                 {
-                    title: "Партнёрство",
+                    title:
+                        "Партнёрство",
+
                     subtitle:
                         "вы команда или каждый сам за себя",
-                    value: clamp(base),
+
+                    value:
+                        clamp(
+                            base
+                        ),
                 },
+
                 {
-                    title: "Секс",
+                    title:
+                        "Секс",
+
                     subtitle:
                         "совпадает ли ваше представление о близости",
-                    value: clamp(base + 2),
+
+                    value:
+                        clamp(
+                            base +
+                            2
+                        ),
                 },
+
                 {
-                    title: "Деньги",
+                    title:
+                        "Деньги",
+
                     subtitle:
                         "одинаково ли вы смотрите на траты",
-                    value: clamp(base - 2),
+
+                    value:
+                        clamp(
+                            base -
+                            2
+                        ),
                 },
+
                 {
-                    title: "Забота",
+                    title:
+                        "Забота",
+
                     subtitle:
                         "понимаете ли вы «я рядом» одинаково",
-                    value: clamp(base + 1),
+
+                    value:
+                        clamp(
+                            base +
+                            1
+                        ),
                 },
+
                 {
-                    title: "Быт",
+                    title:
+                        "Быт",
+
                     subtitle:
                         "как вам живётся в обычный вторник",
-                    value: clamp(base - 1),
+
+                    value:
+                        clamp(
+                            base -
+                            1
+                        ),
                 },
             ];
         }, [data]);
@@ -185,14 +279,45 @@ export default function ResultPage() {
     const yearsForecast =
         useMemo(() => {
             const overall =
-                data?.scores?.overall ?? 50;
+                data?.scores
+                    ?.overall ??
+                50;
 
-            if (overall >= 85) return 45;
-            if (overall >= 75) return 28;
-            if (overall >= 65) return 16;
-            if (overall >= 55) return 10;
-            if (overall >= 45) return 6;
-            if (overall >= 35) return 3;
+            if (
+                overall >= 85
+            ) {
+                return 45;
+            }
+
+            if (
+                overall >= 75
+            ) {
+                return 28;
+            }
+
+            if (
+                overall >= 65
+            ) {
+                return 16;
+            }
+
+            if (
+                overall >= 55
+            ) {
+                return 10;
+            }
+
+            if (
+                overall >= 45
+            ) {
+                return 6;
+            }
+
+            if (
+                overall >= 35
+            ) {
+                return 3;
+            }
 
             return 1;
         }, [data]);
@@ -201,27 +326,39 @@ export default function ResultPage() {
         useMemo(() => {
             const points = [
                 {
-                    years: 1 / 12,
+                    years:
+                        1 / 12,
+
                     position: 2,
                 },
+
                 {
                     years: 1,
+
                     position: 18,
                 },
+
                 {
                     years: 5,
+
                     position: 36,
                 },
+
                 {
                     years: 10,
+
                     position: 54,
                 },
+
                 {
                     years: 25,
+
                     position: 74,
                 },
+
                 {
                     years: 60,
+
                     position: 98,
                 },
             ];
@@ -230,19 +367,24 @@ export default function ResultPage() {
                 yearsForecast <=
                 points[0].years
             ) {
-                return points[0].position;
+                return points[0]
+                    .position;
             }
 
             for (
                 let i = 0;
-                i < points.length - 1;
+                i <
+                points.length -
+                1;
                 i++
             ) {
                 const current =
                     points[i];
 
                 const next =
-                    points[i + 1];
+                    points[
+                    i + 1
+                        ];
 
                 if (
                     yearsForecast >=
@@ -272,14 +414,18 @@ export default function ResultPage() {
             }
 
             return 98;
-        }, [yearsForecast]);
+        }, [
+            yearsForecast,
+        ]);
 
     const nameA =
-        data?.couple?.partner_a_name ||
+        data?.couple
+            ?.partner_a_name ||
         "Вы";
 
     const nameB =
-        data?.couple?.partner_b_name ||
+        data?.couple
+            ?.partner_b_name ||
         "Партнёр";
 
     if (loading) {
@@ -293,19 +439,13 @@ export default function ResultPage() {
                 <style jsx>{`
                     .state {
                         min-height: 100vh;
+
                         display: grid;
+
                         place-items: center;
-                        background: #f8f4f1;
-                    }
 
-                    .state-brand {
-                        font-family:
-                            Georgia,
-                            "Times New Roman",
-                            serif;
-
-                        font-size: 30px;
-                        font-weight: 700;
+                        background:
+                            #f8f4f1;
                     }
                 `}</style>
 
@@ -324,11 +464,15 @@ export default function ResultPage() {
                         min-height: 100vh;
 
                         display: grid;
-                        place-items: center;
 
-                        padding: 24px;
+                        place-items:
+                            center;
 
-                        background: #f8f4f1;
+                        padding:
+                            24px;
+
+                        background:
+                            #f8f4f1;
 
                         font-family:
                             Arial,
@@ -370,10 +514,6 @@ export default function ResultPage() {
 
                 </header>
 
-                {/* ================================
-                    RESULT
-                ================================ */}
-
                 <section className="results">
 
                     <div className="section-label">
@@ -383,7 +523,9 @@ export default function ResultPage() {
                     <div className="category-list">
 
                         {categories.map(
-                            (category) => (
+                            (
+                                category
+                            ) => (
                                 <CategoryRow
                                     key={
                                         category.title
@@ -396,10 +538,6 @@ export default function ResultPage() {
                     </div>
 
                 </section>
-
-                {/* ================================
-                    FORECAST
-                ================================ */}
 
                 <section className="forecast">
 
@@ -428,7 +566,9 @@ export default function ResultPage() {
                         <div className="years">
 
                             <strong>
-                                {yearsForecast}
+                                {
+                                    yearsForecast
+                                }
                             </strong>
 
                             <span>
@@ -502,10 +642,6 @@ export default function ResultPage() {
 
             </div>
 
-            {/* ================================
-                FULL REPORT
-            ================================ */}
-
             <section className="paid-section">
 
                 <div className="paid-card">
@@ -514,16 +650,24 @@ export default function ResultPage() {
 
                         <img
                             className="art-main"
-                            src={PAID_IMAGE}
+                            src={
+                                PAID_IMAGE
+                            }
                             alt=""
-                            draggable={false}
+                            draggable={
+                                false
+                            }
                         />
 
                         <img
                             className="art-edge-blur"
-                            src={PAID_IMAGE}
+                            src={
+                                PAID_IMAGE
+                            }
                             alt=""
-                            draggable={false}
+                            draggable={
+                                false
+                            }
                         />
 
                         <div className="art-color-wash" />
@@ -539,9 +683,18 @@ export default function ResultPage() {
                             </div>
 
                             <h2>
-                                Как продлить
+                                Как превратить
                                 <br />
-                                ваши годы вместе.
+
+                                <span className="forecast-in-title">
+                                    {
+                                        yearsForecast
+                                    }{" "}
+                                    {getYearWord(
+                                        yearsForecast
+                                    )}{" "}
+                                    во всю жизнь
+                                </span>
                             </h2>
 
                         </div>
@@ -634,52 +787,59 @@ export default function ResultPage() {
 
             <style jsx>{`
 
-                /* =============================================
-                   GLOBAL
-                ============================================= */
-
                 :global(*) {
-                    box-sizing: border-box;
+                    box-sizing:
+                        border-box;
                 }
 
                 :global(body) {
                     margin: 0;
 
-                    background: #f8f4f1;
+                    background:
+                        #f8f4f1;
 
-                    color: #201c1e;
+                    color:
+                        #201c1e;
                 }
 
                 .page {
-                    min-height: 100vh;
+                    min-height:
+                        100vh;
 
-                    padding-bottom: 72px;
+                    padding-bottom:
+                        72px;
 
-                    overflow-x: hidden;
+                    overflow-x:
+                        hidden;
 
-                    background: #f8f4f1;
+                    background:
+                        #f8f4f1;
                 }
 
                 .content-shell {
                     width: min(
                         920px,
-                        calc(100% - 56px)
+                        calc(
+                            100% -
+                            56px
+                        )
                     );
 
-                    margin: 0 auto;
+                    margin:
+                        0 auto;
                 }
 
-                /* =============================================
-                   HEADER
-                ============================================= */
-
                 .header {
-                    min-height: 78px;
+                    min-height:
+                        78px;
 
                     display: flex;
 
-                    align-items: center;
-                    justify-content: space-between;
+                    align-items:
+                        center;
+
+                    justify-content:
+                        space-between;
 
                     gap: 20px;
 
@@ -688,82 +848,77 @@ export default function ResultPage() {
                         #ddd5d2;
                 }
 
-                .brand {
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
-
-                    font-size: 24px;
-                    font-weight: 700;
-
-                    letter-spacing: -1.1px;
-                }
-
                 .couple-names {
                     display: flex;
 
                     gap: 9px;
 
-                    align-items: center;
+                    align-items:
+                        center;
 
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
 
-                    font-size: 10px;
-                    font-weight: 700;
+                    font-size:
+                        10px;
 
-                    letter-spacing: 1px;
+                    font-weight:
+                        700;
 
-                    color: #8f8588;
+                    letter-spacing:
+                        1px;
 
-                    text-transform: uppercase;
+                    color:
+                        #8f8588;
+
+                    text-transform:
+                        uppercase;
                 }
 
                 .couple-names b {
-                    color: #c2215a;
+                    color:
+                        #c2215a;
                 }
 
-                /* =============================================
-                   COMMON
-                ============================================= */
-
                 .section-label {
-                    margin-bottom: 14px;
+                    margin-bottom:
+                        14px;
 
-                    color: #c2215a;
+                    color:
+                        #c2215a;
 
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
 
-                    font-size: 10px;
-                    font-weight: 800;
+                    font-size:
+                        10px;
 
-                    letter-spacing: 2.2px;
+                    font-weight:
+                        800;
+
+                    letter-spacing:
+                        2.2px;
                 }
-
-                /* =============================================
-                   RESULT
-                ============================================= */
 
                 .results {
                     padding:
-                        42px 0 38px;
+                        42px
+                        0
+                        38px;
                 }
-
-                /* =============================================
-                   FORECAST
-                ============================================= */
 
                 .forecast {
                     padding:
-                        38px 0 50px;
+                        38px
+                        0
+                        50px;
 
-                    display: grid;
+                    display:
+                        grid;
 
                     grid-template-columns:
                         minmax(
@@ -777,7 +932,8 @@ export default function ResultPage() {
 
                     gap: 56px;
 
-                    align-items: center;
+                    align-items:
+                        center;
 
                     border-top:
                         1px solid
@@ -785,7 +941,8 @@ export default function ResultPage() {
                 }
 
                 .forecast-copy h2 {
-                    max-width: 460px;
+                    max-width:
+                        460px;
 
                     margin: 0;
 
@@ -794,29 +951,36 @@ export default function ResultPage() {
                         "Times New Roman",
                         serif;
 
-                    font-size: 42px;
-                    line-height: 1.01;
+                    font-size:
+                        42px;
 
-                    font-weight: 400;
+                    line-height:
+                        1.01;
 
-                    letter-spacing: -2px;
+                    font-weight:
+                        400;
+
+                    letter-spacing:
+                        -2px;
                 }
 
                 .forecast-copy p {
                     margin:
                         12px 0 0;
 
-                    color: #958b8e;
+                    color:
+                        #958b8e;
 
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
 
-                    font-size: 11px;
-                    line-height: 1.4;
+                    font-size:
+                        11px;
 
-                    letter-spacing: .1px;
+                    line-height:
+                        1.4;
                 }
 
                 .forecast-right {
@@ -826,9 +990,11 @@ export default function ResultPage() {
                 .years {
                     display: flex;
 
-                    align-items: baseline;
+                    align-items:
+                        baseline;
 
-                    color: #c21856;
+                    color:
+                        #c21856;
 
                     font-family:
                         Georgia,
@@ -837,81 +1003,87 @@ export default function ResultPage() {
                 }
 
                 .years strong {
-                    font-size: 76px;
-                    line-height: .88;
+                    font-size:
+                        76px;
 
-                    font-weight: 400;
+                    line-height:
+                        .88;
 
-                    letter-spacing: -4px;
+                    font-weight:
+                        400;
+
+                    letter-spacing:
+                        -4px;
                 }
 
                 .years span {
-                    margin-left: 9px;
+                    margin-left:
+                        9px;
 
-                    font-size: 39px;
+                    font-size:
+                        39px;
                 }
 
-                /* =============================================
-                   SCALE
-                ============================================= */
-
                 .forecast-scale {
-                    margin-top: 24px;
+                    margin-top:
+                        24px;
                 }
 
                 .scale {
-                    position: relative;
+                    position:
+                        relative;
 
-                    height: 8px;
+                    height:
+                        8px;
 
-                    border-radius: 999px;
+                    border-radius:
+                        999px;
 
-                    background: #e5dfe0;
+                    background:
+                        #e5dfe0;
                 }
 
                 .scale-progress {
-                    position: absolute;
+                    position:
+                        absolute;
 
-                    top: 0;
-                    bottom: 0;
-                    left: 0;
+                    inset:
+                        0 auto 0 0;
 
-                    border-radius: inherit;
+                    border-radius:
+                        inherit;
 
                     background:
                         linear-gradient(
                             90deg,
-                            #efb6c9 0%,
-                            #da6b93 100%
+                            #efb6c9,
+                            #da6b93
                         );
                 }
 
                 .scale-dot {
-                    position: absolute;
+                    position:
+                        absolute;
 
                     z-index: 4;
 
                     top: 50%;
 
-                    width: 21px;
-                    height: 21px;
+                    width:
+                        21px;
+
+                    height:
+                        21px;
 
                     border:
                         4px solid
                         #f8f4f1;
 
-                    border-radius: 50%;
+                    border-radius:
+                        50%;
 
-                    background: #c21856;
-
-                    box-shadow:
-                        0 2px 8px
-                        rgba(
-                            104,
-                            18,
-                            52,
-                            .18
-                        );
+                    background:
+                        #c21856;
 
                     transform:
                         translate(
@@ -921,16 +1093,19 @@ export default function ResultPage() {
                 }
 
                 .scale-tick {
-                    position: absolute;
-
-                    z-index: 2;
+                    position:
+                        absolute;
 
                     top: 50%;
 
-                    width: 3px;
-                    height: 3px;
+                    width:
+                        3px;
 
-                    border-radius: 50%;
+                    height:
+                        3px;
+
+                    border-radius:
+                        50%;
 
                     background:
                         rgba(
@@ -964,35 +1139,45 @@ export default function ResultPage() {
                 }
 
                 .scale-labels {
-                    position: relative;
+                    position:
+                        relative;
 
-                    height: 28px;
+                    height:
+                        28px;
 
-                    margin-top: 12px;
+                    margin-top:
+                        12px;
 
-                    color: #948b8e;
+                    color:
+                        #948b8e;
 
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
 
-                    font-size: 9px;
+                    font-size:
+                        9px;
 
-                    white-space: nowrap;
+                    white-space:
+                        nowrap;
                 }
 
                 .scale-labels span {
-                    position: absolute;
+                    position:
+                        absolute;
 
                     transform:
-                        translateX(-50%);
+                        translateX(
+                            -50%
+                        );
                 }
 
                 .scale-labels span:nth-child(1) {
                     left: 0;
 
-                    transform: none;
+                    transform:
+                        none;
                 }
 
                 .scale-labels span:nth-child(2) {
@@ -1014,17 +1199,21 @@ export default function ResultPage() {
                 .scale-labels span:nth-child(6) {
                     right: 0;
 
-                    transform: none;
+                    transform:
+                        none;
                 }
 
-                /* =============================================
-                   PAID CARD
-                ============================================= */
+                /* =================================================
+                   PAID
+                ================================================= */
 
                 .paid-section {
                     width: min(
                         1160px,
-                        calc(100% - 48px)
+                        calc(
+                            100% -
+                            48px
+                        )
                     );
 
                     margin:
@@ -1032,50 +1221,45 @@ export default function ResultPage() {
                 }
 
                 .paid-card {
-                    position: relative;
+                    position:
+                        relative;
 
                     width: 100%;
 
-                    min-height: 440px;
+                    min-height:
+                        440px;
 
-                    overflow: hidden;
+                    overflow:
+                        hidden;
 
-                    border-radius: 24px;
+                    border-radius:
+                        24px;
 
-                    background: #ad194a;
+                    background:
+                        #ad194a;
 
-                    isolation: isolate;
+                    isolation:
+                        isolate;
                 }
 
-                /* =============================================
-                   ART
-                ============================================= */
-
                 .paid-art {
-                    position: absolute;
+                    position:
+                        absolute;
 
                     z-index: 1;
 
                     inset: 0;
 
-                    overflow: hidden;
+                    overflow:
+                        hidden;
 
-                    pointer-events: none;
+                    pointer-events:
+                        none;
                 }
 
-                /*
-                 * ГЛАВНОЕ ИЗМЕНЕНИЕ:
-                 *
-                 * Картинка больше НЕ имеет
-                 * width: 68%.
-                 *
-                 * Её ширина рассчитывается автоматически
-                 * из исходного aspect ratio.
-                 *
-                 * Поэтому она не растягивается.
-                 */
                 .art-main {
-                    position: absolute;
+                    position:
+                        absolute;
 
                     z-index: 1;
 
@@ -1084,13 +1268,17 @@ export default function ResultPage() {
                     left: 0;
 
                     width: auto;
+
                     height: 100%;
 
-                    max-width: none;
+                    max-width:
+                        none;
 
-                    display: block;
+                    display:
+                        block;
 
-                    user-select: none;
+                    user-select:
+                        none;
 
                     mask-image:
                         linear-gradient(
@@ -1156,7 +1344,8 @@ export default function ResultPage() {
                                 .06
                             ) 97%,
 
-                            transparent 100%
+                            transparent
+                                100%
                         );
 
                     -webkit-mask-image:
@@ -1223,47 +1412,54 @@ export default function ResultPage() {
                                 .06
                             ) 97%,
 
-                            transparent 100%
+                            transparent
+                                100%
                         );
                 }
 
-                /*
-                 * BLUR-копия имеет абсолютно
-                 * ту же натуральную геометрию.
-                 */
                 .art-edge-blur {
-                    position: absolute;
+                    position:
+                        absolute;
 
                     z-index: 2;
 
                     top: -2%;
+
                     left: -1%;
 
                     width: auto;
+
                     height: 104%;
 
-                    max-width: none;
+                    max-width:
+                        none;
 
                     filter:
                         blur(14px);
 
                     transform:
-                        scale(1.012);
+                        scale(
+                            1.012
+                        );
 
                     transform-origin:
                         left center;
 
-                    opacity: .42;
+                    opacity:
+                        .42;
 
-                    user-select: none;
+                    user-select:
+                        none;
 
                     mask-image:
                         linear-gradient(
                             90deg,
 
-                            transparent 0%,
+                            transparent
+                                0%,
 
-                            transparent 62%,
+                            transparent
+                                62%,
 
                             rgba(
                                 0,
@@ -1314,16 +1510,19 @@ export default function ResultPage() {
                                 .20
                             ) 95%,
 
-                            transparent 100%
+                            transparent
+                                100%
                         );
 
                     -webkit-mask-image:
                         linear-gradient(
                             90deg,
 
-                            transparent 0%,
+                            transparent
+                                0%,
 
-                            transparent 62%,
+                            transparent
+                                62%,
 
                             rgba(
                                 0,
@@ -1374,18 +1573,14 @@ export default function ResultPage() {
                                 .20
                             ) 95%,
 
-                            transparent 100%
+                            transparent
+                                100%
                         );
                 }
 
-                /*
-                 * Длинный цветовой переход.
-                 *
-                 * Начинается около центра карточки,
-                 * но очень слабо.
-                 */
                 .art-color-wash {
-                    position: absolute;
+                    position:
+                        absolute;
 
                     z-index: 3;
 
@@ -1395,9 +1590,11 @@ export default function ResultPage() {
                         linear-gradient(
                             90deg,
 
-                            transparent 0%,
+                            transparent
+                                0%,
 
-                            transparent 30%,
+                            transparent
+                                30%,
 
                             rgba(
                                 173,
@@ -1476,36 +1673,38 @@ export default function ResultPage() {
                                 .97
                             ) 91%,
 
-                            #ad194a 100%
+                            #ad194a
+                                100%
                         );
                 }
 
-                /* =============================================
-                   PAID CONTENT
-                ============================================= */
-
                 .paid-content {
-                    position: relative;
+                    position:
+                        relative;
 
                     z-index: 10;
 
-                    min-height: 440px;
+                    min-height:
+                        440px;
                 }
 
                 .paid-copy {
-                    position: absolute;
+                    position:
+                        absolute;
 
                     top: 42px;
 
                     left: 52%;
 
-                    width: 43%;
+                    width: 45%;
 
-                    max-width: 520px;
+                    max-width:
+                        540px;
                 }
 
                 .paid-label {
-                    margin-bottom: 11px;
+                    margin-bottom:
+                        11px;
 
                     color:
                         rgba(
@@ -1520,18 +1719,24 @@ export default function ResultPage() {
                         Helvetica,
                         sans-serif;
 
-                    font-size: 9px;
-                    line-height: 1;
+                    font-size:
+                        9px;
 
-                    font-weight: 700;
+                    line-height:
+                        1;
 
-                    letter-spacing: 2.3px;
+                    font-weight:
+                        700;
+
+                    letter-spacing:
+                        2.3px;
                 }
 
                 .paid-copy h2 {
                     margin: 0;
 
-                    color: #fff9f6;
+                    color:
+                        #fff9f6;
 
                     font-family:
                         Georgia,
@@ -1541,18 +1746,23 @@ export default function ResultPage() {
                     font-size:
                         clamp(
                             38px,
-                            4vw,
-                            56px
+                            3.8vw,
+                            54px
                         );
 
-                    line-height: .95;
+                    line-height:
+                        .95;
 
-                    font-weight: 400;
+                    font-weight:
+                        400;
 
-                    letter-spacing: -1.7px;
+                    letter-spacing:
+                        -1.7px;
 
                     text-shadow:
-                        0 2px 18px
+                        0
+                        2px
+                        18px
                         rgba(
                             64,
                             0,
@@ -1561,12 +1771,14 @@ export default function ResultPage() {
                         );
                 }
 
-                /* =============================================
-                   BENEFITS
-                ============================================= */
+                .forecast-in-title {
+                    white-space:
+                        nowrap;
+                }
 
                 .benefits {
-                    position: absolute;
+                    position:
+                        absolute;
 
                     top: 190px;
 
@@ -1574,7 +1786,8 @@ export default function ResultPage() {
 
                     right: 30px;
 
-                    display: grid;
+                    display:
+                        grid;
 
                     grid-template-columns:
                         repeat(
@@ -1585,23 +1798,25 @@ export default function ResultPage() {
                             )
                         );
 
-                    column-gap: 32px;
-                    row-gap: 21px;
+                    column-gap:
+                        32px;
+
+                    row-gap:
+                        21px;
                 }
 
-                /* =============================================
-                   CTA
-                ============================================= */
-
                 .paid-cta {
-                    position: absolute;
+                    position:
+                        absolute;
 
                     z-index: 20;
 
                     right: 26px;
+
                     bottom: 45px;
 
                     width: 50%;
+
                     height: 64px;
 
                     padding:
@@ -1609,7 +1824,8 @@ export default function ResultPage() {
 
                     display: flex;
 
-                    align-items: center;
+                    align-items:
+                        center;
 
                     justify-content:
                         space-between;
@@ -1618,41 +1834,27 @@ export default function ResultPage() {
 
                     border: 0;
 
-                    border-radius: 17px;
+                    border-radius:
+                        17px;
 
-                    background: #fffaf7;
+                    background:
+                        #fffaf7;
 
-                    color: #201d1e;
+                    color:
+                        #201d1e;
 
-                    cursor: pointer;
+                    cursor:
+                        pointer;
 
                     box-shadow:
-                        0 12px 28px
+                        0
+                        12px
+                        28px
                         rgba(
                             67,
                             0,
                             29,
                             .12
-                        );
-
-                    transition:
-                        transform
-                        160ms ease,
-                        box-shadow
-                        160ms ease;
-                }
-
-                .paid-cta:hover {
-                    transform:
-                        translateY(-2px);
-
-                    box-shadow:
-                        0 16px 35px
-                        rgba(
-                            67,
-                            0,
-                            29,
-                            .16
                         );
                 }
 
@@ -1662,20 +1864,24 @@ export default function ResultPage() {
                         Helvetica,
                         sans-serif;
 
-                    font-size: 14px;
-                    font-weight: 600;
+                    font-size:
+                        14px;
 
-                    letter-spacing: -.1px;
+                    font-weight:
+                        600;
                 }
 
                 .cta-right {
-                    display: flex;
+                    display:
+                        flex;
 
-                    align-items: center;
+                    align-items:
+                        center;
 
                     gap: 20px;
 
-                    color: #c71e57;
+                    color:
+                        #c71e57;
                 }
 
                 .cta-right strong {
@@ -1684,12 +1890,17 @@ export default function ResultPage() {
                         "Times New Roman",
                         serif;
 
-                    font-size: 26px;
-                    line-height: 1;
+                    font-size:
+                        26px;
 
-                    font-weight: 400;
+                    line-height:
+                        1;
 
-                    white-space: nowrap;
+                    font-weight:
+                        400;
+
+                    white-space:
+                        nowrap;
                 }
 
                 .cta-right b {
@@ -1698,16 +1909,19 @@ export default function ResultPage() {
                         Helvetica,
                         sans-serif;
 
-                    font-size: 27px;
-                    line-height: 1;
+                    font-size:
+                        27px;
 
-                    font-weight: 300;
+                    font-weight:
+                        300;
                 }
 
                 .paid-note {
-                    position: absolute;
+                    position:
+                        absolute;
 
                     right: 26px;
+
                     bottom: 18px;
 
                     width: 50%;
@@ -1725,17 +1939,20 @@ export default function ResultPage() {
                         Helvetica,
                         sans-serif;
 
-                    font-size: 9px;
+                    font-size:
+                        9px;
 
-                    text-align: center;
+                    text-align:
+                        center;
                 }
 
-                /* =============================================
+                /* =================================================
                    TABLET
-                ============================================= */
+                ================================================= */
 
                 @media (
-                    max-width: 1000px
+                    max-width:
+                        1000px
                 ) {
 
                     .forecast {
@@ -1749,23 +1966,27 @@ export default function ResultPage() {
                                 1.05fr
                             );
 
-                        gap: 40px;
+                        gap:
+                            40px;
                     }
 
                     .forecast-copy h2 {
-                        font-size: 37px;
+                        font-size:
+                            37px;
                     }
 
                     .paid-section {
                         width:
                             calc(
-                                100% - 32px
+                                100% -
+                                32px
                             );
                     }
 
                     .paid-card,
                     .paid-content {
-                        min-height: 410px;
+                        min-height:
+                            410px;
                     }
 
                     .paid-copy {
@@ -1773,11 +1994,12 @@ export default function ResultPage() {
 
                         left: 50%;
 
-                        width: 46%;
+                        width: 47%;
                     }
 
                     .paid-copy h2 {
-                        font-size: 42px;
+                        font-size:
+                            40px;
                     }
 
                     .benefits {
@@ -1787,9 +2009,11 @@ export default function ResultPage() {
 
                         right: 24px;
 
-                        column-gap: 22px;
+                        column-gap:
+                            22px;
 
-                        row-gap: 18px;
+                        row-gap:
+                            18px;
                     }
 
                     .paid-cta {
@@ -1797,7 +2021,8 @@ export default function ResultPage() {
 
                         right: 22px;
 
-                        bottom: 41px;
+                        bottom:
+                            41px;
                     }
 
                     .paid-note {
@@ -1807,113 +2032,129 @@ export default function ResultPage() {
                     }
                 }
 
-                /* =============================================
+                /* =================================================
                    MOBILE
-                   ОСТАВЛЯЕМ КОМПОЗИЦИЮ КАК БЫЛА
-                ============================================= */
+                ================================================= */
 
                 @media (
-                    max-width: 640px
+                    max-width:
+                        640px
                 ) {
 
                     .page {
                         padding:
-                            0 12px 36px;
+                            0
+                            12px
+                            36px;
                     }
 
                     .content-shell {
-                        width: 100%;
+                        width:
+                            100%;
                     }
 
                     .header {
-                        min-height: 64px;
-                    }
-
-                    .brand {
-                        font-size: 21px;
+                        min-height:
+                            64px;
                     }
 
                     .couple-names {
-                        max-width: 52%;
+                        max-width:
+                            52%;
 
-                        font-size: 8px;
+                        font-size:
+                            8px;
                     }
 
                     .results {
                         padding:
-                            27px 0 30px;
+                            27px
+                            0
+                            30px;
                     }
 
                     .forecast {
-                        display: block;
+                        display:
+                            block;
 
                         padding:
-                            29px 0 37px;
+                            29px
+                            0
+                            37px;
                     }
 
                     .forecast-copy h2 {
-                        max-width: 330px;
+                        max-width:
+                            330px;
 
-                        font-size: 34px;
+                        font-size:
+                            34px;
 
                         letter-spacing:
                             -1.5px;
                     }
 
                     .forecast-copy p {
-                        margin-top: 9px;
+                        margin-top:
+                            9px;
 
-                        font-size: 10px;
+                        font-size:
+                            10px;
                     }
 
                     .forecast-right {
-                        margin-top: 27px;
+                        margin-top:
+                            27px;
                     }
 
                     .years strong {
-                        font-size: 64px;
+                        font-size:
+                            64px;
                     }
 
                     .years span {
-                        font-size: 34px;
+                        font-size:
+                            34px;
                     }
 
                     .forecast-scale {
-                        margin-top: 21px;
+                        margin-top:
+                            21px;
                     }
 
                     .scale-labels {
-                        font-size: 7px;
+                        font-size:
+                            7px;
                     }
 
-                    .scale-labels
-                    span:nth-child(2),
-
-                    .scale-labels
-                    span:nth-child(4),
-
-                    .scale-labels
-                    span:nth-child(5) {
-                        display: none;
+                    .scale-labels span:nth-child(2),
+                    .scale-labels span:nth-child(4),
+                    .scale-labels span:nth-child(5) {
+                        display:
+                            none;
                     }
 
                     .paid-section {
-                        width: 100%;
+                        width:
+                            100%;
 
                         margin: 0;
                     }
 
                     .paid-card,
                     .paid-content {
-                        min-height: 760px;
+                        min-height:
+                            760px;
                     }
 
                     .paid-card {
-                        border-radius: 22px;
+                        border-radius:
+                            22px;
                     }
 
                     .paid-art {
-                        height: 375px;
+                        height:
+                            375px;
                     }
 
                     .art-main {
@@ -1921,9 +2162,11 @@ export default function ResultPage() {
                         left: 0;
 
                         width: 100%;
+
                         height: 100%;
 
-                        object-fit: cover;
+                        object-fit:
+                            cover;
 
                         object-position:
                             50% 50%;
@@ -1978,7 +2221,8 @@ export default function ResultPage() {
                                     .11
                                 ) 93%,
 
-                                transparent 100%
+                                transparent
+                                    100%
                             );
 
                         -webkit-mask-image:
@@ -2031,7 +2275,8 @@ export default function ResultPage() {
                                     .11
                                 ) 93%,
 
-                                transparent 100%
+                                transparent
+                                    100%
                             );
                     }
 
@@ -2039,29 +2284,40 @@ export default function ResultPage() {
                         top: 0;
                         left: 0;
 
-                        width: 100%;
-                        height: 100%;
+                        width:
+                            100%;
 
-                        object-fit: cover;
+                        height:
+                            100%;
+
+                        object-fit:
+                            cover;
 
                         object-position:
                             50% 50%;
 
                         filter:
-                            blur(12px);
+                            blur(
+                                12px
+                            );
 
                         transform:
-                            scale(1.02);
+                            scale(
+                                1.02
+                            );
 
-                        opacity: .46;
+                        opacity:
+                            .46;
 
                         mask-image:
                             linear-gradient(
                                 180deg,
 
-                                transparent 0%,
+                                transparent
+                                    0%,
 
-                                transparent 55%,
+                                transparent
+                                    55%,
 
                                 rgba(
                                     0,
@@ -2098,16 +2354,19 @@ export default function ResultPage() {
                                     .28
                                 ) 90%,
 
-                                transparent 100%
+                                transparent
+                                    100%
                             );
 
                         -webkit-mask-image:
                             linear-gradient(
                                 180deg,
 
-                                transparent 0%,
+                                transparent
+                                    0%,
 
-                                transparent 55%,
+                                transparent
+                                    55%,
 
                                 rgba(
                                     0,
@@ -2144,7 +2403,8 @@ export default function ResultPage() {
                                     .28
                                 ) 90%,
 
-                                transparent 100%
+                                transparent
+                                    100%
                             );
                     }
 
@@ -2153,9 +2413,11 @@ export default function ResultPage() {
                             linear-gradient(
                                 180deg,
 
-                                transparent 0%,
+                                transparent
+                                    0%,
 
-                                transparent 40%,
+                                transparent
+                                    40%,
 
                                 rgba(
                                     173,
@@ -2213,49 +2475,70 @@ export default function ResultPage() {
                                     .94
                                 ) 97%,
 
-                                #ad194a 100%
+                                #ad194a
+                                    100%
                             );
                     }
 
                     .paid-copy {
-                        top: 385px;
+                        top:
+                            385px;
 
-                        left: 22px;
+                        left:
+                            22px;
 
                         width:
                             calc(
-                                100% - 44px
+                                100% -
+                                44px
                             );
 
-                        max-width: none;
+                        max-width:
+                            none;
                     }
 
                     .paid-label {
-                        margin-bottom: 10px;
+                        margin-bottom:
+                            10px;
 
-                        font-size: 8px;
+                        font-size:
+                            8px;
 
                         letter-spacing:
                             1.9px;
                     }
 
                     .paid-copy h2 {
-                        max-width: 340px;
+                        max-width:
+                            350px;
 
-                        font-size: 31px;
-                        line-height: .97;
+                        font-size:
+                            31px;
+
+                        line-height:
+                            .97;
 
                         letter-spacing:
                             -1.35px;
                     }
 
+                    .forecast-in-title {
+                        white-space:
+                            normal;
+                    }
+
                     .benefits {
-                        top: 505px;
+                        top:
+                            505px;
 
-                        left: 22px;
-                        right: 22px;
+                        left:
+                            22px;
 
-                        width: auto;
+                        right:
+                            22px;
+
+                        width:
+                            auto;
 
                         grid-template-columns:
                             repeat(
@@ -2266,83 +2549,112 @@ export default function ResultPage() {
                                 )
                             );
 
-                        column-gap: 16px;
-                        row-gap: 18px;
+                        column-gap:
+                            16px;
+
+                        row-gap:
+                            18px;
                     }
 
                     .paid-cta {
-                        left: 16px;
-                        right: 16px;
+                        left:
+                            16px;
 
-                        bottom: 50px;
+                        right:
+                            16px;
+
+                        bottom:
+                            50px;
 
                         width:
                             calc(
-                                100% - 32px
+                                100% -
+                                32px
                             );
 
-                        height: 61px;
+                        height:
+                            61px;
 
                         padding:
                             0 18px;
 
-                        border-radius: 15px;
+                        border-radius:
+                            15px;
                     }
 
                     .cta-title {
-                        font-size: 13px;
+                        font-size:
+                            13px;
                     }
 
                     .cta-right {
-                        gap: 14px;
+                        gap:
+                            14px;
                     }
 
                     .cta-right strong {
-                        font-size: 25px;
+                        font-size:
+                            25px;
                     }
 
                     .cta-right b {
-                        font-size: 24px;
+                        font-size:
+                            24px;
                     }
 
                     .paid-note {
-                        left: 16px;
-                        right: 16px;
+                        left:
+                            16px;
 
-                        bottom: 21px;
+                        right:
+                            16px;
 
-                        width: auto;
+                        bottom:
+                            21px;
 
-                        font-size: 8px;
+                        width:
+                            auto;
+
+                        font-size:
+                            8px;
                     }
                 }
 
                 @media (
-                    max-width: 390px
+                    max-width:
+                        390px
                 ) {
 
                     .paid-card,
                     .paid-content {
-                        min-height: 735px;
+                        min-height:
+                            735px;
                     }
 
                     .paid-art {
-                        height: 355px;
+                        height:
+                            355px;
                     }
 
                     .paid-copy {
-                        top: 365px;
+                        top:
+                            365px;
                     }
 
                     .paid-copy h2 {
-                        font-size: 29px;
+                        font-size:
+                            29px;
                     }
 
                     .benefits {
-                        top: 480px;
+                        top:
+                            480px;
 
-                        column-gap: 12px;
-                        row-gap: 16px;
+                        column-gap:
+                            12px;
+
+                        row-gap:
+                            16px;
                     }
                 }
 
@@ -2351,10 +2663,6 @@ export default function ResultPage() {
         </main>
     );
 }
-
-/* =============================================
-   CATEGORY
-============================================= */
 
 function CategoryRow({
                          title,
@@ -2416,7 +2724,9 @@ function CategoryRow({
 
                 .category-row {
                     padding:
-                        16px 0 18px;
+                        16px
+                        0
+                        18px;
 
                     border-bottom:
                         1px solid
@@ -2424,18 +2734,22 @@ function CategoryRow({
                 }
 
                 .category-row:first-child {
-                    padding-top: 0;
+                    padding-top:
+                        0;
                 }
 
                 .category-head {
-                    display: flex;
+                    display:
+                        flex;
 
-                    align-items: flex-end;
+                    align-items:
+                        flex-end;
 
                     justify-content:
                         space-between;
 
-                    gap: 20px;
+                    gap:
+                        20px;
                 }
 
                 .category-title {
@@ -2444,31 +2758,38 @@ function CategoryRow({
                         "Times New Roman",
                         serif;
 
-                    font-size: 29px;
+                    font-size:
+                        29px;
 
                     letter-spacing:
                         -1.2px;
                 }
 
                 .category-subtitle {
-                    margin-top: 5px;
+                    margin-top:
+                        5px;
 
-                    color: #8e8688;
+                    color:
+                        #8e8688;
 
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
 
-                    font-size: 12px;
+                    font-size:
+                        12px;
                 }
 
                 .category-score {
-                    display: flex;
+                    display:
+                        flex;
 
-                    align-items: baseline;
+                    align-items:
+                        baseline;
 
-                    color: #7f7679;
+                    color:
+                        #7f7679;
 
                     font-family:
                         Georgia,
@@ -2477,67 +2798,90 @@ function CategoryRow({
                 }
 
                 .category-score strong {
-                    color: #c21856;
+                    color:
+                        #c21856;
 
-                    font-size: 42px;
-                    font-weight: 400;
+                    font-size:
+                        42px;
+
+                    font-weight:
+                        400;
                 }
 
                 .category-score span {
-                    margin-left: 3px;
+                    margin-left:
+                        3px;
 
-                    font-size: 18px;
+                    font-size:
+                        18px;
                 }
 
                 .category-line {
-                    height: 6px;
+                    height:
+                        6px;
 
-                    margin-top: 11px;
+                    margin-top:
+                        11px;
 
-                    overflow: hidden;
+                    overflow:
+                        hidden;
 
-                    border-radius: 999px;
+                    border-radius:
+                        999px;
 
-                    background: #e5dfdf;
+                    background:
+                        #e5dfdf;
                 }
 
                 .category-line div {
-                    height: 100%;
+                    height:
+                        100%;
 
-                    border-radius: inherit;
+                    border-radius:
+                        inherit;
 
-                    background: #cb3a6d;
+                    background:
+                        #cb3a6d;
                 }
 
                 @media (
-                    max-width: 640px
+                    max-width:
+                        640px
                 ) {
 
                     .category-row {
                         padding:
-                            13px 0 15px;
+                            13px
+                            0
+                            15px;
                     }
 
                     .category-title {
-                        font-size: 24px;
+                        font-size:
+                            24px;
                     }
 
                     .category-subtitle {
-                        max-width: 250px;
+                        max-width:
+                            250px;
 
-                        font-size: 10px;
+                        font-size:
+                            10px;
                     }
 
                     .category-score strong {
-                        font-size: 34px;
+                        font-size:
+                            34px;
                     }
 
                     .category-score span {
-                        font-size: 14px;
+                        font-size:
+                            14px;
                     }
 
                     .category-line {
-                        height: 5px;
+                        height:
+                            5px;
                     }
                 }
 
@@ -2546,10 +2890,6 @@ function CategoryRow({
         </div>
     );
 }
-
-/* =============================================
-   BENEFIT
-============================================= */
 
 function Benefit({
                      icon,
@@ -2564,7 +2904,9 @@ function Benefit({
             <div className="benefit-icon">
 
                 <BenefitSvg
-                    type={icon}
+                    type={
+                        icon
+                    }
                 />
 
             </div>
@@ -2576,7 +2918,8 @@ function Benefit({
             <style jsx>{`
 
                 .benefit {
-                    display: grid;
+                    display:
+                        grid;
 
                     grid-template-columns:
                         22px
@@ -2585,19 +2928,25 @@ function Benefit({
                             1fr
                         );
 
-                    gap: 10px;
+                    gap:
+                        10px;
 
-                    align-items: start;
+                    align-items:
+                        start;
 
-                    color: #fff8f6;
+                    color:
+                        #fff8f6;
                 }
 
                 .benefit-icon {
-                    width: 20px;
+                    width:
+                        20px;
 
-                    padding-top: 1px;
+                    padding-top:
+                        1px;
 
-                    color: #ffd8e1;
+                    color:
+                        #ffd8e1;
                 }
 
                 .benefit-text {
@@ -2606,14 +2955,19 @@ function Benefit({
                         Helvetica,
                         sans-serif;
 
-                    font-size: 13px;
-                    line-height: 1.28;
+                    font-size:
+                        13px;
 
-                    font-weight: 500;
+                    line-height:
+                        1.28;
+
+                    font-weight:
+                        500;
                 }
 
                 @media (
-                    max-width: 640px
+                    max-width:
+                        640px
                 ) {
 
                     .benefit {
@@ -2624,17 +2978,21 @@ function Benefit({
                                 1fr
                             );
 
-                        gap: 8px;
+                        gap:
+                            8px;
                     }
 
                     .benefit-icon {
-                        width: 17px;
+                        width:
+                            17px;
                     }
 
                     .benefit-text {
-                        font-size: 11px;
+                        font-size:
+                            11px;
 
-                        line-height: 1.27;
+                        line-height:
+                            1.27;
                     }
                 }
 
@@ -2644,16 +3002,15 @@ function Benefit({
     );
 }
 
-/* =============================================
-   ICONS
-============================================= */
-
 function BenefitSvg({
                         type,
                     }: {
     type: BenefitIcon;
 }) {
-    if (type === "heart") {
+    if (
+        type ===
+        "heart"
+    ) {
         return (
             <svg
                 viewBox="0 0 24 24"
@@ -2788,10 +3145,6 @@ function BenefitSvg({
         </svg>
     );
 }
-
-/* =============================================
-   YEAR WORD
-============================================= */
 
 function getYearWord(
     value: number
