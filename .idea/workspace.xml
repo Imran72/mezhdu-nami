@@ -21,23 +21,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0005618216230454" />
-      <entry key="MS500" value="1.3508385163710197" />
-      <entry key="S2" value="2.904617343560467" />
-      <entry key="S5" value="3.92794043487006" />
-      <entry key="S10" value="4.413089846440574" />
-      <entry key="S30" value="4.791627634208489" />
-      <entry key="S60" value="4.894122455532053" />
-      <entry key="M2" value="4.94663051580899" />
-      <entry key="M5" value="4.9785478096020235" />
-      <entry key="M10" value="4.989256419085379" />
-      <entry key="M15" value="4.992833720591384" />
-      <entry key="M30" value="4.9964149126225" />
-      <entry key="H1" value="4.998206970038863" />
-      <entry key="H2" value="4.999257844205429" />
-      <entry key="H4" value="5.066943792833593" />
-      <entry key="D1" value="25.096991735432905" />
-      <entry key="W1" value="66.89370124534513" />
+      <entry key="MS100" value="1.000198341269622" />
+      <entry key="MS500" value="1.2144593859767443" />
+      <entry key="S2" value="2.078214340395993" />
+      <entry key="S5" value="2.553580153960377" />
+      <entry key="S10" value="2.761098233505911" />
+      <entry key="S30" value="2.9165752432930825" />
+      <entry key="S60" value="2.957793351313653" />
+      <entry key="M2" value="2.978771519737263" />
+      <entry key="M5" value="2.9914783646963463" />
+      <entry key="M10" value="2.9957341245628886" />
+      <entry key="M15" value="2.997154957807971" />
+      <entry key="M30" value="2.9985769159662308" />
+      <entry key="H1" value="2.999288317190701" />
+      <entry key="H2" value="2.9996474429999838" />
+      <entry key="H4" value="3.0039509777161655" />
+      <entry key="D1" value="10.670113722460087" />
+      <entry key="W1" value="59.47285428085507" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -59,23 +59,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.9465891625322905" />
-      <entry key="MS500" value="1.3358717915340732" />
-      <entry key="S2" value="2.8947340270264865" />
-      <entry key="S5" value="3.921853546765054" />
-      <entry key="S10" value="4.409493338203772" />
-      <entry key="S30" value="4.79027930846686" />
-      <entry key="S60" value="4.893427669595071" />
-      <entry key="M2" value="4.946277810129314" />
-      <entry key="M5" value="4.978405431669396" />
-      <entry key="M10" value="4.989185012435927" />
-      <entry key="M15" value="4.992786067654721" />
-      <entry key="M30" value="4.996391061869828" />
-      <entry key="H1" value="4.998195038585339" />
-      <entry key="H2" value="4.999251876824638" />
-      <entry key="H4" value="5.0669407790577194" />
-      <entry key="D1" value="25.096989591198103" />
-      <entry key="W1" value="66.8937004326229" />
+      <entry key="MS100" value="0.9661305868955238" />
+      <entry key="MS500" value="1.2063919774922298" />
+      <entry key="S2" value="2.0744799964788276" />
+      <entry key="S5" value="2.5516509049771807" />
+      <entry key="S10" value="2.7600351738545807" />
+      <entry key="S30" value="2.9161959527500794" />
+      <entry key="S60" value="2.957600377474737" />
+      <entry key="M2" value="2.978674184010015" />
+      <entry key="M5" value="2.9914392245229777" />
+      <entry key="M10" value="2.9957145199802495" />
+      <entry key="M15" value="2.9971418804068937" />
+      <entry key="M30" value="2.99857037342264" />
+      <entry key="H1" value="2.999285044957506" />
+      <entry key="H2" value="2.9996458066389944" />
+      <entry key="H4" value="3.0039501570216838" />
+      <entry key="D1" value="10.670112930757526" />
+      <entry key="W1" value="59.47285357525715" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo"><![CDATA[{
@@ -117,8 +117,8 @@
       <recent name="$PROJECT_DIR$/public/images" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/app" />
       <recent name="$PROJECT_DIR$/public/images" />
+      <recent name="$PROJECT_DIR$/app" />
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
@@ -136,7 +136,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1790610616573</updated>
-      <workItem from="1790610617592" duration="48759000" />
+      <workItem from="1790610617592" duration="49505000" />
     </task>
     <servers />
   </component>
