@@ -85,7 +85,7 @@ type MonthPlan = {
 const MAX_SCORE = 10;
 
 const ROADMAP_IMAGE =
-    "/images/relationship-roadmap.svg";
+    "/images/relationship-roadmap.png";
 
 export default function ReportPage() {
     const params =
