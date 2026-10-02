@@ -28,6 +28,8 @@ body {
             ui-sans-serif,
             system-ui,
             -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
             sans-serif;
 }
 
@@ -38,51 +40,74 @@ textarea {
 }
 
 /* ============================================================
-   GLOBAL BRAND
-
-   Все варианты бренда на сайте теперь выглядят одинаково.
-
-   !important здесь намеренно:
-   на некоторых страницах есть локальный styled-jsx,
-   который раньше задавал brand по-разному.
+   BRAND
 ============================================================ */
+
+/*
+ * Визуально заменяем любой старый текст бренда
+ * на единую версию:
+ *
+ * между нами.
+ *
+ * Это позволяет не ловить по всему проекту
+ * варианты без точки.
+ */
 
 .brand,
 .state-brand,
 .loading-brand,
-.site-brand {
+.site-brand,
+.app-brand {
+    position: relative;
+
+    display: inline-block;
+
     margin: 0 !important;
 
     color: var(--brand-color) !important;
 
-    font-family:
-            Georgia,
-            "Times New Roman",
-            serif !important;
-
-    font-size:
-            var(--brand-size) !important;
-
-    font-weight: 700 !important;
+    font-size: 0 !important;
 
     line-height: 1 !important;
-
-    letter-spacing:
-            var(--brand-letter-spacing) !important;
-
-    text-transform: lowercase !important;
 
     text-decoration: none !important;
 
     white-space: nowrap;
 }
 
+.brand::before,
+.state-brand::before,
+.loading-brand::before,
+.site-brand::before,
+.app-brand::before {
+    content: "между нами.";
+
+    color: var(--brand-color);
+
+    font-family:
+            Georgia,
+            "Times New Roman",
+            serif;
+
+    font-size: var(--brand-size);
+
+    font-weight: 700;
+
+    line-height: 1;
+
+    letter-spacing:
+            var(--brand-letter-spacing);
+
+    text-transform: lowercase;
+}
+
 /* ============================================================
-   BASE LAYOUT
+   BASE
 ============================================================ */
 
 .shell {
     min-height: 100svh;
+
     max-width: 620px;
 
     margin: auto;
@@ -93,6 +118,7 @@ textarea {
             42px;
 
     display: flex;
+
     flex-direction: column;
 }
 
@@ -120,6 +146,7 @@ textarea {
 
     font-family:
             Georgia,
+            "Times New Roman",
             serif;
 
     font-weight: 500;
@@ -133,8 +160,7 @@ textarea {
 
     line-height: 0.98;
 
-    letter-spacing:
-            -0.045em;
+    letter-spacing: -0.045em;
 }
 
 .lead {
@@ -146,7 +172,7 @@ textarea {
 }
 
 /* ============================================================
-   BUTTONS
+   BUTTON
 ============================================================ */
 
 .btn {
@@ -179,7 +205,7 @@ textarea {
 }
 
 /* ============================================================
-   HERO CIRCLES
+   PAIR
 ============================================================ */
 
 .pair {
@@ -212,7 +238,7 @@ textarea {
 }
 
 /* ============================================================
-   CARDS
+   CARD
 ============================================================ */
 
 .card {
@@ -236,7 +262,7 @@ textarea {
 }
 
 /* ============================================================
-   TEST
+   QUESTIONS
 ============================================================ */
 
 .question {
@@ -245,6 +271,7 @@ textarea {
 
     font-family:
             Georgia,
+            "Times New Roman",
             serif;
 
     font-size: 34px;
@@ -386,7 +413,8 @@ textarea {
     display: grid;
 
     grid-template-columns:
-        1fr 1fr;
+        1fr
+        1fr;
 
     gap: 10px;
 }
@@ -400,7 +428,9 @@ max-width: 640px
 ) {
     :root {
         --brand-size: 21px;
-        --brand-letter-spacing: -0.9px;
+
+        --brand-letter-spacing:
+                -0.9px;
     }
 }
 
