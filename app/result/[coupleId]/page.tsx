@@ -512,8 +512,6 @@ export default function ResultPage() {
 
                     <div className="paid-art">
 
-                        {/* резкое изображение */}
-
                         <img
                             className="art-main"
                             src={PAID_IMAGE}
@@ -521,16 +519,12 @@ export default function ResultPage() {
                             draggable={false}
                         />
 
-                        {/* очень лёгкий blur только на стыке */}
-
                         <img
                             className="art-edge-blur"
                             src={PAID_IMAGE}
                             alt=""
                             draggable={false}
                         />
-
-                        {/* мягкое окрашивание в цвет карточки */}
 
                         <div className="art-color-wash" />
 
@@ -1029,8 +1023,8 @@ export default function ResultPage() {
 
                 .paid-section {
                     width: min(
-                        1500px,
-                        calc(100% - 40px)
+                        1160px,
+                        calc(100% - 48px)
                     );
 
                     margin:
@@ -1042,20 +1036,12 @@ export default function ResultPage() {
 
                     width: 100%;
 
-                    min-height: 430px;
+                    min-height: 440px;
 
                     overflow: hidden;
 
                     border-radius: 24px;
 
-                    /*
-                     * ВАЖНО:
-                     *
-                     * Цвет близок к правому краю
-                     * самой картинки.
-                     * Поэтому переход становится
-                     * намного менее заметным.
-                     */
                     background: #ad194a;
 
                     isolation: isolate;
@@ -1078,13 +1064,15 @@ export default function ResultPage() {
                 }
 
                 /*
-                 * ГЛАВНАЯ КАРТИНКА
+                 * ГЛАВНОЕ ИЗМЕНЕНИЕ:
                  *
-                 * Вместо жёсткого обрыва справа
-                 * сама картинка постепенно становится
-                 * прозрачной.
+                 * Картинка больше НЕ имеет
+                 * width: 68%.
                  *
-                 * Это основа мягкого перехода.
+                 * Её ширина рассчитывается автоматически
+                 * из исходного aspect ratio.
+                 *
+                 * Поэтому она не растягивается.
                  */
                 .art-main {
                     position: absolute;
@@ -1095,15 +1083,12 @@ export default function ResultPage() {
                     bottom: 0;
                     left: 0;
 
-                    width: 68%;
+                    width: auto;
                     height: 100%;
 
+                    max-width: none;
+
                     display: block;
-
-                    object-fit: cover;
-
-                    object-position:
-                        50% 50%;
 
                     user-select: none;
 
@@ -1113,63 +1098,63 @@ export default function ResultPage() {
 
                             black 0%,
 
-                            black 56%,
+                            black 67%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .98
-                            ) 61%,
-
-                            rgba(
-                                0,
-                                0,
-                                0,
-                                .93
-                            ) 66%,
-
-                            rgba(
-                                0,
-                                0,
-                                0,
-                                .82
+                                .99
                             ) 71%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .67
-                            ) 76%,
+                                .94
+                            ) 75%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .49
-                            ) 81%,
+                                .84
+                            ) 79%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .31
-                            ) 86%,
+                                .69
+                            ) 83%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .16
+                                .51
+                            ) 87%,
+
+                            rgba(
+                                0,
+                                0,
+                                0,
+                                .33
                             ) 91%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
+                                .17
+                            ) 94%,
+
+                            rgba(
+                                0,
+                                0,
+                                0,
                                 .06
-                            ) 96%,
+                            ) 97%,
 
                             transparent 100%
                         );
@@ -1180,77 +1165,71 @@ export default function ResultPage() {
 
                             black 0%,
 
-                            black 56%,
+                            black 67%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .98
-                            ) 61%,
-
-                            rgba(
-                                0,
-                                0,
-                                0,
-                                .93
-                            ) 66%,
-
-                            rgba(
-                                0,
-                                0,
-                                0,
-                                .82
+                                .99
                             ) 71%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .67
-                            ) 76%,
+                                .94
+                            ) 75%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .49
-                            ) 81%,
+                                .84
+                            ) 79%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .31
-                            ) 86%,
+                                .69
+                            ) 83%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .16
+                                .51
+                            ) 87%,
+
+                            rgba(
+                                0,
+                                0,
+                                0,
+                                .33
                             ) 91%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
+                                .17
+                            ) 94%,
+
+                            rgba(
+                                0,
+                                0,
+                                0,
                                 .06
-                            ) 96%,
+                            ) 97%,
 
                             transparent 100%
                         );
                 }
 
                 /*
-                 * BLUR ТОЛЬКО НА ГРАНИЦЕ
-                 *
-                 * Важно:
-                 * геометрия абсолютно такая же,
-                 * как у основной картинки.
-                 *
-                 * Поэтому нет двух разных
-                 * вертикальных зон.
+                 * BLUR-копия имеет абсолютно
+                 * ту же натуральную геометрию.
                  */
                 .art-edge-blur {
                     position: absolute;
@@ -1258,24 +1237,23 @@ export default function ResultPage() {
                     z-index: 2;
 
                     top: -2%;
-                    bottom: -2%;
                     left: -1%;
 
-                    width: 69%;
+                    width: auto;
                     height: 104%;
 
-                    object-fit: cover;
-
-                    object-position:
-                        50% 50%;
+                    max-width: none;
 
                     filter:
-                        blur(13px);
+                        blur(14px);
 
                     transform:
-                        scale(1.015);
+                        scale(1.012);
 
-                    opacity: .48;
+                    transform-origin:
+                        left center;
+
+                    opacity: .42;
 
                     user-select: none;
 
@@ -1285,62 +1263,55 @@ export default function ResultPage() {
 
                             transparent 0%,
 
-                            transparent 55%,
+                            transparent 62%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .04
-                            ) 60%,
+                                .05
+                            ) 67%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .12
-                            ) 65%,
+                                .15
+                            ) 72%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .25
-                            ) 70%,
+                                .28
+                            ) 77%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .38
-                            ) 75%,
+                                .39
+                            ) 82%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .46
-                            ) 80%,
+                                .43
+                            ) 87%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .42
-                            ) 85%,
+                                .35
+                            ) 91%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .30
-                            ) 90%,
-
-                            rgba(
-                                0,
-                                0,
-                                0,
-                                .14
+                                .20
                             ) 95%,
 
                             transparent 100%
@@ -1352,62 +1323,55 @@ export default function ResultPage() {
 
                             transparent 0%,
 
-                            transparent 55%,
+                            transparent 62%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .04
-                            ) 60%,
+                                .05
+                            ) 67%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .12
-                            ) 65%,
+                                .15
+                            ) 72%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .25
-                            ) 70%,
+                                .28
+                            ) 77%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .38
-                            ) 75%,
+                                .39
+                            ) 82%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .46
-                            ) 80%,
+                                .43
+                            ) 87%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .42
-                            ) 85%,
+                                .35
+                            ) 91%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .30
-                            ) 90%,
-
-                            rgba(
-                                0,
-                                0,
-                                0,
-                                .14
+                                .20
                             ) 95%,
 
                             transparent 100%
@@ -1415,13 +1379,10 @@ export default function ResultPage() {
                 }
 
                 /*
-                 * ЦВЕТОВОЙ WASH
+                 * Длинный цветовой переход.
                  *
-                 * Очень длинный и плавный.
-                 *
-                 * Его задача не спрятать картинку,
-                 * а постепенно привести её
-                 * к #ad194a.
+                 * Начинается около центра карточки,
+                 * но очень слабо.
                  */
                 .art-color-wash {
                     position: absolute;
@@ -1436,91 +1397,84 @@ export default function ResultPage() {
 
                             transparent 0%,
 
-                            transparent 34%,
+                            transparent 30%,
 
                             rgba(
                                 173,
                                 25,
                                 74,
-                                .01
-                            ) 40%,
+                                .015
+                            ) 36%,
 
                             rgba(
                                 173,
                                 25,
                                 74,
-                                .025
-                            ) 45%,
-
-                            rgba(
-                                173,
-                                25,
-                                74,
-                                .05
-                            ) 50%,
+                                .04
+                            ) 41%,
 
                             rgba(
                                 173,
                                 25,
                                 74,
                                 .09
-                            ) 55%,
+                            ) 46%,
 
                             rgba(
                                 173,
                                 25,
                                 74,
-                                .15
-                            ) 60%,
+                                .17
+                            ) 51%,
 
                             rgba(
                                 173,
                                 25,
                                 74,
-                                .24
-                            ) 65%,
+                                .29
+                            ) 56%,
 
                             rgba(
                                 173,
                                 25,
                                 74,
-                                .36
-                            ) 70%,
+                                .43
+                            ) 61%,
 
                             rgba(
                                 173,
                                 25,
                                 74,
-                                .50
-                            ) 75%,
+                                .59
+                            ) 66%,
 
                             rgba(
                                 173,
                                 25,
                                 74,
-                                .65
-                            ) 80%,
+                                .73
+                            ) 71%,
 
                             rgba(
                                 173,
                                 25,
                                 74,
-                                .78
-                            ) 85%,
+                                .84
+                            ) 77%,
 
                             rgba(
                                 173,
                                 25,
                                 74,
-                                .88
-                            ) 90%,
+                                .92
+                            ) 84%,
 
                             rgba(
                                 173,
                                 25,
                                 74,
-                                .95
-                            ) 95%,
+                                .97
+                            ) 91%,
 
                             #ad194a 100%
                         );
@@ -1535,23 +1489,23 @@ export default function ResultPage() {
 
                     z-index: 10;
 
-                    min-height: 430px;
+                    min-height: 440px;
                 }
 
                 .paid-copy {
                     position: absolute;
 
-                    top: 38px;
+                    top: 42px;
 
-                    left: 56%;
+                    left: 52%;
 
-                    width: 40%;
+                    width: 43%;
 
-                    max-width: 560px;
+                    max-width: 520px;
                 }
 
                 .paid-label {
-                    margin-bottom: 10px;
+                    margin-bottom: 11px;
 
                     color:
                         rgba(
@@ -1587,8 +1541,8 @@ export default function ResultPage() {
                     font-size:
                         clamp(
                             38px,
-                            3.9vw,
-                            58px
+                            4vw,
+                            56px
                         );
 
                     line-height: .95;
@@ -1614,10 +1568,11 @@ export default function ResultPage() {
                 .benefits {
                     position: absolute;
 
-                    top: 177px;
+                    top: 190px;
 
-                    left: 56%;
-                    right: 34px;
+                    left: 52%;
+
+                    right: 30px;
 
                     display: grid;
 
@@ -1630,8 +1585,8 @@ export default function ResultPage() {
                             )
                         );
 
-                    column-gap: 34px;
-                    row-gap: 22px;
+                    column-gap: 32px;
+                    row-gap: 21px;
                 }
 
                 /* =============================================
@@ -1643,11 +1598,11 @@ export default function ResultPage() {
 
                     z-index: 20;
 
-                    right: 28px;
-                    bottom: 44px;
+                    right: 26px;
+                    bottom: 45px;
 
-                    width: 46%;
-                    height: 62px;
+                    width: 50%;
+                    height: 64px;
 
                     padding:
                         0 24px;
@@ -1752,10 +1707,10 @@ export default function ResultPage() {
                 .paid-note {
                     position: absolute;
 
-                    right: 28px;
+                    right: 26px;
                     bottom: 18px;
 
-                    width: 46%;
+                    width: 50%;
 
                     color:
                         rgba(
@@ -1780,50 +1735,6 @@ export default function ResultPage() {
                 ============================================= */
 
                 @media (
-                    max-width: 1180px
-                ) {
-
-                    .paid-card,
-                    .paid-content {
-                        min-height: 410px;
-                    }
-
-                    .art-main {
-                        width: 69%;
-                    }
-
-                    .art-edge-blur {
-                        width: 70%;
-                    }
-
-                    .paid-copy {
-                        top: 34px;
-
-                        left: 55%;
-
-                        width: 41%;
-                    }
-
-                    .benefits {
-                        top: 168px;
-
-                        left: 55%;
-
-                        right: 28px;
-
-                        column-gap: 24px;
-                    }
-
-                    .paid-cta {
-                        width: 48%;
-                    }
-
-                    .paid-note {
-                        width: 48%;
-                    }
-                }
-
-                @media (
                     max-width: 1000px
                 ) {
 
@@ -1845,51 +1756,60 @@ export default function ResultPage() {
                         font-size: 37px;
                     }
 
+                    .paid-section {
+                        width:
+                            calc(
+                                100% - 32px
+                            );
+                    }
+
                     .paid-card,
                     .paid-content {
-                        min-height: 390px;
+                        min-height: 410px;
                     }
 
                     .paid-copy {
-                        top: 30px;
+                        top: 34px;
 
-                        left: 54.5%;
+                        left: 50%;
 
-                        width: 42%;
+                        width: 46%;
                     }
 
                     .paid-copy h2 {
-                        font-size: 40px;
+                        font-size: 42px;
                     }
 
                     .benefits {
-                        top: 154px;
+                        top: 168px;
 
-                        left: 54.5%;
+                        left: 50%;
 
                         right: 24px;
+
+                        column-gap: 22px;
 
                         row-gap: 18px;
                     }
 
                     .paid-cta {
+                        width: 52%;
+
                         right: 22px;
 
-                        bottom: 40px;
-
-                        width: 50%;
-                        height: 58px;
+                        bottom: 41px;
                     }
 
                     .paid-note {
-                        right: 22px;
+                        width: 52%;
 
-                        width: 50%;
+                        right: 22px;
                     }
                 }
 
                 /* =============================================
                    MOBILE
+                   ОСТАВЛЯЕМ КОМПОЗИЦИЮ КАК БЫЛА
                 ============================================= */
 
                 @media (
@@ -1992,10 +1912,6 @@ export default function ResultPage() {
                         border-radius: 22px;
                     }
 
-                    /*
-                     * На телефоне та же логика,
-                     * только переход идёт сверху вниз.
-                     */
                     .paid-art {
                         height: 375px;
                     }
@@ -2125,6 +2041,8 @@ export default function ResultPage() {
 
                         width: 100%;
                         height: 100%;
+
+                        object-fit: cover;
 
                         object-position:
                             50% 50%;
