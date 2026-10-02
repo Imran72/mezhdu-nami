@@ -185,19 +185,6 @@ export default function ResultPage() {
             return 1;
         }, [data]);
 
-    /*
-     * Шкала теперь специально НЕ линейная по 60 годам.
-     *
-     * Иначе:
-     * 1 год = почти 0%
-     * 6 лет = всего 10%
-     * 10 лет = 16%
-     *
-     * и визуально всё слипается слева.
-     *
-     * Вместо этого распределяем жизненные интервалы
-     * равномернее по шкале.
-     */
     const forecastPosition =
         useMemo(() => {
             const points = [
@@ -306,10 +293,6 @@ export default function ResultPage() {
     return (
         <main className="page">
 
-            {/* =====================================================
-                MAIN RESULT
-            ===================================================== */}
-
             <div className="content-shell">
 
                 <header className="header">
@@ -334,9 +317,9 @@ export default function ResultPage() {
 
                 </header>
 
-                {/* =================================================
-                    SCORES
-                ================================================= */}
+                {/* ================================================
+                    RESULTS
+                ================================================ */}
 
                 <section className="results">
 
@@ -359,9 +342,9 @@ export default function ResultPage() {
 
                 </section>
 
-                {/* =================================================
+                {/* ================================================
                     FORECAST
-                ================================================= */}
+                ================================================ */}
 
                 <section className="forecast">
 
@@ -421,21 +404,10 @@ export default function ResultPage() {
                                     }}
                                 />
 
-                                <div
-                                    className="scale-tick tick-1"
-                                />
-
-                                <div
-                                    className="scale-tick tick-2"
-                                />
-
-                                <div
-                                    className="scale-tick tick-3"
-                                />
-
-                                <div
-                                    className="scale-tick tick-4"
-                                />
+                                <div className="scale-tick tick-1" />
+                                <div className="scale-tick tick-2" />
+                                <div className="scale-tick tick-3" />
+                                <div className="scale-tick tick-4" />
 
                             </div>
 
@@ -475,17 +447,13 @@ export default function ResultPage() {
 
             </div>
 
-            {/* =====================================================
-                FULL REPORT CARD
-            ===================================================== */}
+            {/* ================================================
+                FULL REPORT
+            ================================================ */}
 
             <section className="paid-section">
 
                 <div className="paid-card">
-
-                    {/* =================================================
-                        ART
-                    ================================================= */}
 
                     <div className="paid-art">
 
@@ -507,15 +475,7 @@ export default function ResultPage() {
 
                     </div>
 
-                    {/* =================================================
-                        CONTENT
-                    ================================================= */}
-
                     <div className="paid-content">
-
-                        {/* =============================================
-                            TITLE
-                        ============================================= */}
 
                         <div className="paid-copy">
 
@@ -524,16 +484,12 @@ export default function ResultPage() {
                             </div>
 
                             <h2>
-                                Как продлить
+                                Продлите
                                 <br />
                                 ваши годы вместе.
                             </h2>
 
                         </div>
-
-                        {/* =============================================
-                            BENEFITS 2 × 2
-                        ============================================= */}
 
                         <div className="benefits">
 
@@ -582,10 +538,6 @@ export default function ResultPage() {
                             />
 
                         </div>
-
-                        {/* =============================================
-                            CTA
-                        ============================================= */}
 
                         <button
                             type="button"
@@ -837,7 +789,7 @@ export default function ResultPage() {
                 }
 
                 /* =====================================================
-                   FORECAST SCALE
+                   SCALE
                 ===================================================== */
 
                 .forecast-scale {
@@ -881,7 +833,9 @@ export default function ResultPage() {
                     width: 21px;
                     height: 21px;
 
-                    border: 4px solid #f8f4f1;
+                    border:
+                        4px solid
+                        #f8f4f1;
 
                     border-radius: 50%;
 
@@ -897,7 +851,10 @@ export default function ResultPage() {
                         );
 
                     transform:
-                        translate(-50%, -50%);
+                        translate(
+                            -50%,
+                            -50%
+                        );
                 }
 
                 .scale-tick {
@@ -921,7 +878,10 @@ export default function ResultPage() {
                         );
 
                     transform:
-                        translate(-50%, -50%);
+                        translate(
+                            -50%,
+                            -50%
+                        );
                 }
 
                 .tick-1 {
@@ -968,7 +928,6 @@ export default function ResultPage() {
 
                 .scale-labels span:nth-child(1) {
                     left: 0;
-
                     transform: none;
                 }
 
@@ -990,12 +949,11 @@ export default function ResultPage() {
 
                 .scale-labels span:nth-child(6) {
                     right: 0;
-
                     transform: none;
                 }
 
                 /* =====================================================
-                   FULL REPORT
+                   PAID SECTION
                 ===================================================== */
 
                 .paid-section {
@@ -1040,12 +998,6 @@ export default function ResultPage() {
                     overflow: hidden;
                 }
 
-                /*
-                 * Основная картинка остаётся резкой.
-                 *
-                 * Она не должна растягиваться
-                 * на весь баннер.
-                 */
                 .art-main {
                     position: absolute;
 
@@ -1067,10 +1019,6 @@ export default function ResultPage() {
                     user-select: none;
                 }
 
-                /*
-                 * Та же картинка —
-                 * размазанная копия справа.
-                 */
                 .art-blur {
                     position: absolute;
 
@@ -1171,11 +1119,6 @@ export default function ResultPage() {
                         );
                 }
 
-                /*
-                 * Последний этап:
-                 * blur плавно растворяется
-                 * в berry-фоне.
-                 */
                 .art-color-fade {
                     position: absolute;
 
@@ -1257,7 +1200,7 @@ export default function ResultPage() {
                 }
 
                 /* =====================================================
-                   TITLE
+                   PAID TITLE
                 ===================================================== */
 
                 .paid-copy {
@@ -1272,7 +1215,7 @@ export default function ResultPage() {
                 }
 
                 .paid-label {
-                    margin-bottom: 14px;
+                    margin-bottom: 13px;
 
                     color:
                         rgba(
@@ -1308,15 +1251,15 @@ export default function ResultPage() {
                     font-size:
                         clamp(
                             42px,
-                            4vw,
-                            56px
+                            3.7vw,
+                            53px
                         );
 
-                    line-height: .98;
+                    line-height: .96;
 
                     font-weight: 400;
 
-                    letter-spacing: -2.1px;
+                    letter-spacing: -2px;
 
                     text-shadow:
                         0 2px 18px
@@ -1335,7 +1278,7 @@ export default function ResultPage() {
                 .benefits {
                     position: absolute;
 
-                    top: 245px;
+                    top: 218px;
 
                     left: 51%;
                     right: 42px;
@@ -1348,8 +1291,8 @@ export default function ResultPage() {
                             minmax(0, 1fr)
                         );
 
-                    column-gap: 38px;
-                    row-gap: 30px;
+                    column-gap: 34px;
+                    row-gap: 23px;
                 }
 
                 /* =====================================================
@@ -1521,24 +1464,24 @@ export default function ResultPage() {
                     }
 
                     .paid-copy {
-                        top: 48px;
+                        top: 47px;
                         left: 49%;
 
                         width: 47%;
                     }
 
                     .paid-copy h2 {
-                        font-size: 44px;
+                        font-size: 43px;
                     }
 
                     .benefits {
-                        top: 225px;
+                        top: 205px;
 
                         left: 50%;
                         right: 30px;
 
                         column-gap: 25px;
-                        row-gap: 24px;
+                        row-gap: 21px;
                     }
 
                     .paid-cta {
@@ -1591,7 +1534,7 @@ export default function ResultPage() {
                     }
 
                     /* =============================================
-                       RESULT
+                       RESULTS
                     ============================================= */
 
                     .results {
@@ -1651,14 +1594,6 @@ export default function ResultPage() {
                         font-size: 7px;
                     }
 
-                    /*
-                     * На маленьком экране
-                     * не показываем все подписи,
-                     * чтобы шкала не превращалась
-                     * в кашу.
-                     *
-                     * Точки/геометрия остаются.
-                     */
                     .scale-labels span:nth-child(2),
                     .scale-labels span:nth-child(4),
                     .scale-labels span:nth-child(5) {
@@ -1666,7 +1601,7 @@ export default function ResultPage() {
                     }
 
                     /* =============================================
-                       PAID SECTION
+                       PAID CARD
                     ============================================= */
 
                     .paid-section {
@@ -1677,7 +1612,7 @@ export default function ResultPage() {
 
                     .paid-card,
                     .paid-content {
-                        min-height: 750px;
+                        min-height: 720px;
                     }
 
                     .paid-card {
@@ -1685,7 +1620,7 @@ export default function ResultPage() {
                     }
 
                     /* =============================================
-                       MOBILE ART
+                       MOBILE IMAGE
                     ============================================= */
 
                     .paid-art {
@@ -1693,7 +1628,7 @@ export default function ResultPage() {
                         left: 0;
 
                         width: 100%;
-                        height: 415px;
+                        height: 405px;
 
                         bottom: auto;
                     }
@@ -1854,7 +1789,7 @@ export default function ResultPage() {
                     ============================================= */
 
                     .paid-copy {
-                        top: 326px;
+                        top: 320px;
                         left: 25px;
 
                         width:
@@ -1877,9 +1812,9 @@ export default function ResultPage() {
                     .paid-copy h2 {
                         max-width: 330px;
 
-                        font-size: 35px;
+                        font-size: 34px;
 
-                        line-height: .98;
+                        line-height: .97;
 
                         letter-spacing:
                             -1.5px;
@@ -1899,7 +1834,7 @@ export default function ResultPage() {
                     ============================================= */
 
                     .benefits {
-                        top: 457px;
+                        top: 430px;
 
                         left: 25px;
                         right: 25px;
@@ -1913,7 +1848,7 @@ export default function ResultPage() {
                             );
 
                         column-gap: 20px;
-                        row-gap: 21px;
+                        row-gap: 20px;
                     }
 
                     /* =============================================
@@ -1977,15 +1912,15 @@ export default function ResultPage() {
 
                     .paid-card,
                     .paid-content {
-                        min-height: 720px;
+                        min-height: 700px;
                     }
 
                     .paid-art {
-                        height: 390px;
+                        height: 385px;
                     }
 
                     .paid-copy {
-                        top: 307px;
+                        top: 302px;
 
                         left: 22px;
 
@@ -1996,11 +1931,11 @@ export default function ResultPage() {
                     }
 
                     .paid-copy h2 {
-                        font-size: 32px;
+                        font-size: 31px;
                     }
 
                     .benefits {
-                        top: 430px;
+                        top: 407px;
 
                         left: 22px;
                         right: 22px;
@@ -2026,6 +1961,7 @@ export default function ResultPage() {
                 }
 
             `}</style>
+
         </main>
     );
 }
