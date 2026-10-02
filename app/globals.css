@@ -1,1 +1,418 @@
-:root{--bg:#FAF8F6;--ink:#171515;--berry:#9F4667;--rose:#D9A6B8;--warm:#E8D9CF;--muted:#81777A;--card:#fff;--amber:#B97852}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,sans-serif}button,input,textarea{font:inherit}.shell{min-height:100svh;max-width:620px;margin:auto;padding:28px 22px 42px;display:flex;flex-direction:column}.brand{font-family:Georgia,serif;font-size:22px}.hero{margin:auto 0}.eyebrow{color:var(--berry);font-size:13px;text-transform:uppercase;letter-spacing:.12em}.h1{font-family:Georgia,serif;font-weight:500;font-size:clamp(44px,12vw,72px);line-height:.98;letter-spacing:-.045em;margin:18px 0}.lead{font-size:18px;line-height:1.55;color:var(--muted)}.btn{border:0;border-radius:18px;padding:17px 20px;background:var(--ink);color:white;width:100%;font-weight:650;cursor:pointer}.btn.secondary{background:white;color:var(--ink);border:1px solid #e9e1dd}.pair{display:flex;align-items:center;justify-content:center;margin:36px 0}.orb{width:120px;height:120px;border-radius:50%;background:var(--rose);opacity:.8}.orb+ .orb{background:var(--berry);margin-left:-35px;mix-blend-mode:multiply}.card{background:var(--card);border-radius:28px;padding:24px;margin:14px 0;box-shadow:0 8px 35px rgba(60,40,45,.055)}.question{font-family:Georgia,serif;font-size:34px;line-height:1.08;margin:36px 0}.options{display:grid;gap:10px}.option{background:#fff;border:1px solid #eadfda;border-radius:18px;padding:17px;text-align:left;cursor:pointer}.option:hover{border-color:var(--berry)}.progress{height:5px;background:#e9e0dc;border-radius:99px;overflow:hidden}.progress>div{height:100%;background:var(--berry)}.input{width:100%;border:1px solid #e6dcd8;background:white;border-radius:18px;padding:18px;margin:10px 0 18px;outline:none}.input:focus{border-color:var(--berry)}.scoreRow{margin:20px 0}.scoreHead{display:flex;justify-content:space-between;margin-bottom:8px}.bar{height:9px;background:#eee6e2;border-radius:99px;overflow:hidden}.bar>div{height:100%;background:var(--berry);border-radius:99px}.locked{filter:blur(4px);user-select:none}.tiny{font-size:13px;color:var(--muted)}.center{text-align:center}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:420px){.orb{width:100px;height:100px}.question{font-size:30px}}
+:root {
+    --bg: #faf8f6;
+    --ink: #171515;
+    --berry: #9f4667;
+    --rose: #d9a6b8;
+    --warm: #e8d9cf;
+    --muted: #81777a;
+    --card: #fff;
+    --amber: #b97852;
+
+    --brand-color: #201c1e;
+    --brand-size: 24px;
+    --brand-letter-spacing: -1.1px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+
+    background: var(--bg);
+    color: var(--ink);
+
+    font-family:
+            Inter,
+            ui-sans-serif,
+            system-ui,
+            -apple-system,
+            sans-serif;
+}
+
+button,
+input,
+textarea {
+    font: inherit;
+}
+
+/* ============================================================
+   GLOBAL BRAND
+
+   Все варианты бренда на сайте теперь выглядят одинаково.
+
+   !important здесь намеренно:
+   на некоторых страницах есть локальный styled-jsx,
+   который раньше задавал brand по-разному.
+============================================================ */
+
+.brand,
+.state-brand,
+.loading-brand,
+.site-brand {
+    margin: 0 !important;
+
+    color: var(--brand-color) !important;
+
+    font-family:
+            Georgia,
+            "Times New Roman",
+            serif !important;
+
+    font-size:
+            var(--brand-size) !important;
+
+    font-weight: 700 !important;
+
+    line-height: 1 !important;
+
+    letter-spacing:
+            var(--brand-letter-spacing) !important;
+
+    text-transform: lowercase !important;
+
+    text-decoration: none !important;
+
+    white-space: nowrap;
+}
+
+/* ============================================================
+   BASE LAYOUT
+============================================================ */
+
+.shell {
+    min-height: 100svh;
+    max-width: 620px;
+
+    margin: auto;
+
+    padding:
+            28px
+            22px
+            42px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+/* ============================================================
+   LANDING
+============================================================ */
+
+.hero {
+    margin: auto 0;
+}
+
+.eyebrow {
+    color: var(--berry);
+
+    font-size: 13px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.12em;
+}
+
+.h1 {
+    margin:
+            18px 0;
+
+    font-family:
+            Georgia,
+            serif;
+
+    font-weight: 500;
+
+    font-size:
+            clamp(
+                    44px,
+                    12vw,
+                    72px
+            );
+
+    line-height: 0.98;
+
+    letter-spacing:
+            -0.045em;
+}
+
+.lead {
+    color: var(--muted);
+
+    font-size: 18px;
+
+    line-height: 1.55;
+}
+
+/* ============================================================
+   BUTTONS
+============================================================ */
+
+.btn {
+    width: 100%;
+
+    padding:
+            17px 20px;
+
+    border: 0;
+
+    border-radius: 18px;
+
+    background: var(--ink);
+
+    color: white;
+
+    font-weight: 650;
+
+    cursor: pointer;
+}
+
+.btn.secondary {
+    border:
+            1px solid
+            #e9e1dd;
+
+    background: white;
+
+    color: var(--ink);
+}
+
+/* ============================================================
+   HERO CIRCLES
+============================================================ */
+
+.pair {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    margin:
+            36px 0;
+}
+
+.orb {
+    width: 120px;
+    height: 120px;
+
+    border-radius: 50%;
+
+    background: var(--rose);
+
+    opacity: 0.8;
+}
+
+.orb + .orb {
+    margin-left: -35px;
+
+    background: var(--berry);
+
+    mix-blend-mode: multiply;
+}
+
+/* ============================================================
+   CARDS
+============================================================ */
+
+.card {
+    margin:
+            14px 0;
+
+    padding: 24px;
+
+    border-radius: 28px;
+
+    background: var(--card);
+
+    box-shadow:
+            0 8px 35px
+            rgba(
+                    60,
+                    40,
+                    45,
+                    0.055
+            );
+}
+
+/* ============================================================
+   TEST
+============================================================ */
+
+.question {
+    margin:
+            36px 0;
+
+    font-family:
+            Georgia,
+            serif;
+
+    font-size: 34px;
+
+    line-height: 1.08;
+}
+
+.options {
+    display: grid;
+
+    gap: 10px;
+}
+
+.option {
+    padding: 17px;
+
+    border:
+            1px solid
+            #eadfda;
+
+    border-radius: 18px;
+
+    background: #fff;
+
+    text-align: left;
+
+    cursor: pointer;
+}
+
+.option:hover {
+    border-color: var(--berry);
+}
+
+/* ============================================================
+   PROGRESS
+============================================================ */
+
+.progress {
+    height: 5px;
+
+    overflow: hidden;
+
+    border-radius: 99px;
+
+    background: #e9e0dc;
+}
+
+.progress > div {
+    height: 100%;
+
+    background: var(--berry);
+}
+
+/* ============================================================
+   INPUT
+============================================================ */
+
+.input {
+    width: 100%;
+
+    margin:
+            10px 0
+            18px;
+
+    padding: 18px;
+
+    border:
+            1px solid
+            #e6dcd8;
+
+    border-radius: 18px;
+
+    outline: none;
+
+    background: white;
+}
+
+.input:focus {
+    border-color: var(--berry);
+}
+
+/* ============================================================
+   SCORE
+============================================================ */
+
+.scoreRow {
+    margin:
+            20px 0;
+}
+
+.scoreHead {
+    display: flex;
+
+    justify-content:
+            space-between;
+
+    margin-bottom: 8px;
+}
+
+.bar {
+    height: 9px;
+
+    overflow: hidden;
+
+    border-radius: 99px;
+
+    background: #eee6e2;
+}
+
+.bar > div {
+    height: 100%;
+
+    border-radius: 99px;
+
+    background: var(--berry);
+}
+
+/* ============================================================
+   HELPERS
+============================================================ */
+
+.locked {
+    filter: blur(4px);
+
+    user-select: none;
+}
+
+.tiny {
+    color: var(--muted);
+
+    font-size: 13px;
+}
+
+.center {
+    text-align: center;
+}
+
+.two {
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 10px;
+}
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (
+max-width: 640px
+) {
+    :root {
+        --brand-size: 21px;
+        --brand-letter-spacing: -0.9px;
+    }
+}
+
+@media (
+max-width: 420px
+) {
+    .orb {
+        width: 100px;
+        height: 100px;
+    }
+
+    .question {
+        font-size: 30px;
+    }
+}
