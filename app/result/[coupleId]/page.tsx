@@ -34,7 +34,6 @@ type BenefitIcon =
     | "chart";
 
 const MAX_SCORE = 10;
-
 const PAID_IMAGE = "/images/full-report-couple.png";
 
 export default function ResultPage() {
@@ -175,12 +174,13 @@ export default function ResultPage() {
             const overall =
                 data?.scores?.overall ?? 50;
 
-            if (overall >= 85) return 45;
-            if (overall >= 75) return 28;
-            if (overall >= 65) return 16;
-            if (overall >= 55) return 10;
-            if (overall >= 45) return 6;
-            if (overall >= 35) return 3;
+            if (overall >= 88) return 40;
+            if (overall >= 80) return 25;
+            if (overall >= 72) return 14;
+            if (overall >= 64) return 8;
+            if (overall >= 56) return 5;
+            if (overall >= 48) return 3;
+            if (overall >= 40) return 2;
 
             return 1;
         }, [data]);
@@ -188,12 +188,12 @@ export default function ResultPage() {
     const forecastPosition =
         useMemo(() => {
             const points = [
-                { years: 0.08, position: 3 },
+                { years: 1 / 12, position: 2 },
                 { years: 1, position: 18 },
                 { years: 5, position: 36 },
                 { years: 10, position: 54 },
                 { years: 25, position: 74 },
-                { years: 60, position: 97 },
+                { years: 60, position: 98 },
             ];
 
             if (
@@ -229,7 +229,7 @@ export default function ResultPage() {
                 }
             }
 
-            return 97;
+            return 98;
         }, [yearsForecast]);
 
     const nameA =
@@ -292,43 +292,25 @@ export default function ResultPage() {
 
     return (
         <main className="page">
-
             <div className="content-shell">
-
                 <header className="header">
-
                     <div className="brand">
                         между нами.
                     </div>
 
                     <div className="couple-names">
-
-                        <span>
-                            {nameA}
-                        </span>
-
+                        <span>{nameA}</span>
                         <b>×</b>
-
-                        <span>
-                            {nameB}
-                        </span>
-
+                        <span>{nameB}</span>
                     </div>
-
                 </header>
 
-                {/* ================================================
-                    RESULTS
-                ================================================ */}
-
                 <section className="results">
-
                     <div className="section-label">
                         ВАШ РЕЗУЛЬТАТ
                     </div>
 
                     <div className="category-list">
-
                         {categories.map(
                             (category) => (
                                 <CategoryRow
@@ -337,19 +319,11 @@ export default function ResultPage() {
                                 />
                             )
                         )}
-
                     </div>
-
                 </section>
 
-                {/* ================================================
-                    FORECAST
-                ================================================ */}
-
                 <section className="forecast">
-
                     <div className="forecast-copy">
-
                         <div className="section-label">
                             ПРОГНОЗ
                         </div>
@@ -363,15 +337,13 @@ export default function ResultPage() {
                         </h2>
 
                         <p>
-                            на основании ИИ-модели
+                            на основании
+                            ИИ-модели
                         </p>
-
                     </div>
 
                     <div className="forecast-right">
-
                         <div className="years">
-
                             <strong>
                                 {yearsForecast}
                             </strong>
@@ -381,26 +353,21 @@ export default function ResultPage() {
                                     yearsForecast
                                 )}
                             </span>
-
                         </div>
 
                         <div className="forecast-scale">
-
                             <div className="scale">
-
                                 <div
                                     className="scale-progress"
                                     style={{
-                                        width:
-                                            `${forecastPosition}%`,
+                                        width: `${forecastPosition}%`,
                                     }}
                                 />
 
                                 <div
                                     className="scale-dot"
                                     style={{
-                                        left:
-                                            `${forecastPosition}%`,
+                                        left: `${forecastPosition}%`,
                                     }}
                                 />
 
@@ -408,55 +375,24 @@ export default function ResultPage() {
                                 <div className="scale-tick tick-2" />
                                 <div className="scale-tick tick-3" />
                                 <div className="scale-tick tick-4" />
-
                             </div>
 
                             <div className="scale-labels">
-
-                                <span>
-                                    1 месяц
-                                </span>
-
-                                <span>
-                                    1 год
-                                </span>
-
-                                <span>
-                                    5 лет
-                                </span>
-
-                                <span>
-                                    10 лет
-                                </span>
-
-                                <span>
-                                    25 лет
-                                </span>
-
-                                <span>
-                                    вся жизнь
-                                </span>
-
+                                <span>1 месяц</span>
+                                <span>1 год</span>
+                                <span>5 лет</span>
+                                <span>10 лет</span>
+                                <span>25 лет</span>
+                                <span>вся жизнь</span>
                             </div>
-
                         </div>
-
                     </div>
-
                 </section>
-
             </div>
 
-            {/* ================================================
-                FULL REPORT
-            ================================================ */}
-
             <section className="paid-section">
-
                 <div className="paid-card">
-
                     <div className="paid-art">
-
                         <img
                             className="art-main"
                             src={PAID_IMAGE}
@@ -471,28 +407,24 @@ export default function ResultPage() {
                             draggable={false}
                         />
 
-                        <div className="art-color-fade" />
-
+                        <div className="art-fade" />
+                        <div className="art-glow" />
                     </div>
 
                     <div className="paid-content">
-
                         <div className="paid-copy">
-
                             <div className="paid-label">
                                 ПОЛНЫЙ РАЗБОР
                             </div>
 
                             <h2>
-                                Продлите
+                                Как продлить
                                 <br />
                                 ваши годы вместе.
                             </h2>
-
                         </div>
 
                         <div className="benefits">
-
                             <Benefit
                                 icon="heart"
                                 text={
@@ -500,17 +432,6 @@ export default function ResultPage() {
                                         Где вы можете
                                         <br />
                                         не понимать друг друга
-                                    </>
-                                }
-                            />
-
-                            <Benefit
-                                icon="message"
-                                text={
-                                    <>
-                                        Что каждый ждёт
-                                        <br />
-                                        от отношений
                                     </>
                                 }
                             />
@@ -527,6 +448,17 @@ export default function ResultPage() {
                             />
 
                             <Benefit
+                                icon="message"
+                                text={
+                                    <>
+                                        Что каждый ждёт
+                                        <br />
+                                        от отношений
+                                    </>
+                                }
+                            />
+
+                            <Benefit
                                 icon="chart"
                                 text={
                                     <>
@@ -536,7 +468,6 @@ export default function ResultPage() {
                                     </>
                                 }
                             />
-
                         </div>
 
                         <button
@@ -548,42 +479,27 @@ export default function ResultPage() {
                                 )
                             }
                         >
-
                             <span className="cta-title">
                                 Открыть полный разбор
                             </span>
 
                             <span className="cta-right">
-
                                 <strong>
                                     299 ₽
                                 </strong>
 
-                                <b>
-                                    →
-                                </b>
-
+                                <b>→</b>
                             </span>
-
                         </button>
 
                         <div className="paid-note">
-                            один разбор · для вас двоих ·
-                            сразу после оплаты
+                            один разбор · для вас двоих · сразу после оплаты
                         </div>
-
                     </div>
-
                 </div>
-
             </section>
 
             <style jsx>{`
-
-                /* =====================================================
-                   GLOBAL
-                ===================================================== */
-
                 :global(*) {
                     box-sizing: border-box;
                 }
@@ -596,7 +512,7 @@ export default function ResultPage() {
 
                 .page {
                     min-height: 100vh;
-                    padding-bottom: 80px;
+                    padding-bottom: 72px;
                     overflow-x: hidden;
                     background: #f8f4f1;
                 }
@@ -606,26 +522,17 @@ export default function ResultPage() {
                         920px,
                         calc(100% - 56px)
                     );
-
                     margin: 0 auto;
                 }
 
-                /* =====================================================
-                   HEADER
-                ===================================================== */
-
                 .header {
                     min-height: 78px;
-
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
-
                     gap: 20px;
-
                     border-bottom:
-                        1px solid
-                        #ddd5d2;
+                        1px solid #ddd5d2;
                 }
 
                 .brand {
@@ -633,31 +540,23 @@ export default function ResultPage() {
                         Georgia,
                         "Times New Roman",
                         serif;
-
                     font-size: 24px;
                     font-weight: 700;
-
                     letter-spacing: -1.1px;
                 }
 
                 .couple-names {
                     display: flex;
                     gap: 9px;
-
                     align-items: center;
-
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
-
                     font-size: 10px;
                     font-weight: 700;
-
                     letter-spacing: 1px;
-
                     color: #8f8588;
-
                     text-transform: uppercase;
                 }
 
@@ -665,108 +564,64 @@ export default function ResultPage() {
                     color: #c2215a;
                 }
 
-                /* =====================================================
-                   COMMON LABEL
-                ===================================================== */
-
                 .section-label {
-                    margin-bottom: 18px;
-
+                    margin-bottom: 14px;
                     color: #c2215a;
-
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
-
                     font-size: 10px;
                     font-weight: 800;
-
                     letter-spacing: 2.2px;
                 }
 
-                /* =====================================================
-                   RESULTS
-                ===================================================== */
-
                 .results {
-                    padding:
-                        38px 0 38px;
+                    padding: 42px 0 38px;
                 }
-
-                .category-list {
-                    width: 100%;
-                }
-
-                /* =====================================================
-                   FORECAST
-                ===================================================== */
 
                 .forecast {
-                    padding:
-                        43px 0 52px;
-
+                    padding: 38px 0 50px;
                     display: grid;
-
                     grid-template-columns:
-                        minmax(300px, .95fr)
-                        minmax(390px, 1.05fr);
-
-                    gap: 66px;
-
+                        minmax(280px, 0.95fr)
+                        minmax(360px, 1.05fr);
+                    gap: 56px;
                     align-items: center;
-
                     border-top:
-                        1px solid
-                        #dcd4d1;
+                        1px solid #dcd4d1;
                 }
 
                 .forecast-copy h2 {
                     margin: 0;
-
-                    max-width: 430px;
-
+                    max-width: 460px;
                     font-family:
                         Georgia,
                         "Times New Roman",
                         serif;
-
                     font-size: 42px;
                     line-height: 1.01;
-
                     font-weight: 400;
-
                     letter-spacing: -2px;
                 }
 
                 .forecast-copy p {
-                    margin:
-                        13px 0 0;
-
+                    margin: 12px 0 0;
                     color: #958b8e;
-
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
-
                     font-size: 11px;
-
                     line-height: 1.4;
-
-                    letter-spacing: .15px;
-                }
-
-                .forecast-right {
-                    min-width: 0;
+                    letter-spacing: 0.1px;
+                    text-transform: lowercase;
                 }
 
                 .years {
                     display: flex;
                     align-items: baseline;
-
                     color: #c21856;
-
                     font-family:
                         Georgia,
                         "Times New Roman",
@@ -775,113 +630,69 @@ export default function ResultPage() {
 
                 .years strong {
                     font-size: 76px;
-                    line-height: .88;
-
+                    line-height: 0.88;
                     font-weight: 400;
-
                     letter-spacing: -4px;
                 }
 
                 .years span {
                     margin-left: 9px;
-
                     font-size: 39px;
                 }
 
-                /* =====================================================
-                   SCALE
-                ===================================================== */
-
                 .forecast-scale {
-                    margin-top: 25px;
+                    margin-top: 24px;
                 }
 
                 .scale {
                     position: relative;
-
                     height: 8px;
-
                     border-radius: 999px;
-
                     background: #e5dfe0;
                 }
 
                 .scale-progress {
                     position: absolute;
-
                     top: 0;
                     bottom: 0;
                     left: 0;
-
                     border-radius: inherit;
-
                     background:
                         linear-gradient(
                             90deg,
-                            #edb3c6 0%,
-                            #dc6e95 100%
+                            #efb6c9 0%,
+                            #da6b93 100%
                         );
                 }
 
                 .scale-dot {
                     position: absolute;
-
                     z-index: 4;
-
                     top: 50%;
-
                     width: 21px;
                     height: 21px;
-
                     border:
-                        4px solid
-                        #f8f4f1;
-
+                        4px solid #f8f4f1;
                     border-radius: 50%;
-
                     background: #c21856;
-
                     box-shadow:
                         0 2px 8px
-                        rgba(
-                            104,
-                            18,
-                            52,
-                            .18
-                        );
-
+                        rgba(104, 18, 52, 0.18);
                     transform:
-                        translate(
-                            -50%,
-                            -50%
-                        );
+                        translate(-50%, -50%);
                 }
 
                 .scale-tick {
                     position: absolute;
-
                     z-index: 2;
-
                     top: 50%;
-
                     width: 3px;
                     height: 3px;
-
                     border-radius: 50%;
-
                     background:
-                        rgba(
-                            132,
-                            113,
-                            120,
-                            .42
-                        );
-
+                        rgba(132, 113, 120, 0.42);
                     transform:
-                        translate(
-                            -50%,
-                            -50%
-                        );
+                        translate(-50%, -50%);
                 }
 
                 .tick-1 {
@@ -902,28 +713,20 @@ export default function ResultPage() {
 
                 .scale-labels {
                     position: relative;
-
                     height: 28px;
-
                     margin-top: 12px;
-
                     color: #948b8e;
-
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
-
                     font-size: 9px;
-
                     white-space: nowrap;
                 }
 
                 .scale-labels span {
                     position: absolute;
-
-                    transform:
-                        translateX(-50%);
+                    transform: translateX(-50%);
                 }
 
                 .scale-labels span:nth-child(1) {
@@ -952,413 +755,207 @@ export default function ResultPage() {
                     transform: none;
                 }
 
-                /* =====================================================
-                   PAID SECTION
-                ===================================================== */
-
                 .paid-section {
                     width: min(
-                        1180px,
+                        1500px,
                         calc(100% - 40px)
                     );
-
-                    margin:
-                        10px auto 0;
+                    margin: 12px auto 0;
                 }
 
                 .paid-card {
                     position: relative;
-
                     width: 100%;
-                    min-height: 590px;
-
+                    min-height: 430px;
                     overflow: hidden;
-
                     border-radius: 24px;
-
-                    background: #ad194a;
-
+                    background:
+                        linear-gradient(
+                            135deg,
+                            #b0134f 0%,
+                            #c8175c 48%,
+                            #c0135b 100%
+                        );
                     isolation: isolate;
                 }
 
-                /* =====================================================
-                   ART
-                ===================================================== */
-
                 .paid-art {
                     position: absolute;
-
+                    inset: 0;
                     z-index: 1;
-
-                    inset:
-                        0 auto 0 0;
-
-                    width: 72%;
-
                     overflow: hidden;
                 }
 
                 .art-main {
                     position: absolute;
-
-                    z-index: 1;
-
-                    inset: 0;
-
-                    width: 80%;
+                    top: 0;
+                    bottom: 0;
+                    left: 0;
+                    width: 58%;
                     height: 100%;
-
                     display: block;
-
                     object-fit: cover;
-
-                    object-position:
-                        50% 54%;
-
+                    object-position: 50% 50%;
                     pointer-events: none;
                     user-select: none;
+                    z-index: 1;
                 }
 
                 .art-blur {
                     position: absolute;
-
-                    z-index: 2;
-
-                    inset: 0;
-
-                    width: 92%;
-                    height: 100%;
-
+                    inset: -4%;
+                    width: 82%;
+                    height: 108%;
                     object-fit: cover;
-
-                    object-position:
-                        50% 54%;
-
-                    filter:
-                        blur(25px);
-
-                    transform:
-                        scale(1.08);
-
-                    opacity: .96;
-
+                    object-position: 50% 50%;
+                    filter: blur(30px);
+                    transform: scale(1.03);
+                    opacity: 0.98;
                     pointer-events: none;
-
+                    z-index: 2;
                     mask-image:
                         linear-gradient(
                             90deg,
-
-                            transparent 47%,
-
-                            rgba(
-                                0,
-                                0,
-                                0,
-                                .05
-                            ) 54%,
-
-                            rgba(
-                                0,
-                                0,
-                                0,
-                                .20
-                            ) 62%,
-
-                            rgba(
-                                0,
-                                0,
-                                0,
-                                .46
-                            ) 70%,
-
-                            rgba(
-                                0,
-                                0,
-                                0,
-                                .75
-                            ) 79%,
-
-                            black 91%
+                            transparent 34%,
+                            rgba(0, 0, 0, 0.05) 42%,
+                            rgba(0, 0, 0, 0.16) 49%,
+                            rgba(0, 0, 0, 0.38) 58%,
+                            rgba(0, 0, 0, 0.62) 67%,
+                            rgba(0, 0, 0, 0.84) 77%,
+                            black 88%
                         );
-
                     -webkit-mask-image:
                         linear-gradient(
                             90deg,
-
-                            transparent 47%,
-
-                            rgba(
-                                0,
-                                0,
-                                0,
-                                .05
-                            ) 54%,
-
-                            rgba(
-                                0,
-                                0,
-                                0,
-                                .20
-                            ) 62%,
-
-                            rgba(
-                                0,
-                                0,
-                                0,
-                                .46
-                            ) 70%,
-
-                            rgba(
-                                0,
-                                0,
-                                0,
-                                .75
-                            ) 79%,
-
-                            black 91%
+                            transparent 34%,
+                            rgba(0, 0, 0, 0.05) 42%,
+                            rgba(0, 0, 0, 0.16) 49%,
+                            rgba(0, 0, 0, 0.38) 58%,
+                            rgba(0, 0, 0, 0.62) 67%,
+                            rgba(0, 0, 0, 0.84) 77%,
+                            black 88%
                         );
                 }
 
-                .art-color-fade {
+                .art-fade {
                     position: absolute;
-
-                    z-index: 3;
-
                     inset: 0;
-
+                    z-index: 3;
                     pointer-events: none;
-
                     background:
                         linear-gradient(
                             90deg,
-
-                            transparent 40%,
-
-                            rgba(
-                                173,
-                                25,
-                                74,
-                                .01
-                            ) 49%,
-
-                            rgba(
-                                173,
-                                25,
-                                74,
-                                .06
-                            ) 56%,
-
-                            rgba(
-                                173,
-                                25,
-                                74,
-                                .16
-                            ) 63%,
-
-                            rgba(
-                                173,
-                                25,
-                                74,
-                                .34
-                            ) 70%,
-
-                            rgba(
-                                173,
-                                25,
-                                74,
-                                .57
-                            ) 77%,
-
-                            rgba(
-                                173,
-                                25,
-                                74,
-                                .78
-                            ) 84%,
-
-                            rgba(
-                                173,
-                                25,
-                                74,
-                                .93
-                            ) 91%,
-
-                            #ad194a 100%
+                            rgba(176, 19, 79, 0) 33%,
+                            rgba(176, 19, 79, 0.05) 42%,
+                            rgba(176, 19, 79, 0.14) 50%,
+                            rgba(176, 19, 79, 0.28) 58%,
+                            rgba(176, 19, 79, 0.48) 66%,
+                            rgba(176, 19, 79, 0.7) 75%,
+                            rgba(176, 19, 79, 0.88) 85%,
+                            #b0134f 100%
                         );
                 }
 
-                /* =====================================================
-                   PAID CONTENT
-                ===================================================== */
+                .art-glow {
+                    position: absolute;
+                    inset: 0;
+                    z-index: 4;
+                    pointer-events: none;
+                    background:
+                        radial-gradient(
+                            circle at 66% 8%,
+                            rgba(255, 178, 210, 0.18) 0%,
+                            rgba(255, 178, 210, 0.08) 20%,
+                            rgba(255, 178, 210, 0) 42%
+                        );
+                }
 
                 .paid-content {
                     position: relative;
-
                     z-index: 10;
-
-                    min-height: 590px;
+                    min-height: 430px;
                 }
-
-                /* =====================================================
-                   PAID TITLE
-                ===================================================== */
 
                 .paid-copy {
                     position: absolute;
-
-                    top: 54px;
-                    left: 51%;
-
-                    width: 44%;
-
+                    top: 38px;
+                    left: 56%;
+                    width: 38%;
                     max-width: 510px;
                 }
 
                 .paid-label {
-                    margin-bottom: 13px;
-
-                    color:
-                        rgba(
-                            255,
-                            244,
-                            247,
-                            .72
-                        );
-
+                    margin-bottom: 10px;
+                    color: rgba(255, 244, 247, 0.8);
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
-
                     font-size: 9px;
                     line-height: 1;
-
                     font-weight: 700;
-
                     letter-spacing: 2.3px;
                 }
 
                 .paid-copy h2 {
                     margin: 0;
-
                     color: #fff9f6;
-
                     font-family:
                         Georgia,
                         "Times New Roman",
                         serif;
-
                     font-size:
-                        clamp(
-                            42px,
-                            3.7vw,
-                            53px
-                        );
-
-                    line-height: .96;
-
+                        clamp(38px, 3.9vw, 58px);
+                    line-height: 0.95;
                     font-weight: 400;
-
-                    letter-spacing: -2px;
-
+                    letter-spacing: -1.7px;
                     text-shadow:
                         0 2px 18px
-                        rgba(
-                            64,
-                            0,
-                            28,
-                            .16
-                        );
+                        rgba(64, 0, 28, 0.16);
                 }
-
-                /* =====================================================
-                   BENEFITS
-                ===================================================== */
 
                 .benefits {
                     position: absolute;
-
-                    top: 218px;
-
-                    left: 51%;
-                    right: 42px;
-
+                    top: 177px;
+                    left: 56%;
+                    right: 34px;
                     display: grid;
-
                     grid-template-columns:
-                        repeat(
-                            2,
-                            minmax(0, 1fr)
-                        );
-
+                        repeat(2, minmax(0, 1fr));
                     column-gap: 34px;
-                    row-gap: 23px;
+                    row-gap: 22px;
                 }
-
-                /* =====================================================
-                   CTA
-                ===================================================== */
 
                 .paid-cta {
                     position: absolute;
-
                     z-index: 20;
-
-                    right: 32px;
-                    bottom: 61px;
-
-                    width: 48%;
-                    height: 78px;
-
-                    padding:
-                        0 28px;
-
+                    right: 28px;
+                    bottom: 44px;
+                    width: 46%;
+                    height: 62px;
+                    padding: 0 24px;
                     display: flex;
-
                     align-items: center;
-                    justify-content:
-                        space-between;
-
+                    justify-content: space-between;
                     gap: 20px;
-
                     border: 0;
-
-                    border-radius: 18px;
-
+                    border-radius: 17px;
                     background: #fffaf7;
-
                     color: #201d1e;
-
                     cursor: pointer;
-
                     box-shadow:
-                        0 12px 32px
-                        rgba(
-                            67,
-                            0,
-                            29,
-                            .12
-                        );
-
+                        0 12px 28px
+                        rgba(67, 0, 29, 0.12);
                     transition:
-                        transform
-                        160ms ease,
-                        box-shadow
-                        160ms ease;
+                        transform 160ms ease,
+                        box-shadow 160ms ease;
                 }
 
                 .paid-cta:hover {
-                    transform:
-                        translateY(-2px);
-
+                    transform: translateY(-2px);
                     box-shadow:
                         0 16px 35px
-                        rgba(
-                            67,
-                            0,
-                            29,
-                            .17
-                        );
+                        rgba(67, 0, 29, 0.16);
                 }
 
                 .cta-title {
@@ -1366,19 +963,15 @@ export default function ResultPage() {
                         Arial,
                         Helvetica,
                         sans-serif;
-
-                    font-size: 15px;
+                    font-size: 14px;
                     font-weight: 600;
-
-                    letter-spacing: -.1px;
+                    letter-spacing: -0.1px;
                 }
 
                 .cta-right {
                     display: flex;
                     align-items: center;
-
-                    gap: 22px;
-
+                    gap: 20px;
                     color: #c71e57;
                 }
 
@@ -1387,12 +980,9 @@ export default function ResultPage() {
                         Georgia,
                         "Times New Roman",
                         serif;
-
-                    font-size: 30px;
+                    font-size: 26px;
                     line-height: 1;
-
                     font-weight: 400;
-
                     white-space: nowrap;
                 }
 
@@ -1401,52 +991,63 @@ export default function ResultPage() {
                         Arial,
                         Helvetica,
                         sans-serif;
-
                     font-size: 27px;
                     line-height: 1;
-
                     font-weight: 300;
                 }
 
                 .paid-note {
                     position: absolute;
-
-                    right: 32px;
-                    bottom: 27px;
-
-                    width: 48%;
-
+                    right: 28px;
+                    bottom: 18px;
+                    width: 46%;
                     color:
-                        rgba(
-                            255,
-                            240,
-                            244,
-                            .63
-                        );
-
+                        rgba(255, 240, 244, 0.64);
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
-
                     font-size: 9px;
-
                     text-align: center;
                 }
 
-                /* =====================================================
-                   TABLET
-                ===================================================== */
+                @media (max-width: 1180px) {
+                    .paid-card,
+                    .paid-content {
+                        min-height: 410px;
+                    }
 
-                @media (
-                    max-width: 1000px
-                ) {
+                    .art-main {
+                        width: 59%;
+                    }
 
+                    .paid-copy {
+                        top: 34px;
+                        left: 55.5%;
+                        width: 39%;
+                    }
+
+                    .benefits {
+                        top: 168px;
+                        left: 55.5%;
+                        right: 28px;
+                        column-gap: 24px;
+                    }
+
+                    .paid-cta {
+                        width: 48%;
+                    }
+
+                    .paid-note {
+                        width: 48%;
+                    }
+                }
+
+                @media (max-width: 1000px) {
                     .forecast {
                         grid-template-columns:
-                            minmax(260px, .9fr)
-                            minmax(340px, 1.1fr);
-
+                            minmax(260px, 0.95fr)
+                            minmax(330px, 1.05fr);
                         gap: 40px;
                     }
 
@@ -1456,63 +1057,50 @@ export default function ResultPage() {
 
                     .paid-card,
                     .paid-content {
-                        min-height: 550px;
+                        min-height: 390px;
                     }
 
-                    .paid-art {
-                        width: 74%;
+                    .art-main {
+                        width: 60%;
+                    }
+
+                    .art-blur {
+                        width: 85%;
                     }
 
                     .paid-copy {
-                        top: 47px;
-                        left: 49%;
-
-                        width: 47%;
+                        top: 30px;
+                        left: 55%;
+                        width: 40%;
                     }
 
                     .paid-copy h2 {
-                        font-size: 43px;
+                        font-size: 40px;
                     }
 
                     .benefits {
-                        top: 205px;
-
-                        left: 50%;
-                        right: 30px;
-
-                        column-gap: 25px;
-                        row-gap: 21px;
+                        top: 154px;
+                        left: 55%;
+                        right: 24px;
+                        row-gap: 18px;
                     }
 
                     .paid-cta {
-                        right: 25px;
-
-                        bottom: 57px;
-
-                        width: 51%;
-                        height: 70px;
+                        right: 22px;
+                        bottom: 40px;
+                        width: 49%;
+                        height: 58px;
                     }
 
                     .paid-note {
-                        right: 25px;
-
-                        bottom: 25px;
-
-                        width: 51%;
+                        right: 22px;
+                        width: 49%;
                     }
                 }
 
-                /* =====================================================
-                   MOBILE
-                ===================================================== */
-
-                @media (
-                    max-width: 640px
-                ) {
-
+                @media (max-width: 640px) {
                     .page {
-                        padding:
-                            0 12px 36px;
+                        padding: 0 12px 36px;
                     }
 
                     .content-shell {
@@ -1529,48 +1117,26 @@ export default function ResultPage() {
 
                     .couple-names {
                         max-width: 52%;
-
                         font-size: 8px;
                     }
 
-                    /* =============================================
-                       RESULTS
-                    ============================================= */
-
                     .results {
-                        padding:
-                            27px 0 30px;
+                        padding: 27px 0 30px;
                     }
-
-                    .section-label {
-                        margin-bottom: 14px;
-
-                        font-size: 9px;
-                    }
-
-                    /* =============================================
-                       FORECAST
-                    ============================================= */
 
                     .forecast {
                         display: block;
-
-                        padding:
-                            29px 0 37px;
+                        padding: 29px 0 37px;
                     }
 
                     .forecast-copy h2 {
                         max-width: 330px;
-
                         font-size: 34px;
-
-                        letter-spacing:
-                            -1.5px;
+                        letter-spacing: -1.5px;
                     }
 
                     .forecast-copy p {
                         margin-top: 9px;
-
                         font-size: 10px;
                     }
 
@@ -1600,277 +1166,129 @@ export default function ResultPage() {
                         display: none;
                     }
 
-                    /* =============================================
-                       PAID CARD
-                    ============================================= */
-
                     .paid-section {
                         width: 100%;
-
                         margin: 0;
                     }
 
                     .paid-card,
                     .paid-content {
-                        min-height: 720px;
+                        min-height: 760px;
                     }
 
                     .paid-card {
                         border-radius: 22px;
                     }
 
-                    /* =============================================
-                       MOBILE IMAGE
-                    ============================================= */
-
                     .paid-art {
                         top: 0;
                         left: 0;
-
                         width: 100%;
-                        height: 405px;
-
+                        height: 355px;
                         bottom: auto;
                     }
 
                     .art-main {
                         width: 100%;
                         height: 100%;
-
                         object-fit: cover;
-
-                        object-position:
-                            50% 50%;
+                        object-position: 50% 50%;
                     }
 
                     .art-blur {
+                        inset: 0;
                         width: 100%;
                         height: 100%;
-
-                        object-position:
-                            50% 50%;
-
-                        filter:
-                            blur(22px);
-
-                        transform:
-                            scale(1.08);
-
+                        object-position: 50% 50%;
+                        filter: blur(20px);
+                        transform: scale(1.06);
                         mask-image:
                             linear-gradient(
                                 180deg,
-
                                 transparent 48%,
-
-                                rgba(
-                                    0,
-                                    0,
-                                    0,
-                                    .04
-                                ) 56%,
-
-                                rgba(
-                                    0,
-                                    0,
-                                    0,
-                                    .18
-                                ) 65%,
-
-                                rgba(
-                                    0,
-                                    0,
-                                    0,
-                                    .43
-                                ) 74%,
-
-                                rgba(
-                                    0,
-                                    0,
-                                    0,
-                                    .72
-                                ) 84%,
-
-                                black 96%
+                                rgba(0, 0, 0, 0.06) 57%,
+                                rgba(0, 0, 0, 0.18) 66%,
+                                rgba(0, 0, 0, 0.42) 75%,
+                                rgba(0, 0, 0, 0.7) 86%,
+                                black 100%
                             );
-
                         -webkit-mask-image:
                             linear-gradient(
                                 180deg,
-
                                 transparent 48%,
-
-                                rgba(
-                                    0,
-                                    0,
-                                    0,
-                                    .04
-                                ) 56%,
-
-                                rgba(
-                                    0,
-                                    0,
-                                    0,
-                                    .18
-                                ) 65%,
-
-                                rgba(
-                                    0,
-                                    0,
-                                    0,
-                                    .43
-                                ) 74%,
-
-                                rgba(
-                                    0,
-                                    0,
-                                    0,
-                                    .72
-                                ) 84%,
-
-                                black 96%
+                                rgba(0, 0, 0, 0.06) 57%,
+                                rgba(0, 0, 0, 0.18) 66%,
+                                rgba(0, 0, 0, 0.42) 75%,
+                                rgba(0, 0, 0, 0.7) 86%,
+                                black 100%
                             );
                     }
 
-                    .art-color-fade {
+                    .art-fade {
                         background:
                             linear-gradient(
                                 180deg,
-
-                                transparent 45%,
-
-                                rgba(
-                                    173,
-                                    25,
-                                    74,
-                                    .02
-                                ) 55%,
-
-                                rgba(
-                                    173,
-                                    25,
-                                    74,
-                                    .10
-                                ) 64%,
-
-                                rgba(
-                                    173,
-                                    25,
-                                    74,
-                                    .28
-                                ) 73%,
-
-                                rgba(
-                                    173,
-                                    25,
-                                    74,
-                                    .53
-                                ) 82%,
-
-                                rgba(
-                                    173,
-                                    25,
-                                    74,
-                                    .78
-                                ) 90%,
-
-                                rgba(
-                                    173,
-                                    25,
-                                    74,
-                                    .95
-                                ) 97%,
-
-                                #ad194a 100%
+                                rgba(176, 19, 79, 0) 46%,
+                                rgba(176, 19, 79, 0.04) 56%,
+                                rgba(176, 19, 79, 0.13) 64%,
+                                rgba(176, 19, 79, 0.3) 73%,
+                                rgba(176, 19, 79, 0.56) 82%,
+                                rgba(176, 19, 79, 0.82) 92%,
+                                #b0134f 100%
                             );
                     }
 
-                    /* =============================================
-                       MOBILE TITLE
-                    ============================================= */
+                    .art-glow {
+                        background:
+                            radial-gradient(
+                                circle at 72% 4%,
+                                rgba(255, 178, 210, 0.2) 0%,
+                                rgba(255, 178, 210, 0.08) 18%,
+                                rgba(255, 178, 210, 0) 40%
+                            );
+                    }
 
                     .paid-copy {
-                        top: 320px;
-                        left: 25px;
-
-                        width:
-                            calc(
-                                100% - 50px
-                            );
-
+                        top: 376px;
+                        left: 22px;
+                        width: calc(100% - 44px);
                         max-width: none;
                     }
 
                     .paid-label {
                         margin-bottom: 10px;
-
                         font-size: 8px;
-
-                        letter-spacing:
-                            1.9px;
+                        letter-spacing: 1.9px;
                     }
 
                     .paid-copy h2 {
                         max-width: 330px;
-
-                        font-size: 34px;
-
-                        line-height: .97;
-
-                        letter-spacing:
-                            -1.5px;
-
+                        font-size: 31px;
+                        line-height: 0.97;
+                        letter-spacing: -1.35px;
                         text-shadow:
                             0 2px 15px
-                            rgba(
-                                55,
-                                0,
-                                26,
-                                .24
-                            );
+                            rgba(55, 0, 26, 0.24);
                     }
-
-                    /* =============================================
-                       MOBILE BENEFITS
-                    ============================================= */
 
                     .benefits {
-                        top: 430px;
-
-                        left: 25px;
-                        right: 25px;
-
+                        top: 500px;
+                        left: 22px;
+                        right: 22px;
                         width: auto;
-
                         grid-template-columns:
-                            repeat(
-                                2,
-                                minmax(0, 1fr)
-                            );
-
-                        column-gap: 20px;
-                        row-gap: 20px;
+                            repeat(2, minmax(0, 1fr));
+                        column-gap: 16px;
+                        row-gap: 18px;
                     }
 
-                    /* =============================================
-                       MOBILE CTA
-                    ============================================= */
-
                     .paid-cta {
-                        left: 20px;
-                        right: 20px;
-
-                        bottom: 49px;
-
-                        width:
-                            calc(
-                                100% - 40px
-                            );
-
+                        left: 16px;
+                        right: 16px;
+                        bottom: 50px;
+                        width: calc(100% - 32px);
                         height: 61px;
-
-                        padding:
-                            0 18px;
-
+                        padding: 0 18px;
                         border-radius: 15px;
                     }
 
@@ -1891,84 +1309,42 @@ export default function ResultPage() {
                     }
 
                     .paid-note {
-                        left: 20px;
-                        right: 20px;
-
-                        bottom: 20px;
-
+                        left: 16px;
+                        right: 16px;
+                        bottom: 21px;
                         width: auto;
-
                         font-size: 8px;
                     }
                 }
 
-                /* =====================================================
-                   SMALL MOBILE
-                ===================================================== */
-
-                @media (
-                    max-width: 390px
-                ) {
-
+                @media (max-width: 390px) {
                     .paid-card,
                     .paid-content {
-                        min-height: 700px;
+                        min-height: 735px;
                     }
 
                     .paid-art {
-                        height: 385px;
+                        height: 340px;
                     }
 
                     .paid-copy {
-                        top: 302px;
-
-                        left: 22px;
-
-                        width:
-                            calc(
-                                100% - 44px
-                            );
+                        top: 360px;
                     }
 
                     .paid-copy h2 {
-                        font-size: 31px;
+                        font-size: 29px;
                     }
 
                     .benefits {
-                        top: 407px;
-
-                        left: 22px;
-                        right: 22px;
-
-                        column-gap: 14px;
-                        row-gap: 18px;
-                    }
-
-                    .paid-cta {
-                        left: 16px;
-                        right: 16px;
-
-                        width:
-                            calc(
-                                100% - 32px
-                            );
-                    }
-
-                    .paid-note {
-                        left: 16px;
-                        right: 16px;
+                        top: 482px;
+                        column-gap: 12px;
+                        row-gap: 16px;
                     }
                 }
-
             `}</style>
-
         </main>
     );
 }
-
-/* ============================================================
-   CATEGORY
-============================================================ */
 
 function CategoryRow({
                          title,
@@ -1978,19 +1354,13 @@ function CategoryRow({
     const safeValue =
         Math.max(
             0,
-            Math.min(
-                MAX_SCORE,
-                value
-            )
+            Math.min(MAX_SCORE, value)
         );
 
     return (
         <div className="category-row">
-
             <div className="category-head">
-
                 <div>
-
                     <div className="category-title">
                         {title}
                     </div>
@@ -1998,43 +1368,30 @@ function CategoryRow({
                     <div className="category-subtitle">
                         {subtitle}
                     </div>
-
                 </div>
 
                 <div className="category-score">
-
                     <strong>
                         {safeValue}
                     </strong>
 
-                    <span>
-                        /10
-                    </span>
-
+                    <span>/10</span>
                 </div>
-
             </div>
 
             <div className="category-line">
-
                 <div
                     style={{
-                        width:
-                            `${safeValue * 10}%`,
+                        width: `${safeValue * 10}%`,
                     }}
                 />
-
             </div>
 
             <style jsx>{`
-
                 .category-row {
-                    padding:
-                        16px 0 18px;
-
+                    padding: 16px 0 18px;
                     border-bottom:
-                        1px solid
-                        #e0d9d6;
+                        1px solid #e0d9d6;
                 }
 
                 .category-row:first-child {
@@ -2043,12 +1400,8 @@ function CategoryRow({
 
                 .category-head {
                     display: flex;
-
                     align-items: flex-end;
-
-                    justify-content:
-                        space-between;
-
+                    justify-content: space-between;
                     gap: 20px;
                 }
 
@@ -2057,33 +1410,24 @@ function CategoryRow({
                         Georgia,
                         "Times New Roman",
                         serif;
-
                     font-size: 29px;
-
-                    letter-spacing:
-                        -1.2px;
+                    letter-spacing: -1.2px;
                 }
 
                 .category-subtitle {
                     margin-top: 5px;
-
                     color: #8e8688;
-
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
-
                     font-size: 12px;
                 }
 
                 .category-score {
                     display: flex;
-
                     align-items: baseline;
-
                     color: #7f7679;
-
                     font-family:
                         Georgia,
                         "Times New Roman",
@@ -2092,45 +1436,32 @@ function CategoryRow({
 
                 .category-score strong {
                     color: #c21856;
-
                     font-size: 42px;
-
                     font-weight: 400;
                 }
 
                 .category-score span {
                     margin-left: 3px;
-
                     font-size: 18px;
                 }
 
                 .category-line {
                     height: 6px;
-
                     margin-top: 11px;
-
                     overflow: hidden;
-
                     border-radius: 999px;
-
                     background: #e5dfdf;
                 }
 
                 .category-line div {
                     height: 100%;
-
                     border-radius: inherit;
-
                     background: #cb3a6d;
                 }
 
-                @media (
-                    max-width: 640px
-                ) {
-
+                @media (max-width: 640px) {
                     .category-row {
-                        padding:
-                            13px 0 15px;
+                        padding: 13px 0 15px;
                     }
 
                     .category-title {
@@ -2138,9 +1469,8 @@ function CategoryRow({
                     }
 
                     .category-subtitle {
-                        max-width: 250px;
-
                         font-size: 10px;
+                        max-width: 250px;
                     }
 
                     .category-score strong {
@@ -2155,16 +1485,10 @@ function CategoryRow({
                         height: 5px;
                     }
                 }
-
             `}</style>
-
         </div>
     );
 }
-
-/* ============================================================
-   BENEFIT
-============================================================ */
 
 function Benefit({
                      icon,
@@ -2175,11 +1499,8 @@ function Benefit({
 }) {
     return (
         <div className="benefit">
-
             <div className="benefit-icon">
-                <BenefitSvg
-                    type={icon}
-                />
+                <BenefitSvg type={icon} />
             </div>
 
             <div className="benefit-text">
@@ -2187,26 +1508,18 @@ function Benefit({
             </div>
 
             <style jsx>{`
-
                 .benefit {
                     display: grid;
-
                     grid-template-columns:
-                        22px
-                        minmax(0, 1fr);
-
+                        22px minmax(0, 1fr);
                     gap: 10px;
-
                     align-items: start;
-
                     color: #fff8f6;
                 }
 
                 .benefit-icon {
                     width: 20px;
-
                     padding-top: 1px;
-
                     color: #ffd8e1;
                 }
 
@@ -2215,23 +1528,15 @@ function Benefit({
                         Arial,
                         Helvetica,
                         sans-serif;
-
                     font-size: 13px;
-
-                    line-height: 1.3;
-
+                    line-height: 1.28;
                     font-weight: 500;
                 }
 
-                @media (
-                    max-width: 640px
-                ) {
-
+                @media (max-width: 640px) {
                     .benefit {
                         grid-template-columns:
-                            19px
-                            minmax(0, 1fr);
-
+                            19px minmax(0, 1fr);
                         gap: 8px;
                     }
 
@@ -2241,20 +1546,13 @@ function Benefit({
 
                     .benefit-text {
                         font-size: 11px;
-
-                        line-height: 1.28;
+                        line-height: 1.27;
                     }
                 }
-
             `}</style>
-
         </div>
     );
 }
-
-/* ============================================================
-   ICONS
-============================================================ */
 
 function BenefitSvg({
                         type,
@@ -2390,10 +1688,6 @@ function BenefitSvg({
         </svg>
     );
 }
-
-/* ============================================================
-   YEAR WORD
-============================================================ */
 
 function getYearWord(
     value: number
