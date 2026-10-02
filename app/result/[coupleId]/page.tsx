@@ -35,16 +35,13 @@ type BenefitIcon =
 
 const MAX_SCORE = 10;
 
-const PAID_IMAGE =
-    "/images/full-report-couple.png";
+const PAID_IMAGE = "/images/full-report-couple.png";
 
 export default function ResultPage() {
     const params = useParams();
     const router = useRouter();
 
-    const coupleId = String(
-        params.coupleId ?? ""
-    );
+    const coupleId = String(params.coupleId ?? "");
 
     const [data, setData] =
         useState<ApiResponse | null>(null);
@@ -62,15 +59,12 @@ export default function ResultPage() {
 
         async function loadResult() {
             try {
-                const response =
-                    await fetch(
-                        `/api/report?id=${encodeURIComponent(
-                            coupleId
-                        )}`,
-                        {
-                            cache: "no-store",
-                        }
-                    );
+                const response = await fetch(
+                    `/api/report?id=${encodeURIComponent(coupleId)}`,
+                    {
+                        cache: "no-store",
+                    }
+                );
 
                 if (!response.ok) {
                     throw new Error(
@@ -126,20 +120,14 @@ export default function ResultPage() {
             );
 
             const base = Math.round(
-                ((same + close * 0.5) /
-                    total) *
+                ((same + close * 0.5) / total) *
                 MAX_SCORE
             );
 
-            const clamp = (
-                value: number
-            ) =>
+            const clamp = (value: number) =>
                 Math.max(
                     0,
-                    Math.min(
-                        MAX_SCORE,
-                        value
-                    )
+                    Math.min(MAX_SCORE, value)
                 );
 
             return [
@@ -197,19 +185,64 @@ export default function ResultPage() {
             return 1;
         }, [data]);
 
+    /*
+     * Шкала теперь специально НЕ линейная по 60 годам.
+     *
+     * Иначе:
+     * 1 год = почти 0%
+     * 6 лет = всего 10%
+     * 10 лет = 16%
+     *
+     * и визуально всё слипается слева.
+     *
+     * Вместо этого распределяем жизненные интервалы
+     * равномернее по шкале.
+     */
     const forecastPosition =
         useMemo(() => {
-            const maxYears = 60;
+            const points = [
+                { years: 0.08, position: 3 },
+                { years: 1, position: 18 },
+                { years: 5, position: 36 },
+                { years: 10, position: 54 },
+                { years: 25, position: 74 },
+                { years: 60, position: 97 },
+            ];
 
-            return Math.max(
-                4,
-                Math.min(
-                    96,
-                    (yearsForecast /
-                        maxYears) *
-                    100
-                )
-            );
+            if (
+                yearsForecast <= points[0].years
+            ) {
+                return points[0].position;
+            }
+
+            for (
+                let i = 0;
+                i < points.length - 1;
+                i++
+            ) {
+                const current = points[i];
+                const next = points[i + 1];
+
+                if (
+                    yearsForecast >= current.years &&
+                    yearsForecast <= next.years
+                ) {
+                    const ratio =
+                        (yearsForecast -
+                            current.years) /
+                        (next.years -
+                            current.years);
+
+                    return (
+                        current.position +
+                        ratio *
+                        (next.position -
+                            current.position)
+                    );
+                }
+            }
+
+            return 97;
         }, [yearsForecast]);
 
     const nameA =
@@ -274,7 +307,7 @@ export default function ResultPage() {
         <main className="page">
 
             {/* =====================================================
-                RESULT
+                MAIN RESULT
             ===================================================== */}
 
             <div className="content-shell">
@@ -301,17 +334,15 @@ export default function ResultPage() {
 
                 </header>
 
+                {/* =================================================
+                    SCORES
+                ================================================= */}
+
                 <section className="results">
 
                     <div className="section-label">
                         ВАШ РЕЗУЛЬТАТ
                     </div>
-
-                    <h1>
-                        Вот что
-                        <br />
-                        получилось
-                    </h1>
 
                     <div className="category-list">
 
@@ -328,16 +359,20 @@ export default function ResultPage() {
 
                 </section>
 
+                {/* =================================================
+                    FORECAST
+                ================================================= */}
+
                 <section className="forecast">
 
-                    <div>
+                    <div className="forecast-copy">
 
                         <div className="section-label">
                             ПРОГНОЗ
                         </div>
 
                         <h2>
-                            Ориентировочная
+                            Примерная
                             <br />
                             длительность
                             <br />
@@ -345,10 +380,7 @@ export default function ResultPage() {
                         </h2>
 
                         <p>
-                            На основе ваших ответов
-                            мы оценили ориентировочный
-                            сценарий длительности
-                            ваших отношений.
+                            на основании ИИ-модели
                         </p>
 
                     </div>
@@ -376,15 +408,33 @@ export default function ResultPage() {
                                 <div
                                     className="scale-progress"
                                     style={{
-                                        width: `${forecastPosition}%`,
+                                        width:
+                                            `${forecastPosition}%`,
                                     }}
                                 />
 
                                 <div
                                     className="scale-dot"
                                     style={{
-                                        left: `${forecastPosition}%`,
+                                        left:
+                                            `${forecastPosition}%`,
                                     }}
+                                />
+
+                                <div
+                                    className="scale-tick tick-1"
+                                />
+
+                                <div
+                                    className="scale-tick tick-2"
+                                />
+
+                                <div
+                                    className="scale-tick tick-3"
+                                />
+
+                                <div
+                                    className="scale-tick tick-4"
                                 />
 
                             </div>
@@ -393,6 +443,22 @@ export default function ResultPage() {
 
                                 <span>
                                     1 месяц
+                                </span>
+
+                                <span>
+                                    1 год
+                                </span>
+
+                                <span>
+                                    5 лет
+                                </span>
+
+                                <span>
+                                    10 лет
+                                </span>
+
+                                <span>
+                                    25 лет
                                 </span>
 
                                 <span>
@@ -423,8 +489,6 @@ export default function ResultPage() {
 
                     <div className="paid-art">
 
-                        {/* обычная картинка */}
-
                         <img
                             className="art-main"
                             src={PAID_IMAGE}
@@ -432,16 +496,12 @@ export default function ResultPage() {
                             draggable={false}
                         />
 
-                        {/* та же картинка, но blur */}
-
                         <img
                             className="art-blur"
                             src={PAID_IMAGE}
                             alt=""
                             draggable={false}
                         />
-
-                        {/* переход в berry */}
 
                         <div className="art-color-fade" />
 
@@ -453,6 +513,10 @@ export default function ResultPage() {
 
                     <div className="paid-content">
 
+                        {/* =============================================
+                            TITLE
+                        ============================================= */}
+
                         <div className="paid-copy">
 
                             <div className="paid-label">
@@ -460,12 +524,16 @@ export default function ResultPage() {
                             </div>
 
                             <h2>
-                                Чтобы вместе —
+                                Как продлить
                                 <br />
-                                и надолго.
+                                ваши годы вместе.
                             </h2>
 
                         </div>
+
+                        {/* =============================================
+                            BENEFITS 2 × 2
+                        ============================================= */}
 
                         <div className="benefits">
 
@@ -514,6 +582,10 @@ export default function ResultPage() {
                             />
 
                         </div>
+
+                        {/* =============================================
+                            CTA
+                        ============================================= */}
 
                         <button
                             type="button"
@@ -642,15 +714,11 @@ export default function ResultPage() {
                 }
 
                 /* =====================================================
-                   RESULTS
+                   COMMON LABEL
                 ===================================================== */
 
-                .results {
-                    padding: 42px 0 45px;
-                }
-
                 .section-label {
-                    margin-bottom: 13px;
+                    margin-bottom: 18px;
 
                     color: #c2215a;
 
@@ -665,20 +733,17 @@ export default function ResultPage() {
                     letter-spacing: 2.2px;
                 }
 
-                .results h1 {
-                    margin: 0 0 32px;
+                /* =====================================================
+                   RESULTS
+                ===================================================== */
 
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
+                .results {
+                    padding:
+                        38px 0 38px;
+                }
 
-                    font-size: 48px;
-                    line-height: .98;
-
-                    font-weight: 400;
-
-                    letter-spacing: -2.5px;
+                .category-list {
+                    width: 100%;
                 }
 
                 /* =====================================================
@@ -686,15 +751,16 @@ export default function ResultPage() {
                 ===================================================== */
 
                 .forecast {
-                    padding: 38px 0 46px;
+                    padding:
+                        43px 0 52px;
 
                     display: grid;
 
                     grid-template-columns:
-                        minmax(0, 1.1fr)
-                        minmax(280px, .9fr);
+                        minmax(300px, .95fr)
+                        minmax(390px, 1.05fr);
 
-                    gap: 55px;
+                    gap: 66px;
 
                     align-items: center;
 
@@ -703,36 +769,44 @@ export default function ResultPage() {
                         #dcd4d1;
                 }
 
-                .forecast h2 {
+                .forecast-copy h2 {
                     margin: 0;
+
+                    max-width: 430px;
 
                     font-family:
                         Georgia,
                         "Times New Roman",
                         serif;
 
-                    font-size: 43px;
+                    font-size: 42px;
                     line-height: 1.01;
 
                     font-weight: 400;
 
-                    letter-spacing: -2.2px;
+                    letter-spacing: -2px;
                 }
 
-                .forecast p {
-                    max-width: 500px;
+                .forecast-copy p {
+                    margin:
+                        13px 0 0;
 
-                    margin: 15px 0 0;
-
-                    color: #8d8587;
+                    color: #958b8e;
 
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
 
-                    font-size: 14px;
-                    line-height: 1.5;
+                    font-size: 11px;
+
+                    line-height: 1.4;
+
+                    letter-spacing: .15px;
+                }
+
+                .forecast-right {
+                    min-width: 0;
                 }
 
                 .years {
@@ -762,14 +836,18 @@ export default function ResultPage() {
                     font-size: 39px;
                 }
 
+                /* =====================================================
+                   FORECAST SCALE
+                ===================================================== */
+
                 .forecast-scale {
-                    margin-top: 23px;
+                    margin-top: 25px;
                 }
 
                 .scale {
                     position: relative;
 
-                    height: 9px;
+                    height: 8px;
 
                     border-radius: 999px;
 
@@ -777,43 +855,143 @@ export default function ResultPage() {
                 }
 
                 .scale-progress {
-                    height: 100%;
+                    position: absolute;
+
+                    top: 0;
+                    bottom: 0;
+                    left: 0;
 
                     border-radius: inherit;
 
-                    background: #e99ab5;
+                    background:
+                        linear-gradient(
+                            90deg,
+                            #edb3c6 0%,
+                            #dc6e95 100%
+                        );
                 }
 
                 .scale-dot {
                     position: absolute;
 
+                    z-index: 4;
+
                     top: 50%;
 
-                    width: 22px;
-                    height: 22px;
+                    width: 21px;
+                    height: 21px;
+
+                    border: 4px solid #f8f4f1;
 
                     border-radius: 50%;
 
                     background: #c21856;
 
+                    box-shadow:
+                        0 2px 8px
+                        rgba(
+                            104,
+                            18,
+                            52,
+                            .18
+                        );
+
                     transform:
                         translate(-50%, -50%);
                 }
 
+                .scale-tick {
+                    position: absolute;
+
+                    z-index: 2;
+
+                    top: 50%;
+
+                    width: 3px;
+                    height: 3px;
+
+                    border-radius: 50%;
+
+                    background:
+                        rgba(
+                            132,
+                            113,
+                            120,
+                            .42
+                        );
+
+                    transform:
+                        translate(-50%, -50%);
+                }
+
+                .tick-1 {
+                    left: 18%;
+                }
+
+                .tick-2 {
+                    left: 36%;
+                }
+
+                .tick-3 {
+                    left: 54%;
+                }
+
+                .tick-4 {
+                    left: 74%;
+                }
+
                 .scale-labels {
+                    position: relative;
+
+                    height: 28px;
+
                     margin-top: 12px;
 
-                    display: flex;
-                    justify-content: space-between;
-
-                    color: #8d8587;
+                    color: #948b8e;
 
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
 
-                    font-size: 11px;
+                    font-size: 9px;
+
+                    white-space: nowrap;
+                }
+
+                .scale-labels span {
+                    position: absolute;
+
+                    transform:
+                        translateX(-50%);
+                }
+
+                .scale-labels span:nth-child(1) {
+                    left: 0;
+
+                    transform: none;
+                }
+
+                .scale-labels span:nth-child(2) {
+                    left: 18%;
+                }
+
+                .scale-labels span:nth-child(3) {
+                    left: 36%;
+                }
+
+                .scale-labels span:nth-child(4) {
+                    left: 54%;
+                }
+
+                .scale-labels span:nth-child(5) {
+                    left: 74%;
+                }
+
+                .scale-labels span:nth-child(6) {
+                    right: 0;
+
+                    transform: none;
                 }
 
                 /* =====================================================
@@ -826,23 +1004,15 @@ export default function ResultPage() {
                         calc(100% - 40px)
                     );
 
-                    margin: 8px auto 0;
+                    margin:
+                        10px auto 0;
                 }
-
-                /*
-                 * ВАЖНО:
-                 *
-                 * Блок выше предыдущей версии.
-                 * Это приближает его к твоему
-                 * второму референсу.
-                 */
 
                 .paid-card {
                     position: relative;
 
                     width: 100%;
-
-                    min-height: 640px;
+                    min-height: 590px;
 
                     overflow: hidden;
 
@@ -854,15 +1024,7 @@ export default function ResultPage() {
                 }
 
                 /* =====================================================
-                   DESKTOP ART
-
-                   Твоя картинка 870×756.
-                   Это почти квадрат.
-
-                   Поэтому НЕ растягиваем её
-                   на весь широкий блок.
-
-                   Она занимает только левую часть.
+                   ART
                 ===================================================== */
 
                 .paid-art {
@@ -870,19 +1032,20 @@ export default function ResultPage() {
 
                     z-index: 1;
 
-                    top: 0;
-                    bottom: 0;
-                    left: 0;
+                    inset:
+                        0 auto 0 0;
 
-                    width: 66%;
+                    width: 72%;
 
                     overflow: hidden;
                 }
 
                 /*
-                 * CRISP ART
+                 * Основная картинка остаётся резкой.
+                 *
+                 * Она не должна растягиваться
+                 * на весь баннер.
                  */
-
                 .art-main {
                     position: absolute;
 
@@ -890,33 +1053,24 @@ export default function ResultPage() {
 
                     inset: 0;
 
-                    width: 88%;
+                    width: 80%;
                     height: 100%;
+
+                    display: block;
 
                     object-fit: cover;
 
-                    /*
-                     * У квадратной картинки
-                     * держим пару ближе к центру-низу.
-                     */
                     object-position:
-                        50%
-                        54%;
-
-                    display: block;
+                        50% 54%;
 
                     pointer-events: none;
                     user-select: none;
                 }
 
                 /*
-                 * BLURRED COPY
-
-                 * Она совпадает по геометрии
-                 * с основной картинкой,
-                 * но появляется только справа.
+                 * Та же картинка —
+                 * размазанная копия справа.
                  */
-
                 .art-blur {
                     position: absolute;
 
@@ -924,20 +1078,19 @@ export default function ResultPage() {
 
                     inset: 0;
 
-                    width: 91%;
+                    width: 92%;
                     height: 100%;
 
                     object-fit: cover;
 
                     object-position:
-                        50%
-                        54%;
+                        50% 54%;
 
                     filter:
-                        blur(22px);
+                        blur(25px);
 
                     transform:
-                        scale(1.07);
+                        scale(1.08);
 
                     opacity: .96;
 
@@ -947,84 +1100,82 @@ export default function ResultPage() {
                         linear-gradient(
                             90deg,
 
-                            transparent 50%,
+                            transparent 47%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .08
-                            ) 58%,
+                                .05
+                            ) 54%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .25
-                            ) 66%,
+                                .20
+                            ) 62%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .58
-                            ) 74%,
+                                .46
+                            ) 70%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .88
-                            ) 84%,
+                                .75
+                            ) 79%,
 
-                            black 100%
+                            black 91%
                         );
 
                     -webkit-mask-image:
                         linear-gradient(
                             90deg,
 
-                            transparent 50%,
+                            transparent 47%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .08
-                            ) 58%,
+                                .05
+                            ) 54%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .25
-                            ) 66%,
+                                .20
+                            ) 62%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .58
-                            ) 74%,
+                                .46
+                            ) 70%,
 
                             rgba(
                                 0,
                                 0,
                                 0,
-                                .88
-                            ) 84%,
+                                .75
+                            ) 79%,
 
-                            black 100%
+                            black 91%
                         );
                 }
 
                 /*
-                 * BLUR → BERRY
-
-                 * Это уже не резкая линия,
-                 * а длинный плавный переход.
+                 * Последний этап:
+                 * blur плавно растворяется
+                 * в berry-фоне.
                  */
-
                 .art-color-fade {
                     position: absolute;
 
@@ -1038,56 +1189,63 @@ export default function ResultPage() {
                         linear-gradient(
                             90deg,
 
-                            transparent 44%,
+                            transparent 40%,
 
                             rgba(
                                 173,
                                 25,
                                 74,
-                                .02
-                            ) 52%,
+                                .01
+                            ) 49%,
 
                             rgba(
                                 173,
                                 25,
                                 74,
-                                .09
-                            ) 59%,
+                                .06
+                            ) 56%,
 
                             rgba(
                                 173,
                                 25,
                                 74,
-                                .22
-                            ) 66%,
+                                .16
+                            ) 63%,
 
                             rgba(
                                 173,
                                 25,
                                 74,
-                                .43
-                            ) 73%,
+                                .34
+                            ) 70%,
 
                             rgba(
                                 173,
                                 25,
                                 74,
-                                .68
-                            ) 80%,
+                                .57
+                            ) 77%,
 
                             rgba(
                                 173,
                                 25,
                                 74,
-                                .88
-                            ) 89%,
+                                .78
+                            ) 84%,
+
+                            rgba(
+                                173,
+                                25,
+                                74,
+                                .93
+                            ) 91%,
 
                             #ad194a 100%
                         );
                 }
 
                 /* =====================================================
-                   CONTENT
+                   PAID CONTENT
                 ===================================================== */
 
                 .paid-content {
@@ -1095,7 +1253,7 @@ export default function ResultPage() {
 
                     z-index: 10;
 
-                    min-height: 640px;
+                    min-height: 590px;
                 }
 
                 /* =====================================================
@@ -1105,24 +1263,23 @@ export default function ResultPage() {
                 .paid-copy {
                     position: absolute;
 
-                    top: 62px;
+                    top: 54px;
+                    left: 51%;
 
-                    left: 57.5%;
+                    width: 44%;
 
-                    width: 38%;
-
-                    max-width: 450px;
+                    max-width: 510px;
                 }
 
                 .paid-label {
-                    margin-bottom: 16px;
+                    margin-bottom: 14px;
 
                     color:
                         rgba(
                             255,
                             244,
                             247,
-                            .78
+                            .72
                         );
 
                     font-family:
@@ -1130,12 +1287,12 @@ export default function ResultPage() {
                         Helvetica,
                         sans-serif;
 
-                    font-size: 10px;
+                    font-size: 9px;
                     line-height: 1;
 
                     font-weight: 700;
 
-                    letter-spacing: 2.35px;
+                    letter-spacing: 2.3px;
                 }
 
                 .paid-copy h2 {
@@ -1150,16 +1307,16 @@ export default function ResultPage() {
 
                     font-size:
                         clamp(
-                            45px,
-                            4.1vw,
-                            58px
+                            42px,
+                            4vw,
+                            56px
                         );
 
-                    line-height: .99;
+                    line-height: .98;
 
                     font-weight: 400;
 
-                    letter-spacing: -2px;
+                    letter-spacing: -2.1px;
 
                     text-shadow:
                         0 2px 18px
@@ -1167,7 +1324,7 @@ export default function ResultPage() {
                             64,
                             0,
                             28,
-                            .18
+                            .16
                         );
                 }
 
@@ -1178,18 +1335,21 @@ export default function ResultPage() {
                 .benefits {
                     position: absolute;
 
-                    top: 262px;
+                    top: 245px;
 
-                    left: 64%;
-
-                    right: 52px;
+                    left: 51%;
+                    right: 42px;
 
                     display: grid;
 
                     grid-template-columns:
-                        1fr;
+                        repeat(
+                            2,
+                            minmax(0, 1fr)
+                        );
 
-                    gap: 24px;
+                    column-gap: 38px;
+                    row-gap: 30px;
                 }
 
                 /* =====================================================
@@ -1202,20 +1362,19 @@ export default function ResultPage() {
                     z-index: 20;
 
                     right: 32px;
+                    bottom: 61px;
 
-                    bottom: 68px;
+                    width: 48%;
+                    height: 78px;
 
-                    width: 53%;
-
-                    height: 82px;
-
-                    padding: 0 30px;
+                    padding:
+                        0 28px;
 
                     display: flex;
 
                     align-items: center;
-
-                    justify-content: space-between;
+                    justify-content:
+                        space-between;
 
                     gap: 20px;
 
@@ -1255,7 +1414,7 @@ export default function ResultPage() {
                             67,
                             0,
                             29,
-                            .16
+                            .17
                         );
                 }
 
@@ -1265,7 +1424,7 @@ export default function ResultPage() {
                         Helvetica,
                         sans-serif;
 
-                    font-size: 16px;
+                    font-size: 15px;
                     font-weight: 600;
 
                     letter-spacing: -.1px;
@@ -1275,7 +1434,7 @@ export default function ResultPage() {
                     display: flex;
                     align-items: center;
 
-                    gap: 24px;
+                    gap: 22px;
 
                     color: #c71e57;
                 }
@@ -1286,7 +1445,7 @@ export default function ResultPage() {
                         "Times New Roman",
                         serif;
 
-                    font-size: 31px;
+                    font-size: 30px;
                     line-height: 1;
 
                     font-weight: 400;
@@ -1300,7 +1459,7 @@ export default function ResultPage() {
                         Helvetica,
                         sans-serif;
 
-                    font-size: 29px;
+                    font-size: 27px;
                     line-height: 1;
 
                     font-weight: 300;
@@ -1310,17 +1469,16 @@ export default function ResultPage() {
                     position: absolute;
 
                     right: 32px;
+                    bottom: 27px;
 
-                    bottom: 29px;
-
-                    width: 53%;
+                    width: 48%;
 
                     color:
                         rgba(
                             255,
                             240,
                             244,
-                            .65
+                            .63
                         );
 
                     font-family:
@@ -1341,52 +1499,63 @@ export default function ResultPage() {
                     max-width: 1000px
                 ) {
 
+                    .forecast {
+                        grid-template-columns:
+                            minmax(260px, .9fr)
+                            minmax(340px, 1.1fr);
+
+                        gap: 40px;
+                    }
+
+                    .forecast-copy h2 {
+                        font-size: 37px;
+                    }
+
                     .paid-card,
                     .paid-content {
-                        min-height: 560px;
+                        min-height: 550px;
                     }
 
                     .paid-art {
-                        width: 67%;
+                        width: 74%;
                     }
 
                     .paid-copy {
-                        top: 50px;
-                        left: 55%;
+                        top: 48px;
+                        left: 49%;
 
-                        width: 41%;
+                        width: 47%;
                     }
 
                     .paid-copy h2 {
-                        font-size: 45px;
+                        font-size: 44px;
                     }
 
                     .benefits {
                         top: 225px;
 
-                        left: 63%;
+                        left: 50%;
+                        right: 30px;
 
-                        right: 34px;
-
-                        gap: 19px;
+                        column-gap: 25px;
+                        row-gap: 24px;
                     }
 
                     .paid-cta {
-                        right: 26px;
+                        right: 25px;
 
-                        bottom: 58px;
+                        bottom: 57px;
 
-                        width: 56%;
-
-                        height: 72px;
+                        width: 51%;
+                        height: 70px;
                     }
 
                     .paid-note {
-                        right: 26px;
+                        right: 25px;
 
                         bottom: 25px;
 
-                        width: 56%;
+                        width: 51%;
                     }
                 }
 
@@ -1417,18 +1586,28 @@ export default function ResultPage() {
 
                     .couple-names {
                         max-width: 52%;
+
                         font-size: 8px;
                     }
 
+                    /* =============================================
+                       RESULT
+                    ============================================= */
+
                     .results {
                         padding:
-                            29px 0 33px;
+                            27px 0 30px;
                     }
 
-                    .results h1 {
-                        font-size: 37px;
-                        letter-spacing: -1.8px;
+                    .section-label {
+                        margin-bottom: 14px;
+
+                        font-size: 9px;
                     }
+
+                    /* =============================================
+                       FORECAST
+                    ============================================= */
 
                     .forecast {
                         display: block;
@@ -1437,16 +1616,23 @@ export default function ResultPage() {
                             29px 0 37px;
                     }
 
-                    .forecast h2 {
+                    .forecast-copy h2 {
+                        max-width: 330px;
+
                         font-size: 34px;
+
+                        letter-spacing:
+                            -1.5px;
                     }
 
-                    .forecast p {
-                        font-size: 12px;
+                    .forecast-copy p {
+                        margin-top: 9px;
+
+                        font-size: 10px;
                     }
 
                     .forecast-right {
-                        margin-top: 25px;
+                        margin-top: 27px;
                     }
 
                     .years strong {
@@ -1457,18 +1643,41 @@ export default function ResultPage() {
                         font-size: 34px;
                     }
 
-                    .paid-section {
-                        width: 100%;
-                        margin: 0;
+                    .forecast-scale {
+                        margin-top: 21px;
+                    }
+
+                    .scale-labels {
+                        font-size: 7px;
+                    }
+
+                    /*
+                     * На маленьком экране
+                     * не показываем все подписи,
+                     * чтобы шкала не превращалась
+                     * в кашу.
+                     *
+                     * Точки/геометрия остаются.
+                     */
+                    .scale-labels span:nth-child(2),
+                    .scale-labels span:nth-child(4),
+                    .scale-labels span:nth-child(5) {
+                        display: none;
                     }
 
                     /* =============================================
-                       MOBILE CARD
+                       PAID SECTION
                     ============================================= */
+
+                    .paid-section {
+                        width: 100%;
+
+                        margin: 0;
+                    }
 
                     .paid-card,
                     .paid-content {
-                        min-height: 760px;
+                        min-height: 750px;
                     }
 
                     .paid-card {
@@ -1476,7 +1685,7 @@ export default function ResultPage() {
                     }
 
                     /* =============================================
-                       MOBILE IMAGE
+                       MOBILE ART
                     ============================================= */
 
                     .paid-art {
@@ -1484,15 +1693,10 @@ export default function ResultPage() {
                         left: 0;
 
                         width: 100%;
-                        height: 405px;
+                        height: 415px;
 
                         bottom: auto;
                     }
-
-                    /*
-                     * На mobile квадратная картинка
-                     * почти идеально подходит по ширине.
-                     */
 
                     .art-main {
                         width: 100%;
@@ -1501,101 +1705,94 @@ export default function ResultPage() {
                         object-fit: cover;
 
                         object-position:
-                            50%
-                            50%;
+                            50% 50%;
                     }
-
-                    /*
-                     * Blur начинается только
-                     * в нижней части картинки.
-                     */
 
                     .art-blur {
                         width: 100%;
                         height: 100%;
 
                         object-position:
-                            50%
-                            50%;
+                            50% 50%;
 
                         filter:
-                            blur(19px);
+                            blur(22px);
 
                         transform:
-                            scale(1.07);
+                            scale(1.08);
 
                         mask-image:
                             linear-gradient(
                                 180deg,
 
-                                transparent 52%,
+                                transparent 48%,
 
                                 rgba(
                                     0,
                                     0,
                                     0,
-                                    .06
-                                ) 61%,
+                                    .04
+                                ) 56%,
 
                                 rgba(
                                     0,
                                     0,
                                     0,
-                                    .22
-                                ) 70%,
+                                    .18
+                                ) 65%,
 
                                 rgba(
                                     0,
                                     0,
                                     0,
-                                    .52
-                                ) 79%,
+                                    .43
+                                ) 74%,
 
                                 rgba(
                                     0,
                                     0,
                                     0,
-                                    .82
-                                ) 89%,
+                                    .72
+                                ) 84%,
 
-                                black 100%
+                                black 96%
                             );
 
                         -webkit-mask-image:
                             linear-gradient(
                                 180deg,
 
-                                transparent 52%,
+                                transparent 48%,
 
                                 rgba(
                                     0,
                                     0,
                                     0,
-                                    .06
-                                ) 61%,
+                                    .04
+                                ) 56%,
 
                                 rgba(
                                     0,
                                     0,
                                     0,
-                                    .22
-                                ) 70%,
+                                    .18
+                                ) 65%,
 
                                 rgba(
                                     0,
                                     0,
                                     0,
-                                    .52
-                                ) 79%,
+                                    .43
+                                ) 74%,
 
                                 rgba(
                                     0,
                                     0,
                                     0,
-                                    .82
-                                ) 89%,
+                                    .72
+                                ) 84%,
 
-                                black 100%
+                                black 96%
                             );
                     }
 
@@ -1604,79 +1801,88 @@ export default function ResultPage() {
                             linear-gradient(
                                 180deg,
 
-                                transparent 51%,
+                                transparent 45%,
 
                                 rgba(
                                     173,
                                     25,
                                     74,
-                                    .03
-                                ) 61%,
+                                    .02
+                                ) 55%,
 
                                 rgba(
                                     173,
                                     25,
                                     74,
-                                    .12
-                                ) 70%,
+                                    .10
+                                ) 64%,
 
                                 rgba(
                                     173,
                                     25,
                                     74,
-                                    .33
-                                ) 79%,
+                                    .28
+                                ) 73%,
 
                                 rgba(
                                     173,
                                     25,
                                     74,
-                                    .62
-                                ) 88%,
+                                    .53
+                                ) 82%,
 
                                 rgba(
                                     173,
                                     25,
                                     74,
-                                    .88
-                                ) 95%,
+                                    .78
+                                ) 90%,
+
+                                rgba(
+                                    173,
+                                    25,
+                                    74,
+                                    .95
+                                ) 97%,
 
                                 #ad194a 100%
                             );
                     }
 
                     /* =============================================
-                       MOBILE COPY
-
-                       Заголовок немного заходит
-                       на размытую часть картинки.
+                       MOBILE TITLE
                     ============================================= */
 
                     .paid-copy {
-                        top: 335px;
-
-                        left: 27px;
+                        top: 326px;
+                        left: 25px;
 
                         width:
-                            calc(100% - 54px);
+                            calc(
+                                100% - 50px
+                            );
 
                         max-width: none;
                     }
 
                     .paid-label {
-                        margin-bottom: 11px;
+                        margin-bottom: 10px;
 
                         font-size: 8px;
 
-                        letter-spacing: 1.9px;
+                        letter-spacing:
+                            1.9px;
                     }
 
                     .paid-copy h2 {
+                        max-width: 330px;
+
                         font-size: 35px;
 
-                        line-height: .99;
+                        line-height: .98;
 
-                        letter-spacing: -1.5px;
+                        letter-spacing:
+                            -1.5px;
 
                         text-shadow:
                             0 2px 15px
@@ -1684,7 +1890,7 @@ export default function ResultPage() {
                                 55,
                                 0,
                                 26,
-                                .25
+                                .24
                             );
                     }
 
@@ -1693,25 +1899,21 @@ export default function ResultPage() {
                     ============================================= */
 
                     .benefits {
-                        top: 454px;
+                        top: 457px;
 
-                        left: 27px;
-
-                        right: 27px;
+                        left: 25px;
+                        right: 25px;
 
                         width: auto;
 
                         grid-template-columns:
                             repeat(
                                 2,
-                                minmax(
-                                    0,
-                                    1fr
-                                )
+                                minmax(0, 1fr)
                             );
 
-                        column-gap: 22px;
-                        row-gap: 20px;
+                        column-gap: 20px;
+                        row-gap: 21px;
                     }
 
                     /* =============================================
@@ -1722,7 +1924,7 @@ export default function ResultPage() {
                         left: 20px;
                         right: 20px;
 
-                        bottom: 50px;
+                        bottom: 49px;
 
                         width:
                             calc(
@@ -1757,7 +1959,7 @@ export default function ResultPage() {
                         left: 20px;
                         right: 20px;
 
-                        bottom: 21px;
+                        bottom: 20px;
 
                         width: auto;
 
@@ -1779,17 +1981,17 @@ export default function ResultPage() {
                     }
 
                     .paid-art {
-                        height: 380px;
+                        height: 390px;
                     }
 
                     .paid-copy {
-                        top: 315px;
+                        top: 307px;
 
-                        left: 23px;
+                        left: 22px;
 
                         width:
                             calc(
-                                100% - 46px
+                                100% - 44px
                             );
                     }
 
@@ -1798,13 +2000,13 @@ export default function ResultPage() {
                     }
 
                     .benefits {
-                        top: 425px;
+                        top: 430px;
 
-                        left: 23px;
-
-                        right: 23px;
+                        left: 22px;
+                        right: 22px;
 
                         column-gap: 14px;
+                        row-gap: 18px;
                     }
 
                     .paid-cta {
@@ -1922,7 +2124,8 @@ function CategoryRow({
 
                     font-size: 29px;
 
-                    letter-spacing: -1.2px;
+                    letter-spacing:
+                        -1.2px;
                 }
 
                 .category-subtitle {
@@ -1955,11 +2158,13 @@ function CategoryRow({
                     color: #c21856;
 
                     font-size: 42px;
+
                     font-weight: 400;
                 }
 
                 .category-score span {
                     margin-left: 3px;
+
                     font-size: 18px;
                 }
 
@@ -1997,9 +2202,9 @@ function CategoryRow({
                     }
 
                     .category-subtitle {
-                        font-size: 10px;
-
                         max-width: 250px;
+
+                        font-size: 10px;
                     }
 
                     .category-score strong {
@@ -2052,10 +2257,7 @@ function Benefit({
 
                     grid-template-columns:
                         22px
-                        minmax(
-                            0,
-                            1fr
-                        );
+                        minmax(0, 1fr);
 
                     gap: 10px;
 
@@ -2078,7 +2280,7 @@ function Benefit({
                         Helvetica,
                         sans-serif;
 
-                    font-size: 14px;
+                    font-size: 13px;
 
                     line-height: 1.3;
 
@@ -2092,10 +2294,7 @@ function Benefit({
                     .benefit {
                         grid-template-columns:
                             19px
-                            minmax(
-                                0,
-                                1fr
-                            );
+                            minmax(0, 1fr);
 
                         gap: 8px;
                     }
@@ -2105,9 +2304,9 @@ function Benefit({
                     }
 
                     .benefit-text {
-                        font-size: 11.5px;
+                        font-size: 11px;
 
-                        line-height: 1.27;
+                        line-height: 1.28;
                     }
                 }
 
@@ -2162,10 +2361,7 @@ function BenefitSvg({
         );
     }
 
-    if (
-        type ===
-        "message"
-    ) {
+    if (type === "message") {
         return (
             <svg
                 viewBox="0 0 24 24"
@@ -2202,10 +2398,7 @@ function BenefitSvg({
         );
     }
 
-    if (
-        type ===
-        "lightning"
-    ) {
+    if (type === "lightning") {
         return (
             <svg
                 viewBox="0 0 24 24"
