@@ -74,14 +74,8 @@ export default function WaitingPage() {
     }, []);
 
     /*
-     * ВАЖНО:
-     *
-     * Ссылка для партнёра строится ТОЛЬКО
-     * через /invite/<invite_token>.
-     *
-     * Не используем текущий URL страницы.
-     * Не используем /result/.
-     * Не используем coupleId вместо token.
+     * Ссылка для партнёра
+     * строится только через invite_token.
      */
     const inviteUrl =
         useMemo(() => {
@@ -100,6 +94,10 @@ export default function WaitingPage() {
             couple?.invite_token,
         ]);
 
+    /*
+     * Проверяем,
+     * закончил ли второй человек.
+     */
     useEffect(() => {
         if (!coupleId) {
             return;
@@ -149,8 +147,7 @@ export default function WaitingPage() {
 
                 /*
                  * Когда оба закончили —
-                 * отправляем первого участника
-                 * на общий результат.
+                 * открываем бесплатный результат.
                  */
                 if (
                     currentCouple
@@ -198,10 +195,6 @@ export default function WaitingPage() {
 
         loadCouple();
 
-        /*
-         * Первый человек ждёт.
-         * Проверяем, закончил ли второй.
-         */
         timer =
             setInterval(
                 loadCouple,
@@ -209,7 +202,8 @@ export default function WaitingPage() {
             );
 
         return () => {
-            cancelled = true;
+            cancelled =
+                true;
 
             if (timer) {
                 clearInterval(
@@ -228,9 +222,11 @@ export default function WaitingPage() {
         }
 
         try {
-            await navigator.clipboard.writeText(
-                inviteUrl
-            );
+            await navigator
+                .clipboard
+                .writeText(
+                    inviteUrl
+                );
 
             setCopied(true);
 
@@ -243,17 +239,13 @@ export default function WaitingPage() {
                 1800
             );
         } catch (
-            error
+            clipboardError
             ) {
             console.error(
                 "Clipboard error:",
-                error
+                clipboardError
             );
 
-            /*
-             * Fallback для браузеров,
-             * где clipboard API недоступен.
-             */
             const textarea =
                 document.createElement(
                     "textarea"
@@ -300,12 +292,6 @@ export default function WaitingPage() {
             return;
         }
 
-        /*
-         * ВАЖНО:
-         *
-         * navigator.share получает именно inviteUrl.
-         * Никогда не window.location.href.
-         */
         if (
             navigator.share
         ) {
@@ -313,24 +299,21 @@ export default function WaitingPage() {
                 await navigator.share({
                     title:
                         "между нами.",
+
                     text:
                         "Пройди свою часть — потом увидим общий результат.",
+
                     url:
                     inviteUrl,
                 });
 
                 return;
             } catch (
-                error
+                shareError
                 ) {
-                /*
-                 * Если человек просто закрыл
-                 * системное окно share —
-                 * ничего страшного.
-                 */
                 console.log(
                     "Share cancelled:",
-                    error
+                    shareError
                 );
             }
         }
@@ -340,55 +323,9 @@ export default function WaitingPage() {
 
     if (loading) {
         return (
-            <main className="state">
-
-                <div className="brand">
-                    между нами.
-                </div>
-
-                <p>
-                    готовим ссылку
-                </p>
-
-                <style jsx>{`
-                    .state {
-                        min-height: 100vh;
-
-                        display: grid;
-                        place-items: center;
-                        align-content: center;
-
-                        gap: 12px;
-
-                        background: #f8f4f1;
-
-                        color: #211d1f;
-                    }
-
-                    .brand {
-                        font-family:
-                            Georgia,
-                            "Times New Roman",
-                            serif;
-
-                        font-size: 26px;
-                        font-weight: 700;
-                    }
-
-                    p {
-                        margin: 0;
-
-                        color: #91878a;
-
-                        font-family:
-                            Arial,
-                            sans-serif;
-
-                        font-size: 12px;
-                    }
-                `}</style>
-
-            </main>
+            <StateScreen
+                text="готовим приглашение"
+            />
         );
     }
 
@@ -397,131 +334,41 @@ export default function WaitingPage() {
         !couple
     ) {
         return (
-            <main className="state">
-
-                <div className="brand">
-                    между нами.
-                </div>
-
-                <p>
-                    {error ||
-                        "Пара не найдена."}
-                </p>
-
-                <style jsx>{`
-                    .state {
-                        min-height: 100vh;
-
-                        display: grid;
-                        place-items: center;
-                        align-content: center;
-
-                        gap: 12px;
-
-                        padding: 24px;
-
-                        text-align: center;
-
-                        background: #f8f4f1;
-
-                        color: #211d1f;
-                    }
-
-                    .brand {
-                        font-family:
-                            Georgia,
-                            "Times New Roman",
-                            serif;
-
-                        font-size: 26px;
-                        font-weight: 700;
-                    }
-
-                    p {
-                        margin: 0;
-
-                        color: #91878a;
-
-                        font-family:
-                            Arial,
-                            sans-serif;
-                    }
-                `}</style>
-
-            </main>
+            <StateScreen
+                text={
+                    error ||
+                    "Пара не найдена."
+                }
+            />
         );
     }
 
-    /*
-     * invite_token обязателен.
-     *
-     * Лучше явно показать ошибку,
-     * чем случайно отправить человеку
-     * неправильный URL.
-     */
     if (
         !couple.invite_token
     ) {
         return (
-            <main className="state">
-
-                <div className="brand">
-                    между нами.
-                </div>
-
-                <p>
-                    Не удалось создать
-                    ссылку для партнёра.
-                </p>
-
-                <style jsx>{`
-                    .state {
-                        min-height: 100vh;
-
-                        display: grid;
-                        place-items: center;
-                        align-content: center;
-
-                        gap: 12px;
-
-                        padding: 24px;
-
-                        text-align: center;
-
-                        background: #f8f4f1;
-                    }
-
-                    .brand {
-                        font-family:
-                            Georgia,
-                            "Times New Roman",
-                            serif;
-
-                        font-size: 26px;
-                        font-weight: 700;
-                    }
-
-                    p {
-                        font-family:
-                            Arial,
-                            sans-serif;
-
-                        color: #91878a;
-                    }
-                `}</style>
-
-            </main>
+            <StateScreen
+                text="Не удалось создать ссылку для партнёра."
+            />
         );
     }
 
     const partnerName =
         couple.partner_b_name ||
-        "партнёра";
+        "партнёр";
+
+    const firstName =
+        couple.partner_a_name ||
+        "Вы";
 
     return (
         <main className="page">
 
             <div className="shell">
+
+                {/* =====================================================
+                    HEADER
+                ===================================================== */}
 
                 <header className="header">
 
@@ -529,69 +376,180 @@ export default function WaitingPage() {
                         между нами.
                     </div>
 
-                </header>
+                    <div className="names">
 
-                <section className="hero">
+                        <span>
+                            {firstName}
+                        </span>
 
-                    <div className="eyebrow">
-                        ТВОЯ ЧАСТЬ ГОТОВА
-                    </div>
-
-                    <h1>
-                        Теперь очередь:
-                        <br />
+                        <b>
+                            ×
+                        </b>
 
                         <span>
                             {partnerName}
                         </span>
-                        .
-                    </h1>
 
-                    <p className="lead">
-                        После второго ответа
-                        вы увидите картину целиком.
-                    </p>
+                    </div>
+
+                </header>
+
+                {/* =====================================================
+                    HERO
+                ===================================================== */}
+
+                <section className="hero">
+
+                    <div className="hero-copy">
+
+                        <div className="eyebrow">
+                            ТВОЯ ЧАСТЬ ГОТОВА
+                        </div>
+
+                        <h1>
+                            Осталось
+                            <br />
+                            совсем немного.
+                        </h1>
+
+                        <p className="lead">
+                            Теперь очередь{" "}
+                            <strong>
+                                {partnerName}
+                            </strong>
+                            . Когда второй человек
+                            закончит тест, здесь
+                            автоматически откроется
+                            ваш общий результат.
+                        </p>
+
+                    </div>
+
+                    <div className="status-art">
+
+                        <div className="circles">
+
+                            <div className="circle circle-a">
+
+                                <span className="check">
+                                    ✓
+                                </span>
+
+                            </div>
+
+                            <div className="circle circle-b">
+
+                                <span className="dots">
+                                    <i />
+                                    <i />
+                                    <i />
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <div className="status-labels">
+
+                            <span>
+                                ты готов
+                            </span>
+
+                            <span>
+                                ждём партнёра
+                            </span>
+
+                        </div>
+
+                    </div>
 
                 </section>
 
-                <section className="invite-card">
+                {/* =====================================================
+                    INVITE
+                ===================================================== */}
 
-                    <div className="invite-label">
-                        ССЫЛКА ДЛЯ ПАРТНЁРА
+                <section className="invite-section">
+
+                    <div className="invite-copy">
+
+                        <div className="section-label">
+                            ПРИГЛАШЕНИЕ
+                        </div>
+
+                        <h2>
+                            Отправь ссылку
+                            <br />
+                            партнёру
+                        </h2>
+
+                        <p>
+                            По ней откроется его часть
+                            теста. После завершения
+                            результат будет один
+                            для вас двоих.
+                        </p>
+
                     </div>
 
-                    <div className="url-box">
-                        {inviteUrl}
+                    <div className="invite-card">
+
+                        <div className="url-label">
+                            ССЫЛКА ДЛЯ ПАРТНЁРА
+                        </div>
+
+                        <div className="url-box">
+                            {inviteUrl}
+                        </div>
+
+                        <button
+                            type="button"
+                            className="primary"
+                            onClick={
+                                shareInvite
+                            }
+                        >
+                            <span>
+                                Отправить приглашение
+                            </span>
+
+                            <span className="arrow">
+                                →
+                            </span>
+                        </button>
+
+                        <button
+                            type="button"
+                            className={
+                                copied
+                                    ? "copy copied"
+                                    : "copy"
+                            }
+                            onClick={
+                                copyInvite
+                            }
+                        >
+                            {copied
+                                ? "Ссылка скопирована ✓"
+                                : "Скопировать ссылку"}
+                        </button>
+
                     </div>
-
-                    <button
-                        type="button"
-                        className="primary"
-                        onClick={
-                            shareInvite
-                        }
-                    >
-                        Отправить приглашение
-                    </button>
-
-                    <button
-                        type="button"
-                        className="copy"
-                        onClick={
-                            copyInvite
-                        }
-                    >
-                        {copied
-                            ? "Ссылка скопирована"
-                            : "Скопировать ссылку"}
-                    </button>
 
                 </section>
 
-                <div className="bottom-note">
-                    Результат откроется
-                    автоматически, когда
-                    вы оба закончите.
+                {/* =====================================================
+                    FOOTER STATUS
+                ===================================================== */}
+
+                <div className="bottom-status">
+
+                    <span className="pulse" />
+
+                    <span>
+                        ждём завершения второй части
+                    </span>
+
                 </div>
 
             </div>
@@ -603,8 +561,14 @@ export default function WaitingPage() {
                         border-box;
                 }
 
+                :global(html) {
+                    background:
+                        #f8f4f1;
+                }
+
                 :global(body) {
-                    margin: 0;
+                    margin:
+                        0;
 
                     background:
                         #f8f4f1;
@@ -613,13 +577,19 @@ export default function WaitingPage() {
                         #211d1f;
                 }
 
+                button {
+                    font:
+                        inherit;
+                }
+
                 .page {
                     min-height:
                         100vh;
 
                     padding:
-                        0 22px
-                        50px;
+                        0
+                        28px
+                        60px;
 
                     background:
                         #f8f4f1;
@@ -628,7 +598,7 @@ export default function WaitingPage() {
                 .shell {
                     width:
                         min(
-                            620px,
+                            920px,
                             100%
                         );
 
@@ -636,18 +606,35 @@ export default function WaitingPage() {
                         0 auto;
                 }
 
+                /* =====================================================
+                   HEADER
+                ===================================================== */
+
                 .header {
                     min-height:
-                        72px;
+                        78px;
 
                     display:
                         flex;
 
                     align-items:
                         center;
+
+                    justify-content:
+                        space-between;
+
+                    gap:
+                        24px;
+
+                    border-bottom:
+                        1px solid
+                        #ddd5d2;
                 }
 
                 .brand {
+                    flex-shrink:
+                        0;
+
                     font-family:
                         Georgia,
                         "Times New Roman",
@@ -656,39 +643,138 @@ export default function WaitingPage() {
                     font-size:
                         24px;
 
+                    line-height:
+                        1;
+
                     font-weight:
                         700;
 
                     letter-spacing:
-                        -1px;
+                        -1.1px;
                 }
+
+                .names {
+                    min-width:
+                        0;
+
+                    max-width:
+                        50%;
+
+                    display:
+                        flex;
+
+                    align-items:
+                        center;
+
+                    justify-content:
+                        flex-end;
+
+                    gap:
+                        8px;
+
+                    overflow:
+                        hidden;
+
+                    color:
+                        #91878a;
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        10px;
+
+                    line-height:
+                        1;
+
+                    font-weight:
+                        700;
+
+                    letter-spacing:
+                        1.1px;
+
+                    text-transform:
+                        uppercase;
+
+                    white-space:
+                        nowrap;
+                }
+
+                .names span {
+                    overflow:
+                        hidden;
+
+                    text-overflow:
+                        ellipsis;
+                }
+
+                .names b {
+                    flex-shrink:
+                        0;
+
+                    color:
+                        #c51f59;
+
+                    font-size:
+                        12px;
+                }
+
+                /* =====================================================
+                   HERO
+                ===================================================== */
 
                 .hero {
                     padding:
-                        62px
+                        66px
                         0
-                        38px;
+                        72px;
+
+                    display:
+                        grid;
+
+                    grid-template-columns:
+                        minmax(
+                            0,
+                            1.15fr
+                        )
+                        minmax(
+                            280px,
+                            .85fr
+                        );
+
+                    gap:
+                        70px;
+
+                    align-items:
+                        center;
                 }
 
-                .eyebrow {
+                .eyebrow,
+                .section-label {
                     margin-bottom:
-                        15px;
+                        14px;
 
                     color:
                         #c51f59;
 
                     font-family:
                         Arial,
+                        Helvetica,
                         sans-serif;
 
                     font-size:
                         10px;
 
+                    line-height:
+                        1;
+
                     font-weight:
                         800;
 
                     letter-spacing:
-                        2px;
+                        2.2px;
                 }
 
                 h1 {
@@ -702,40 +788,36 @@ export default function WaitingPage() {
 
                     font-size:
                         clamp(
-                            45px,
-                            8vw,
-                            64px
+                            56px,
+                            7vw,
+                            78px
                         );
 
                     line-height:
-                        .95;
+                        .91;
 
                     font-weight:
                         400;
 
                     letter-spacing:
-                        -2.3px;
-                }
-
-                h1 span {
-                    color:
-                        #c51f59;
+                        -3.6px;
                 }
 
                 .lead {
                     max-width:
-                        470px;
+                        560px;
 
                     margin:
-                        22px
+                        24px
                         0
                         0;
 
                     color:
-                        #7f7679;
+                        #81777a;
 
                     font-family:
                         Arial,
+                        Helvetica,
                         sans-serif;
 
                     font-size:
@@ -745,13 +827,304 @@ export default function WaitingPage() {
                         1.55;
                 }
 
+                .lead strong {
+                    color:
+                        #c51f59;
+
+                    font-weight:
+                        700;
+                }
+
+                /* =====================================================
+                   STATUS ART
+                ===================================================== */
+
+                .status-art {
+                    padding:
+                        34px;
+
+                    border-radius:
+                        28px;
+
+                    background:
+                        #f0dfe4;
+                }
+
+                .circles {
+                    position:
+                        relative;
+
+                    width:
+                        224px;
+
+                    height:
+                        132px;
+
+                    margin:
+                        0 auto;
+                }
+
+                .circle {
+                    position:
+                        absolute;
+
+                    top:
+                        0;
+
+                    width:
+                        132px;
+
+                    height:
+                        132px;
+
+                    display:
+                        grid;
+
+                    place-items:
+                        center;
+
+                    border-radius:
+                        50%;
+                }
+
+                .circle-a {
+                    left:
+                        0;
+
+                    z-index:
+                        2;
+
+                    background:
+                        #b84b73;
+                }
+
+                .circle-b {
+                    right:
+                        0;
+
+                    z-index:
+                        1;
+
+                    background:
+                        #dfa7ba;
+                }
+
+                .check {
+                    color:
+                        white;
+
+                    font-family:
+                        Arial,
+                        sans-serif;
+
+                    font-size:
+                        31px;
+
+                    line-height:
+                        1;
+
+                    font-weight:
+                        500;
+                }
+
+                .dots {
+                    display:
+                        flex;
+
+                    gap:
+                        5px;
+
+                    transform:
+                        translateX(
+                            15px
+                        );
+                }
+
+                .dots i {
+                    width:
+                        6px;
+
+                    height:
+                        6px;
+
+                    display:
+                        block;
+
+                    border-radius:
+                        50%;
+
+                    background:
+                        rgba(
+                            255,
+                            255,
+                            255,
+                            .8
+                        );
+
+                    animation:
+                        dotPulse
+                        1.2s
+                        infinite
+                        ease-in-out;
+                }
+
+                .dots i:nth-child(2) {
+                    animation-delay:
+                        150ms;
+                }
+
+                .dots i:nth-child(3) {
+                    animation-delay:
+                        300ms;
+                }
+
+                @keyframes dotPulse {
+                    0%,
+                    60%,
+                    100% {
+                        opacity:
+                            .35;
+
+                        transform:
+                            translateY(
+                                0
+                            );
+                    }
+
+                    30% {
+                        opacity:
+                            1;
+
+                        transform:
+                            translateY(
+                                -3px
+                            );
+                    }
+                }
+
+                .status-labels {
+                    display:
+                        flex;
+
+                    justify-content:
+                        space-between;
+
+                    gap:
+                        15px;
+
+                    margin-top:
+                        24px;
+
+                    color:
+                        #85797d;
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        9px;
+
+                    line-height:
+                        1;
+
+                    font-weight:
+                        800;
+
+                    letter-spacing:
+                        1.2px;
+
+                    text-transform:
+                        uppercase;
+                }
+
+                /* =====================================================
+                   INVITE
+                ===================================================== */
+
+                .invite-section {
+                    padding:
+                        50px
+                        0;
+
+                    display:
+                        grid;
+
+                    grid-template-columns:
+                        minmax(
+                            0,
+                            .85fr
+                        )
+                        minmax(
+                            360px,
+                            1.15fr
+                        );
+
+                    gap:
+                        65px;
+
+                    align-items:
+                        center;
+
+                    border-top:
+                        1px solid
+                        #ddd5d2;
+                }
+
+                .invite-copy h2 {
+                    margin:
+                        0;
+
+                    font-family:
+                        Georgia,
+                        "Times New Roman",
+                        serif;
+
+                    font-size:
+                        44px;
+
+                    line-height:
+                        .96;
+
+                    font-weight:
+                        400;
+
+                    letter-spacing:
+                        -2px;
+                }
+
+                .invite-copy p {
+                    max-width:
+                        330px;
+
+                    margin:
+                        17px
+                        0
+                        0;
+
+                    color:
+                        #8a8083;
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        12px;
+
+                    line-height:
+                        1.5;
+                }
+
                 .invite-card {
                     padding:
-                        25px;
+                        26px;
 
                     border:
                         1px solid
-                        #e3d9d7;
+                        #e2d8d6;
 
                     border-radius:
                         23px;
@@ -760,19 +1133,23 @@ export default function WaitingPage() {
                         #fffaf8;
                 }
 
-                .invite-label {
+                .url-label {
                     margin-bottom:
                         10px;
 
                     color:
-                        #a29398;
+                        #a09095;
 
                     font-family:
                         Arial,
+                        Helvetica,
                         sans-serif;
 
                     font-size:
                         9px;
+
+                    line-height:
+                        1;
 
                     font-weight:
                         800;
@@ -785,11 +1162,9 @@ export default function WaitingPage() {
                     width:
                         100%;
 
-                    margin-bottom:
-                        18px;
-
                     padding:
-                        15px;
+                        15px
+                        16px;
 
                     overflow:
                         hidden;
@@ -805,6 +1180,7 @@ export default function WaitingPage() {
 
                     font-family:
                         Arial,
+                        Helvetica,
                         sans-serif;
 
                     font-size:
@@ -820,19 +1196,34 @@ export default function WaitingPage() {
                         nowrap;
                 }
 
-                button {
+                .primary {
                     width:
                         100%;
 
-                    border: 0;
-
-                    cursor:
-                        pointer;
-                }
-
-                .primary {
                     min-height:
-                        54px;
+                        56px;
+
+                    margin-top:
+                        17px;
+
+                    padding:
+                        0
+                        22px;
+
+                    display:
+                        flex;
+
+                    align-items:
+                        center;
+
+                    justify-content:
+                        space-between;
+
+                    gap:
+                        20px;
+
+                    border:
+                        0;
 
                     border-radius:
                         999px;
@@ -845,21 +1236,64 @@ export default function WaitingPage() {
 
                     font-family:
                         Arial,
+                        Helvetica,
                         sans-serif;
 
                     font-size:
                         14px;
 
+                    line-height:
+                        1;
+
                     font-weight:
                         700;
+
+                    cursor:
+                        pointer;
+
+                    transition:
+                        transform
+                        150ms
+                        ease,
+                        opacity
+                        150ms
+                        ease;
+                }
+
+                .primary:hover {
+                    transform:
+                        translateY(
+                            -1px
+                        );
+                }
+
+                .primary:active {
+                    transform:
+                        translateY(
+                            0
+                        );
+                }
+
+                .arrow {
+                    font-size:
+                        22px;
+
+                    font-weight:
+                        400;
                 }
 
                 .copy {
+                    width:
+                        100%;
+
                     margin-top:
-                        10px;
+                        8px;
 
                     padding:
                         12px;
+
+                    border:
+                        0;
 
                     background:
                         transparent;
@@ -869,33 +1303,146 @@ export default function WaitingPage() {
 
                     font-family:
                         Arial,
+                        Helvetica,
                         sans-serif;
 
                     font-size:
                         11px;
+
+                    cursor:
+                        pointer;
+
+                    transition:
+                        color
+                        150ms
+                        ease;
                 }
 
-                .bottom-note {
+                .copy:hover {
+                    color:
+                        #c51f59;
+                }
+
+                .copy.copied {
+                    color:
+                        #a13d63;
+
+                    font-weight:
+                        700;
+                }
+
+                /* =====================================================
+                   BOTTOM
+                ===================================================== */
+
+                .bottom-status {
+                    display:
+                        flex;
+
+                    align-items:
+                        center;
+
+                    justify-content:
+                        center;
+
+                    gap:
+                        8px;
+
                     padding:
-                        23px
-                        5px;
+                        9px
+                        0
+                        0;
 
                     color:
                         #a09397;
 
                     font-family:
                         Arial,
+                        Helvetica,
                         sans-serif;
 
                     font-size:
-                        11px;
+                        10px;
 
                     line-height:
-                        1.45;
+                        1;
 
-                    text-align:
-                        center;
+                    letter-spacing:
+                        .3px;
                 }
+
+                .pulse {
+                    width:
+                        6px;
+
+                    height:
+                        6px;
+
+                    border-radius:
+                        50%;
+
+                    background:
+                        #c7245c;
+
+                    animation:
+                        pulse
+                        1.6s
+                        ease-in-out
+                        infinite;
+                }
+
+                @keyframes pulse {
+                    0%,
+                    100% {
+                        opacity:
+                            .3;
+                    }
+
+                    50% {
+                        opacity:
+                            1;
+                    }
+                }
+
+                /* =====================================================
+                   TABLET
+                ===================================================== */
+
+                @media (
+                    max-width:
+                        800px
+                ) {
+
+                    .hero {
+                        grid-template-columns:
+                            1fr;
+
+                        gap:
+                            38px;
+                    }
+
+                    .status-art {
+                        max-width:
+                            420px;
+                    }
+
+                    .invite-section {
+                        grid-template-columns:
+                            1fr;
+
+                        gap:
+                            28px;
+                    }
+
+                    .invite-copy p {
+                        max-width:
+                            460px;
+                    }
+                }
+
+                /* =====================================================
+                   MOBILE
+                ===================================================== */
 
                 @media (
                     max-width:
@@ -904,13 +1451,17 @@ export default function WaitingPage() {
 
                     .page {
                         padding:
-                            0 14px
-                            34px;
+                            0
+                            14px
+                            38px;
                     }
 
                     .header {
                         min-height:
                             64px;
+
+                        gap:
+                            12px;
                     }
 
                     .brand {
@@ -918,15 +1469,238 @@ export default function WaitingPage() {
                             21px;
                     }
 
+                    .names {
+                        max-width:
+                            48%;
+
+                        gap:
+                            5px;
+
+                        font-size:
+                            8px;
+
+                        letter-spacing:
+                            .6px;
+                    }
+
                     .hero {
-                        padding-top:
-                            44px;
+                        padding:
+                            42px
+                            0
+                            46px;
+
+                        gap:
+                            32px;
+                    }
+
+                    .eyebrow,
+                    .section-label {
+                        font-size:
+                            9px;
+
+                        letter-spacing:
+                            1.8px;
+                    }
+
+                    h1 {
+                        font-size:
+                            48px;
+
+                        line-height:
+                            .94;
+
+                        letter-spacing:
+                            -2.5px;
+                    }
+
+                    .lead {
+                        margin-top:
+                            18px;
+
+                        font-size:
+                            12px;
+                    }
+
+                    .status-art {
+                        width:
+                            100%;
+
+                        padding:
+                            25px
+                            20px;
+
+                        border-radius:
+                            22px;
+                    }
+
+                    .circles {
+                        width:
+                            184px;
+
+                        height:
+                            108px;
+                    }
+
+                    .circle {
+                        width:
+                            108px;
+
+                        height:
+                            108px;
+                    }
+
+                    .check {
+                        font-size:
+                            27px;
+                    }
+
+                    .status-labels {
+                        margin-top:
+                            20px;
+
+                        font-size:
+                            8px;
+                    }
+
+                    .invite-section {
+                        padding:
+                            38px
+                            0;
+
+                        gap:
+                            24px;
+                    }
+
+                    .invite-copy h2 {
+                        font-size:
+                            36px;
+
+                        letter-spacing:
+                            -1.6px;
+                    }
+
+                    .invite-copy p {
+                        font-size:
+                            11px;
                     }
 
                     .invite-card {
                         padding:
                             20px;
+
+                        border-radius:
+                            20px;
                     }
+
+                    .url-box {
+                        font-size:
+                            10px;
+                    }
+
+                    .primary {
+                        min-height:
+                            52px;
+
+                        padding:
+                            0
+                            18px;
+
+                        font-size:
+                            13px;
+                    }
+
+                    .bottom-status {
+                        font-size:
+                            9px;
+                    }
+                }
+
+            `}</style>
+
+        </main>
+    );
+}
+
+function StateScreen({
+                         text,
+                     }: {
+    text: string;
+}) {
+    return (
+        <main className="state">
+
+            <div className="brand">
+                между нами.
+            </div>
+
+            <p>
+                {text}
+            </p>
+
+            <style jsx>{`
+
+                .state {
+                    min-height:
+                        100vh;
+
+                    display:
+                        grid;
+
+                    place-items:
+                        center;
+
+                    align-content:
+                        center;
+
+                    gap:
+                        11px;
+
+                    padding:
+                        24px;
+
+                    text-align:
+                        center;
+
+                    background:
+                        #f8f4f1;
+
+                    color:
+                        #211d1f;
+                }
+
+                .brand {
+                    font-family:
+                        Georgia,
+                        "Times New Roman",
+                        serif;
+
+                    font-size:
+                        26px;
+
+                    line-height:
+                        1;
+
+                    font-weight:
+                        700;
+
+                    letter-spacing:
+                        -1px;
+                }
+
+                p {
+                    margin:
+                        0;
+
+                    color:
+                        #91878a;
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        12px;
                 }
 
             `}</style>
