@@ -1,7 +1,19 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import {
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
+
+import {
+    useParams,
+    useRouter,
+} from "next/navigation";
+
+import type {
+    ReactNode,
+} from "react";
 
 type Couple = {
     id: string;
@@ -316,7 +328,9 @@ export default function ReportPage() {
     const sortedCategories =
         useMemo(
             () =>
-                [...categories].sort(
+                [
+                    ...categories,
+                ].sort(
                     (a, b) =>
                         a.value -
                         b.value
@@ -324,16 +338,18 @@ export default function ReportPage() {
             [categories]
         );
 
-    const risks =
+    const weakest =
         sortedCategories.slice(
             0,
-            3
+            2
         );
 
     const strongest =
         useMemo(
             () =>
-                [...categories].sort(
+                [
+                    ...categories,
+                ].sort(
                     (a, b) =>
                         b.value -
                         a.value
@@ -377,6 +393,15 @@ export default function ReportPage() {
         useMemo<
             MonthPlan[]
         >(() => {
+            const first =
+                sortedCategories[0];
+
+            const second =
+                sortedCategories[1];
+
+            const third =
+                sortedCategories[2];
+
             return [
                 {
                     number: 1,
@@ -396,8 +421,7 @@ export default function ReportPage() {
                         "Каждый день задавайте друг другу один настоящий вопрос о прошедшем дне",
 
                         getActionForCategory(
-                            risks[0]
-                                ?.id ??
+                            first?.id ??
                             "friendship"
                         ),
                     ],
@@ -417,8 +441,7 @@ export default function ReportPage() {
 
                     tasks: [
                         getActionForCategory(
-                            risks[1]
-                                ?.id ??
+                            second?.id ??
                             "money"
                         ),
 
@@ -442,8 +465,7 @@ export default function ReportPage() {
 
                     tasks: [
                         getActionForCategory(
-                            risks[2]
-                                ?.id ??
+                            third?.id ??
                             "home"
                         ),
 
@@ -453,7 +475,9 @@ export default function ReportPage() {
                     ],
                 },
             ];
-        }, [risks]);
+        }, [
+            sortedCategories,
+        ]);
 
     const nameA =
         data?.couple
@@ -469,7 +493,7 @@ export default function ReportPage() {
         return (
             <main className="state">
 
-                <div className="brand">
+                <div className="state-brand">
                     между нами.
                 </div>
 
@@ -498,7 +522,7 @@ export default function ReportPage() {
                             #f8f4f1;
                     }
 
-                    .brand {
+                    .state-brand {
                         font-family:
                             Georgia,
                             "Times New Roman",
@@ -537,7 +561,7 @@ export default function ReportPage() {
         return (
             <main className="state">
 
-                <div className="brand">
+                <div className="state-brand">
                     между нами.
                 </div>
 
@@ -570,7 +594,7 @@ export default function ReportPage() {
                             #f8f4f1;
                     }
 
-                    .brand {
+                    .state-brand {
                         font-family:
                             Georgia,
                             "Times New Roman",
@@ -603,13 +627,13 @@ export default function ReportPage() {
     }
 
     return (
-        <main className="page">
+        <main className="report-page">
 
             {/* =================================================
                 HEADER
             ================================================= */}
 
-            <header className="header shell">
+            <header className="report-header report-shell">
 
                 <div className="brand">
                     между нами.
@@ -617,13 +641,17 @@ export default function ReportPage() {
 
                 <div className="couple-names">
 
-                    {nameA}
-
                     <span>
-                        ×
+                        {nameA}
                     </span>
 
-                    {nameB}
+                    <b>
+                        ×
+                    </b>
+
+                    <span>
+                        {nameB}
+                    </span>
 
                 </div>
 
@@ -633,11 +661,7 @@ export default function ReportPage() {
                 INTRO
             ================================================= */}
 
-            <section className="intro shell">
-
-                <div className="section-label">
-                    ВАШ ПОЛНЫЙ РАЗБОР
-                </div>
+            <section className="intro report-shell">
 
                 <div className="intro-grid">
 
@@ -650,51 +674,62 @@ export default function ReportPage() {
                         </h1>
 
                         <p>
-                            Здесь — не оценка ваших
-                            отношений, а карта того,
-                            где вам легко, где вы
-                            смотрите на вещи по-разному
-                            и что можно попробовать
-                            изменить.
+                            Здесь — не оценка ваших отношений,
+                            а карта того, где вам легко,
+                            где вы смотрите на вещи по-разному
+                            и что можно попробовать изменить.
                         </p>
 
                     </div>
 
                     <aside className="intro-insight">
 
-                        <div className="heart">
-                            ♥
+                        <h2>
+                            Главное про вас
+                        </h2>
+
+                        <div className="intro-point">
+
+                            <span>
+                                —
+                            </span>
+
+                            <p>
+                                Сильнее всего сейчас выглядит{" "}
+
+                                <strong>
+                                    {strongest.title.toLowerCase()}
+                                </strong>
+                                .
+                            </p>
+
                         </div>
 
-                        <p>
-                            Сильнее всего сейчас
-                            выглядит{" "}
+                        <div className="intro-point">
 
-                            <strong>
-                                {strongest.title.toLowerCase()}
-                            </strong>
-                            .
-                        </p>
+                            <span>
+                                —
+                            </span>
 
-                        <p>
-                            Больше внимания требуют{" "}
+                            <p>
+                                Больше внимания требуют{" "}
 
-                            <strong>
-                                {risks
-                                    .slice(
-                                        0,
-                                        2
-                                    )
-                                    .map(
-                                        (item) =>
-                                            item.title.toLowerCase()
-                                    )
-                                    .join(
-                                        " и "
-                                    )}
-                            </strong>
-                            .
-                        </p>
+                                <strong>
+                                    {weakest
+                                        .map(
+                                            (
+                                                item
+                                            ) =>
+                                                item.title.toLowerCase()
+                                        )
+                                        .join(
+                                            " и "
+                                        )}
+                                </strong>
+                                .
+                            </p>
+
+                        </div>
 
                     </aside>
 
@@ -703,10 +738,10 @@ export default function ReportPage() {
             </section>
 
             {/* =================================================
-                6 AREAS
+                6 СФЕР
             ================================================= */}
 
-            <section className="section shell">
+            <section className="report-section report-shell">
 
                 <SectionHeading
                     label="6 СФЕР"
@@ -742,54 +777,10 @@ export default function ReportPage() {
             </section>
 
             {/* =================================================
-                RISKS
+                СЛЕПЫЕ ЗОНЫ
             ================================================= */}
 
-            <section className="section shell">
-
-                <SectionHeading
-                    label="ГДЕ СЕЙЧАС СЛОЖНЕЕ"
-                    title={
-                        <>
-                            Три точки, которые
-                            <br />
-                            стоит пройти вместе
-                        </>
-                    }
-                    description="Это не «плохие» части отношений. Просто именно здесь ваши ответы расходятся сильнее всего."
-                />
-
-                <div className="risk-grid">
-
-                    {risks.map(
-                        (
-                            risk,
-                            index
-                        ) => (
-                            <RiskCard
-                                key={
-                                    risk.id
-                                }
-                                category={
-                                    risk
-                                }
-                                number={
-                                    index +
-                                    1
-                                }
-                            />
-                        )
-                    )}
-
-                </div>
-
-            </section>
-
-            {/* =================================================
-                BLIND SPOTS
-            ================================================= */}
-
-            <section className="section shell">
+            <section className="report-section report-shell">
 
                 <SectionHeading
                     label="СЛЕПЫЕ ЗОНЫ"
@@ -798,6 +789,7 @@ export default function ReportPage() {
                             Где вы можете
                             <br />
                             неправильно понимать
+                            <br className="desktop-only" />
                             друг друга
                         </>
                     }
@@ -834,9 +826,7 @@ export default function ReportPage() {
                         )
                     ) : (
                         <div className="empty">
-                            Здесь ваши ответы
-                            оказались довольно
-                            близкими.
+                            Здесь ваши ответы оказались довольно близкими.
                         </div>
                     )}
 
@@ -845,10 +835,10 @@ export default function ReportPage() {
             </section>
 
             {/* =================================================
-                ROADMAP
+                ПЛАН
             ================================================= */}
 
-            <section className="section roadmap-section shell">
+            <section className="report-section roadmap-section report-shell">
 
                 <SectionHeading
                     label="ВАШ ПУТЬ ВМЕСТЕ"
@@ -888,60 +878,6 @@ export default function ReportPage() {
 
             </section>
 
-            {/* =================================================
-                TODAY
-            ================================================= */}
-
-            <section className="section today shell">
-
-                <div className="section-label">
-                    НАЧНИТЕ СЕГОДНЯ
-                </div>
-
-                <div className="today-card">
-
-                    <div className="today-copy">
-
-                        <h2>
-                            Первый вечер:
-                            <br />
-                            без угадываний
-                        </h2>
-
-                        <p>
-                            Сядьте рядом
-                            на 20 минут
-                            и ответьте
-                            по очереди.
-                            Не спорьте
-                            с ответом партнёра.
-                        </p>
-
-                    </div>
-
-                    <div className="today-questions">
-
-                        <QuestionCard
-                            number="01"
-                            text="Что сейчас делает тебя счастливее в наших отношениях?"
-                        />
-
-                        <QuestionCard
-                            number="02"
-                            text="Чего тебе сейчас не хватает от меня?"
-                        />
-
-                        <QuestionCard
-                            number="03"
-                            text="Что мы можем сделать уже на этой неделе?"
-                        />
-
-                    </div>
-
-                </div>
-
-            </section>
-
             <style jsx>{`
 
                 :global(*) {
@@ -964,21 +900,21 @@ export default function ReportPage() {
                         #211d1f;
                 }
 
-                .page {
+                .report-page {
+                    width:
+                        100%;
+
                     min-height:
                         100vh;
 
                     padding-bottom:
                         72px;
+
+                    background:
+                        #f8f4f1;
                 }
 
-                /*
-                 * ЧУТЬ ШИРЕ.
-                 *
-                 * Из-за этого карточки
-                 * перестают быть узкими.
-                 */
-                .shell {
+                .report-shell {
                     width:
                         min(
                             1140px,
@@ -988,17 +924,32 @@ export default function ReportPage() {
                             )
                         );
 
+                    max-width:
+                        1140px;
+
+                    min-height:
+                        0;
+
+                    height:
+                        auto;
+
                     margin:
                         0 auto;
+
+                    padding:
+                        0;
                 }
 
-                /* =============================================
+                /* =================================================
                    HEADER
-                ============================================= */
+                ================================================= */
 
-                .header {
-                    min-height:
+                .report-header {
+                    height:
                         76px;
+
+                    min-height:
+                        0;
 
                     display:
                         flex;
@@ -1010,31 +961,34 @@ export default function ReportPage() {
                         space-between;
 
                     gap:
-                        20px;
-
-                    border-bottom:
-                        1px solid
-                        #ddd5d2;
+                        24px;
                 }
 
                 .brand {
+                    flex:
+                        0 0 auto;
+
                     font-family:
                         Georgia,
                         "Times New Roman",
                         serif;
 
                     font-size:
-                        24px;
+                        25px;
+
+                    line-height:
+                        1;
 
                     font-weight:
                         700;
 
                     letter-spacing:
-                        -1.1px;
+                        -1.2px;
                 }
 
                 .couple-names {
-                    min-width: 0;
+                    min-width:
+                        0;
 
                     display:
                         flex;
@@ -1042,54 +996,14 @@ export default function ReportPage() {
                     align-items:
                         center;
 
+                    justify-content:
+                        flex-end;
+
                     gap:
-                        8px;
-
-                    color:
-                        #91878a;
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
                         10px;
 
-                    font-weight:
-                        700;
-
-                    letter-spacing:
-                        1.2px;
-
-                    text-transform:
-                        uppercase;
-                }
-
-                .couple-names span {
                     color:
-                        #c51f59;
-                }
-
-                /* =============================================
-                   COMMON
-                ============================================= */
-
-                /*
-                 * БЫЛО 108px+
-                 * ТЕПЕРЬ 72px
-                 */
-                .section {
-                    margin-top:
-                        72px;
-                }
-
-                .section-label {
-                    margin-bottom:
-                        13px;
-
-                    color:
-                        #c51f59;
+                        #93888c;
 
                     font-family:
                         Arial,
@@ -1103,28 +1017,29 @@ export default function ReportPage() {
                         800;
 
                     letter-spacing:
-                        2.2px;
+                        1.15px;
+
+                    text-transform:
+                        uppercase;
                 }
 
-                /*
-                 * Заголовок и сам контент
-                 * ближе друг к другу.
-                 */
-                :global(.section-heading) {
-                    max-width:
-                        650px;
+                .couple-names b {
+                    color:
+                        #c8235b;
 
-                    margin-bottom:
-                        30px;
+                    font-size:
+                        13px;
                 }
 
-                /* =============================================
+                /* =================================================
                    INTRO
-                ============================================= */
+                ================================================= */
 
                 .intro {
-                    padding-top:
-                        46px;
+                    padding:
+                        43px
+                        0
+                        12px;
                 }
 
                 .intro-grid {
@@ -1134,22 +1049,23 @@ export default function ReportPage() {
                     grid-template-columns:
                         minmax(
                             0,
-                            1.35fr
+                            1.15fr
                         )
                         minmax(
-                            300px,
-                            .65fr
+                            340px,
+                            .85fr
                         );
 
                     gap:
-                        54px;
+                        72px;
 
                     align-items:
-                        end;
+                        center;
                 }
 
                 .intro-main h1 {
-                    margin: 0;
+                    margin:
+                        0;
 
                     font-family:
                         Georgia,
@@ -1158,9 +1074,9 @@ export default function ReportPage() {
 
                     font-size:
                         clamp(
-                            60px,
-                            7vw,
-                            88px
+                            64px,
+                            7.6vw,
+                            92px
                         );
 
                     line-height:
@@ -1175,15 +1091,15 @@ export default function ReportPage() {
 
                 .intro-main p {
                     max-width:
-                        530px;
+                        590px;
 
                     margin:
-                        22px
+                        25px
                         0
                         0;
 
                     color:
-                        #7d7477;
+                        #7b7275;
 
                     font-family:
                         Arial,
@@ -1191,7 +1107,7 @@ export default function ReportPage() {
                         sans-serif;
 
                     font-size:
-                        14px;
+                        15px;
 
                     line-height:
                         1.55;
@@ -1199,31 +1115,88 @@ export default function ReportPage() {
 
                 .intro-insight {
                     padding:
-                        25px;
+                        30px
+                        34px;
 
                     border-radius:
-                        23px;
+                        27px;
 
                     background:
-                        #f1dee4;
+                        #f0dce2;
                 }
 
-                .heart {
-                    margin-bottom:
-                        15px;
+                .intro-insight h2 {
+                    margin:
+                        0
+                        0
+                        21px;
 
                     color:
-                        #cf3168;
+                        #322a2d;
+
+                    font-family:
+                        Georgia,
+                        "Times New Roman",
+                        serif;
 
                     font-size:
-                        28px;
+                        27px;
+
+                    line-height:
+                        1;
+
+                    font-weight:
+                        400;
+
+                    letter-spacing:
+                        -.8px;
                 }
 
-                .intro-insight p {
-                    margin: 0;
+                .intro-point {
+                    display:
+                        grid;
+
+                    grid-template-columns:
+                        18px
+                        minmax(
+                            0,
+                            1fr
+                        );
+
+                    gap:
+                        7px;
+
+                    align-items:
+                        start;
+                }
+
+                .intro-point +
+                .intro-point {
+                    margin-top:
+                        13px;
+                }
+
+                .intro-point > span {
+                    color:
+                        #cb255d;
+
+                    font-family:
+                        Georgia,
+                        serif;
+
+                    font-size:
+                        18px;
+
+                    line-height:
+                        1.4;
+                }
+
+                .intro-point p {
+                    margin:
+                        0;
 
                     color:
-                        #655b5e;
+                        #5e5458;
 
                     font-family:
                         Arial,
@@ -1231,20 +1204,29 @@ export default function ReportPage() {
                         sans-serif;
 
                     font-size:
-                        13px;
+                        15px;
 
                     line-height:
-                        1.5;
+                        1.48;
                 }
 
-                .intro-insight p + p {
+                /* =================================================
+                   COMMON SECTIONS
+                ================================================= */
+
+                .report-section {
+                    min-height:
+                        0;
+
+                    height:
+                        auto;
+
                     margin-top:
-                        12px;
-                }
+                        70px;
 
-                /* =============================================
-                   SCORE
-                ============================================= */
+                    padding:
+                        0;
+                }
 
                 .score-list {
                     border-top:
@@ -1252,37 +1234,14 @@ export default function ReportPage() {
                         #ded7d4;
                 }
 
-                /* =============================================
-                   RISK
-                ============================================= */
-
-                .risk-grid {
+                .desktop-only {
                     display:
-                        grid;
-
-                    grid-template-columns:
-                        repeat(
-                            3,
-                            minmax(
-                                0,
-                                1fr
-                            )
-                        );
-
-                    gap:
-                        14px;
-
-                    /*
-                     * Не растягиваем
-                     * все карточки по самой высокой.
-                     */
-                    align-items:
-                        start;
+                        inline;
                 }
 
-                /* =============================================
+                /* =================================================
                    BLIND
-                ============================================= */
+                ================================================= */
 
                 .blind-list {
                     display:
@@ -1294,26 +1253,32 @@ export default function ReportPage() {
 
                 .empty {
                     padding:
-                        26px;
+                        25px;
 
                     border:
                         1px solid
-                        #e5dcda;
+                        #e3d9d7;
 
                     border-radius:
-                        21px;
+                        22px;
 
                     color:
-                        #81777a;
+                        #7e7478;
+
+                    background:
+                        #fffaf8;
 
                     font-family:
                         Arial,
                         sans-serif;
+
+                    font-size:
+                        14px;
                 }
 
-                /* =============================================
+                /* =================================================
                    ROADMAP
-                ============================================= */
+                ================================================= */
 
                 .roadmap-section {
                     margin-top:
@@ -1328,13 +1293,14 @@ export default function ReportPage() {
                         hidden;
 
                     border-radius:
-                        24px;
+                        25px;
 
                     background:
                         #ecd9de;
 
                     box-shadow:
-                        0 12px
+                        0
+                        12px
                         34px
                         rgba(
                             74,
@@ -1355,10 +1321,6 @@ export default function ReportPage() {
                         block;
                 }
 
-                /*
-                 * Карточки максимально близко
-                 * к самой карте.
-                 */
                 .month-grid {
                     display:
                         grid;
@@ -1373,7 +1335,7 @@ export default function ReportPage() {
                         );
 
                     gap:
-                        12px;
+                        13px;
 
                     margin-top:
                         14px;
@@ -1382,109 +1344,9 @@ export default function ReportPage() {
                         start;
                 }
 
-                /* =============================================
-                   TODAY
-                ============================================= */
-
-                .today {
-                    margin-top:
-                        76px;
-                }
-
-                .today-card {
-                    padding:
-                        30px;
-
-                    border:
-                        1px solid
-                        #e4dad8;
-
-                    border-radius:
-                        26px;
-
-                    background:
-                        #fffaf8;
-                }
-
-                .today-copy {
-                    display:
-                        flex;
-
-                    align-items:
-                        flex-end;
-
-                    justify-content:
-                        space-between;
-
-                    gap:
-                        36px;
-
-                    margin-bottom:
-                        24px;
-                }
-
-                .today-copy h2 {
-                    margin: 0;
-
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
-
-                    font-size:
-                        42px;
-
-                    line-height:
-                        .95;
-
-                    font-weight:
-                        400;
-
-                    letter-spacing:
-                        -1.9px;
-                }
-
-                .today-copy p {
-                    max-width:
-                        340px;
-
-                    margin: 0;
-
-                    color:
-                        #82797c;
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        12px;
-
-                    line-height:
-                        1.5;
-                }
-
-                .today-questions {
-                    display:
-                        grid;
-
-                    grid-template-columns:
-                        repeat(
-                            3,
-                            minmax(
-                                0,
-                                1fr
-                            )
-                        );
-
-                    gap:
-                        10px;
-                }
-
-                /* =============================================
+                /* =================================================
                    TABLET
-                ============================================= */
+                ================================================= */
 
                 @media (
                     max-width:
@@ -1496,55 +1358,35 @@ export default function ReportPage() {
                             1fr;
 
                         gap:
-                            25px;
+                            28px;
                     }
 
                     .intro-insight {
                         max-width:
-                            500px;
-                    }
-
-                    .risk-grid {
-                        grid-template-columns:
-                            1fr;
+                            620px;
                     }
 
                     .month-grid {
                         grid-template-columns:
                             1fr;
                     }
-
-                    .today-copy {
-                        display:
-                            block;
-                    }
-
-                    .today-copy p {
-                        margin-top:
-                            15px;
-                    }
-
-                    .today-questions {
-                        grid-template-columns:
-                            1fr;
-                    }
                 }
 
-                /* =============================================
+                /* =================================================
                    MOBILE
-                ============================================= */
+                ================================================= */
 
                 @media (
                     max-width:
                         640px
                 ) {
 
-                    .page {
+                    .report-page {
                         padding-bottom:
-                            50px;
+                            44px;
                     }
 
-                    .shell {
+                    .report-shell {
                         width:
                             calc(
                                 100% -
@@ -1552,9 +1394,12 @@ export default function ReportPage() {
                             );
                     }
 
-                    .header {
-                        min-height:
-                            64px;
+                    .report-header {
+                        height:
+                            63px;
+
+                        gap:
+                            12px;
                     }
 
                     .brand {
@@ -1572,44 +1417,66 @@ export default function ReportPage() {
                         white-space:
                             nowrap;
 
-                        text-overflow:
-                            ellipsis;
-
                         font-size:
                             8px;
                     }
 
+                    .couple-names span {
+                        overflow:
+                            hidden;
+
+                        text-overflow:
+                            ellipsis;
+                    }
+
                     .intro {
                         padding-top:
-                            34px;
+                            30px;
                     }
 
                     .intro-main h1 {
                         font-size:
-                            53px;
+                            54px;
 
                         letter-spacing:
-                            -2.6px;
+                            -2.8px;
                     }
 
                     .intro-main p {
+                        margin-top:
+                            18px;
+
                         font-size:
                             12px;
                     }
 
-                    /*
-                     * На мобиле ещё плотнее.
-                     */
-                    .section,
-                    .roadmap-section,
-                    .today {
-                        margin-top:
-                            56px;
+                    .intro-insight {
+                        padding:
+                            23px;
+
+                        border-radius:
+                            22px;
                     }
 
-                    :global(.section-heading) {
-                        margin-bottom:
+                    .intro-insight h2 {
+                        font-size:
                             23px;
+                    }
+
+                    .intro-point p {
+                        font-size:
+                            13px;
+                    }
+
+                    .report-section,
+                    .roadmap-section {
+                        margin-top:
+                            52px;
+                    }
+
+                    .desktop-only {
+                        display:
+                            none;
                     }
 
                     .map {
@@ -1620,19 +1487,6 @@ export default function ReportPage() {
                     .month-grid {
                         margin-top:
                             10px;
-                    }
-
-                    .today-card {
-                        padding:
-                            21px;
-
-                        border-radius:
-                            21px;
-                    }
-
-                    .today-copy h2 {
-                        font-size:
-                            33px;
                     }
                 }
 
@@ -1652,7 +1506,7 @@ function SectionHeading({
                             description,
                         }: {
     label: string;
-    title: React.ReactNode;
+    title: ReactNode;
     description: string;
 }) {
     return (
@@ -1674,7 +1528,7 @@ function SectionHeading({
 
                 .section-heading {
                     max-width:
-                        650px;
+                        780px;
 
                     margin-bottom:
                         30px;
@@ -1712,32 +1566,32 @@ function SectionHeading({
 
                     font-size:
                         clamp(
-                            42px,
-                            4.7vw,
-                            56px
+                            43px,
+                            4.8vw,
+                            58px
                         );
 
                     line-height:
-                        .96;
+                        .95;
 
                     font-weight:
                         400;
 
                     letter-spacing:
-                        -2.2px;
+                        -2.3px;
                 }
 
                 p {
                     max-width:
-                        520px;
+                        630px;
 
                     margin:
-                        15px
+                        16px
                         0
                         0;
 
                     color:
-                        #8b8285;
+                        #898083;
 
                     font-family:
                         Arial,
@@ -1758,15 +1612,15 @@ function SectionHeading({
 
                     .section-heading {
                         margin-bottom:
-                            23px;
+                            22px;
                     }
 
                     h2 {
                         font-size:
-                            36px;
+                            37px;
 
                         letter-spacing:
-                            -1.5px;
+                            -1.6px;
                     }
 
                     p {
@@ -1782,7 +1636,7 @@ function SectionHeading({
 }
 
 /* ============================================================
-   SCORE ROW
+   SCORE
 ============================================================ */
 
 function ScoreRow({
@@ -1853,7 +1707,7 @@ function ScoreRow({
                             0,
                             1fr
                         )
-                        80px;
+                        84px;
 
                     gap:
                         18px;
@@ -1905,7 +1759,7 @@ function ScoreRow({
                         serif;
 
                     font-size:
-                        28px;
+                        29px;
 
                     line-height:
                         1;
@@ -1980,7 +1834,7 @@ function ScoreRow({
                         #c51f59;
 
                     font-size:
-                        45px;
+                        46px;
 
                     line-height:
                         1;
@@ -2007,7 +1861,7 @@ function ScoreRow({
 
                     .score-row {
                         min-height:
-                            88px;
+                            87px;
 
                         grid-template-columns:
                             30px
@@ -2060,205 +1914,6 @@ function ScoreRow({
 }
 
 /* ============================================================
-   RISK CARD
-============================================================ */
-
-function RiskCard({
-                      category,
-                      number,
-                  }: {
-    category: CategoryScore;
-    number: number;
-}) {
-    return (
-        <article className="risk-card">
-
-            <div className="risk-top">
-
-                <div className="number">
-                    {number}
-                </div>
-
-                <div className="icon">
-                    {getCategoryIcon(
-                        category.id
-                    )}
-                </div>
-
-            </div>
-
-            <h3>
-                {category.title}
-            </h3>
-
-            <p>
-                {getRiskText(
-                    category.id
-                )}
-            </p>
-
-            <div className="score">
-                {category.value}
-
-                <span>
-                    /10
-                </span>
-            </div>
-
-            <style jsx>{`
-
-                .risk-card {
-                    position:
-                        relative;
-
-                    min-height:
-                        250px;
-
-                    padding:
-                        23px;
-
-                    border:
-                        1px solid
-                        #e5dcda;
-
-                    border-radius:
-                        22px;
-
-                    background:
-                        #fffaf8;
-                }
-
-                .risk-top {
-                    display:
-                        flex;
-
-                    align-items:
-                        center;
-
-                    justify-content:
-                        space-between;
-                }
-
-                .number {
-                    width:
-                        34px;
-
-                    height:
-                        34px;
-
-                    display:
-                        grid;
-
-                    place-items:
-                        center;
-
-                    border-radius:
-                        50%;
-
-                    background:
-                        #f2dfe4;
-
-                    color:
-                        #c51f59;
-
-                    font-family:
-                        Georgia,
-                        serif;
-
-                    font-size:
-                        16px;
-                }
-
-                .icon {
-                    color:
-                        #c51f59;
-
-                    font-size:
-                        19px;
-                }
-
-                h3 {
-                    margin:
-                        24px
-                        0
-                        11px;
-
-                    font-family:
-                        Georgia,
-                        serif;
-
-                    font-size:
-                        28px;
-
-                    line-height:
-                        1;
-
-                    font-weight:
-                        400;
-                }
-
-                p {
-                    max-width:
-                        270px;
-
-                    margin:
-                        0
-                        0
-                        40px;
-
-                    color:
-                        #756d70;
-
-                    font-family:
-                        Arial,
-                        sans-serif;
-
-                    font-size:
-                        12px;
-
-                    line-height:
-                        1.5;
-                }
-
-                .score {
-                    position:
-                        absolute;
-
-                    right:
-                        21px;
-
-                    bottom:
-                        18px;
-
-                    color:
-                        #c51f59;
-
-                    font-family:
-                        Georgia,
-                        serif;
-
-                    font-size:
-                        28px;
-                }
-
-                .score span {
-                    margin-left:
-                        2px;
-
-                    color:
-                        #8a8284;
-
-                    font-size:
-                        12px;
-                }
-
-            `}</style>
-
-        </article>
-    );
-}
-
-/* ============================================================
    BLIND SPOT
 ============================================================ */
 
@@ -2276,49 +1931,57 @@ function BlindSpot({
     return (
         <article className="blind-card">
 
-            <div className="blind-number">
-                0{index + 1}
-            </div>
+            <div className="blind-top">
 
-            <div className="blind-content">
+                <div className="blind-number">
+                    0{index + 1}
+                </div>
 
                 <h3>
                     {item.question}
                 </h3>
 
-                <div className="answers">
+            </div>
 
-                    <div className="answer">
+            <div className="answers">
 
-                        <span className="person">
-                            {nameA}
-                        </span>
+                <div className="answer">
 
-                        <strong>
-                            {item.labelA}
-                        </strong>
+                    <span className="person">
+                        {nameA}
+                    </span>
 
-                    </div>
-
-                    <div className="arrow">
-                        →
-                    </div>
-
-                    <div className="answer">
-
-                        <span className="person">
-                            {nameB}
-                        </span>
-
-                        <strong>
-                            {item.labelB}
-                        </strong>
-
-                    </div>
+                    <strong>
+                        {item.labelA}
+                    </strong>
 
                 </div>
 
-                <p className="insight">
+                <div className="arrow">
+                    →
+                </div>
+
+                <div className="answer">
+
+                    <span className="person">
+                        {nameB}
+                    </span>
+
+                    <strong>
+                        {item.labelB}
+                    </strong>
+
+                </div>
+
+            </div>
+
+            <div className="meaning">
+
+                <span>
+                    ЧТО ЭТО ЗНАЧИТ
+                </span>
+
+                <p>
                     {getBlindInsight(
                         item
                     )}
@@ -2335,37 +1998,46 @@ function BlindSpot({
                     min-width:
                         0;
 
-                    display:
-                        grid;
-
-                    grid-template-columns:
-                        42px
-                        minmax(
-                            0,
-                            1fr
-                        );
-
-                    gap:
-                        20px;
-
                     padding:
-                        25px;
+                        25px
+                        28px;
 
                     overflow:
                         hidden;
 
                     border:
                         1px solid
-                        #e5dcda;
+                        #e2d8d6;
 
                     border-radius:
-                        22px;
+                        23px;
 
                     background:
                         #fffaf8;
                 }
 
+                .blind-top {
+                    display:
+                        grid;
+
+                    grid-template-columns:
+                        52px
+                        minmax(
+                            0,
+                            1fr
+                        );
+
+                    gap:
+                        16px;
+
+                    align-items:
+                        start;
+                }
+
                 .blind-number {
+                    padding-top:
+                        4px;
+
                     color:
                         #ca275f;
 
@@ -2374,41 +2046,37 @@ function BlindSpot({
                         serif;
 
                     font-size:
-                        19px;
-                }
+                        20px;
 
-                .blind-content {
-                    min-width:
-                        0;
+                    line-height:
+                        1;
                 }
 
                 h3 {
                     max-width:
-                        780px;
+                        850px;
 
-                    margin:
-                        0
-                        0
-                        18px;
+                    margin: 0;
 
                     font-family:
                         Georgia,
+                        "Times New Roman",
                         serif;
 
                     font-size:
-                        27px;
+                        30px;
 
                     line-height:
                         1.08;
 
                     font-weight:
                         400;
+
+                    letter-spacing:
+                        -.8px;
                 }
 
                 .answers {
-                    min-width:
-                        0;
-
                     display:
                         grid;
 
@@ -2417,17 +2085,23 @@ function BlindSpot({
                             0,
                             1fr
                         )
-                        34px
+                        46px
                         minmax(
                             0,
                             1fr
                         );
 
                     gap:
-                        10px;
+                        13px;
 
                     align-items:
                         center;
+
+                    margin:
+                        23px
+                        0
+                        0
+                        68px;
                 }
 
                 .answer {
@@ -2435,16 +2109,26 @@ function BlindSpot({
                         0;
 
                     min-height:
-                        86px;
+                        108px;
+
+                    display:
+                        flex;
+
+                    flex-direction:
+                        column;
+
+                    justify-content:
+                        center;
 
                     padding:
-                        15px;
+                        19px
+                        21px;
 
                     border-radius:
-                        15px;
+                        18px;
 
                     background:
-                        #f3e5e7;
+                        #f1e1e4;
                 }
 
                 .person {
@@ -2452,29 +2136,33 @@ function BlindSpot({
                         block;
 
                     margin-bottom:
-                        7px;
+                        10px;
 
                     overflow:
                         hidden;
 
-                    text-overflow:
-                        ellipsis;
-
                     color:
-                        #a08f94;
+                        #9d8c91;
 
                     font-family:
                         Arial,
+                        Helvetica,
                         sans-serif;
 
                     font-size:
-                        9px;
+                        10px;
+
+                    line-height:
+                        1;
 
                     font-weight:
                         800;
 
                     letter-spacing:
                         .8px;
+
+                    text-overflow:
+                        ellipsis;
 
                     text-transform:
                         uppercase;
@@ -2483,15 +2171,12 @@ function BlindSpot({
                         nowrap;
                 }
 
-                strong {
+                .answer strong {
                     display:
                         block;
 
-                    max-width:
-                        100%;
-
                     color:
-                        #352e30;
+                        #30282b;
 
                     font-family:
                         Arial,
@@ -2499,10 +2184,10 @@ function BlindSpot({
                         sans-serif;
 
                     font-size:
-                        12px;
+                        17px;
 
                     line-height:
-                        1.4;
+                        1.38;
 
                     font-weight:
                         500;
@@ -2520,20 +2205,36 @@ function BlindSpot({
                         serif;
 
                     font-size:
-                        25px;
+                        29px;
 
                     text-align:
                         center;
                 }
 
-                .insight {
+                .meaning {
                     margin:
-                        14px
+                        19px
                         0
-                        0;
+                        0
+                        68px;
+
+                    padding-top:
+                        17px;
+
+                    border-top:
+                        1px solid
+                        #e9dfdd;
+                }
+
+                .meaning span {
+                    display:
+                        block;
+
+                    margin-bottom:
+                        6px;
 
                     color:
-                        #81777a;
+                        #c2275c;
 
                     font-family:
                         Arial,
@@ -2541,7 +2242,31 @@ function BlindSpot({
                         sans-serif;
 
                     font-size:
-                        11px;
+                        9px;
+
+                    font-weight:
+                        800;
+
+                    letter-spacing:
+                        1.4px;
+                }
+
+                .meaning p {
+                    max-width:
+                        850px;
+
+                    margin: 0;
+
+                    color:
+                        #655b5e;
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        14px;
 
                     line-height:
                         1.5;
@@ -2549,41 +2274,84 @@ function BlindSpot({
 
                 @media (
                     max-width:
-                        620px
+                        640px
                 ) {
 
                     .blind-card {
+                        padding:
+                            20px;
+                    }
+
+                    .blind-top {
                         grid-template-columns:
                             1fr;
 
                         gap:
-                            10px;
+                            8px;
+                    }
 
-                        padding:
-                            19px;
+                    .blind-number {
+                        font-size:
+                            17px;
                     }
 
                     h3 {
                         font-size:
-                            22px;
+                            24px;
                     }
 
                     .answers {
                         grid-template-columns:
                             1fr;
+
+                        gap:
+                            8px;
+
+                        margin:
+                            18px
+                            0
+                            0;
+                    }
+
+                    .answer {
+                        min-height:
+                            0;
+
+                        padding:
+                            16px;
+                    }
+
+                    .answer strong {
+                        font-size:
+                            15px;
                     }
 
                     .arrow {
                         height:
-                            20px;
+                            21px;
 
                         line-height:
-                            20px;
+                            21px;
 
                         transform:
                             rotate(
                                 90deg
                             );
+                    }
+
+                    .meaning {
+                        margin:
+                            16px
+                            0
+                            0;
+
+                        padding-top:
+                            14px;
+                    }
+
+                    .meaning p {
+                        font-size:
+                            12px;
                     }
                 }
 
@@ -2604,13 +2372,6 @@ function MonthCard({
 }) {
     return (
         <article className="month-card">
-
-            {/*
-                НОМЕР И ЛЕЙБЛ СВЕРХУ.
-
-                Они больше не отнимают
-                ширину у заголовка.
-            */}
 
             <div className="month-top">
 
@@ -2664,23 +2425,20 @@ function MonthCard({
                         0;
 
                     padding:
-                        23px;
+                        24px;
 
                     border:
                         1px solid
-                        #e5dcda;
+                        #e3d9d7;
 
                     border-radius:
-                        22px;
+                        23px;
 
                     background:
                         #fffaf8;
                 }
 
                 .month-top {
-                    min-height:
-                        40px;
-
                     display:
                         flex;
 
@@ -2691,7 +2449,7 @@ function MonthCard({
                         12px;
 
                     margin-bottom:
-                        16px;
+                        17px;
                 }
 
                 .number {
@@ -2749,16 +2507,8 @@ function MonthCard({
                         1.3px;
                 }
 
-                /*
-                 * Теперь заголовок
-                 * имеет ВСЮ ширину карточки.
-                 */
                 h3 {
-                    max-width:
-                        100%;
-
-                    margin:
-                        0;
+                    margin: 0;
 
                     font-family:
                         Georgia,
@@ -2766,7 +2516,7 @@ function MonthCard({
                         serif;
 
                     font-size:
-                        29px;
+                        30px;
 
                     line-height:
                         .98;
@@ -2785,7 +2535,7 @@ function MonthCard({
                         21px;
 
                     color:
-                        #82787b;
+                        #807679;
 
                     font-family:
                         Arial,
@@ -2808,9 +2558,6 @@ function MonthCard({
                 }
 
                 .task {
-                    min-width:
-                        0;
-
                     display:
                         grid;
 
@@ -2847,11 +2594,8 @@ function MonthCard({
                 }
 
                 .task-text {
-                    min-width:
-                        0;
-
                     color:
-                        #51484a;
+                        #4e4548;
 
                     font-family:
                         Arial,
@@ -2868,102 +2612,9 @@ function MonthCard({
                         break-word;
                 }
 
-                @media (
-                    max-width:
-                        900px
-                ) {
-
-                    .month-card {
-                        padding:
-                            22px;
-                    }
-
-                    h3 {
-                        font-size:
-                            28px;
-                    }
-                }
-
             `}</style>
 
         </article>
-    );
-}
-
-/* ============================================================
-   QUESTION
-============================================================ */
-
-function QuestionCard({
-                          number,
-                          text,
-                      }: {
-    number: string;
-    text: string;
-}) {
-    return (
-        <div className="question">
-
-            <span>
-                {number}
-            </span>
-
-            <p>
-                {text}
-            </p>
-
-            <style jsx>{`
-
-                .question {
-                    min-height:
-                        112px;
-
-                    padding:
-                        17px;
-
-                    border-radius:
-                        17px;
-
-                    background:
-                        #f2e3e7;
-                }
-
-                span {
-                    color:
-                        #c9245c;
-
-                    font-family:
-                        Georgia,
-                        serif;
-
-                    font-size:
-                        17px;
-                }
-
-                p {
-                    margin:
-                        13px
-                        0
-                        0;
-
-                    color:
-                        #393234;
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        12px;
-
-                    line-height:
-                        1.42;
-                }
-
-            `}</style>
-
-        </div>
     );
 }
 
@@ -2992,30 +2643,6 @@ function getCategoryIcon(
 
         case "home":
             return "⌂";
-    }
-}
-
-function getRiskText(
-    id: CategoryId
-) {
-    switch (id) {
-        case "friendship":
-            return "Вам может не хватать лёгкости, совместных впечатлений или ощущения, что вместе интересно даже без большой программы.";
-
-        case "partnership":
-            return "В некоторых ситуациях вы можете по-разному понимать, что значит быть командой и как принимать решения вдвоём.";
-
-        case "sex":
-            return "Ожидания от близости могут различаться: частота, инициатива и то, что помогает каждому чувствовать связь.";
-
-        case "money":
-            return "Ваш подход к тратам, безопасности и крупным решениям может создавать напряжение даже тогда, когда сумма сама по себе не главная.";
-
-        case "care":
-            return "Вы можете оба стараться заботиться, но показывать это способами, которые партнёр не всегда считывает как поддержку.";
-
-        case "home":
-            return "Повседневные обязанности, привычки и ожидания от быта могут незаметно накапливать раздражение.";
     }
 }
 
@@ -3050,15 +2677,15 @@ function getBlindInsight(
         item.similarity ===
         "different"
     ) {
-        return "Здесь вы отвечаете заметно по-разному. В реальной ситуации каждый может считать свою реакцию очевидной — и не понимать, почему партнёр реагирует иначе.";
+        return "Здесь вы смотрите на одну ситуацию заметно по-разному. Один из вас может считать свою реакцию очевидной, а второй в этот же момент ждать совсем другого сигнала.";
     }
 
     if (
         item.similarity ===
         "close"
     ) {
-        return "Ваши ответы близки, но не полностью совпадают. Обычно именно такие небольшие различия сложнее всего заметить заранее.";
+        return "В целом вы рядом, но детали различаются. Такие небольшие расхождения часто остаются незаметными, пока не возникает реальная ситуация.";
     }
 
-    return "Здесь вы смотрите на ситуацию довольно похоже.";
+    return "В этой ситуации вы воспринимаете происходящее довольно похоже.";
 }
