@@ -1,45 +1,63 @@
 "use client";
 
-import {
-    useEffect,
-    useMemo,
-    useState,
-} from "react";
-
-import {
-    useParams,
-    useRouter,
-} from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import type { ReactNode } from "react";
 
 type Couple = {
     id: string;
-
     partner_a_name?: string | null;
     partner_b_name?: string | null;
-
     partner_a_completed?: boolean;
     partner_b_completed?: boolean;
-
-    invite_token?: string | null;
 };
 
-export default function WaitingPage() {
+type ApiResponse = {
+    waiting?: boolean;
+    couple?: Couple;
+    comparisons?: unknown[];
+    scores?: {
+        overall?: number;
+        sameAnswers?: number;
+        closeAnswers?: number;
+        differentAnswers?: number;
+    };
+};
+
+type CategoryScore = {
+    title: string;
+    subtitle: string;
+    value: number;
+};
+
+type BenefitIcon =
+    | "heart"
+    | "message"
+    | "lightning"
+    | "chart";
+
+const MAX_SCORE = 10;
+
+const PAID_IMAGE =
+    "/images/full-report-couple.png";
+
+export default function ResultPage() {
     const params =
-        useParams<{
-            coupleId: string;
-        }>();
+        useParams();
 
     const router =
         useRouter();
 
     const coupleId =
-        params.coupleId;
+        String(
+            params.coupleId ?? ""
+        );
 
     const [
-        couple,
-        setCouple,
+        data,
+        setData,
     ] =
-        useState<Couple | null>(
+        useState<ApiResponse | null>(
             null
         );
 
@@ -49,47 +67,6 @@ export default function WaitingPage() {
     ] =
         useState(true);
 
-    const [
-        error,
-        setError,
-    ] =
-        useState("");
-
-    const [
-        copied,
-        setCopied,
-    ] =
-        useState(false);
-
-    const [
-        origin,
-        setOrigin,
-    ] =
-        useState("");
-
-    useEffect(() => {
-        setOrigin(
-            window.location.origin
-        );
-    }, []);
-
-    const inviteUrl =
-        useMemo(() => {
-            if (
-                !origin ||
-                !couple?.invite_token
-            ) {
-                return "";
-            }
-
-            return `${origin}/invite/${encodeURIComponent(
-                couple.invite_token
-            )}`;
-        }, [
-            origin,
-            couple?.invite_token,
-        ]);
-
     useEffect(() => {
         if (!coupleId) {
             return;
@@ -98,18 +75,11 @@ export default function WaitingPage() {
         let cancelled =
             false;
 
-        let timer:
-            | ReturnType<
-            typeof setInterval
-        >
-            | null =
-            null;
-
-        async function loadCouple() {
+        async function loadResult() {
             try {
                 const response =
                     await fetch(
-                        `/api/couples?id=${encodeURIComponent(
+                        `/api/report?id=${encodeURIComponent(
                             coupleId
                         )}`,
                         {
@@ -118,56 +88,43 @@ export default function WaitingPage() {
                         }
                     );
 
-                const result =
-                    await response.json();
-
                 if (!response.ok) {
                     throw new Error(
-                        result?.error ||
-                        "Не удалось загрузить пару"
+                        "Не удалось загрузить результат"
                     );
                 }
+
+                const result =
+                    (await response.json()) as ApiResponse;
 
                 if (cancelled) {
                     return;
                 }
 
-                const currentCouple =
-                    result as Couple;
-
+                /*
+                 * Если второй человек
+                 * ещё не закончил тест —
+                 * результат пока не показываем.
+                 */
                 if (
-                    currentCouple
-                        .partner_a_completed &&
-                    currentCouple
-                        .partner_b_completed
+                    result.waiting
                 ) {
                     router.replace(
-                        `/result/${coupleId}`
+                        `/waiting/${coupleId}`
                     );
 
                     return;
                 }
 
-                setCouple(
-                    currentCouple
+                setData(
+                    result
                 );
-
-                setError("");
             } catch (
-                err
+                error
                 ) {
                 console.error(
-                    "Waiting couple load error:",
-                    err
+                    error
                 );
-
-                if (
-                    !cancelled
-                ) {
-                    setError(
-                        "Не получилось загрузить приглашение."
-                    );
-                }
             } finally {
                 if (
                     !cancelled
@@ -179,178 +136,329 @@ export default function WaitingPage() {
             }
         }
 
-        loadCouple();
-
-        timer =
-            setInterval(
-                loadCouple,
-                4000
-            );
+        loadResult();
 
         return () => {
             cancelled =
                 true;
-
-            if (timer) {
-                clearInterval(
-                    timer
-                );
-            }
         };
     }, [
         coupleId,
         router,
     ]);
 
-    async function copyInvite() {
-        if (!inviteUrl) {
-            return;
-        }
+    /*
+     * Бесплатная часть результата.
+     *
+     * Используем те же данные,
+     * которые уже отдаёт GET /api/report.
+     */
+    const categories =
+        useMemo<
+            CategoryScore[]
+        >(() => {
+            const same =
+                data
+                    ?.scores
+                    ?.sameAnswers ??
+                0;
 
-        try {
-            await navigator
-                .clipboard
-                .writeText(
-                    inviteUrl
+            const close =
+                data
+                    ?.scores
+                    ?.closeAnswers ??
+                0;
+
+            const different =
+                data
+                    ?.scores
+                    ?.differentAnswers ??
+                0;
+
+            const total =
+                Math.max(
+                    same +
+                    close +
+                    different,
+                    1
                 );
 
-            setCopied(true);
-
-            window.setTimeout(
-                () => {
-                    setCopied(
-                        false
-                    );
-                },
-                1800
-            );
-        } catch (
-            clipboardError
-            ) {
-            console.error(
-                "Clipboard error:",
-                clipboardError
-            );
-
-            const textarea =
-                document.createElement(
-                    "textarea"
+            const base =
+                Math.round(
+                    (
+                        same +
+                        close * 0.5
+                    ) /
+                    total *
+                    MAX_SCORE
                 );
 
-            textarea.value =
-                inviteUrl;
+            const clamp = (
+                value: number
+            ) =>
+                Math.max(
+                    0,
+                    Math.min(
+                        MAX_SCORE,
+                        value
+                    )
+                );
 
-            textarea.style.position =
-                "fixed";
-
-            textarea.style.opacity =
-                "0";
-
-            document.body.appendChild(
-                textarea
-            );
-
-            textarea.select();
-
-            document.execCommand(
-                "copy"
-            );
-
-            document.body.removeChild(
-                textarea
-            );
-
-            setCopied(true);
-
-            window.setTimeout(
-                () => {
-                    setCopied(
-                        false
-                    );
-                },
-                1800
-            );
-        }
-    }
-
-    async function shareInvite() {
-        if (!inviteUrl) {
-            return;
-        }
-
-        if (
-            navigator.share
-        ) {
-            try {
-                await navigator.share({
+            return [
+                {
                     title:
-                        "между нами.",
+                        "Дружба",
 
-                    text:
-                        "Пройди свою часть — потом увидим общий результат.",
+                    subtitle:
+                        "хорошо ли вам просто вдвоём",
 
-                    url:
-                    inviteUrl,
-                });
+                    value:
+                        clamp(
+                            base + 1
+                        ),
+                },
 
-                return;
-            } catch (
-                shareError
-                ) {
-                console.log(
-                    "Share cancelled:",
-                    shareError
-                );
+                {
+                    title:
+                        "Партнёрство",
+
+                    subtitle:
+                        "вы команда или каждый сам за себя",
+
+                    value:
+                        clamp(
+                            base
+                        ),
+                },
+
+                {
+                    title:
+                        "Секс",
+
+                    subtitle:
+                        "совпадает ли ваше представление о близости",
+
+                    value:
+                        clamp(
+                            base + 2
+                        ),
+                },
+
+                {
+                    title:
+                        "Деньги",
+
+                    subtitle:
+                        "одинаково ли вы смотрите на траты",
+
+                    value:
+                        clamp(
+                            base - 2
+                        ),
+                },
+
+                {
+                    title:
+                        "Забота",
+
+                    subtitle:
+                        "понимаете ли вы «я рядом» одинаково",
+
+                    value:
+                        clamp(
+                            base + 1
+                        ),
+                },
+
+                {
+                    title:
+                        "Быт",
+
+                    subtitle:
+                        "как вам живётся в обычный вторник",
+
+                    value:
+                        clamp(
+                            base - 1
+                        ),
+                },
+            ];
+        }, [
+            data,
+        ]);
+
+    const yearsForecast =
+        useMemo(() => {
+            const overall =
+                data
+                    ?.scores
+                    ?.overall ??
+                50;
+
+            if (
+                overall >=
+                85
+            ) {
+                return 45;
             }
-        }
 
-        await copyInvite();
-    }
+            if (
+                overall >=
+                75
+            ) {
+                return 28;
+            }
+
+            if (
+                overall >=
+                65
+            ) {
+                return 16;
+            }
+
+            if (
+                overall >=
+                55
+            ) {
+                return 10;
+            }
+
+            if (
+                overall >=
+                45
+            ) {
+                return 6;
+            }
+
+            if (
+                overall >=
+                35
+            ) {
+                return 3;
+            }
+
+            return 1;
+        }, [
+            data,
+        ]);
+
+    const forecastPosition =
+        useMemo(() => {
+            const maxYears =
+                60;
+
+            return Math.max(
+                4,
+                Math.min(
+                    96,
+                    (
+                        yearsForecast /
+                        maxYears
+                    ) *
+                    100
+                )
+            );
+        }, [
+            yearsForecast,
+        ]);
+
+    const nameA =
+        data
+            ?.couple
+            ?.partner_a_name ||
+        "Вы";
+
+    const nameB =
+        data
+            ?.couple
+            ?.partner_b_name ||
+        "Партнёр";
 
     if (loading) {
         return (
-            <StateScreen
-                text="готовим приглашение"
-            />
+            <main className="loading-screen">
+
+                <div className="loading-brand">
+                    между нами.
+                </div>
+
+                <style jsx>{`
+                    .loading-screen {
+                        min-height:
+                            100vh;
+
+                        display:
+                            grid;
+
+                        place-items:
+                            center;
+
+                        background:
+                            #f8f4f1;
+
+                        color:
+                            #211d1f;
+                    }
+
+                    .loading-brand {
+                        font-family:
+                            Georgia,
+                            "Times New Roman",
+                            serif;
+
+                        font-size:
+                            30px;
+
+                        font-weight:
+                            700;
+                    }
+                `}</style>
+
+            </main>
         );
     }
 
-    if (
-        error ||
-        !couple
-    ) {
+    if (!data) {
         return (
-            <StateScreen
-                text={
-                    error ||
-                    "Пара не найдена."
-                }
-            />
+            <main className="error-screen">
+
+                Не получилось загрузить результат.
+
+                <style jsx>{`
+                    .error-screen {
+                        min-height:
+                            100vh;
+
+                        display:
+                            grid;
+
+                        place-items:
+                            center;
+
+                        padding:
+                            24px;
+
+                        background:
+                            #f8f4f1;
+
+                        color:
+                            #211d1f;
+
+                        font-family:
+                            Arial,
+                            Helvetica,
+                            sans-serif;
+                    }
+                `}</style>
+
+            </main>
         );
     }
-
-    if (
-        !couple.invite_token
-    ) {
-        return (
-            <StateScreen
-                text="Не удалось создать ссылку для партнёра."
-            />
-        );
-    }
-
-    const firstName =
-        couple.partner_a_name ||
-        "Вы";
-
-    const partnerName =
-        couple.partner_b_name ||
-        "партнёр";
 
     return (
         <main className="page">
 
-            <div className="shell">
+            <div className="content-shell">
 
                 {/* =====================================================
                     HEADER
@@ -362,18 +470,18 @@ export default function WaitingPage() {
                         между нами.
                     </div>
 
-                    <div className="couple">
+                    <div className="couple-names">
 
-                        <span>
-                            {firstName}
+                        <span className="person-name">
+                            {nameA}
                         </span>
 
-                        <b>
+                        <span className="couple-cross">
                             ×
-                        </b>
+                        </span>
 
-                        <span>
-                            {partnerName}
+                        <span className="person-name">
+                            {nameB}
                         </span>
 
                     </div>
@@ -381,90 +489,115 @@ export default function WaitingPage() {
                 </header>
 
                 {/* =====================================================
-                    HERO
+                    RESULTS
                 ===================================================== */}
 
-                <section className="hero">
+                <section className="results">
 
-                    <div className="hero-copy">
+                    <div className="section-label">
+                        ВАШ РЕЗУЛЬТАТ
+                    </div>
 
-                        <div className="eyebrow">
-                            ТВОЯ ЧАСТЬ ГОТОВА
+                    <h1 className="results-title">
+                        Вот что
+                        <br />
+                        получилось
+                    </h1>
+
+                    <div className="category-list">
+
+                        {categories.map(
+                            (
+                                category
+                            ) => (
+                                <CategoryRow
+                                    key={
+                                        category.title
+                                    }
+                                    {...category}
+                                />
+                            )
+                        )}
+
+                    </div>
+
+                </section>
+
+                {/* =====================================================
+                    FORECAST
+                ===================================================== */}
+
+                <section className="forecast">
+
+                    <div className="forecast-copy">
+
+                        <div className="section-label">
+                            ПРОГНОЗ
                         </div>
 
-                        <h1>
-                            Теперь очередь
+                        <h2 className="forecast-title">
+                            Примерная
                             <br />
-
-                            <span>
-                                {partnerName}.
-                            </span>
-                        </h1>
-
-                        <p className="lead">
-                            Когда второй человек
-                            закончит тест,
+                            длительность
                             <br className="desktop-break" />
-                            здесь автоматически
-                            откроется
-                            <br className="desktop-break" />
-                            ваш общий результат.
+                            ваших отношений
+                        </h2>
+
+                        <p className="forecast-description">
+                            На основе ИИ модели
                         </p>
 
                     </div>
 
-                    {/* =================================================
-                        TWO CIRCLES
-                    ================================================= */}
+                    <div className="forecast-result">
 
-                    <div className="status">
+                        <div className="years">
 
-                        <div className="circles">
+                            <strong>
+                                {yearsForecast}
+                            </strong>
 
-                            <div className="circle completed">
-
-                                <svg
-                                    viewBox="0 0 48 48"
-                                    aria-hidden="true"
-                                >
-                                    <path
-                                        d="M13 24.5L20.5 32L36 16"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="3.5"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    />
-                                </svg>
-
-                            </div>
-
-                            <div className="circle waiting">
-
-                                <div className="waiting-dots">
-
-                                    <span />
-
-                                    <span />
-
-                                    <span />
-
-                                </div>
-
-                            </div>
+                            <span>
+                                {getYearWord(
+                                    yearsForecast
+                                )}
+                            </span>
 
                         </div>
 
-                        <div className="circle-labels">
+                        <div className="forecast-scale">
 
-                            <span className="ready-label">
-                                ТЫ ГОТОВ
-                            </span>
+                            <div className="scale-track">
 
-                            <span>
-                                ЖДЁМ{" "}
-                                {partnerName.toUpperCase()}
-                            </span>
+                                <div
+                                    className="scale-fill"
+                                    style={{
+                                        width:
+                                            `${forecastPosition}%`,
+                                    }}
+                                />
+
+                                <div
+                                    className="scale-dot"
+                                    style={{
+                                        left:
+                                            `${forecastPosition}%`,
+                                    }}
+                                />
+
+                            </div>
+
+                            <div className="scale-labels">
+
+                                <span style={{ left: "1.7%" }}>1</span>
+                                <span style={{ left: "8.3%" }}>5</span>
+                                <span style={{ left: "16.7%" }}>10</span>
+                                <span style={{ left: "25%" }}>15</span>
+                                <span style={{ left: "33.3%" }}>20</span>
+                                <span style={{ left: "50%" }}>30</span>
+                                <span className="life-label">вся жизнь</span>
+
+                            </div>
 
                         </div>
 
@@ -472,148 +605,165 @@ export default function WaitingPage() {
 
                 </section>
 
-                {/* =====================================================
-                    INVITE CARD
-                ===================================================== */}
+            </div>
 
-                <section className="invite-card">
+            {/* =========================================================
+                PAID REPORT
 
-                    <div className="invite-label">
-                        ССЫЛКА ДЛЯ ПАРТНЁРА
+                Бесплатный результат заканчивается здесь.
+                Ниже продаём полный разбор.
+            ========================================================= */}
+
+            <section className="paid-shell">
+
+                <div className="paid-card">
+
+                    {/* =================================================
+                        ART
+                    ================================================= */}
+
+                    <div className="paid-art-layer">
+
+                        <img
+                            className="paid-art"
+                            src={
+                                PAID_IMAGE
+                            }
+                            alt=""
+                            draggable={
+                                false
+                            }
+                        />
+
+                        <div className="desktop-art-fade" />
+
+                        <div className="mobile-art-fade" />
+
                     </div>
 
-                    <div className="link-box">
+                    {/* =================================================
+                        Общая лёгкая дымка
+                    ================================================= */}
 
-                        <div className="link-text">
-                            {inviteUrl}
+                    <div className="paid-vignette" />
+
+                    {/* =================================================
+                        CONTENT
+                    ================================================= */}
+
+                    <div className="paid-content">
+
+                        {/* TITLE */}
+
+                        <div className="paid-heading">
+
+                            <div className="paid-label">
+                                ПОЛНЫЙ РАЗБОР
+                            </div>
+
+                            <h2>
+                                План на 3 месяца,
+                                <br />
+                                как усилить ваши отношения
+                            </h2>
+
                         </div>
+
+                        {/* BENEFITS */}
+
+                        <div className="paid-benefits">
+
+                            <Benefit
+                                icon="heart"
+                                text={
+                                    <>
+                                        Где вы можете
+                                        <br />
+                                        не понимать друг друга
+                                    </>
+                                }
+                            />
+
+                            <Benefit
+                                icon="message"
+                                text={
+                                    <>
+                                        Что каждый ждёт
+                                        <br />
+                                        от отношений
+                                    </>
+                                }
+                            />
+
+                            <Benefit
+                                icon="lightning"
+                                text={
+                                    <>
+                                        Что может стать
+                                        <br />
+                                        причиной ссор
+                                    </>
+                                }
+                            />
+
+                            <Benefit
+                                icon="chart"
+                                text={
+                                    <>
+                                        Как сделать вашу
+                                        <br />
+                                        пару крепче
+                                    </>
+                                }
+                            />
+
+                        </div>
+
+                        {/* CTA */}
 
                         <button
                             type="button"
-                            className="link-copy"
-                            aria-label="Скопировать ссылку"
-                            onClick={
-                                copyInvite
+                            className="paid-cta"
+                            onClick={() =>
+                                router.push(
+                                    `/report/${coupleId}`
+                                )
                             }
                         >
 
-                            {copied ? (
-                                <svg
-                                    viewBox="0 0 24 24"
-                                    aria-hidden="true"
-                                >
-                                    <path
-                                        d="M5 12.5L9.2 16.7L19 7"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    />
-                                </svg>
-                            ) : (
-                                <svg
-                                    viewBox="0 0 24 24"
-                                    aria-hidden="true"
-                                >
-                                    <rect
-                                        x="8"
-                                        y="3"
-                                        width="12"
-                                        height="14"
-                                        rx="2"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="1.8"
-                                    />
+                            <span className="cta-title">
+                                Открыть полный разбор
+                            </span>
 
-                                    <path
-                                        d="M16 17V19C16 20.1 15.1 21 14 21H6C4.9 21 4 20.1 4 19V8C4 6.9 4.9 6 6 6H8"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="1.8"
-                                        strokeLinecap="round"
-                                    />
-                                </svg>
-                            )}
+                            <span className="cta-right">
+
+                                <span className="price">
+                                    99 ₽
+                                </span>
+
+                                <span className="arrow">
+                                    →
+                                </span>
+
+                            </span>
 
                         </button>
 
-                    </div>
-
-                    <button
-                        type="button"
-                        className="share-button"
-                        onClick={
-                            shareInvite
-                        }
-                    >
-
-                        <span>
-                            Отправить приглашение
-                        </span>
-
-                        <span className="share-arrow">
-                            →
-                        </span>
-
-                    </button>
-
-                    <button
-                        type="button"
-                        className={
-                            copied
-                                ? "copy-button copied"
-                                : "copy-button"
-                        }
-                        onClick={
-                            copyInvite
-                        }
-                    >
-                        {copied
-                            ? "Ссылка скопирована ✓"
-                            : "Скопировать ссылку"}
-                    </button>
-
-                </section>
-
-                {/* =====================================================
-                    FOOTER
-                ===================================================== */}
-
-                <footer className="footer">
-
-                    <div className="heart">
-
-                        <svg
-                            viewBox="0 0 24 24"
-                            aria-hidden="true"
-                        >
-                            <path
-                                d="M12 20.2C10.9 19.2 5.3 14.6 3.2 11.7C1.1 8.8 2 5.1 5.1 3.8C7.5 2.8 10.1 3.7 12 5.8C13.9 3.7 16.5 2.8 18.9 3.8C22 5.1 22.9 8.8 20.8 11.7C18.7 14.6 13.1 19.2 12 20.2Z"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="1.7"
-                                strokeLinejoin="round"
-                            />
-                        </svg>
+                        <div className="paid-note">
+                            один разбор · для вас двоих ·
+                            сразу после оплаты
+                        </div>
 
                     </div>
 
-                    <span>
-                        Результат откроется
-                        автоматически, когда вы
-                        оба закончите.
-                    </span>
+                </div>
 
-                </footer>
-
-            </div>
+            </section>
 
             <style jsx>{`
 
                 /* =====================================================
-                   GLOBAL
+                   BASE
                 ===================================================== */
 
                 :global(*) {
@@ -627,14 +777,13 @@ export default function WaitingPage() {
                 }
 
                 :global(body) {
-                    margin:
-                        0;
+                    margin: 0;
 
                     background:
                         #f8f4f1;
 
                     color:
-                        #211d1f;
+                        #201c1e;
                 }
 
                 button {
@@ -643,22 +792,28 @@ export default function WaitingPage() {
                 }
 
                 .page {
+                    width:
+                        100%;
+
                     min-height:
                         100vh;
 
                     padding:
                         0
                         28px
-                        46px;
+                        72px;
+
+                    overflow-x:
+                        hidden;
 
                     background:
                         #f8f4f1;
                 }
 
-                .shell {
+                .content-shell {
                     width:
                         min(
-                            980px,
+                            920px,
                             100%
                         );
 
@@ -672,7 +827,7 @@ export default function WaitingPage() {
 
                 .header {
                     min-height:
-                        116px;
+                        78px;
 
                     display:
                         flex;
@@ -688,7 +843,7 @@ export default function WaitingPage() {
 
                     border-bottom:
                         1px solid
-                        #ded7d4;
+                        #ddd5d2;
                 }
 
                 .brand {
@@ -701,7 +856,7 @@ export default function WaitingPage() {
                         serif;
 
                     font-size:
-                        29px;
+                        24px;
 
                     line-height:
                         1;
@@ -710,15 +865,12 @@ export default function WaitingPage() {
                         700;
 
                     letter-spacing:
-                        -1.4px;
+                        -1.1px;
                 }
 
-                .couple {
+                .couple-names {
                     min-width:
                         0;
-
-                    max-width:
-                        50%;
 
                     display:
                         flex;
@@ -726,14 +878,66 @@ export default function WaitingPage() {
                     align-items:
                         center;
 
-                    justify-content:
-                        flex-end;
-
                     gap:
-                        16px;
+                        9px;
 
                     color:
-                        #92888b;
+                        #8f8588;
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        10px;
+
+                    font-weight:
+                        700;
+
+                    letter-spacing:
+                        1.2px;
+
+                    text-transform:
+                        uppercase;
+                }
+
+                .person-name {
+                    overflow:
+                        hidden;
+
+                    text-overflow:
+                        ellipsis;
+
+                    white-space:
+                        nowrap;
+                }
+
+                .couple-cross {
+                    flex-shrink:
+                        0;
+
+                    color:
+                        #c2215a;
+                }
+
+                /* =====================================================
+                   RESULTS
+                ===================================================== */
+
+                .results {
+                    padding:
+                        42px
+                        0
+                        45px;
+                }
+
+                .section-label {
+                    margin-bottom:
+                        13px;
+
+                    color:
+                        #c2215a;
 
                     font-family:
                         Arial,
@@ -750,46 +954,50 @@ export default function WaitingPage() {
                         800;
 
                     letter-spacing:
-                        1.7px;
-
-                    text-transform:
-                        uppercase;
-
-                    white-space:
-                        nowrap;
+                        2.2px;
                 }
 
-                .couple span {
-                    overflow:
-                        hidden;
+                .results-title {
+                    margin:
+                        0
+                        0
+                        32px;
 
-                    text-overflow:
-                        ellipsis;
-                }
-
-                .couple b {
-                    flex-shrink:
-                        0;
-
-                    color:
-                        #cb225c;
+                    font-family:
+                        Georgia,
+                        "Times New Roman",
+                        serif;
 
                     font-size:
-                        14px;
+                        48px;
+
+                    line-height:
+                        .98;
 
                     font-weight:
-                        700;
+                        400;
+
+                    letter-spacing:
+                        -2.5px;
+                }
+
+                .category-list {
+                    display:
+                        flex;
+
+                    flex-direction:
+                        column;
                 }
 
                 /* =====================================================
-                   HERO
+                   FORECAST
                 ===================================================== */
 
-                .hero {
+                .forecast {
                     padding:
-                        93px
+                        38px
                         0
-                        66px;
+                        46px;
 
                     display:
                         grid;
@@ -797,51 +1005,33 @@ export default function WaitingPage() {
                     grid-template-columns:
                         minmax(
                             0,
-                            1.35fr
+                            1.15fr
                         )
                         minmax(
-                            290px,
-                            .65fr
+                            280px,
+                            .85fr
                         );
 
                     gap:
-                        54px;
+                        55px;
 
                     align-items:
                         center;
+
+                    border-top:
+                        1px solid
+                        #dcd4d1;
                 }
 
-                .hero-copy {
+                .forecast-copy {
                     min-width:
                         0;
                 }
 
-                .eyebrow {
-                    margin-bottom:
-                        22px;
+                .forecast-title {
+                    max-width:
+                        520px;
 
-                    color:
-                        #cc225d;
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        11px;
-
-                    line-height:
-                        1;
-
-                    font-weight:
-                        800;
-
-                    letter-spacing:
-                        2.7px;
-                }
-
-                h1 {
                     margin:
                         0;
 
@@ -851,35 +1041,29 @@ export default function WaitingPage() {
                         serif;
 
                     font-size:
-                        clamp(
-                            56px,
-                            6.5vw,
-                            82px
-                        );
+                        43px;
 
                     line-height:
-                        .9;
+                        1.01;
 
                     font-weight:
                         400;
 
                     letter-spacing:
-                        -4.3px;
+                        -2.2px;
                 }
 
-                h1 span {
-                    color:
-                        #ca235d;
-                }
+                .forecast-description {
+                    max-width:
+                        520px;
 
-                .lead {
                     margin:
-                        31px
+                        15px
                         0
                         0;
 
                     color:
-                        #8c8486;
+                        #8d8587;
 
                     font-family:
                         Arial,
@@ -887,269 +1071,513 @@ export default function WaitingPage() {
                         sans-serif;
 
                     font-size:
-                        16px;
+                        14px;
 
                     line-height:
-                        1.45;
+                        1.5;
 
                     font-weight:
-                        400;
+                        500;
                 }
 
-                /* =====================================================
-                   STATUS CIRCLES
-                ===================================================== */
-
-                .status {
+                .forecast-result {
                     min-width:
                         0;
                 }
 
-                .circles {
+                .years {
+                    display:
+                        flex;
+
+                    align-items:
+                        baseline;
+
+                    color:
+                        #c21856;
+
+                    font-family:
+                        Georgia,
+                        "Times New Roman",
+                        serif;
+
+                    white-space:
+                        nowrap;
+                }
+
+                .years strong {
+                    font-size:
+                        76px;
+
+                    line-height:
+                        .88;
+
+                    font-weight:
+                        400;
+
+                    letter-spacing:
+                        -4px;
+                }
+
+                .years span {
+                    margin-left:
+                        9px;
+
+                    font-size:
+                        39px;
+
+                    line-height:
+                        1;
+
+                    letter-spacing:
+                        -1.5px;
+                }
+
+                .forecast-scale {
+                    width:
+                        100%;
+
+                    margin-top:
+                        23px;
+                }
+
+                .scale-track {
                     position:
                         relative;
 
-                    width:
-                        268px;
-
                     height:
-                        154px;
+                        9px;
 
-                    margin:
-                        0 auto;
+                    border-radius:
+                        999px;
+
+                    background:
+                        #e5dfe0;
                 }
 
-                .circle {
+                .scale-fill {
+                    position:
+                        absolute;
+
+                    inset:
+                        0
+                        auto
+                        0
+                        0;
+
+                    border-radius:
+                        inherit;
+
+                    background:
+                        #e99ab5;
+                }
+
+                .scale-dot {
+                    position:
+                        absolute;
+
+                    top:
+                        50%;
+
+                    width:
+                        22px;
+
+                    height:
+                        22px;
+
+                    border-radius:
+                        50%;
+
+                    background:
+                        #c21856;
+
+                    transform:
+                        translate(
+                            -50%,
+                            -50%
+                        );
+                }
+
+                .scale-labels {
+                    position:
+                        relative;
+
+                    height:
+                        18px;
+
+                    margin-top:
+                        12px;
+
+                    color:
+                        #8d8587;
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        10px;
+
+                    font-weight:
+                        600;
+                }
+
+                .scale-labels span {
                     position:
                         absolute;
 
                     top:
                         0;
 
-                    width:
-                        154px;
-
-                    height:
-                        154px;
-
-                    display:
-                        grid;
-
-                    place-items:
-                        center;
-
-                    border-radius:
-                        50%;
-                }
-
-                .circle.completed {
-                    left:
-                        0;
-
-                    z-index:
-                        2;
-
-                    background:
-                        rgba(
-                            197,
-                            50,
-                            101,
-                            .82
-                        );
-
-                    color:
-                        white;
-                }
-
-                .circle.completed svg {
-                    width:
-                        48px;
-
-                    height:
-                        48px;
-                }
-
-                .circle.waiting {
-                    right:
-                        0;
-
-                    z-index:
-                        1;
-
-                    background:
-                        #f0d9df;
-                }
-
-                .waiting-dots {
-                    display:
-                        flex;
-
-                    align-items:
-                        center;
-
-                    gap:
-                        8px;
-
                     transform:
-                        translateX(
-                            18px
-                        );
-                }
-
-                .waiting-dots span {
-                    width:
-                        9px;
-
-                    height:
-                        9px;
-
-                    border-radius:
-                        50%;
-
-                    background:
-                        #d15c84;
-
-                    animation:
-                        waitingDot
-                        1.4s
-                        ease-in-out
-                        infinite;
-                }
-
-                .waiting-dots span:nth-child(
-                    2
-                ) {
-                    animation-delay:
-                        .15s;
-                }
-
-                .waiting-dots span:nth-child(
-                    3
-                ) {
-                    animation-delay:
-                        .3s;
-                }
-
-                @keyframes waitingDot {
-
-                    0%,
-                    60%,
-                    100% {
-                        opacity:
-                            .4;
-
-                        transform:
-                            translateY(
-                                0
-                            );
-                    }
-
-                    30% {
-                        opacity:
-                            1;
-
-                        transform:
-                            translateY(
-                                -3px
-                            );
-                    }
-                }
-
-                .circle-labels {
-                    width:
-                        268px;
-
-                    margin:
-                        18px
-                        auto
-                        0;
-
-                    display:
-                        grid;
-
-                    grid-template-columns:
-                        1fr
-                        1fr;
-
-                    gap:
-                        28px;
-
-                    color:
-                        #92888b;
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        9px;
-
-                    line-height:
-                        1;
-
-                    font-weight:
-                        800;
-
-                    letter-spacing:
-                        1.3px;
-
-                    text-align:
-                        center;
-
-                    text-transform:
-                        uppercase;
-                }
-
-                .circle-labels span {
-                    overflow:
-                        hidden;
-
-                    text-overflow:
-                        ellipsis;
+                        translateX(-50%);
 
                     white-space:
                         nowrap;
                 }
 
-                .circle-labels
-                .ready-label {
-                    color:
-                        #ce3267;
+                .scale-labels span::before {
+                    content:
+                        "";
+
+                    position:
+                        absolute;
+
+                    left:
+                        50%;
+
+                    top:
+                        -17px;
+
+                    width:
+                        1px;
+
+                    height:
+                        7px;
+
+                    background:
+                        #cfc4c7;
+                }
+
+                .scale-labels .life-label {
+                    left:
+                        100%;
+
+                    transform:
+                        translateX(-100%);
+                }
+
+                .scale-labels .life-label::before {
+                    left:
+                        100%;
                 }
 
                 /* =====================================================
-                   INVITE CARD
+                   PAID SHELL
                 ===================================================== */
 
-                .invite-card {
-                    padding:
-                        34px
-                        44px
-                        28px;
+                .paid-shell {
+                    width:
+                        min(
+                            1180px,
+                            100%
+                        );
 
-                    border:
-                        1px solid
-                        #ddd4d1;
+                    margin:
+                        8px
+                        auto
+                        0;
+                }
+
+                /* =====================================================
+                   PAID CARD
+                ===================================================== */
+
+                .paid-card {
+                    position:
+                        relative;
+
+                    width:
+                        100%;
+
+                    min-height:
+                        500px;
+
+                    overflow:
+                        hidden;
 
                     border-radius:
-                        28px;
+                        24px;
 
                     background:
-                        rgba(
-                            255,
-                            250,
-                            248,
-                            .42
+                        linear-gradient(
+                            90deg,
+                            #9c124c
+                            0%,
+                            #a70e4c
+                            48%,
+                            #a70f4d
+                            100%
+                        );
+
+                    isolation:
+                        isolate;
+                }
+
+                /* =====================================================
+                   ART LAYER
+                ===================================================== */
+
+                .paid-art-layer {
+                    position:
+                        absolute;
+
+                    inset:
+                        0;
+
+                    z-index:
+                        0;
+
+                    overflow:
+                        hidden;
+
+                    pointer-events:
+                        none;
+                }
+
+                .paid-art {
+                    position:
+                        absolute;
+
+                    left:
+                        0;
+
+                    top:
+                        0;
+
+                    width:
+                        73%;
+
+                    height:
+                        100%;
+
+                    display:
+                        block;
+
+                    object-fit:
+                        cover;
+
+                    object-position:
+                        43%
+                        center;
+
+                    user-select:
+                        none;
+
+                    pointer-events:
+                        none;
+                }
+
+                .desktop-art-fade {
+                    position:
+                        absolute;
+
+                    z-index:
+                        2;
+
+                    top:
+                        0;
+
+                    left:
+                        38%;
+
+                    width:
+                        38%;
+
+                    height:
+                        100%;
+
+                    pointer-events:
+                        none;
+
+                    background:
+                        linear-gradient(
+                            90deg,
+                            rgba(
+                                166,
+                                18,
+                                77,
+                                0
+                            )
+                            0%,
+
+                            rgba(
+                                166,
+                                18,
+                                77,
+                                .03
+                            )
+                            10%,
+
+                            rgba(
+                                166,
+                                18,
+                                77,
+                                .12
+                            )
+                            24%,
+
+                            rgba(
+                                166,
+                                18,
+                                77,
+                                .28
+                            )
+                            38%,
+
+                            rgba(
+                                166,
+                                18,
+                                77,
+                                .50
+                            )
+                            53%,
+
+                            rgba(
+                                166,
+                                18,
+                                77,
+                                .72
+                            )
+                            67%,
+
+                            rgba(
+                                166,
+                                18,
+                                77,
+                                .88
+                            )
+                            80%,
+
+                            rgba(
+                                166,
+                                18,
+                                77,
+                                .97
+                            )
+                            91%,
+
+                            #a6124d
+                            100%
                         );
                 }
 
-                .invite-label {
+                .mobile-art-fade {
+                    display:
+                        none;
+                }
+
+                /* =====================================================
+                   VIGNETTE
+                ===================================================== */
+
+                .paid-vignette {
+                    position:
+                        absolute;
+
+                    z-index:
+                        3;
+
+                    inset:
+                        0;
+
+                    pointer-events:
+                        none;
+
+                    background:
+                        linear-gradient(
+                            180deg,
+                            rgba(
+                                40,
+                                0,
+                                20,
+                                .05
+                            )
+                            0%,
+
+                            rgba(
+                                40,
+                                0,
+                                20,
+                                0
+                            )
+                            28%,
+
+                            rgba(
+                                40,
+                                0,
+                                20,
+                                0
+                            )
+                            74%,
+
+                            rgba(
+                                40,
+                                0,
+                                20,
+                                .08
+                            )
+                            100%
+                        );
+                }
+
+                /* =====================================================
+                   CONTENT
+                ===================================================== */
+
+                .paid-content {
+                    position:
+                        relative;
+
+                    z-index:
+                        10;
+
+                    min-height:
+                        500px;
+
+                    width:
+                        100%;
+                }
+
+                /* =====================================================
+                   TITLE
+                ===================================================== */
+
+                .paid-heading {
+                    position:
+                        absolute;
+
+                    top:
+                        38px;
+
+                    left:
+                        70px;
+
+                    width:
+                        490px;
+                }
+
+                .paid-label {
                     margin-bottom:
-                        17px;
+                        14px;
 
                     color:
-                        #9f9296;
+                        rgba(
+                            255,
+                            244,
+                            247,
+                            .88
+                        );
 
                     font-family:
                         Arial,
@@ -1163,156 +1591,111 @@ export default function WaitingPage() {
                         1;
 
                     font-weight:
-                        800;
+                        700;
 
                     letter-spacing:
-                        1.8px;
+                        2.1px;
                 }
 
-                .link-box {
-                    width:
-                        100%;
-
-                    min-width:
+                .paid-heading h2 {
+                    margin:
                         0;
 
-                    height:
-                        58px;
+                    color:
+                        #fff9f6;
 
-                    padding:
+                    font-family:
+                        Georgia,
+                        "Times New Roman",
+                        serif;
+
+                    font-size:
+                        clamp(
+                            44px,
+                            4.2vw,
+                            55px
+                        );
+
+                    line-height:
+                        .95;
+
+                    font-weight:
+                        400;
+
+                    letter-spacing:
+                        -2.4px;
+
+                    text-shadow:
                         0
-                        13px
-                        0
-                        20px;
+                        2px
+                        16px
+                        rgba(
+                            59,
+                            0,
+                            27,
+                            .1
+                        );
+                }
+
+                /* =====================================================
+                   BENEFITS
+                ===================================================== */
+
+                .paid-benefits {
+                    position:
+                        absolute;
+
+                    top:
+                        48px;
+
+                    right:
+                        68px;
+
+                    width:
+                        305px;
 
                     display:
                         flex;
 
-                    align-items:
-                        center;
+                    flex-direction:
+                        column;
 
                     gap:
-                        12px;
-
-                    border-radius:
-                        15px;
-
-                    background:
-                        #f1e4e7;
-                }
-
-                .link-text {
-                    min-width:
-                        0;
-
-                    flex:
-                        1;
-
-                    overflow:
-                        hidden;
-
-                    color:
-                        #62595c;
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        13px;
-
-                    line-height:
-                        1;
-
-                    text-overflow:
-                        ellipsis;
-
-                    white-space:
-                        nowrap;
-                }
-
-                .link-copy {
-                    width:
-                        40px;
-
-                    height:
-                        40px;
-
-                    flex-shrink:
-                        0;
-
-                    display:
-                        grid;
-
-                    place-items:
-                        center;
-
-                    padding:
-                        0;
-
-                    border:
-                        0;
-
-                    border-radius:
-                        50%;
-
-                    background:
-                        transparent;
-
-                    color:
-                        #887d80;
-
-                    cursor:
-                        pointer;
-
-                    transition:
-                        background
-                        150ms
-                        ease,
-                        color
-                        150ms
-                        ease;
-                }
-
-                .link-copy:hover {
-                    background:
-                        rgba(
-                            255,
-                            255,
-                            255,
-                            .7
-                        );
-
-                    color:
-                        #c9225b;
-                }
-
-                .link-copy svg {
-                    width:
-                        22px;
-
-                    height:
-                        22px;
+                        25px;
                 }
 
                 /* =====================================================
-                   SHARE
+                   CTA
                 ===================================================== */
 
-                .share-button {
+                .paid-cta {
+                    position:
+                        absolute;
+
+                    right:
+                        36px;
+
+                    bottom:
+                        52px;
+
                     width:
-                        100%;
+                        min(
+                            638px,
+                            calc(
+                                100% -
+                                600px
+                            )
+                        );
+
+                    min-width:
+                        500px;
 
                     height:
-                        64px;
-
-                    margin-top:
-                        20px;
+                        72px;
 
                     padding:
                         0
-                        25px;
+                        26px;
 
                     display:
                         flex;
@@ -1321,23 +1704,72 @@ export default function WaitingPage() {
                         center;
 
                     justify-content:
-                        center;
+                        space-between;
 
-                    position:
-                        relative;
+                    gap:
+                        20px;
 
                     border:
                         0;
 
                     border-radius:
-                        999px;
+                        15px;
 
                     background:
-                        #cb225c;
+                        #fffaf7;
 
                     color:
-                        white;
+                        #201d1e;
 
+                    cursor:
+                        pointer;
+
+                    box-shadow:
+                        0
+                        9px
+                        25px
+                        rgba(
+                            65,
+                            0,
+                            27,
+                            .13
+                        );
+
+                    transition:
+                        transform
+                        160ms
+                        ease,
+                        box-shadow
+                        160ms
+                        ease;
+                }
+
+                .paid-cta:hover {
+                    transform:
+                        translateY(
+                            -2px
+                        );
+
+                    box-shadow:
+                        0
+                        13px
+                        30px
+                        rgba(
+                            65,
+                            0,
+                            27,
+                            .17
+                        );
+                }
+
+                .paid-cta:active {
+                    transform:
+                        translateY(
+                            0
+                        );
+                }
+
+                .cta-title {
                     font-family:
                         Arial,
                         Helvetica,
@@ -1350,54 +1782,56 @@ export default function WaitingPage() {
                         1;
 
                     font-weight:
-                        700;
+                        600;
 
-                    cursor:
-                        pointer;
+                    letter-spacing:
+                        -.1px;
 
-                    transition:
-                        transform
-                        150ms
-                        ease,
-                        background
-                        150ms
-                        ease;
+                    white-space:
+                        nowrap;
                 }
 
-                .share-button:hover {
-                    background:
-                        #bd1d54;
+                .cta-right {
+                    display:
+                        flex;
 
-                    transform:
-                        translateY(
-                            -1px
-                        );
+                    align-items:
+                        center;
+
+                    gap:
+                        22px;
+
+                    color:
+                        #c51b58;
                 }
 
-                .share-button:active {
-                    transform:
-                        translateY(
-                            0
-                        );
-                }
-
-                .share-arrow {
-                    position:
-                        absolute;
-
-                    right:
-                        28px;
-
-                    top:
-                        50%;
-
-                    transform:
-                        translateY(
-                            -53%
-                        );
+                .price {
+                    font-family:
+                        Georgia,
+                        "Times New Roman",
+                        serif;
 
                     font-size:
-                        27px;
+                        29px;
+
+                    line-height:
+                        1;
+
+                    font-weight:
+                        400;
+
+                    white-space:
+                        nowrap;
+                }
+
+                .arrow {
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        26px;
 
                     line-height:
                         1;
@@ -1406,27 +1840,35 @@ export default function WaitingPage() {
                         300;
                 }
 
-                .copy-button {
+                .paid-note {
+                    position:
+                        absolute;
+
+                    right:
+                        36px;
+
+                    bottom:
+                        22px;
+
                     width:
-                        100%;
+                        min(
+                            638px,
+                            calc(
+                                100% -
+                                600px
+                            )
+                        );
 
-                    min-height:
-                        44px;
-
-                    margin-top:
-                        10px;
-
-                    padding:
-                        8px;
-
-                    border:
-                        0;
-
-                    background:
-                        transparent;
+                    min-width:
+                        500px;
 
                     color:
-                        #8d8386;
+                        rgba(
+                            255,
+                            238,
+                            243,
+                            .68
+                        );
 
                     font-family:
                         Arial,
@@ -1434,93 +1876,16 @@ export default function WaitingPage() {
                         sans-serif;
 
                     font-size:
-                        12px;
+                        9px;
 
                     line-height:
                         1;
 
-                    cursor:
-                        pointer;
-                }
-
-                .copy-button:hover {
-                    color:
-                        #c9225b;
-                }
-
-                .copy-button.copied {
-                    color:
-                        #c9225b;
-
                     font-weight:
-                        700;
-                }
-
-                /* =====================================================
-                   FOOTER
-                ===================================================== */
-
-                .footer {
-                    margin-top:
-                        68px;
-
-                    padding-top:
-                        27px;
-
-                    display:
-                        flex;
-
-                    align-items:
-                        center;
-
-                    justify-content:
-                        center;
-
-                    gap:
-                        12px;
-
-                    border-top:
-                        1px solid
-                        #ded7d4;
-
-                    color:
-                        #948a8d;
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        11px;
-
-                    line-height:
-                        1.4;
+                        400;
 
                     text-align:
                         center;
-                }
-
-                .heart {
-                    width:
-                        23px;
-
-                    height:
-                        23px;
-
-                    flex-shrink:
-                        0;
-
-                    color:
-                        #d02961;
-                }
-
-                .heart svg {
-                    width:
-                        100%;
-
-                    height:
-                        100%;
                 }
 
                 /* =====================================================
@@ -1529,48 +1894,80 @@ export default function WaitingPage() {
 
                 @media (
                     max-width:
-                        820px
+                        1000px
                 ) {
 
-                    .hero {
-                        grid-template-columns:
-                            minmax(
-                                0,
-                                1fr
-                            )
-                            250px;
-
-                        gap:
-                            24px;
-                    }
-
-                    .circles {
+                    .content-shell {
                         width:
-                            224px;
-
-                        height:
-                            130px;
+                            min(
+                                820px,
+                                100%
+                            );
                     }
 
-                    .circle {
+                    .paid-card {
+                        min-height:
+                            470px;
+                    }
+
+                    .paid-content {
+                        min-height:
+                            470px;
+                    }
+
+                    .paid-heading {
+                        left:
+                            48px;
+
+                        top:
+                            34px;
+
                         width:
-                            130px;
-
-                        height:
-                            130px;
+                            430px;
                     }
 
-                    .circle-labels {
-                        width:
-                            224px;
-
-                        gap:
-                            20px;
-                    }
-
-                    h1 {
+                    .paid-heading h2 {
                         font-size:
-                            58px;
+                            45px;
+                    }
+
+                    .paid-benefits {
+                        right:
+                            38px;
+
+                        width:
+                            275px;
+
+                        gap:
+                            21px;
+                    }
+
+                    .paid-cta {
+                        right:
+                            28px;
+
+                        bottom:
+                            43px;
+
+                        min-width:
+                            430px;
+
+                        width:
+                            52%;
+                    }
+
+                    .paid-note {
+                        right:
+                            28px;
+
+                        bottom:
+                            18px;
+
+                        min-width:
+                            430px;
+
+                        width:
+                            52%;
                     }
                 }
 
@@ -1586,13 +1983,18 @@ export default function WaitingPage() {
                     .page {
                         padding:
                             0
-                            14px
-                            30px;
+                            12px
+                            32px;
+                    }
+
+                    .content-shell {
+                        width:
+                            100%;
                     }
 
                     .header {
                         min-height:
-                            66px;
+                            64px;
 
                         gap:
                             12px;
@@ -1601,79 +2003,98 @@ export default function WaitingPage() {
                     .brand {
                         font-size:
                             21px;
-
-                        letter-spacing:
-                            -1px;
                     }
 
-                    .couple {
+                    .couple-names {
                         max-width:
-                            48%;
+                            52%;
 
                         gap:
-                            6px;
+                            5px;
 
                         font-size:
-                            7px;
+                            8px;
 
                         letter-spacing:
-                            .7px;
-                    }
-
-                    .couple b {
-                        font-size:
-                            10px;
+                            .65px;
                     }
 
                     /* ---------------------------------------------
-                       HERO
+                       RESULTS
                     --------------------------------------------- */
 
-                    .hero {
+                    .results {
                         padding:
-                            44px
+                            29px
                             0
-                            38px;
-
-                        display:
-                            block;
+                            33px;
                     }
 
-                    .eyebrow {
+                    .section-label {
                         margin-bottom:
-                            17px;
+                            11px;
 
                         font-size:
                             9px;
 
                         letter-spacing:
-                            2px;
+                            1.8px;
                     }
 
-                    h1 {
+                    .results-title {
+                        margin-bottom:
+                            24px;
+
                         font-size:
-                            clamp(
-                                44px,
-                                13vw,
-                                57px
-                            );
+                            37px;
 
                         line-height:
-                            .92;
+                            1;
 
                         letter-spacing:
-                            -2.8px;
+                            -1.8px;
                     }
 
-                    .lead {
+                    /* ---------------------------------------------
+                       FORECAST
+                    --------------------------------------------- */
+
+                    .forecast {
+                        padding:
+                            29px
+                            0
+                            37px;
+
+                        display:
+                            block;
+                    }
+
+                    .forecast-title {
+                        max-width:
+                            100%;
+
+                        font-size:
+                            34px;
+
+                        line-height:
+                            1.01;
+
+                        letter-spacing:
+                            -1.55px;
+                    }
+
+                    .forecast-description {
+                        max-width:
+                            100%;
+
                         margin-top:
-                            20px;
+                            13px;
 
                         font-size:
                             12px;
 
                         line-height:
-                            1.5;
+                            1.45;
                     }
 
                     .desktop-break {
@@ -1681,252 +2102,693 @@ export default function WaitingPage() {
                             none;
                     }
 
+                    .forecast-result {
+                        width:
+                            100%;
+
+                        margin-top:
+                            25px;
+                    }
+
+                    .years strong {
+                        font-size:
+                            64px;
+
+                        letter-spacing:
+                            -3px;
+                    }
+
+                    .years span {
+                        margin-left:
+                            7px;
+
+                        font-size:
+                            34px;
+
+                        letter-spacing:
+                            -1px;
+                    }
+
+                    .forecast-scale {
+                        margin-top:
+                            20px;
+                    }
+
+                    .scale-track {
+                        height:
+                            7px;
+                    }
+
+                    .scale-dot {
+                        width:
+                            19px;
+
+                        height:
+                            19px;
+                    }
+
+                    .scale-labels {
+                        margin-top:
+                            10px;
+
+                        font-size:
+                            9px;
+                    }
+
                     /* ---------------------------------------------
-                       CIRCLES
+                       PAID SHELL
                     --------------------------------------------- */
 
-                    .status {
+                    .paid-shell {
+                        width:
+                            100%;
+
                         margin-top:
-                            39px;
+                            0;
                     }
 
-                    .circles {
-                        width:
-                            218px;
+                    /* ---------------------------------------------
+                       PAID CARD
+                    --------------------------------------------- */
 
-                        height:
-                            126px;
-                    }
+                    .paid-card {
+                        min-height:
+                            620px;
 
-                    .circle {
-                        width:
-                            126px;
+                        border-radius:
+                            22px;
 
-                        height:
-                            126px;
-                    }
-
-                    .circle.completed svg {
-                        width:
-                            40px;
-
-                        height:
-                            40px;
-                    }
-
-                    .waiting-dots {
-                        gap:
-                            6px;
-
-                        transform:
-                            translateX(
-                                14px
+                        background:
+                            linear-gradient(
+                                180deg,
+                                #a30e4d
+                                0%,
+                                #aa104f
+                                100%
                             );
                     }
 
-                    .waiting-dots span {
-                        width:
-                            7px;
-
-                        height:
-                            7px;
-                    }
-
-                    .circle-labels {
-                        width:
-                            218px;
-
-                        margin-top:
-                            15px;
-
-                        gap:
-                            17px;
-
-                        font-size:
-                            7px;
-
-                        letter-spacing:
-                            .8px;
+                    .paid-content {
+                        min-height:
+                            620px;
                     }
 
                     /* ---------------------------------------------
-                       INVITE
+                       MOBILE ART
                     --------------------------------------------- */
 
-                    .invite-card {
-                        padding:
-                            23px
-                            18px
-                            17px;
+                    .paid-art {
+                        left:
+                            -4%;
 
-                        border-radius:
-                            21px;
+                        top:
+                            0;
+
+                        width:
+                            108%;
+
+                        height:
+                            370px;
+
+                        object-fit:
+                            cover;
+
+                        object-position:
+                            43%
+                            center;
                     }
 
-                    .invite-label {
+                    .paid-art-layer {
+                        height:
+                            410px;
+                    }
+
+                    .desktop-art-fade {
+                        display:
+                            none;
+                    }
+
+                    .mobile-art-fade {
+                        display:
+                            block;
+
+                        position:
+                            absolute;
+
+                        left:
+                            0;
+
+                        right:
+                            0;
+
+                        bottom:
+                            0;
+
+                        height:
+                            190px;
+
+                        background:
+                            linear-gradient(
+                                180deg,
+
+                                rgba(
+                                    163,
+                                    14,
+                                    77,
+                                    0
+                                )
+                                0%,
+
+                                rgba(
+                                    163,
+                                    14,
+                                    77,
+                                    .08
+                                )
+                                18%,
+
+                                rgba(
+                                    163,
+                                    14,
+                                    77,
+                                    .28
+                                )
+                                38%,
+
+                                rgba(
+                                    163,
+                                    14,
+                                    77,
+                                    .52
+                                )
+                                58%,
+
+                                rgba(
+                                    163,
+                                    14,
+                                    77,
+                                    .78
+                                )
+                                76%,
+
+                                #a30e4d
+                                100%
+                            );
+                    }
+
+                    /* ---------------------------------------------
+                       MOBILE TITLE
+                    --------------------------------------------- */
+
+                    .paid-heading {
+                        top:
+                            31px;
+
+                        left:
+                            28px;
+
+                        width:
+                            calc(
+                                100% -
+                                56px
+                            );
+                    }
+
+                    .paid-label {
                         margin-bottom:
                             13px;
 
                         font-size:
-                            8px;
+                            9px;
 
                         letter-spacing:
-                            1.4px;
+                            1.9px;
                     }
 
-                    .link-box {
-                        height:
-                            54px;
-
-                        padding-left:
-                            15px;
-
-                        border-radius:
-                            13px;
-                    }
-
-                    .link-text {
+                    .paid-heading h2 {
                         font-size:
-                            11px;
-                    }
-
-                    .link-copy {
-                        width:
                             38px;
 
-                        height:
-                            38px;
+                        line-height:
+                            .96;
+
+                        letter-spacing:
+                            -1.8px;
+
+                        text-shadow:
+                            0
+                            2px
+                            14px
+                            rgba(
+                                49,
+                                0,
+                                25,
+                                .16
+                            );
                     }
 
-                    .link-copy svg {
+                    /* ---------------------------------------------
+                       MOBILE BENEFITS
+                    --------------------------------------------- */
+
+                    .paid-benefits {
+                        top:
+                            385px;
+
+                        left:
+                            28px;
+
+                        right:
+                            28px;
+
                         width:
-                            20px;
+                            calc(
+                                100% -
+                                56px
+                            );
 
-                        height:
-                            20px;
+                        gap:
+                            18px;
                     }
 
-                    .share-button {
-                        height:
-                            56px;
+                    /* ---------------------------------------------
+                       MOBILE CTA
+                    --------------------------------------------- */
 
-                        margin-top:
-                            15px;
+                    .paid-cta {
+                        left:
+                            20px;
+
+                        right:
+                            20px;
+
+                        bottom:
+                            48px;
+
+                        width:
+                            calc(
+                                100% -
+                                40px
+                            );
+
+                        min-width:
+                            0;
+
+                        height:
+                            58px;
 
                         padding:
                             0
-                            50px
-                            0
                             18px;
 
+                        border-radius:
+                            14px;
+                    }
+
+                    .cta-title {
                         font-size:
                             13px;
                     }
 
-                    .share-arrow {
-                        right:
-                            21px;
+                    .cta-right {
+                        gap:
+                            13px;
+                    }
 
+                    .price {
+                        font-size:
+                            24px;
+                    }
+
+                    .arrow {
                         font-size:
                             23px;
                     }
 
-                    .copy-button {
-                        margin-top:
-                            6px;
+                    .paid-note {
+                        left:
+                            20px;
 
-                        font-size:
-                            11px;
-                    }
+                        right:
+                            20px;
 
-                    /* ---------------------------------------------
-                       FOOTER
-                    --------------------------------------------- */
+                        bottom:
+                            20px;
 
-                    .footer {
-                        margin-top:
-                            39px;
+                        width:
+                            calc(
+                                100% -
+                                40px
+                            );
 
-                        padding:
-                            22px
-                            16px
+                        min-width:
                             0;
 
-                        gap:
-                            9px;
-
                         font-size:
-                            9px;
-                    }
-
-                    .heart {
-                        width:
-                            19px;
-
-                        height:
-                            19px;
+                            8px;
                     }
                 }
 
                 /* =====================================================
-                   VERY SMALL MOBILE
+                   PAID BLOCK — TEXT ONLY ON THE RIGHT
+                ===================================================== */
+
+                @media (min-width: 641px) {
+                    .paid-art {
+                        width:
+                            52%;
+
+                        object-position:
+                            center center;
+                    }
+
+                    .desktop-art-fade {
+                        left:
+                            36%;
+
+                        width:
+                            20%;
+                    }
+
+                    .paid-heading {
+                        top:
+                            42px;
+
+                        left:
+                            auto;
+
+                        right:
+                            58px;
+
+                        width:
+                            43%;
+                    }
+
+                    .paid-heading h2 {
+                        font-size:
+                            clamp(34px, 3.2vw, 46px);
+
+                        line-height:
+                            .98;
+                    }
+
+                    .paid-benefits {
+                        top:
+                            185px;
+
+                        right:
+                            58px;
+
+                        width:
+                            43%;
+
+                        display:
+                            grid;
+
+                        grid-template-columns:
+                            1fr 1fr;
+
+                        gap:
+                            18px 24px;
+                    }
+
+                    .paid-cta {
+                        right:
+                            58px;
+
+                        width:
+                            43%;
+
+                        min-width:
+                            0;
+                    }
+
+                    .paid-note {
+                        right:
+                            58px;
+
+                        width:
+                            43%;
+
+                        min-width:
+                            0;
+                    }
+                }
+
+                @media (max-width: 640px) {
+                    .scale-labels {
+                        font-size:
+                            8px;
+                    }
+
+                    .scale-labels span::before {
+                        top:
+                            -15px;
+
+                        height:
+                            6px;
+                    }
+
+                    .paid-card,
+                    .paid-content {
+                        min-height:
+                            790px;
+                    }
+
+                    .paid-art {
+                        left:
+                            0;
+
+                        width:
+                            100%;
+
+                        height:
+                            300px;
+
+                        object-position:
+                            center center;
+                    }
+
+                    .paid-art-layer {
+                        height:
+                            335px;
+                    }
+
+                    .mobile-art-fade {
+                        height:
+                            150px;
+                    }
+
+                    .paid-heading {
+                        top:
+                            315px;
+
+                        left:
+                            24px;
+
+                        right:
+                            24px;
+
+                        width:
+                            auto;
+                    }
+
+                    .paid-heading h2 {
+                        font-size:
+                            34px;
+
+                        line-height:
+                            .98;
+                    }
+
+                    .paid-benefits {
+                        top:
+                            445px;
+
+                        left:
+                            24px;
+
+                        right:
+                            24px;
+
+                        width:
+                            auto;
+
+                        display:
+                            grid;
+
+                        grid-template-columns:
+                            1fr 1fr;
+
+                        gap:
+                            17px 14px;
+                    }
+
+                    .paid-cta {
+                        bottom:
+                            50px;
+                    }
+
+                    .paid-note {
+                        bottom:
+                            21px;
+                    }
+                }
+
+                /* =====================================================
+                   SMALL MOBILE
                 ===================================================== */
 
                 @media (
                     max-width:
-                        370px
+                        390px
                 ) {
 
-                    h1 {
-                        font-size:
-                            43px;
+                    .paid-card {
+                        min-height:
+                            600px;
                     }
 
-                    .circles {
-                        width:
-                            198px;
+                    .paid-content {
+                        min-height:
+                            600px;
+                    }
 
+                    .paid-art {
                         height:
-                            114px;
+                            355px;
+
+                        object-position:
+                            43%
+                            center;
                     }
 
-                    .circle {
-                        width:
-                            114px;
-
+                    .paid-art-layer {
                         height:
-                            114px;
+                            395px;
                     }
 
-                    .circle-labels {
+                    .paid-heading {
+                        top:
+                            28px;
+
+                        left:
+                            24px;
+
                         width:
-                            198px;
+                            calc(
+                                100% -
+                                48px
+                            );
                     }
 
-                    .share-button {
+                    .paid-heading h2 {
                         font-size:
-                            12px;
+                            35px;
+                    }
+
+                    .paid-benefits {
+                        top:
+                            370px;
+
+                        left:
+                            24px;
+
+                        right:
+                            24px;
+
+                        width:
+                            calc(
+                                100% -
+                                48px
+                            );
+
+                        gap:
+                            16px;
+                    }
+
+                    .paid-cta {
+                        left:
+                            16px;
+
+                        right:
+                            16px;
+
+                        width:
+                            calc(
+                                100% -
+                                32px
+                            );
+
+                        padding:
+                            0
+                            16px;
+                    }
+
+                    .paid-note {
+                        left:
+                            16px;
+
+                        right:
+                            16px;
+
+                        width:
+                            calc(
+                                100% -
+                                32px
+                            );
                     }
                 }
 
-                /* =====================================================
-                   REDUCED MOTION
-                ===================================================== */
 
-                @media (
-                    prefers-reduced-motion:
-                        reduce
-                ) {
-
-                    .waiting-dots span {
-                        animation:
-                            none;
+                @media (max-width: 390px) {
+                    .paid-card,
+                    .paid-content {
+                        min-height:
+                            780px;
                     }
 
-                    .share-button,
-                    .link-copy {
-                        transition:
-                            none;
+                    .paid-art {
+                        height:
+                            285px;
+                    }
+
+                    .paid-art-layer {
+                        height:
+                            320px;
+                    }
+
+                    .paid-heading {
+                        top:
+                            300px;
+
+                        left:
+                            20px;
+
+                        right:
+                            20px;
+
+                        width:
+                            auto;
+                    }
+
+                    .paid-heading h2 {
+                        font-size:
+                            31px;
+                    }
+
+                    .paid-benefits {
+                        top:
+                            425px;
+
+                        left:
+                            20px;
+
+                        right:
+                            20px;
+
+                        width:
+                            auto;
                     }
                 }
 
@@ -1937,147 +2799,125 @@ export default function WaitingPage() {
 }
 
 /* ============================================================
-   STATE SCREEN
+   CATEGORY
 ============================================================ */
 
-function StateScreen({
-                         text,
-                     }: {
-    text: string;
-}) {
+function CategoryRow({
+                         title,
+                         subtitle,
+                         value,
+                     }: CategoryScore) {
+    const safeValue =
+        Math.max(
+            0,
+            Math.min(
+                MAX_SCORE,
+                value
+            )
+        );
+
     return (
-        <main className="state">
+        <div className="category-row">
 
-            <div className="state-brand">
-                между нами.
+            <div className="category-top">
+
+                <div className="category-copy">
+
+                    <div className="category-title">
+                        {title}
+                    </div>
+
+                    <div className="category-subtitle">
+                        {subtitle}
+                    </div>
+
+                </div>
+
+                <div className="category-score">
+
+                    <strong>
+                        {safeValue}
+                    </strong>
+
+                    <span>
+                        /10
+                    </span>
+
+                </div>
+
             </div>
 
-            <div className="state-dots">
+            <div className="category-track">
 
-                <span />
-
-                <span />
-
-                <span />
+                <div
+                    className="category-fill"
+                    style={{
+                        width:
+                            `${safeValue * 10}%`,
+                    }}
+                />
 
             </div>
-
-            <p>
-                {text}
-            </p>
 
             <style jsx>{`
 
-                :global(body) {
-                    margin:
-                        0;
+                .category-row {
+                    padding:
+                        16px
+                        0
+                        18px;
 
-                    background:
-                        #f8f4f1;
+                    border-bottom:
+                        1px solid
+                        #e0d9d6;
                 }
 
-                .state {
-                    min-height:
-                        100vh;
+                .category-row:first-child {
+                    padding-top:
+                        0;
+                }
 
+                .category-top {
                     display:
                         flex;
 
-                    flex-direction:
-                        column;
-
                     align-items:
-                        center;
+                        flex-end;
 
                     justify-content:
-                        center;
+                        space-between;
 
                     gap:
-                        16px;
-
-                    padding:
                         24px;
-
-                    background:
-                        #f8f4f1;
-
-                    color:
-                        #211d1f;
-
-                    text-align:
-                        center;
                 }
 
-                .state-brand {
+                .category-copy {
+                    min-width:
+                        0;
+                }
+
+                .category-title {
                     font-family:
                         Georgia,
                         "Times New Roman",
                         serif;
 
                     font-size:
-                        28px;
+                        29px;
 
                     line-height:
                         1;
-
-                    font-weight:
-                        700;
 
                     letter-spacing:
                         -1.2px;
                 }
 
-                .state-dots {
-                    display:
-                        flex;
-
-                    gap:
+                .category-subtitle {
+                    margin-top:
                         5px;
 
-                    margin-top:
-                        6px;
-                }
-
-                .state-dots span {
-                    width:
-                        6px;
-
-                    height:
-                        6px;
-
-                    border-radius:
-                        50%;
-
-                    background:
-                        #c9255e;
-
-                    animation:
-                        stateDot
-                        1.2s
-                        ease-in-out
-                        infinite;
-                }
-
-                .state-dots span:nth-child(
-                    2
-                ) {
-                    animation-delay:
-                        .15s;
-                }
-
-                .state-dots span:nth-child(
-                    3
-                ) {
-                    animation-delay:
-                        .3s;
-                }
-
-                p {
-                    margin:
-                        0;
-
                     color:
-                        #92888b;
+                        #8e8688;
 
                     font-family:
                         Arial,
@@ -2086,46 +2926,443 @@ function StateScreen({
 
                     font-size:
                         12px;
+
+                    line-height:
+                        1.3;
+
+                    font-weight:
+                        500;
                 }
 
-                @keyframes stateDot {
+                .category-score {
+                    display:
+                        flex;
 
-                    0%,
-                    60%,
-                    100% {
-                        opacity:
-                            .3;
+                    align-items:
+                        baseline;
 
-                        transform:
-                            translateY(
-                                0
-                            );
-                    }
+                    flex-shrink:
+                        0;
 
-                    30% {
-                        opacity:
-                            1;
+                    color:
+                        #7f7679;
 
-                        transform:
-                            translateY(
-                                -2px
-                            );
-                    }
+                    font-family:
+                        Georgia,
+                        "Times New Roman",
+                        serif;
+                }
+
+                .category-score strong {
+                    color:
+                        #c21856;
+
+                    font-size:
+                        42px;
+
+                    line-height:
+                        .8;
+
+                    font-weight:
+                        400;
+
+                    letter-spacing:
+                        -1.8px;
+                }
+
+                .category-score span {
+                    margin-left:
+                        3px;
+
+                    font-size:
+                        18px;
+                }
+
+                .category-track {
+                    height:
+                        6px;
+
+                    margin-top:
+                        11px;
+
+                    overflow:
+                        hidden;
+
+                    border-radius:
+                        999px;
+
+                    background:
+                        #e5dfdf;
+                }
+
+                .category-fill {
+                    height:
+                        100%;
+
+                    border-radius:
+                        inherit;
+
+                    background:
+                        #cb3a6d;
                 }
 
                 @media (
-                    prefers-reduced-motion:
-                        reduce
+                    max-width:
+                        640px
                 ) {
 
-                    .state-dots span {
-                        animation:
-                            none;
+                    .category-row {
+                        padding:
+                            13px
+                            0
+                            15px;
+                    }
+
+                    .category-top {
+                        gap:
+                            15px;
+                    }
+
+                    .category-title {
+                        font-size:
+                            24px;
+                    }
+
+                    .category-subtitle {
+                        max-width:
+                            250px;
+
+                        margin-top:
+                            4px;
+
+                        font-size:
+                            10px;
+                    }
+
+                    .category-score strong {
+                        font-size:
+                            34px;
+                    }
+
+                    .category-score span {
+                        font-size:
+                            14px;
+                    }
+
+                    .category-track {
+                        height:
+                            5px;
+
+                        margin-top:
+                            10px;
                     }
                 }
 
             `}</style>
 
-        </main>
+        </div>
     );
+}
+
+/* ============================================================
+   BENEFIT
+============================================================ */
+
+function Benefit({
+                     icon,
+                     text,
+                 }: {
+    icon: BenefitIcon;
+    text: ReactNode;
+}) {
+    return (
+        <div className="benefit">
+
+            <div className="benefit-icon">
+                <BenefitSvg
+                    type={
+                        icon
+                    }
+                />
+            </div>
+
+            <div className="benefit-text">
+                {text}
+            </div>
+
+            <style jsx>{`
+
+                .benefit {
+                    display:
+                        grid;
+
+                    grid-template-columns:
+                        24px
+                        minmax(
+                            0,
+                            1fr
+                        );
+
+                    gap:
+                        12px;
+
+                    align-items:
+                        start;
+
+                    color:
+                        #fff8f6;
+                }
+
+                .benefit-icon {
+                    width:
+                        21px;
+
+                    padding-top:
+                        1px;
+
+                    color:
+                        #ffd8e1;
+                }
+
+                .benefit-text {
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        14px;
+
+                    line-height:
+                        1.28;
+
+                    font-weight:
+                        500;
+
+                    letter-spacing:
+                        -.1px;
+
+                    text-shadow:
+                        0
+                        1px
+                        8px
+                        rgba(
+                            65,
+                            0,
+                            27,
+                            .08
+                        );
+                }
+
+                @media (
+                    max-width:
+                        640px
+                ) {
+
+                    .benefit {
+                        grid-template-columns:
+                            22px
+                            minmax(
+                                0,
+                                1fr
+                            );
+
+                        gap:
+                            10px;
+                    }
+
+                    .benefit-icon {
+                        width:
+                            19px;
+                    }
+
+                    .benefit-text {
+                        font-size:
+                            13px;
+
+                        line-height:
+                            1.25;
+                    }
+                }
+
+            `}</style>
+
+        </div>
+    );
+}
+
+/* ============================================================
+   BENEFIT ICONS
+============================================================ */
+
+function BenefitSvg({
+                        type,
+                    }: {
+    type: BenefitIcon;
+}) {
+    if (
+        type ===
+        "heart"
+    ) {
+        return (
+            <svg
+                viewBox="0 0 24 24"
+                width="100%"
+                height="auto"
+                fill="currentColor"
+                aria-hidden="true"
+            >
+                <path
+                    d="
+                        M12 21
+                        C10.9 19.9 5.4 15.2 3.1 12.3
+                        C0.6 9.2 1.3 5.1 4.7 3.5
+                        C7.2 2.3 10.1 3.1 12 5.3
+                        C13.9 3.1 16.8 2.3 19.3 3.5
+                        C22.7 5.1 23.4 9.2 20.9 12.3
+                        C18.6 15.2 13.1 19.9 12 21
+                        Z
+                    "
+                />
+            </svg>
+        );
+    }
+
+    if (
+        type ===
+        "message"
+    ) {
+        return (
+            <svg
+                viewBox="0 0 24 24"
+                width="100%"
+                height="auto"
+                fill="currentColor"
+                aria-hidden="true"
+            >
+                <path
+                    d="
+                        M6 3
+                        H18
+                        C20.2 3 22 4.8 22 7
+                        V14
+                        C22 16.2 20.2 18 18 18
+                        H12
+                        L7 22
+                        L8 18
+                        H6
+                        C3.8 18 2 16.2 2 14
+                        V7
+                        C2 4.8 3.8 3 6 3
+                        Z
+                    "
+                />
+            </svg>
+        );
+    }
+
+    if (
+        type ===
+        "lightning"
+    ) {
+        return (
+            <svg
+                viewBox="0 0 24 24"
+                width="100%"
+                height="auto"
+                fill="currentColor"
+                aria-hidden="true"
+            >
+                <path
+                    d="
+                        M13.6 1.8
+                        L5.2 13
+                        H10.5
+                        L9.3 22.2
+                        L18.8 9.6
+                        H13.1
+                        Z
+                    "
+                />
+            </svg>
+        );
+    }
+
+    return (
+        <svg
+            viewBox="0 0 24 24"
+            width="100%"
+            height="auto"
+            fill="currentColor"
+            aria-hidden="true"
+        >
+            <rect
+                x="3"
+                y="13"
+                width="4"
+                height="8"
+                rx="1"
+            />
+
+            <rect
+                x="10"
+                y="8"
+                width="4"
+                height="13"
+                rx="1"
+            />
+
+            <rect
+                x="17"
+                y="3"
+                width="4"
+                height="18"
+                rx="1"
+            />
+
+        </svg>
+    );
+}
+
+/* ============================================================
+   YEAR WORD
+============================================================ */
+
+function getYearWord(
+    value: number
+) {
+    const mod100 =
+        value %
+        100;
+
+    const mod10 =
+        value %
+        10;
+
+    if (
+        mod100 >=
+        11 &&
+        mod100 <=
+        14
+    ) {
+        return "лет";
+    }
+
+    if (
+        mod10 ===
+        1
+    ) {
+        return "год";
+    }
+
+    if (
+        mod10 >=
+        2 &&
+        mod10 <=
+        4
+    ) {
+        return "года";
+    }
+
+    return "лет";
 }
