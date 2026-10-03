@@ -536,7 +536,7 @@ export default function ResultPage() {
                         </div>
 
                         <h2 className="forecast-title">
-                            Ориентировочная
+                            Примерная
                             <br />
                             длительность
                             <br className="desktop-break" />
@@ -544,9 +544,7 @@ export default function ResultPage() {
                         </h2>
 
                         <p className="forecast-description">
-                            На основе ваших ответов мы оценили
-                            ориентировочный сценарий
-                            длительности ваших отношений.
+                            На основе ИИ модели
                         </p>
 
                     </div>
@@ -591,13 +589,13 @@ export default function ResultPage() {
 
                             <div className="scale-labels">
 
-                                <span>
-                                    1 месяц
-                                </span>
-
-                                <span>
-                                    вся жизнь
-                                </span>
+                                <span style={{ left: "1.7%" }}>1</span>
+                                <span style={{ left: "8.3%" }}>5</span>
+                                <span style={{ left: "16.7%" }}>10</span>
+                                <span style={{ left: "25%" }}>15</span>
+                                <span style={{ left: "33.3%" }}>20</span>
+                                <span style={{ left: "50%" }}>30</span>
+                                <span className="life-label">вся жизнь</span>
 
                             </div>
 
@@ -664,9 +662,9 @@ export default function ResultPage() {
                             </div>
 
                             <h2>
-                                Чтобы вместе —
+                                План на 3 месяца,
                                 <br />
-                                и надолго.
+                                как усилить ваши отношения
                             </h2>
 
                         </div>
@@ -740,7 +738,7 @@ export default function ResultPage() {
                             <span className="cta-right">
 
                                 <span className="price">
-                                    299 ₽
+                                    99 ₽
                                 </span>
 
                                 <span className="arrow">
@@ -1200,11 +1198,11 @@ export default function ResultPage() {
                 }
 
                 .scale-labels {
-                    display:
-                        flex;
+                    position:
+                        relative;
 
-                    justify-content:
-                        space-between;
+                    height:
+                        18px;
 
                     margin-top:
                         12px;
@@ -1218,10 +1216,60 @@ export default function ResultPage() {
                         sans-serif;
 
                     font-size:
-                        11px;
+                        10px;
 
                     font-weight:
                         600;
+                }
+
+                .scale-labels span {
+                    position:
+                        absolute;
+
+                    top:
+                        0;
+
+                    transform:
+                        translateX(-50%);
+
+                    white-space:
+                        nowrap;
+                }
+
+                .scale-labels span::before {
+                    content:
+                        "";
+
+                    position:
+                        absolute;
+
+                    left:
+                        50%;
+
+                    top:
+                        -17px;
+
+                    width:
+                        1px;
+
+                    height:
+                        7px;
+
+                    background:
+                        #cfc4c7;
+                }
+
+                .scale-labels .life-label {
+                    left:
+                        100%;
+
+                    transform:
+                        translateX(-100%);
+                }
+
+                .scale-labels .life-label::before {
+                    left:
+                        100%;
                 }
 
                 /* =====================================================
@@ -2402,6 +2450,192 @@ export default function ResultPage() {
                 }
 
                 /* =====================================================
+                   PAID BLOCK — TEXT ONLY ON THE RIGHT
+                ===================================================== */
+
+                @media (min-width: 641px) {
+                    .paid-art {
+                        width:
+                            52%;
+
+                        object-position:
+                            center center;
+                    }
+
+                    .desktop-art-fade {
+                        left:
+                            36%;
+
+                        width:
+                            20%;
+                    }
+
+                    .paid-heading {
+                        top:
+                            42px;
+
+                        left:
+                            auto;
+
+                        right:
+                            58px;
+
+                        width:
+                            43%;
+                    }
+
+                    .paid-heading h2 {
+                        font-size:
+                            clamp(34px, 3.2vw, 46px);
+
+                        line-height:
+                            .98;
+                    }
+
+                    .paid-benefits {
+                        top:
+                            185px;
+
+                        right:
+                            58px;
+
+                        width:
+                            43%;
+
+                        display:
+                            grid;
+
+                        grid-template-columns:
+                            1fr 1fr;
+
+                        gap:
+                            18px 24px;
+                    }
+
+                    .paid-cta {
+                        right:
+                            58px;
+
+                        width:
+                            43%;
+
+                        min-width:
+                            0;
+                    }
+
+                    .paid-note {
+                        right:
+                            58px;
+
+                        width:
+                            43%;
+
+                        min-width:
+                            0;
+                    }
+                }
+
+                @media (max-width: 640px) {
+                    .scale-labels {
+                        font-size:
+                            8px;
+                    }
+
+                    .scale-labels span::before {
+                        top:
+                            -15px;
+
+                        height:
+                            6px;
+                    }
+
+                    .paid-card,
+                    .paid-content {
+                        min-height:
+                            790px;
+                    }
+
+                    .paid-art {
+                        left:
+                            0;
+
+                        width:
+                            100%;
+
+                        height:
+                            300px;
+
+                        object-position:
+                            center center;
+                    }
+
+                    .paid-art-layer {
+                        height:
+                            335px;
+                    }
+
+                    .mobile-art-fade {
+                        height:
+                            150px;
+                    }
+
+                    .paid-heading {
+                        top:
+                            315px;
+
+                        left:
+                            24px;
+
+                        right:
+                            24px;
+
+                        width:
+                            auto;
+                    }
+
+                    .paid-heading h2 {
+                        font-size:
+                            34px;
+
+                        line-height:
+                            .98;
+                    }
+
+                    .paid-benefits {
+                        top:
+                            445px;
+
+                        left:
+                            24px;
+
+                        right:
+                            24px;
+
+                        width:
+                            auto;
+
+                        display:
+                            grid;
+
+                        grid-template-columns:
+                            1fr 1fr;
+
+                        gap:
+                            17px 14px;
+                    }
+
+                    .paid-cta {
+                        bottom:
+                            50px;
+                    }
+
+                    .paid-note {
+                        bottom:
+                            21px;
+                    }
+                }
+
+                /* =====================================================
                    SMALL MOBILE
                 ===================================================== */
 
@@ -2503,6 +2737,58 @@ export default function ResultPage() {
                                 100% -
                                 32px
                             );
+                    }
+                }
+
+
+                @media (max-width: 390px) {
+                    .paid-card,
+                    .paid-content {
+                        min-height:
+                            780px;
+                    }
+
+                    .paid-art {
+                        height:
+                            285px;
+                    }
+
+                    .paid-art-layer {
+                        height:
+                            320px;
+                    }
+
+                    .paid-heading {
+                        top:
+                            300px;
+
+                        left:
+                            20px;
+
+                        right:
+                            20px;
+
+                        width:
+                            auto;
+                    }
+
+                    .paid-heading h2 {
+                        font-size:
+                            31px;
+                    }
+
+                    .paid-benefits {
+                        top:
+                            425px;
+
+                        left:
+                            20px;
+
+                        right:
+                            20px;
+
+                        width:
+                            auto;
                     }
                 }
 

@@ -1,63 +1,45 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import type { ReactNode } from "react";
+import {
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
+
+import {
+    useParams,
+    useRouter,
+} from "next/navigation";
 
 type Couple = {
     id: string;
+
     partner_a_name?: string | null;
     partner_b_name?: string | null;
+
     partner_a_completed?: boolean;
     partner_b_completed?: boolean;
+
+    invite_token?: string | null;
 };
 
-type ApiResponse = {
-    waiting?: boolean;
-    couple?: Couple;
-    comparisons?: unknown[];
-    scores?: {
-        overall?: number;
-        sameAnswers?: number;
-        closeAnswers?: number;
-        differentAnswers?: number;
-    };
-};
-
-type CategoryScore = {
-    title: string;
-    subtitle: string;
-    value: number;
-};
-
-type BenefitIcon =
-    | "heart"
-    | "message"
-    | "lightning"
-    | "chart";
-
-const MAX_SCORE = 10;
-
-const PAID_IMAGE =
-    "/images/full-report-couple.png";
-
-export default function ResultPage() {
+export default function WaitingPage() {
     const params =
-        useParams();
+        useParams<{
+            coupleId: string;
+        }>();
 
     const router =
         useRouter();
 
     const coupleId =
-        String(
-            params.coupleId ?? ""
-        );
+        params.coupleId;
 
     const [
-        data,
-        setData,
+        couple,
+        setCouple,
     ] =
-        useState<ApiResponse | null>(
+        useState<Couple | null>(
             null
         );
 
@@ -67,6 +49,47 @@ export default function ResultPage() {
     ] =
         useState(true);
 
+    const [
+        error,
+        setError,
+    ] =
+        useState("");
+
+    const [
+        copied,
+        setCopied,
+    ] =
+        useState(false);
+
+    const [
+        origin,
+        setOrigin,
+    ] =
+        useState("");
+
+    useEffect(() => {
+        setOrigin(
+            window.location.origin
+        );
+    }, []);
+
+    const inviteUrl =
+        useMemo(() => {
+            if (
+                !origin ||
+                !couple?.invite_token
+            ) {
+                return "";
+            }
+
+            return `${origin}/invite/${encodeURIComponent(
+                couple.invite_token
+            )}`;
+        }, [
+            origin,
+            couple?.invite_token,
+        ]);
+
     useEffect(() => {
         if (!coupleId) {
             return;
@@ -75,11 +98,18 @@ export default function ResultPage() {
         let cancelled =
             false;
 
-        async function loadResult() {
+        let timer:
+            | ReturnType<
+            typeof setInterval
+        >
+            | null =
+            null;
+
+        async function loadCouple() {
             try {
                 const response =
                     await fetch(
-                        `/api/report?id=${encodeURIComponent(
+                        `/api/couples?id=${encodeURIComponent(
                             coupleId
                         )}`,
                         {
@@ -88,43 +118,56 @@ export default function ResultPage() {
                         }
                     );
 
+                const result =
+                    await response.json();
+
                 if (!response.ok) {
                     throw new Error(
-                        "Не удалось загрузить результат"
+                        result?.error ||
+                        "Не удалось загрузить пару"
                     );
                 }
-
-                const result =
-                    (await response.json()) as ApiResponse;
 
                 if (cancelled) {
                     return;
                 }
 
-                /*
-                 * Если второй человек
-                 * ещё не закончил тест —
-                 * результат пока не показываем.
-                 */
+                const currentCouple =
+                    result as Couple;
+
                 if (
-                    result.waiting
+                    currentCouple
+                        .partner_a_completed &&
+                    currentCouple
+                        .partner_b_completed
                 ) {
                     router.replace(
-                        `/waiting/${coupleId}`
+                        `/result/${coupleId}`
                     );
 
                     return;
                 }
 
-                setData(
-                    result
+                setCouple(
+                    currentCouple
                 );
+
+                setError("");
             } catch (
-                error
+                err
                 ) {
                 console.error(
-                    error
+                    "Waiting couple load error:",
+                    err
                 );
+
+                if (
+                    !cancelled
+                ) {
+                    setError(
+                        "Не получилось загрузить приглашение."
+                    );
+                }
             } finally {
                 if (
                     !cancelled
@@ -136,329 +179,178 @@ export default function ResultPage() {
             }
         }
 
-        loadResult();
+        loadCouple();
+
+        timer =
+            setInterval(
+                loadCouple,
+                4000
+            );
 
         return () => {
             cancelled =
                 true;
+
+            if (timer) {
+                clearInterval(
+                    timer
+                );
+            }
         };
     }, [
         coupleId,
         router,
     ]);
 
-    /*
-     * Бесплатная часть результата.
-     *
-     * Используем те же данные,
-     * которые уже отдаёт GET /api/report.
-     */
-    const categories =
-        useMemo<
-            CategoryScore[]
-        >(() => {
-            const same =
-                data
-                    ?.scores
-                    ?.sameAnswers ??
-                0;
+    async function copyInvite() {
+        if (!inviteUrl) {
+            return;
+        }
 
-            const close =
-                data
-                    ?.scores
-                    ?.closeAnswers ??
-                0;
-
-            const different =
-                data
-                    ?.scores
-                    ?.differentAnswers ??
-                0;
-
-            const total =
-                Math.max(
-                    same +
-                    close +
-                    different,
-                    1
+        try {
+            await navigator
+                .clipboard
+                .writeText(
+                    inviteUrl
                 );
 
-            const base =
-                Math.round(
-                    (
-                        same +
-                        close * 0.5
-                    ) /
-                    total *
-                    MAX_SCORE
-                );
+            setCopied(true);
 
-            const clamp = (
-                value: number
-            ) =>
-                Math.max(
-                    0,
-                    Math.min(
-                        MAX_SCORE,
-                        value
-                    )
-                );
-
-            return [
-                {
-                    title:
-                        "Дружба",
-
-                    subtitle:
-                        "хорошо ли вам просто вдвоём",
-
-                    value:
-                        clamp(
-                            base + 1
-                        ),
+            window.setTimeout(
+                () => {
+                    setCopied(
+                        false
+                    );
                 },
-
-                {
-                    title:
-                        "Партнёрство",
-
-                    subtitle:
-                        "вы команда или каждый сам за себя",
-
-                    value:
-                        clamp(
-                            base
-                        ),
-                },
-
-                {
-                    title:
-                        "Секс",
-
-                    subtitle:
-                        "совпадает ли ваше представление о близости",
-
-                    value:
-                        clamp(
-                            base + 2
-                        ),
-                },
-
-                {
-                    title:
-                        "Деньги",
-
-                    subtitle:
-                        "одинаково ли вы смотрите на траты",
-
-                    value:
-                        clamp(
-                            base - 2
-                        ),
-                },
-
-                {
-                    title:
-                        "Забота",
-
-                    subtitle:
-                        "понимаете ли вы «я рядом» одинаково",
-
-                    value:
-                        clamp(
-                            base + 1
-                        ),
-                },
-
-                {
-                    title:
-                        "Быт",
-
-                    subtitle:
-                        "как вам живётся в обычный вторник",
-
-                    value:
-                        clamp(
-                            base - 1
-                        ),
-                },
-            ];
-        }, [
-            data,
-        ]);
-
-    const yearsForecast =
-        useMemo(() => {
-            const overall =
-                data
-                    ?.scores
-                    ?.overall ??
-                50;
-
-            if (
-                overall >=
-                85
-            ) {
-                return 45;
-            }
-
-            if (
-                overall >=
-                75
-            ) {
-                return 28;
-            }
-
-            if (
-                overall >=
-                65
-            ) {
-                return 16;
-            }
-
-            if (
-                overall >=
-                55
-            ) {
-                return 10;
-            }
-
-            if (
-                overall >=
-                45
-            ) {
-                return 6;
-            }
-
-            if (
-                overall >=
-                35
-            ) {
-                return 3;
-            }
-
-            return 1;
-        }, [
-            data,
-        ]);
-
-    const forecastPosition =
-        useMemo(() => {
-            const maxYears =
-                60;
-
-            return Math.max(
-                4,
-                Math.min(
-                    96,
-                    (
-                        yearsForecast /
-                        maxYears
-                    ) *
-                    100
-                )
+                1800
             );
-        }, [
-            yearsForecast,
-        ]);
+        } catch (
+            clipboardError
+            ) {
+            console.error(
+                "Clipboard error:",
+                clipboardError
+            );
 
-    const nameA =
-        data
-            ?.couple
-            ?.partner_a_name ||
-        "Вы";
+            const textarea =
+                document.createElement(
+                    "textarea"
+                );
 
-    const nameB =
-        data
-            ?.couple
-            ?.partner_b_name ||
-        "Партнёр";
+            textarea.value =
+                inviteUrl;
+
+            textarea.style.position =
+                "fixed";
+
+            textarea.style.opacity =
+                "0";
+
+            document.body.appendChild(
+                textarea
+            );
+
+            textarea.select();
+
+            document.execCommand(
+                "copy"
+            );
+
+            document.body.removeChild(
+                textarea
+            );
+
+            setCopied(true);
+
+            window.setTimeout(
+                () => {
+                    setCopied(
+                        false
+                    );
+                },
+                1800
+            );
+        }
+    }
+
+    async function shareInvite() {
+        if (!inviteUrl) {
+            return;
+        }
+
+        if (
+            navigator.share
+        ) {
+            try {
+                await navigator.share({
+                    title:
+                        "между нами.",
+
+                    text:
+                        "Пройди свою часть — потом увидим общий результат.",
+
+                    url:
+                    inviteUrl,
+                });
+
+                return;
+            } catch (
+                shareError
+                ) {
+                console.log(
+                    "Share cancelled:",
+                    shareError
+                );
+            }
+        }
+
+        await copyInvite();
+    }
 
     if (loading) {
         return (
-            <main className="loading-screen">
-
-                <div className="loading-brand">
-                    между нами.
-                </div>
-
-                <style jsx>{`
-                    .loading-screen {
-                        min-height:
-                            100vh;
-
-                        display:
-                            grid;
-
-                        place-items:
-                            center;
-
-                        background:
-                            #f8f4f1;
-
-                        color:
-                            #211d1f;
-                    }
-
-                    .loading-brand {
-                        font-family:
-                            Georgia,
-                            "Times New Roman",
-                            serif;
-
-                        font-size:
-                            30px;
-
-                        font-weight:
-                            700;
-                    }
-                `}</style>
-
-            </main>
+            <StateScreen
+                text="готовим приглашение"
+            />
         );
     }
 
-    if (!data) {
+    if (
+        error ||
+        !couple
+    ) {
         return (
-            <main className="error-screen">
-
-                Не получилось загрузить результат.
-
-                <style jsx>{`
-                    .error-screen {
-                        min-height:
-                            100vh;
-
-                        display:
-                            grid;
-
-                        place-items:
-                            center;
-
-                        padding:
-                            24px;
-
-                        background:
-                            #f8f4f1;
-
-                        color:
-                            #211d1f;
-
-                        font-family:
-                            Arial,
-                            Helvetica,
-                            sans-serif;
-                    }
-                `}</style>
-
-            </main>
+            <StateScreen
+                text={
+                    error ||
+                    "Пара не найдена."
+                }
+            />
         );
     }
+
+    if (
+        !couple.invite_token
+    ) {
+        return (
+            <StateScreen
+                text="Не удалось создать ссылку для партнёра."
+            />
+        );
+    }
+
+    const firstName =
+        couple.partner_a_name ||
+        "Вы";
+
+    const partnerName =
+        couple.partner_b_name ||
+        "партнёр";
 
     return (
         <main className="page">
 
-            <div className="content-shell">
+            <div className="shell">
 
                 {/* =====================================================
                     HEADER
@@ -470,18 +362,18 @@ export default function ResultPage() {
                         между нами.
                     </div>
 
-                    <div className="couple-names">
+                    <div className="couple">
 
-                        <span className="person-name">
-                            {nameA}
+                        <span>
+                            {firstName}
                         </span>
 
-                        <span className="couple-cross">
+                        <b>
                             ×
-                        </span>
+                        </b>
 
-                        <span className="person-name">
-                            {nameB}
+                        <span>
+                            {partnerName}
                         </span>
 
                     </div>
@@ -489,281 +381,239 @@ export default function ResultPage() {
                 </header>
 
                 {/* =====================================================
-                    RESULTS
+                    HERO
                 ===================================================== */}
 
-                <section className="results">
+                <section className="hero">
 
-                    <div className="section-label">
-                        ВАШ РЕЗУЛЬТАТ
+                    <div className="hero-copy">
+
+                        <div className="eyebrow">
+                            ТВОЯ ЧАСТЬ ГОТОВА
+                        </div>
+
+                        <h1>
+                            Теперь очередь
+                            <br />
+
+                            <span>
+                                {partnerName}.
+                            </span>
+                        </h1>
+
+                        <p className="lead">
+                            Когда второй человек
+                            закончит тест,
+                            <br className="desktop-break" />
+                            здесь автоматически
+                            откроется
+                            <br className="desktop-break" />
+                            ваш общий результат.
+                        </p>
+
                     </div>
 
-                    <h1 className="results-title">
-                        Вот что
-                        <br />
-                        получилось
-                    </h1>
+                    {/* =================================================
+                        TWO CIRCLES
+                    ================================================= */}
 
-                    <div className="category-list">
+                    <div className="status">
 
-                        {categories.map(
-                            (
-                                category
-                            ) => (
-                                <CategoryRow
-                                    key={
-                                        category.title
-                                    }
-                                    {...category}
-                                />
-                            )
-                        )}
+                        <div className="circles">
+
+                            <div className="circle completed">
+
+                                <svg
+                                    viewBox="0 0 48 48"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="M13 24.5L20.5 32L36 16"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="3.5"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    />
+                                </svg>
+
+                            </div>
+
+                            <div className="circle waiting">
+
+                                <div className="waiting-dots">
+
+                                    <span />
+
+                                    <span />
+
+                                    <span />
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div className="circle-labels">
+
+                            <span className="ready-label">
+                                ТЫ ГОТОВ
+                            </span>
+
+                            <span>
+                                ЖДЁМ{" "}
+                                {partnerName.toUpperCase()}
+                            </span>
+
+                        </div>
 
                     </div>
 
                 </section>
 
                 {/* =====================================================
-                    FORECAST
+                    INVITE CARD
                 ===================================================== */}
 
-                <section className="forecast">
+                <section className="invite-card">
 
-                    <div className="forecast-copy">
-
-                        <div className="section-label">
-                            ПРОГНОЗ
-                        </div>
-
-                        <h2 className="forecast-title">
-                            Примерная
-                            <br />
-                            длительность
-                            <br className="desktop-break" />
-                            ваших отношений
-                        </h2>
-
-                        <p className="forecast-description">
-                            На основе ИИ модели
-                        </p>
-
+                    <div className="invite-label">
+                        ССЫЛКА ДЛЯ ПАРТНЁРА
                     </div>
 
-                    <div className="forecast-result">
+                    <div className="link-box">
 
-                        <div className="years">
-
-                            <strong>
-                                {yearsForecast}
-                            </strong>
-
-                            <span>
-                                {getYearWord(
-                                    yearsForecast
-                                )}
-                            </span>
-
+                        <div className="link-text">
+                            {inviteUrl}
                         </div>
-
-                        <div className="forecast-scale">
-
-                            <div className="scale-track">
-
-                                <div
-                                    className="scale-fill"
-                                    style={{
-                                        width:
-                                            `${forecastPosition}%`,
-                                    }}
-                                />
-
-                                <div
-                                    className="scale-dot"
-                                    style={{
-                                        left:
-                                            `${forecastPosition}%`,
-                                    }}
-                                />
-
-                            </div>
-
-                            <div className="scale-labels">
-
-                                <span style={{ left: "1.7%" }}>1</span>
-                                <span style={{ left: "8.3%" }}>5</span>
-                                <span style={{ left: "16.7%" }}>10</span>
-                                <span style={{ left: "25%" }}>15</span>
-                                <span style={{ left: "33.3%" }}>20</span>
-                                <span style={{ left: "50%" }}>30</span>
-                                <span className="life-label">вся жизнь</span>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </section>
-
-            </div>
-
-            {/* =========================================================
-                PAID REPORT
-
-                Бесплатный результат заканчивается здесь.
-                Ниже продаём полный разбор.
-            ========================================================= */}
-
-            <section className="paid-shell">
-
-                <div className="paid-card">
-
-                    {/* =================================================
-                        ART
-                    ================================================= */}
-
-                    <div className="paid-art-layer">
-
-                        <img
-                            className="paid-art"
-                            src={
-                                PAID_IMAGE
-                            }
-                            alt=""
-                            draggable={
-                                false
-                            }
-                        />
-
-                        <div className="desktop-art-fade" />
-
-                        <div className="mobile-art-fade" />
-
-                    </div>
-
-                    {/* =================================================
-                        Общая лёгкая дымка
-                    ================================================= */}
-
-                    <div className="paid-vignette" />
-
-                    {/* =================================================
-                        CONTENT
-                    ================================================= */}
-
-                    <div className="paid-content">
-
-                        {/* TITLE */}
-
-                        <div className="paid-heading">
-
-                            <div className="paid-label">
-                                ПОЛНЫЙ РАЗБОР
-                            </div>
-
-                            <h2>
-                                План на 3 месяца,
-                                <br />
-                                как усилить ваши отношения
-                            </h2>
-
-                        </div>
-
-                        {/* BENEFITS */}
-
-                        <div className="paid-benefits">
-
-                            <Benefit
-                                icon="heart"
-                                text={
-                                    <>
-                                        Где вы можете
-                                        <br />
-                                        не понимать друг друга
-                                    </>
-                                }
-                            />
-
-                            <Benefit
-                                icon="message"
-                                text={
-                                    <>
-                                        Что каждый ждёт
-                                        <br />
-                                        от отношений
-                                    </>
-                                }
-                            />
-
-                            <Benefit
-                                icon="lightning"
-                                text={
-                                    <>
-                                        Что может стать
-                                        <br />
-                                        причиной ссор
-                                    </>
-                                }
-                            />
-
-                            <Benefit
-                                icon="chart"
-                                text={
-                                    <>
-                                        Как сделать вашу
-                                        <br />
-                                        пару крепче
-                                    </>
-                                }
-                            />
-
-                        </div>
-
-                        {/* CTA */}
 
                         <button
                             type="button"
-                            className="paid-cta"
-                            onClick={() =>
-                                router.push(
-                                    `/report/${coupleId}`
-                                )
+                            className="link-copy"
+                            aria-label="Скопировать ссылку"
+                            onClick={
+                                copyInvite
                             }
                         >
 
-                            <span className="cta-title">
-                                Открыть полный разбор
-                            </span>
+                            {copied ? (
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="M5 12.5L9.2 16.7L19 7"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    />
+                                </svg>
+                            ) : (
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    aria-hidden="true"
+                                >
+                                    <rect
+                                        x="8"
+                                        y="3"
+                                        width="12"
+                                        height="14"
+                                        rx="2"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.8"
+                                    />
 
-                            <span className="cta-right">
-
-                                <span className="price">
-                                    99 ₽
-                                </span>
-
-                                <span className="arrow">
-                                    →
-                                </span>
-
-                            </span>
+                                    <path
+                                        d="M16 17V19C16 20.1 15.1 21 14 21H6C4.9 21 4 20.1 4 19V8C4 6.9 4.9 6 6 6H8"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.8"
+                                        strokeLinecap="round"
+                                    />
+                                </svg>
+                            )}
 
                         </button>
 
-                        <div className="paid-note">
-                            один разбор · для вас двоих ·
-                            сразу после оплаты
-                        </div>
+                    </div>
+
+                    <button
+                        type="button"
+                        className="share-button"
+                        onClick={
+                            shareInvite
+                        }
+                    >
+
+                        <span>
+                            Отправить приглашение
+                        </span>
+
+                        <span className="share-arrow">
+                            →
+                        </span>
+
+                    </button>
+
+                    <button
+                        type="button"
+                        className={
+                            copied
+                                ? "copy-button copied"
+                                : "copy-button"
+                        }
+                        onClick={
+                            copyInvite
+                        }
+                    >
+                        {copied
+                            ? "Ссылка скопирована ✓"
+                            : "Скопировать ссылку"}
+                    </button>
+
+                </section>
+
+                {/* =====================================================
+                    FOOTER
+                ===================================================== */}
+
+                <footer className="footer">
+
+                    <div className="heart">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M12 20.2C10.9 19.2 5.3 14.6 3.2 11.7C1.1 8.8 2 5.1 5.1 3.8C7.5 2.8 10.1 3.7 12 5.8C13.9 3.7 16.5 2.8 18.9 3.8C22 5.1 22.9 8.8 20.8 11.7C18.7 14.6 13.1 19.2 12 20.2Z"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.7"
+                                strokeLinejoin="round"
+                            />
+                        </svg>
 
                     </div>
 
-                </div>
+                    <span>
+                        Результат откроется
+                        автоматически, когда вы
+                        оба закончите.
+                    </span>
 
-            </section>
+                </footer>
+
+            </div>
 
             <style jsx>{`
 
                 /* =====================================================
-                   BASE
+                   GLOBAL
                 ===================================================== */
 
                 :global(*) {
@@ -777,13 +627,14 @@ export default function ResultPage() {
                 }
 
                 :global(body) {
-                    margin: 0;
+                    margin:
+                        0;
 
                     background:
                         #f8f4f1;
 
                     color:
-                        #201c1e;
+                        #211d1f;
                 }
 
                 button {
@@ -792,28 +643,22 @@ export default function ResultPage() {
                 }
 
                 .page {
-                    width:
-                        100%;
-
                     min-height:
                         100vh;
 
                     padding:
                         0
                         28px
-                        72px;
-
-                    overflow-x:
-                        hidden;
+                        46px;
 
                     background:
                         #f8f4f1;
                 }
 
-                .content-shell {
+                .shell {
                     width:
                         min(
-                            920px,
+                            980px,
                             100%
                         );
 
@@ -827,7 +672,7 @@ export default function ResultPage() {
 
                 .header {
                     min-height:
-                        78px;
+                        116px;
 
                     display:
                         flex;
@@ -843,7 +688,7 @@ export default function ResultPage() {
 
                     border-bottom:
                         1px solid
-                        #ddd5d2;
+                        #ded7d4;
                 }
 
                 .brand {
@@ -856,7 +701,7 @@ export default function ResultPage() {
                         serif;
 
                     font-size:
-                        24px;
+                        29px;
 
                     line-height:
                         1;
@@ -865,12 +710,15 @@ export default function ResultPage() {
                         700;
 
                     letter-spacing:
-                        -1.1px;
+                        -1.4px;
                 }
 
-                .couple-names {
+                .couple {
                     min-width:
                         0;
+
+                    max-width:
+                        50%;
 
                     display:
                         flex;
@@ -878,66 +726,14 @@ export default function ResultPage() {
                     align-items:
                         center;
 
+                    justify-content:
+                        flex-end;
+
                     gap:
-                        9px;
+                        16px;
 
                     color:
-                        #8f8588;
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        10px;
-
-                    font-weight:
-                        700;
-
-                    letter-spacing:
-                        1.2px;
-
-                    text-transform:
-                        uppercase;
-                }
-
-                .person-name {
-                    overflow:
-                        hidden;
-
-                    text-overflow:
-                        ellipsis;
-
-                    white-space:
-                        nowrap;
-                }
-
-                .couple-cross {
-                    flex-shrink:
-                        0;
-
-                    color:
-                        #c2215a;
-                }
-
-                /* =====================================================
-                   RESULTS
-                ===================================================== */
-
-                .results {
-                    padding:
-                        42px
-                        0
-                        45px;
-                }
-
-                .section-label {
-                    margin-bottom:
-                        13px;
-
-                    color:
-                        #c2215a;
+                        #92888b;
 
                     font-family:
                         Arial,
@@ -954,50 +750,46 @@ export default function ResultPage() {
                         800;
 
                     letter-spacing:
-                        2.2px;
+                        1.7px;
+
+                    text-transform:
+                        uppercase;
+
+                    white-space:
+                        nowrap;
                 }
 
-                .results-title {
-                    margin:
-                        0
-                        0
-                        32px;
+                .couple span {
+                    overflow:
+                        hidden;
 
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
+                    text-overflow:
+                        ellipsis;
+                }
+
+                .couple b {
+                    flex-shrink:
+                        0;
+
+                    color:
+                        #cb225c;
 
                     font-size:
-                        48px;
-
-                    line-height:
-                        .98;
+                        14px;
 
                     font-weight:
-                        400;
-
-                    letter-spacing:
-                        -2.5px;
-                }
-
-                .category-list {
-                    display:
-                        flex;
-
-                    flex-direction:
-                        column;
+                        700;
                 }
 
                 /* =====================================================
-                   FORECAST
+                   HERO
                 ===================================================== */
 
-                .forecast {
+                .hero {
                     padding:
-                        38px
+                        93px
                         0
-                        46px;
+                        66px;
 
                     display:
                         grid;
@@ -1005,579 +797,31 @@ export default function ResultPage() {
                     grid-template-columns:
                         minmax(
                             0,
-                            1.15fr
+                            1.35fr
                         )
                         minmax(
-                            280px,
-                            .85fr
+                            290px,
+                            .65fr
                         );
 
                     gap:
-                        55px;
+                        54px;
 
                     align-items:
                         center;
-
-                    border-top:
-                        1px solid
-                        #dcd4d1;
                 }
 
-                .forecast-copy {
+                .hero-copy {
                     min-width:
                         0;
                 }
 
-                .forecast-title {
-                    max-width:
-                        520px;
-
-                    margin:
-                        0;
-
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
-
-                    font-size:
-                        43px;
-
-                    line-height:
-                        1.01;
-
-                    font-weight:
-                        400;
-
-                    letter-spacing:
-                        -2.2px;
-                }
-
-                .forecast-description {
-                    max-width:
-                        520px;
-
-                    margin:
-                        15px
-                        0
-                        0;
-
-                    color:
-                        #8d8587;
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        14px;
-
-                    line-height:
-                        1.5;
-
-                    font-weight:
-                        500;
-                }
-
-                .forecast-result {
-                    min-width:
-                        0;
-                }
-
-                .years {
-                    display:
-                        flex;
-
-                    align-items:
-                        baseline;
-
-                    color:
-                        #c21856;
-
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
-
-                    white-space:
-                        nowrap;
-                }
-
-                .years strong {
-                    font-size:
-                        76px;
-
-                    line-height:
-                        .88;
-
-                    font-weight:
-                        400;
-
-                    letter-spacing:
-                        -4px;
-                }
-
-                .years span {
-                    margin-left:
-                        9px;
-
-                    font-size:
-                        39px;
-
-                    line-height:
-                        1;
-
-                    letter-spacing:
-                        -1.5px;
-                }
-
-                .forecast-scale {
-                    width:
-                        100%;
-
-                    margin-top:
-                        23px;
-                }
-
-                .scale-track {
-                    position:
-                        relative;
-
-                    height:
-                        9px;
-
-                    border-radius:
-                        999px;
-
-                    background:
-                        #e5dfe0;
-                }
-
-                .scale-fill {
-                    position:
-                        absolute;
-
-                    inset:
-                        0
-                        auto
-                        0
-                        0;
-
-                    border-radius:
-                        inherit;
-
-                    background:
-                        #e99ab5;
-                }
-
-                .scale-dot {
-                    position:
-                        absolute;
-
-                    top:
-                        50%;
-
-                    width:
-                        22px;
-
-                    height:
-                        22px;
-
-                    border-radius:
-                        50%;
-
-                    background:
-                        #c21856;
-
-                    transform:
-                        translate(
-                            -50%,
-                            -50%
-                        );
-                }
-
-                .scale-labels {
-                    position:
-                        relative;
-
-                    height:
-                        18px;
-
-                    margin-top:
-                        12px;
-
-                    color:
-                        #8d8587;
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        10px;
-
-                    font-weight:
-                        600;
-                }
-
-                .scale-labels span {
-                    position:
-                        absolute;
-
-                    top:
-                        0;
-
-                    transform:
-                        translateX(-50%);
-
-                    white-space:
-                        nowrap;
-                }
-
-                .scale-labels span::before {
-                    content:
-                        "";
-
-                    position:
-                        absolute;
-
-                    left:
-                        50%;
-
-                    top:
-                        -17px;
-
-                    width:
-                        1px;
-
-                    height:
-                        7px;
-
-                    background:
-                        #cfc4c7;
-                }
-
-                .scale-labels .life-label {
-                    left:
-                        100%;
-
-                    transform:
-                        translateX(-100%);
-                }
-
-                .scale-labels .life-label::before {
-                    left:
-                        100%;
-                }
-
-                /* =====================================================
-                   PAID SHELL
-                ===================================================== */
-
-                .paid-shell {
-                    width:
-                        min(
-                            1180px,
-                            100%
-                        );
-
-                    margin:
-                        8px
-                        auto
-                        0;
-                }
-
-                /* =====================================================
-                   PAID CARD
-                ===================================================== */
-
-                .paid-card {
-                    position:
-                        relative;
-
-                    width:
-                        100%;
-
-                    min-height:
-                        500px;
-
-                    overflow:
-                        hidden;
-
-                    border-radius:
-                        24px;
-
-                    background:
-                        linear-gradient(
-                            90deg,
-                            #9c124c
-                            0%,
-                            #a70e4c
-                            48%,
-                            #a70f4d
-                            100%
-                        );
-
-                    isolation:
-                        isolate;
-                }
-
-                /* =====================================================
-                   ART LAYER
-                ===================================================== */
-
-                .paid-art-layer {
-                    position:
-                        absolute;
-
-                    inset:
-                        0;
-
-                    z-index:
-                        0;
-
-                    overflow:
-                        hidden;
-
-                    pointer-events:
-                        none;
-                }
-
-                .paid-art {
-                    position:
-                        absolute;
-
-                    left:
-                        0;
-
-                    top:
-                        0;
-
-                    width:
-                        73%;
-
-                    height:
-                        100%;
-
-                    display:
-                        block;
-
-                    object-fit:
-                        cover;
-
-                    object-position:
-                        43%
-                        center;
-
-                    user-select:
-                        none;
-
-                    pointer-events:
-                        none;
-                }
-
-                .desktop-art-fade {
-                    position:
-                        absolute;
-
-                    z-index:
-                        2;
-
-                    top:
-                        0;
-
-                    left:
-                        38%;
-
-                    width:
-                        38%;
-
-                    height:
-                        100%;
-
-                    pointer-events:
-                        none;
-
-                    background:
-                        linear-gradient(
-                            90deg,
-                            rgba(
-                                166,
-                                18,
-                                77,
-                                0
-                            )
-                            0%,
-
-                            rgba(
-                                166,
-                                18,
-                                77,
-                                .03
-                            )
-                            10%,
-
-                            rgba(
-                                166,
-                                18,
-                                77,
-                                .12
-                            )
-                            24%,
-
-                            rgba(
-                                166,
-                                18,
-                                77,
-                                .28
-                            )
-                            38%,
-
-                            rgba(
-                                166,
-                                18,
-                                77,
-                                .50
-                            )
-                            53%,
-
-                            rgba(
-                                166,
-                                18,
-                                77,
-                                .72
-                            )
-                            67%,
-
-                            rgba(
-                                166,
-                                18,
-                                77,
-                                .88
-                            )
-                            80%,
-
-                            rgba(
-                                166,
-                                18,
-                                77,
-                                .97
-                            )
-                            91%,
-
-                            #a6124d
-                            100%
-                        );
-                }
-
-                .mobile-art-fade {
-                    display:
-                        none;
-                }
-
-                /* =====================================================
-                   VIGNETTE
-                ===================================================== */
-
-                .paid-vignette {
-                    position:
-                        absolute;
-
-                    z-index:
-                        3;
-
-                    inset:
-                        0;
-
-                    pointer-events:
-                        none;
-
-                    background:
-                        linear-gradient(
-                            180deg,
-                            rgba(
-                                40,
-                                0,
-                                20,
-                                .05
-                            )
-                            0%,
-
-                            rgba(
-                                40,
-                                0,
-                                20,
-                                0
-                            )
-                            28%,
-
-                            rgba(
-                                40,
-                                0,
-                                20,
-                                0
-                            )
-                            74%,
-
-                            rgba(
-                                40,
-                                0,
-                                20,
-                                .08
-                            )
-                            100%
-                        );
-                }
-
-                /* =====================================================
-                   CONTENT
-                ===================================================== */
-
-                .paid-content {
-                    position:
-                        relative;
-
-                    z-index:
-                        10;
-
-                    min-height:
-                        500px;
-
-                    width:
-                        100%;
-                }
-
-                /* =====================================================
-                   TITLE
-                ===================================================== */
-
-                .paid-heading {
-                    position:
-                        absolute;
-
-                    top:
-                        38px;
-
-                    left:
-                        70px;
-
-                    width:
-                        490px;
-                }
-
-                .paid-label {
+                .eyebrow {
                     margin-bottom:
-                        14px;
+                        22px;
 
                     color:
-                        rgba(
-                            255,
-                            244,
-                            247,
-                            .88
-                        );
+                        #cc225d;
 
                     font-family:
                         Arial,
@@ -1585,24 +829,21 @@ export default function ResultPage() {
                         sans-serif;
 
                     font-size:
-                        10px;
+                        11px;
 
                     line-height:
                         1;
 
                     font-weight:
-                        700;
+                        800;
 
                     letter-spacing:
-                        2.1px;
+                        2.7px;
                 }
 
-                .paid-heading h2 {
+                h1 {
                     margin:
                         0;
-
-                    color:
-                        #fff9f6;
 
                     font-family:
                         Georgia,
@@ -1611,187 +852,135 @@ export default function ResultPage() {
 
                     font-size:
                         clamp(
-                            44px,
-                            4.2vw,
-                            55px
+                            56px,
+                            6.5vw,
+                            82px
                         );
 
                     line-height:
-                        .95;
+                        .9;
 
                     font-weight:
                         400;
 
                     letter-spacing:
-                        -2.4px;
+                        -4.3px;
+                }
 
-                    text-shadow:
+                h1 span {
+                    color:
+                        #ca235d;
+                }
+
+                .lead {
+                    margin:
+                        31px
                         0
-                        2px
-                        16px
-                        rgba(
-                            59,
-                            0,
-                            27,
-                            .1
-                        );
+                        0;
+
+                    color:
+                        #8c8486;
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        16px;
+
+                    line-height:
+                        1.45;
+
+                    font-weight:
+                        400;
                 }
 
                 /* =====================================================
-                   BENEFITS
+                   STATUS CIRCLES
                 ===================================================== */
 
-                .paid-benefits {
+                .status {
+                    min-width:
+                        0;
+                }
+
+                .circles {
+                    position:
+                        relative;
+
+                    width:
+                        268px;
+
+                    height:
+                        154px;
+
+                    margin:
+                        0 auto;
+                }
+
+                .circle {
                     position:
                         absolute;
 
                     top:
-                        48px;
-
-                    right:
-                        68px;
-
-                    width:
-                        305px;
-
-                    display:
-                        flex;
-
-                    flex-direction:
-                        column;
-
-                    gap:
-                        25px;
-                }
-
-                /* =====================================================
-                   CTA
-                ===================================================== */
-
-                .paid-cta {
-                    position:
-                        absolute;
-
-                    right:
-                        36px;
-
-                    bottom:
-                        52px;
-
-                    width:
-                        min(
-                            638px,
-                            calc(
-                                100% -
-                                600px
-                            )
-                        );
-
-                    min-width:
-                        500px;
-
-                    height:
-                        72px;
-
-                    padding:
-                        0
-                        26px;
-
-                    display:
-                        flex;
-
-                    align-items:
-                        center;
-
-                    justify-content:
-                        space-between;
-
-                    gap:
-                        20px;
-
-                    border:
                         0;
 
+                    width:
+                        154px;
+
+                    height:
+                        154px;
+
+                    display:
+                        grid;
+
+                    place-items:
+                        center;
+
                     border-radius:
-                        15px;
+                        50%;
+                }
+
+                .circle.completed {
+                    left:
+                        0;
+
+                    z-index:
+                        2;
 
                     background:
-                        #fffaf7;
+                        rgba(
+                            197,
+                            50,
+                            101,
+                            .82
+                        );
 
                     color:
-                        #201d1e;
-
-                    cursor:
-                        pointer;
-
-                    box-shadow:
-                        0
-                        9px
-                        25px
-                        rgba(
-                            65,
-                            0,
-                            27,
-                            .13
-                        );
-
-                    transition:
-                        transform
-                        160ms
-                        ease,
-                        box-shadow
-                        160ms
-                        ease;
+                        white;
                 }
 
-                .paid-cta:hover {
-                    transform:
-                        translateY(
-                            -2px
-                        );
+                .circle.completed svg {
+                    width:
+                        48px;
 
-                    box-shadow:
-                        0
-                        13px
-                        30px
-                        rgba(
-                            65,
-                            0,
-                            27,
-                            .17
-                        );
+                    height:
+                        48px;
                 }
 
-                .paid-cta:active {
-                    transform:
-                        translateY(
-                            0
-                        );
-                }
+                .circle.waiting {
+                    right:
+                        0;
 
-                .cta-title {
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        15px;
-
-                    line-height:
+                    z-index:
                         1;
 
-                    font-weight:
-                        600;
-
-                    letter-spacing:
-                        -.1px;
-
-                    white-space:
-                        nowrap;
+                    background:
+                        #f0d9df;
                 }
 
-                .cta-right {
+                .waiting-dots {
                     display:
                         flex;
 
@@ -1799,76 +988,94 @@ export default function ResultPage() {
                         center;
 
                     gap:
-                        22px;
+                        8px;
 
-                    color:
-                        #c51b58;
+                    transform:
+                        translateX(
+                            18px
+                        );
                 }
 
-                .price {
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
-
-                    font-size:
-                        29px;
-
-                    line-height:
-                        1;
-
-                    font-weight:
-                        400;
-
-                    white-space:
-                        nowrap;
-                }
-
-                .arrow {
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        26px;
-
-                    line-height:
-                        1;
-
-                    font-weight:
-                        300;
-                }
-
-                .paid-note {
-                    position:
-                        absolute;
-
-                    right:
-                        36px;
-
-                    bottom:
-                        22px;
-
+                .waiting-dots span {
                     width:
-                        min(
-                            638px,
-                            calc(
-                                100% -
-                                600px
-                            )
-                        );
+                        9px;
 
-                    min-width:
-                        500px;
+                    height:
+                        9px;
+
+                    border-radius:
+                        50%;
+
+                    background:
+                        #d15c84;
+
+                    animation:
+                        waitingDot
+                        1.4s
+                        ease-in-out
+                        infinite;
+                }
+
+                .waiting-dots span:nth-child(
+                    2
+                ) {
+                    animation-delay:
+                        .15s;
+                }
+
+                .waiting-dots span:nth-child(
+                    3
+                ) {
+                    animation-delay:
+                        .3s;
+                }
+
+                @keyframes waitingDot {
+
+                    0%,
+                    60%,
+                    100% {
+                        opacity:
+                            .4;
+
+                        transform:
+                            translateY(
+                                0
+                            );
+                    }
+
+                    30% {
+                        opacity:
+                            1;
+
+                        transform:
+                            translateY(
+                                -3px
+                            );
+                    }
+                }
+
+                .circle-labels {
+                    width:
+                        268px;
+
+                    margin:
+                        18px
+                        auto
+                        0;
+
+                    display:
+                        grid;
+
+                    grid-template-columns:
+                        1fr
+                        1fr;
+
+                    gap:
+                        28px;
 
                     color:
-                        rgba(
-                            255,
-                            238,
-                            243,
-                            .68
-                        );
+                        #92888b;
 
                     font-family:
                         Arial,
@@ -1882,10 +1089,438 @@ export default function ResultPage() {
                         1;
 
                     font-weight:
-                        400;
+                        800;
+
+                    letter-spacing:
+                        1.3px;
 
                     text-align:
                         center;
+
+                    text-transform:
+                        uppercase;
+                }
+
+                .circle-labels span {
+                    overflow:
+                        hidden;
+
+                    text-overflow:
+                        ellipsis;
+
+                    white-space:
+                        nowrap;
+                }
+
+                .circle-labels
+                .ready-label {
+                    color:
+                        #ce3267;
+                }
+
+                /* =====================================================
+                   INVITE CARD
+                ===================================================== */
+
+                .invite-card {
+                    padding:
+                        34px
+                        44px
+                        28px;
+
+                    border:
+                        1px solid
+                        #ddd4d1;
+
+                    border-radius:
+                        28px;
+
+                    background:
+                        rgba(
+                            255,
+                            250,
+                            248,
+                            .42
+                        );
+                }
+
+                .invite-label {
+                    margin-bottom:
+                        17px;
+
+                    color:
+                        #9f9296;
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        10px;
+
+                    line-height:
+                        1;
+
+                    font-weight:
+                        800;
+
+                    letter-spacing:
+                        1.8px;
+                }
+
+                .link-box {
+                    width:
+                        100%;
+
+                    min-width:
+                        0;
+
+                    height:
+                        58px;
+
+                    padding:
+                        0
+                        13px
+                        0
+                        20px;
+
+                    display:
+                        flex;
+
+                    align-items:
+                        center;
+
+                    gap:
+                        12px;
+
+                    border-radius:
+                        15px;
+
+                    background:
+                        #f1e4e7;
+                }
+
+                .link-text {
+                    min-width:
+                        0;
+
+                    flex:
+                        1;
+
+                    overflow:
+                        hidden;
+
+                    color:
+                        #62595c;
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        13px;
+
+                    line-height:
+                        1;
+
+                    text-overflow:
+                        ellipsis;
+
+                    white-space:
+                        nowrap;
+                }
+
+                .link-copy {
+                    width:
+                        40px;
+
+                    height:
+                        40px;
+
+                    flex-shrink:
+                        0;
+
+                    display:
+                        grid;
+
+                    place-items:
+                        center;
+
+                    padding:
+                        0;
+
+                    border:
+                        0;
+
+                    border-radius:
+                        50%;
+
+                    background:
+                        transparent;
+
+                    color:
+                        #887d80;
+
+                    cursor:
+                        pointer;
+
+                    transition:
+                        background
+                        150ms
+                        ease,
+                        color
+                        150ms
+                        ease;
+                }
+
+                .link-copy:hover {
+                    background:
+                        rgba(
+                            255,
+                            255,
+                            255,
+                            .7
+                        );
+
+                    color:
+                        #c9225b;
+                }
+
+                .link-copy svg {
+                    width:
+                        22px;
+
+                    height:
+                        22px;
+                }
+
+                /* =====================================================
+                   SHARE
+                ===================================================== */
+
+                .share-button {
+                    width:
+                        100%;
+
+                    height:
+                        64px;
+
+                    margin-top:
+                        20px;
+
+                    padding:
+                        0
+                        25px;
+
+                    display:
+                        flex;
+
+                    align-items:
+                        center;
+
+                    justify-content:
+                        center;
+
+                    position:
+                        relative;
+
+                    border:
+                        0;
+
+                    border-radius:
+                        999px;
+
+                    background:
+                        #cb225c;
+
+                    color:
+                        white;
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        15px;
+
+                    line-height:
+                        1;
+
+                    font-weight:
+                        700;
+
+                    cursor:
+                        pointer;
+
+                    transition:
+                        transform
+                        150ms
+                        ease,
+                        background
+                        150ms
+                        ease;
+                }
+
+                .share-button:hover {
+                    background:
+                        #bd1d54;
+
+                    transform:
+                        translateY(
+                            -1px
+                        );
+                }
+
+                .share-button:active {
+                    transform:
+                        translateY(
+                            0
+                        );
+                }
+
+                .share-arrow {
+                    position:
+                        absolute;
+
+                    right:
+                        28px;
+
+                    top:
+                        50%;
+
+                    transform:
+                        translateY(
+                            -53%
+                        );
+
+                    font-size:
+                        27px;
+
+                    line-height:
+                        1;
+
+                    font-weight:
+                        300;
+                }
+
+                .copy-button {
+                    width:
+                        100%;
+
+                    min-height:
+                        44px;
+
+                    margin-top:
+                        10px;
+
+                    padding:
+                        8px;
+
+                    border:
+                        0;
+
+                    background:
+                        transparent;
+
+                    color:
+                        #8d8386;
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        12px;
+
+                    line-height:
+                        1;
+
+                    cursor:
+                        pointer;
+                }
+
+                .copy-button:hover {
+                    color:
+                        #c9225b;
+                }
+
+                .copy-button.copied {
+                    color:
+                        #c9225b;
+
+                    font-weight:
+                        700;
+                }
+
+                /* =====================================================
+                   FOOTER
+                ===================================================== */
+
+                .footer {
+                    margin-top:
+                        68px;
+
+                    padding-top:
+                        27px;
+
+                    display:
+                        flex;
+
+                    align-items:
+                        center;
+
+                    justify-content:
+                        center;
+
+                    gap:
+                        12px;
+
+                    border-top:
+                        1px solid
+                        #ded7d4;
+
+                    color:
+                        #948a8d;
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        11px;
+
+                    line-height:
+                        1.4;
+
+                    text-align:
+                        center;
+                }
+
+                .heart {
+                    width:
+                        23px;
+
+                    height:
+                        23px;
+
+                    flex-shrink:
+                        0;
+
+                    color:
+                        #d02961;
+                }
+
+                .heart svg {
+                    width:
+                        100%;
+
+                    height:
+                        100%;
                 }
 
                 /* =====================================================
@@ -1894,80 +1529,48 @@ export default function ResultPage() {
 
                 @media (
                     max-width:
-                        1000px
+                        820px
                 ) {
 
-                    .content-shell {
-                        width:
-                            min(
-                                820px,
-                                100%
-                            );
-                    }
-
-                    .paid-card {
-                        min-height:
-                            470px;
-                    }
-
-                    .paid-content {
-                        min-height:
-                            470px;
-                    }
-
-                    .paid-heading {
-                        left:
-                            48px;
-
-                        top:
-                            34px;
-
-                        width:
-                            430px;
-                    }
-
-                    .paid-heading h2 {
-                        font-size:
-                            45px;
-                    }
-
-                    .paid-benefits {
-                        right:
-                            38px;
-
-                        width:
-                            275px;
+                    .hero {
+                        grid-template-columns:
+                            minmax(
+                                0,
+                                1fr
+                            )
+                            250px;
 
                         gap:
-                            21px;
+                            24px;
                     }
 
-                    .paid-cta {
-                        right:
-                            28px;
-
-                        bottom:
-                            43px;
-
-                        min-width:
-                            430px;
-
+                    .circles {
                         width:
-                            52%;
+                            224px;
+
+                        height:
+                            130px;
                     }
 
-                    .paid-note {
-                        right:
-                            28px;
-
-                        bottom:
-                            18px;
-
-                        min-width:
-                            430px;
-
+                    .circle {
                         width:
-                            52%;
+                            130px;
+
+                        height:
+                            130px;
+                    }
+
+                    .circle-labels {
+                        width:
+                            224px;
+
+                        gap:
+                            20px;
+                    }
+
+                    h1 {
+                        font-size:
+                            58px;
                     }
                 }
 
@@ -1983,18 +1586,13 @@ export default function ResultPage() {
                     .page {
                         padding:
                             0
-                            12px
-                            32px;
-                    }
-
-                    .content-shell {
-                        width:
-                            100%;
+                            14px
+                            30px;
                     }
 
                     .header {
                         min-height:
-                            64px;
+                            66px;
 
                         gap:
                             12px;
@@ -2003,98 +1601,79 @@ export default function ResultPage() {
                     .brand {
                         font-size:
                             21px;
+
+                        letter-spacing:
+                            -1px;
                     }
 
-                    .couple-names {
+                    .couple {
                         max-width:
-                            52%;
+                            48%;
 
                         gap:
-                            5px;
+                            6px;
 
                         font-size:
-                            8px;
+                            7px;
 
                         letter-spacing:
-                            .65px;
+                            .7px;
+                    }
+
+                    .couple b {
+                        font-size:
+                            10px;
                     }
 
                     /* ---------------------------------------------
-                       RESULTS
+                       HERO
                     --------------------------------------------- */
 
-                    .results {
+                    .hero {
                         padding:
-                            29px
+                            44px
                             0
-                            33px;
-                    }
-
-                    .section-label {
-                        margin-bottom:
-                            11px;
-
-                        font-size:
-                            9px;
-
-                        letter-spacing:
-                            1.8px;
-                    }
-
-                    .results-title {
-                        margin-bottom:
-                            24px;
-
-                        font-size:
-                            37px;
-
-                        line-height:
-                            1;
-
-                        letter-spacing:
-                            -1.8px;
-                    }
-
-                    /* ---------------------------------------------
-                       FORECAST
-                    --------------------------------------------- */
-
-                    .forecast {
-                        padding:
-                            29px
-                            0
-                            37px;
+                            38px;
 
                         display:
                             block;
                     }
 
-                    .forecast-title {
-                        max-width:
-                            100%;
+                    .eyebrow {
+                        margin-bottom:
+                            17px;
 
                         font-size:
-                            34px;
-
-                        line-height:
-                            1.01;
+                            9px;
 
                         letter-spacing:
-                            -1.55px;
+                            2px;
                     }
 
-                    .forecast-description {
-                        max-width:
-                            100%;
+                    h1 {
+                        font-size:
+                            clamp(
+                                44px,
+                                13vw,
+                                57px
+                            );
 
+                        line-height:
+                            .92;
+
+                        letter-spacing:
+                            -2.8px;
+                    }
+
+                    .lead {
                         margin-top:
-                            13px;
+                            20px;
 
                         font-size:
                             12px;
 
                         line-height:
-                            1.45;
+                            1.5;
                     }
 
                     .desktop-break {
@@ -2102,693 +1681,252 @@ export default function ResultPage() {
                             none;
                     }
 
-                    .forecast-result {
-                        width:
-                            100%;
+                    /* ---------------------------------------------
+                       CIRCLES
+                    --------------------------------------------- */
 
+                    .status {
                         margin-top:
-                            25px;
+                            39px;
                     }
 
-                    .years strong {
-                        font-size:
-                            64px;
+                    .circles {
+                        width:
+                            218px;
 
-                        letter-spacing:
-                            -3px;
+                        height:
+                            126px;
                     }
 
-                    .years span {
-                        margin-left:
+                    .circle {
+                        width:
+                            126px;
+
+                        height:
+                            126px;
+                    }
+
+                    .circle.completed svg {
+                        width:
+                            40px;
+
+                        height:
+                            40px;
+                    }
+
+                    .waiting-dots {
+                        gap:
+                            6px;
+
+                        transform:
+                            translateX(
+                                14px
+                            );
+                    }
+
+                    .waiting-dots span {
+                        width:
                             7px;
 
-                        font-size:
-                            34px;
-
-                        letter-spacing:
-                            -1px;
-                    }
-
-                    .forecast-scale {
-                        margin-top:
-                            20px;
-                    }
-
-                    .scale-track {
                         height:
                             7px;
                     }
 
-                    .scale-dot {
+                    .circle-labels {
                         width:
-                            19px;
+                            218px;
 
-                        height:
-                            19px;
-                    }
-
-                    .scale-labels {
                         margin-top:
-                            10px;
+                            15px;
+
+                        gap:
+                            17px;
 
                         font-size:
-                            9px;
+                            7px;
+
+                        letter-spacing:
+                            .8px;
                     }
 
                     /* ---------------------------------------------
-                       PAID SHELL
+                       INVITE
                     --------------------------------------------- */
 
-                    .paid-shell {
-                        width:
-                            100%;
-
-                        margin-top:
-                            0;
-                    }
-
-                    /* ---------------------------------------------
-                       PAID CARD
-                    --------------------------------------------- */
-
-                    .paid-card {
-                        min-height:
-                            620px;
+                    .invite-card {
+                        padding:
+                            23px
+                            18px
+                            17px;
 
                         border-radius:
-                            22px;
-
-                        background:
-                            linear-gradient(
-                                180deg,
-                                #a30e4d
-                                0%,
-                                #aa104f
-                                100%
-                            );
+                            21px;
                     }
 
-                    .paid-content {
-                        min-height:
-                            620px;
-                    }
-
-                    /* ---------------------------------------------
-                       MOBILE ART
-                    --------------------------------------------- */
-
-                    .paid-art {
-                        left:
-                            -4%;
-
-                        top:
-                            0;
-
-                        width:
-                            108%;
-
-                        height:
-                            370px;
-
-                        object-fit:
-                            cover;
-
-                        object-position:
-                            43%
-                            center;
-                    }
-
-                    .paid-art-layer {
-                        height:
-                            410px;
-                    }
-
-                    .desktop-art-fade {
-                        display:
-                            none;
-                    }
-
-                    .mobile-art-fade {
-                        display:
-                            block;
-
-                        position:
-                            absolute;
-
-                        left:
-                            0;
-
-                        right:
-                            0;
-
-                        bottom:
-                            0;
-
-                        height:
-                            190px;
-
-                        background:
-                            linear-gradient(
-                                180deg,
-
-                                rgba(
-                                    163,
-                                    14,
-                                    77,
-                                    0
-                                )
-                                0%,
-
-                                rgba(
-                                    163,
-                                    14,
-                                    77,
-                                    .08
-                                )
-                                18%,
-
-                                rgba(
-                                    163,
-                                    14,
-                                    77,
-                                    .28
-                                )
-                                38%,
-
-                                rgba(
-                                    163,
-                                    14,
-                                    77,
-                                    .52
-                                )
-                                58%,
-
-                                rgba(
-                                    163,
-                                    14,
-                                    77,
-                                    .78
-                                )
-                                76%,
-
-                                #a30e4d
-                                100%
-                            );
-                    }
-
-                    /* ---------------------------------------------
-                       MOBILE TITLE
-                    --------------------------------------------- */
-
-                    .paid-heading {
-                        top:
-                            31px;
-
-                        left:
-                            28px;
-
-                        width:
-                            calc(
-                                100% -
-                                56px
-                            );
-                    }
-
-                    .paid-label {
+                    .invite-label {
                         margin-bottom:
                             13px;
 
                         font-size:
-                            9px;
+                            8px;
 
                         letter-spacing:
-                            1.9px;
+                            1.4px;
                     }
 
-                    .paid-heading h2 {
+                    .link-box {
+                        height:
+                            54px;
+
+                        padding-left:
+                            15px;
+
+                        border-radius:
+                            13px;
+                    }
+
+                    .link-text {
                         font-size:
+                            11px;
+                    }
+
+                    .link-copy {
+                        width:
                             38px;
 
-                        line-height:
-                            .96;
-
-                        letter-spacing:
-                            -1.8px;
-
-                        text-shadow:
-                            0
-                            2px
-                            14px
-                            rgba(
-                                49,
-                                0,
-                                25,
-                                .16
-                            );
+                        height:
+                            38px;
                     }
 
-                    /* ---------------------------------------------
-                       MOBILE BENEFITS
-                    --------------------------------------------- */
-
-                    .paid-benefits {
-                        top:
-                            385px;
-
-                        left:
-                            28px;
-
-                        right:
-                            28px;
-
+                    .link-copy svg {
                         width:
-                            calc(
-                                100% -
-                                56px
-                            );
-
-                        gap:
-                            18px;
-                    }
-
-                    /* ---------------------------------------------
-                       MOBILE CTA
-                    --------------------------------------------- */
-
-                    .paid-cta {
-                        left:
                             20px;
-
-                        right:
-                            20px;
-
-                        bottom:
-                            48px;
-
-                        width:
-                            calc(
-                                100% -
-                                40px
-                            );
-
-                        min-width:
-                            0;
 
                         height:
-                            58px;
+                            20px;
+                    }
+
+                    .share-button {
+                        height:
+                            56px;
+
+                        margin-top:
+                            15px;
 
                         padding:
                             0
+                            50px
+                            0
                             18px;
 
-                        border-radius:
-                            14px;
-                    }
-
-                    .cta-title {
                         font-size:
                             13px;
                     }
 
-                    .cta-right {
-                        gap:
-                            13px;
-                    }
+                    .share-arrow {
+                        right:
+                            21px;
 
-                    .price {
-                        font-size:
-                            24px;
-                    }
-
-                    .arrow {
                         font-size:
                             23px;
                     }
 
-                    .paid-note {
-                        left:
-                            20px;
-
-                        right:
-                            20px;
-
-                        bottom:
-                            20px;
-
-                        width:
-                            calc(
-                                100% -
-                                40px
-                            );
-
-                        min-width:
-                            0;
-
-                        font-size:
-                            8px;
-                    }
-                }
-
-                /* =====================================================
-                   PAID BLOCK — TEXT ONLY ON THE RIGHT
-                ===================================================== */
-
-                @media (min-width: 641px) {
-                    .paid-art {
-                        width:
-                            52%;
-
-                        object-position:
-                            center center;
-                    }
-
-                    .desktop-art-fade {
-                        left:
-                            36%;
-
-                        width:
-                            20%;
-                    }
-
-                    .paid-heading {
-                        top:
-                            42px;
-
-                        left:
-                            auto;
-
-                        right:
-                            58px;
-
-                        width:
-                            43%;
-                    }
-
-                    .paid-heading h2 {
-                        font-size:
-                            clamp(34px, 3.2vw, 46px);
-
-                        line-height:
-                            .98;
-                    }
-
-                    .paid-benefits {
-                        top:
-                            185px;
-
-                        right:
-                            58px;
-
-                        width:
-                            43%;
-
-                        display:
-                            grid;
-
-                        grid-template-columns:
-                            1fr 1fr;
-
-                        gap:
-                            18px 24px;
-                    }
-
-                    .paid-cta {
-                        right:
-                            58px;
-
-                        width:
-                            43%;
-
-                        min-width:
-                            0;
-                    }
-
-                    .paid-note {
-                        right:
-                            58px;
-
-                        width:
-                            43%;
-
-                        min-width:
-                            0;
-                    }
-                }
-
-                @media (max-width: 640px) {
-                    .scale-labels {
-                        font-size:
-                            8px;
-                    }
-
-                    .scale-labels span::before {
-                        top:
-                            -15px;
-
-                        height:
+                    .copy-button {
+                        margin-top:
                             6px;
+
+                        font-size:
+                            11px;
                     }
 
-                    .paid-card,
-                    .paid-content {
-                        min-height:
-                            790px;
-                    }
+                    /* ---------------------------------------------
+                       FOOTER
+                    --------------------------------------------- */
 
-                    .paid-art {
-                        left:
+                    .footer {
+                        margin-top:
+                            39px;
+
+                        padding:
+                            22px
+                            16px
                             0;
 
-                        width:
-                            100%;
-
-                        height:
-                            300px;
-
-                        object-position:
-                            center center;
-                    }
-
-                    .paid-art-layer {
-                        height:
-                            335px;
-                    }
-
-                    .mobile-art-fade {
-                        height:
-                            150px;
-                    }
-
-                    .paid-heading {
-                        top:
-                            315px;
-
-                        left:
-                            24px;
-
-                        right:
-                            24px;
-
-                        width:
-                            auto;
-                    }
-
-                    .paid-heading h2 {
-                        font-size:
-                            34px;
-
-                        line-height:
-                            .98;
-                    }
-
-                    .paid-benefits {
-                        top:
-                            445px;
-
-                        left:
-                            24px;
-
-                        right:
-                            24px;
-
-                        width:
-                            auto;
-
-                        display:
-                            grid;
-
-                        grid-template-columns:
-                            1fr 1fr;
-
                         gap:
-                            17px 14px;
+                            9px;
+
+                        font-size:
+                            9px;
                     }
 
-                    .paid-cta {
-                        bottom:
-                            50px;
-                    }
+                    .heart {
+                        width:
+                            19px;
 
-                    .paid-note {
-                        bottom:
-                            21px;
+                        height:
+                            19px;
                     }
                 }
 
                 /* =====================================================
-                   SMALL MOBILE
+                   VERY SMALL MOBILE
                 ===================================================== */
 
                 @media (
                     max-width:
-                        390px
+                        370px
                 ) {
 
-                    .paid-card {
-                        min-height:
-                            600px;
-                    }
-
-                    .paid-content {
-                        min-height:
-                            600px;
-                    }
-
-                    .paid-art {
-                        height:
-                            355px;
-
-                        object-position:
-                            43%
-                            center;
-                    }
-
-                    .paid-art-layer {
-                        height:
-                            395px;
-                    }
-
-                    .paid-heading {
-                        top:
-                            28px;
-
-                        left:
-                            24px;
-
-                        width:
-                            calc(
-                                100% -
-                                48px
-                            );
-                    }
-
-                    .paid-heading h2 {
+                    h1 {
                         font-size:
-                            35px;
+                            43px;
                     }
 
-                    .paid-benefits {
-                        top:
-                            370px;
-
-                        left:
-                            24px;
-
-                        right:
-                            24px;
-
+                    .circles {
                         width:
-                            calc(
-                                100% -
-                                48px
-                            );
+                            198px;
 
-                        gap:
-                            16px;
+                        height:
+                            114px;
                     }
 
-                    .paid-cta {
-                        left:
-                            16px;
-
-                        right:
-                            16px;
-
+                    .circle {
                         width:
-                            calc(
-                                100% -
-                                32px
-                            );
+                            114px;
 
-                        padding:
-                            0
-                            16px;
+                        height:
+                            114px;
                     }
 
-                    .paid-note {
-                        left:
-                            16px;
-
-                        right:
-                            16px;
-
+                    .circle-labels {
                         width:
-                            calc(
-                                100% -
-                                32px
-                            );
+                            198px;
+                    }
+
+                    .share-button {
+                        font-size:
+                            12px;
                     }
                 }
 
+                /* =====================================================
+                   REDUCED MOTION
+                ===================================================== */
 
-                @media (max-width: 390px) {
-                    .paid-card,
-                    .paid-content {
-                        min-height:
-                            780px;
+                @media (
+                    prefers-reduced-motion:
+                        reduce
+                ) {
+
+                    .waiting-dots span {
+                        animation:
+                            none;
                     }
 
-                    .paid-art {
-                        height:
-                            285px;
-                    }
-
-                    .paid-art-layer {
-                        height:
-                            320px;
-                    }
-
-                    .paid-heading {
-                        top:
-                            300px;
-
-                        left:
-                            20px;
-
-                        right:
-                            20px;
-
-                        width:
-                            auto;
-                    }
-
-                    .paid-heading h2 {
-                        font-size:
-                            31px;
-                    }
-
-                    .paid-benefits {
-                        top:
-                            425px;
-
-                        left:
-                            20px;
-
-                        right:
-                            20px;
-
-                        width:
-                            auto;
+                    .share-button,
+                    .link-copy {
+                        transition:
+                            none;
                     }
                 }
 
@@ -2799,570 +1937,195 @@ export default function ResultPage() {
 }
 
 /* ============================================================
-   CATEGORY
+   STATE SCREEN
 ============================================================ */
 
-function CategoryRow({
-                         title,
-                         subtitle,
-                         value,
-                     }: CategoryScore) {
-    const safeValue =
-        Math.max(
-            0,
-            Math.min(
-                MAX_SCORE,
-                value
-            )
-        );
-
+function StateScreen({
+                         text,
+                     }: {
+    text: string;
+}) {
     return (
-        <div className="category-row">
+        <main className="state">
 
-            <div className="category-top">
+            <div className="state-brand">
+                между нами.
+            </div>
 
-                <div className="category-copy">
+            <div className="state-dots">
 
-                    <div className="category-title">
-                        {title}
-                    </div>
+                <span />
 
-                    <div className="category-subtitle">
-                        {subtitle}
-                    </div>
+                <span />
 
-                </div>
-
-                <div className="category-score">
-
-                    <strong>
-                        {safeValue}
-                    </strong>
-
-                    <span>
-                        /10
-                    </span>
-
-                </div>
+                <span />
 
             </div>
 
-            <div className="category-track">
-
-                <div
-                    className="category-fill"
-                    style={{
-                        width:
-                            `${safeValue * 10}%`,
-                    }}
-                />
-
-            </div>
+            <p>
+                {text}
+            </p>
 
             <style jsx>{`
 
-                .category-row {
-                    padding:
-                        16px
-                        0
-                        18px;
-
-                    border-bottom:
-                        1px solid
-                        #e0d9d6;
-                }
-
-                .category-row:first-child {
-                    padding-top:
+                :global(body) {
+                    margin:
                         0;
+
+                    background:
+                        #f8f4f1;
                 }
 
-                .category-top {
+                .state {
+                    min-height:
+                        100vh;
+
                     display:
                         flex;
 
+                    flex-direction:
+                        column;
+
                     align-items:
-                        flex-end;
+                        center;
 
                     justify-content:
-                        space-between;
+                        center;
 
                     gap:
+                        16px;
+
+                    padding:
                         24px;
+
+                    background:
+                        #f8f4f1;
+
+                    color:
+                        #211d1f;
+
+                    text-align:
+                        center;
                 }
 
-                .category-copy {
-                    min-width:
-                        0;
-                }
-
-                .category-title {
+                .state-brand {
                     font-family:
                         Georgia,
                         "Times New Roman",
                         serif;
 
                     font-size:
-                        29px;
+                        28px;
 
                     line-height:
                         1;
+
+                    font-weight:
+                        700;
 
                     letter-spacing:
                         -1.2px;
                 }
 
-                .category-subtitle {
-                    margin-top:
-                        5px;
-
-                    color:
-                        #8e8688;
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        12px;
-
-                    line-height:
-                        1.3;
-
-                    font-weight:
-                        500;
-                }
-
-                .category-score {
+                .state-dots {
                     display:
                         flex;
 
-                    align-items:
-                        baseline;
+                    gap:
+                        5px;
 
-                    flex-shrink:
-                        0;
-
-                    color:
-                        #7f7679;
-
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
+                    margin-top:
+                        6px;
                 }
 
-                .category-score strong {
-                    color:
-                        #c21856;
+                .state-dots span {
+                    width:
+                        6px;
 
-                    font-size:
-                        42px;
-
-                    line-height:
-                        .8;
-
-                    font-weight:
-                        400;
-
-                    letter-spacing:
-                        -1.8px;
-                }
-
-                .category-score span {
-                    margin-left:
-                        3px;
-
-                    font-size:
-                        18px;
-                }
-
-                .category-track {
                     height:
                         6px;
 
-                    margin-top:
-                        11px;
-
-                    overflow:
-                        hidden;
-
                     border-radius:
-                        999px;
+                        50%;
 
                     background:
-                        #e5dfdf;
+                        #c9255e;
+
+                    animation:
+                        stateDot
+                        1.2s
+                        ease-in-out
+                        infinite;
                 }
 
-                .category-fill {
-                    height:
-                        100%;
-
-                    border-radius:
-                        inherit;
-
-                    background:
-                        #cb3a6d;
-                }
-
-                @media (
-                    max-width:
-                        640px
+                .state-dots span:nth-child(
+                    2
                 ) {
-
-                    .category-row {
-                        padding:
-                            13px
-                            0
-                            15px;
-                    }
-
-                    .category-top {
-                        gap:
-                            15px;
-                    }
-
-                    .category-title {
-                        font-size:
-                            24px;
-                    }
-
-                    .category-subtitle {
-                        max-width:
-                            250px;
-
-                        margin-top:
-                            4px;
-
-                        font-size:
-                            10px;
-                    }
-
-                    .category-score strong {
-                        font-size:
-                            34px;
-                    }
-
-                    .category-score span {
-                        font-size:
-                            14px;
-                    }
-
-                    .category-track {
-                        height:
-                            5px;
-
-                        margin-top:
-                            10px;
-                    }
+                    animation-delay:
+                        .15s;
                 }
 
-            `}</style>
+                .state-dots span:nth-child(
+                    3
+                ) {
+                    animation-delay:
+                        .3s;
+                }
 
-        </div>
-    );
-}
-
-/* ============================================================
-   BENEFIT
-============================================================ */
-
-function Benefit({
-                     icon,
-                     text,
-                 }: {
-    icon: BenefitIcon;
-    text: ReactNode;
-}) {
-    return (
-        <div className="benefit">
-
-            <div className="benefit-icon">
-                <BenefitSvg
-                    type={
-                        icon
-                    }
-                />
-            </div>
-
-            <div className="benefit-text">
-                {text}
-            </div>
-
-            <style jsx>{`
-
-                .benefit {
-                    display:
-                        grid;
-
-                    grid-template-columns:
-                        24px
-                        minmax(
-                            0,
-                            1fr
-                        );
-
-                    gap:
-                        12px;
-
-                    align-items:
-                        start;
+                p {
+                    margin:
+                        0;
 
                     color:
-                        #fff8f6;
-                }
+                        #92888b;
 
-                .benefit-icon {
-                    width:
-                        21px;
-
-                    padding-top:
-                        1px;
-
-                    color:
-                        #ffd8e1;
-                }
-
-                .benefit-text {
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
 
                     font-size:
-                        14px;
+                        12px;
+                }
 
-                    line-height:
-                        1.28;
+                @keyframes stateDot {
 
-                    font-weight:
-                        500;
+                    0%,
+                    60%,
+                    100% {
+                        opacity:
+                            .3;
 
-                    letter-spacing:
-                        -.1px;
+                        transform:
+                            translateY(
+                                0
+                            );
+                    }
 
-                    text-shadow:
-                        0
-                        1px
-                        8px
-                        rgba(
-                            65,
-                            0,
-                            27,
-                            .08
-                        );
+                    30% {
+                        opacity:
+                            1;
+
+                        transform:
+                            translateY(
+                                -2px
+                            );
+                    }
                 }
 
                 @media (
-                    max-width:
-                        640px
+                    prefers-reduced-motion:
+                        reduce
                 ) {
 
-                    .benefit {
-                        grid-template-columns:
-                            22px
-                            minmax(
-                                0,
-                                1fr
-                            );
-
-                        gap:
-                            10px;
-                    }
-
-                    .benefit-icon {
-                        width:
-                            19px;
-                    }
-
-                    .benefit-text {
-                        font-size:
-                            13px;
-
-                        line-height:
-                            1.25;
+                    .state-dots span {
+                        animation:
+                            none;
                     }
                 }
 
             `}</style>
 
-        </div>
+        </main>
     );
-}
-
-/* ============================================================
-   BENEFIT ICONS
-============================================================ */
-
-function BenefitSvg({
-                        type,
-                    }: {
-    type: BenefitIcon;
-}) {
-    if (
-        type ===
-        "heart"
-    ) {
-        return (
-            <svg
-                viewBox="0 0 24 24"
-                width="100%"
-                height="auto"
-                fill="currentColor"
-                aria-hidden="true"
-            >
-                <path
-                    d="
-                        M12 21
-                        C10.9 19.9 5.4 15.2 3.1 12.3
-                        C0.6 9.2 1.3 5.1 4.7 3.5
-                        C7.2 2.3 10.1 3.1 12 5.3
-                        C13.9 3.1 16.8 2.3 19.3 3.5
-                        C22.7 5.1 23.4 9.2 20.9 12.3
-                        C18.6 15.2 13.1 19.9 12 21
-                        Z
-                    "
-                />
-            </svg>
-        );
-    }
-
-    if (
-        type ===
-        "message"
-    ) {
-        return (
-            <svg
-                viewBox="0 0 24 24"
-                width="100%"
-                height="auto"
-                fill="currentColor"
-                aria-hidden="true"
-            >
-                <path
-                    d="
-                        M6 3
-                        H18
-                        C20.2 3 22 4.8 22 7
-                        V14
-                        C22 16.2 20.2 18 18 18
-                        H12
-                        L7 22
-                        L8 18
-                        H6
-                        C3.8 18 2 16.2 2 14
-                        V7
-                        C2 4.8 3.8 3 6 3
-                        Z
-                    "
-                />
-            </svg>
-        );
-    }
-
-    if (
-        type ===
-        "lightning"
-    ) {
-        return (
-            <svg
-                viewBox="0 0 24 24"
-                width="100%"
-                height="auto"
-                fill="currentColor"
-                aria-hidden="true"
-            >
-                <path
-                    d="
-                        M13.6 1.8
-                        L5.2 13
-                        H10.5
-                        L9.3 22.2
-                        L18.8 9.6
-                        H13.1
-                        Z
-                    "
-                />
-            </svg>
-        );
-    }
-
-    return (
-        <svg
-            viewBox="0 0 24 24"
-            width="100%"
-            height="auto"
-            fill="currentColor"
-            aria-hidden="true"
-        >
-            <rect
-                x="3"
-                y="13"
-                width="4"
-                height="8"
-                rx="1"
-            />
-
-            <rect
-                x="10"
-                y="8"
-                width="4"
-                height="13"
-                rx="1"
-            />
-
-            <rect
-                x="17"
-                y="3"
-                width="4"
-                height="18"
-                rx="1"
-            />
-
-        </svg>
-    );
-}
-
-/* ============================================================
-   YEAR WORD
-============================================================ */
-
-function getYearWord(
-    value: number
-) {
-    const mod100 =
-        value %
-        100;
-
-    const mod10 =
-        value %
-        10;
-
-    if (
-        mod100 >=
-        11 &&
-        mod100 <=
-        14
-    ) {
-        return "лет";
-    }
-
-    if (
-        mod10 ===
-        1
-    ) {
-        return "год";
-    }
-
-    if (
-        mod10 >=
-        2 &&
-        mod10 <=
-        4
-    ) {
-        return "года";
-    }
-
-    return "лет";
 }
