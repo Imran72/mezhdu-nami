@@ -98,8 +98,7 @@ export default function ResultPage() {
                 }
 
                 const result =
-                    await response.json()
-                as ApiResponse;
+                    (await response.json()) as ApiResponse;
 
                 if (cancelled) {
                     return;
