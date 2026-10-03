@@ -11,35 +11,10 @@ import {
     useRouter,
 } from "next/navigation";
 
-import type {
-    ReactNode,
-} from "react";
-
 type Couple = {
     id: string;
     partner_a_name?: string | null;
     partner_b_name?: string | null;
-};
-
-type Comparison = {
-    questionId: string;
-    question: string;
-
-    answerA: string;
-    answerB: string;
-
-    labelA: string;
-    labelB: string;
-
-    traitsA: string[];
-    traitsB: string[];
-
-    sharedTraits: string[];
-
-    similarity:
-        | "same"
-        | "close"
-        | "different";
 };
 
 type ApiResponse = {
@@ -53,45 +28,21 @@ type ApiResponse = {
         closeAnswers?: number;
         differentAnswers?: number;
     };
-
-    comparisons?: Comparison[];
-
-    highlights?: {
-        same?: Comparison[];
-        close?: Comparison[];
-        different?: Comparison[];
-    };
 };
 
-type CategoryId =
-    | "friendship"
-    | "partnership"
-    | "sex"
-    | "money"
-    | "care"
-    | "home";
-
 type CategoryScore = {
-    id: CategoryId;
     title: string;
     subtitle: string;
     value: number;
-};
-
-type MonthPlan = {
-    number: number;
-    eyebrow: string;
-    title: string;
-    description: string;
-    tasks: string[];
+    symbol: string;
 };
 
 const MAX_SCORE = 10;
 
-const ROADMAP_IMAGE =
-    "/images/relationship-roadmap.png";
+const PAID_IMAGE =
+    "/images/full-report-couple.png";
 
-export default function ReportPage() {
+export default function ResultPage() {
     const params =
         useParams<{
             coupleId: string;
@@ -103,15 +54,24 @@ export default function ReportPage() {
     const coupleId =
         params.coupleId;
 
-    const [data, setData] =
+    const [
+        data,
+        setData,
+    ] =
         useState<ApiResponse | null>(
             null
         );
 
-    const [loading, setLoading] =
+    const [
+        loading,
+        setLoading,
+    ] =
         useState(true);
 
-    const [error, setError] =
+    const [
+        error,
+        setError,
+    ] =
         useState("");
 
     useEffect(() => {
@@ -133,12 +93,13 @@ export default function ReportPage() {
 
                 if (!response.ok) {
                     throw new Error(
-                        "Не удалось загрузить полный разбор"
+                        "Не удалось загрузить результат"
                     );
                 }
 
                 const result =
-                    (await response.json()) as ApiResponse;
+                    await response.json()
+                as ApiResponse;
 
                 if (cancelled) {
                     return;
@@ -154,18 +115,22 @@ export default function ReportPage() {
                     return;
                 }
 
-                setData(result);
+                setData(
+                    result
+                );
             } catch (err) {
                 console.error(err);
 
                 if (!cancelled) {
                     setError(
-                        "Не получилось загрузить разбор."
+                        "Не получилось загрузить результат."
                     );
                 }
             } finally {
                 if (!cancelled) {
-                    setLoading(false);
+                    setLoading(
+                        false
+                    );
                 }
             }
         }
@@ -173,7 +138,8 @@ export default function ReportPage() {
         load();
 
         return () => {
-            cancelled = true;
+            cancelled =
+                true;
         };
     }, [
         coupleId,
@@ -211,7 +177,7 @@ export default function ReportPage() {
                 Math.round(
                     (
                         same +
-                        close * 0.5
+                        close * .5
                     ) /
                     total *
                     MAX_SCORE
@@ -230,9 +196,6 @@ export default function ReportPage() {
 
             return [
                 {
-                    id:
-                        "friendship",
-
                     title:
                         "Дружба",
 
@@ -243,12 +206,12 @@ export default function ReportPage() {
                         clamp(
                             base + 1
                         ),
+
+                    symbol:
+                        "♥",
                 },
 
                 {
-                    id:
-                        "partnership",
-
                     title:
                         "Партнёрство",
 
@@ -256,13 +219,15 @@ export default function ReportPage() {
                         "вы команда или каждый сам за себя",
 
                     value:
-                        clamp(base),
+                        clamp(
+                            base
+                        ),
+
+                    symbol:
+                        "×",
                 },
 
                 {
-                    id:
-                        "sex",
-
                     title:
                         "Секс",
 
@@ -273,12 +238,12 @@ export default function ReportPage() {
                         clamp(
                             base + 2
                         ),
+
+                    symbol:
+                        "♡",
                 },
 
                 {
-                    id:
-                        "money",
-
                     title:
                         "Деньги",
 
@@ -289,12 +254,12 @@ export default function ReportPage() {
                         clamp(
                             base - 2
                         ),
+
+                    symbol:
+                        "₽",
                 },
 
                 {
-                    id:
-                        "care",
-
                     title:
                         "Забота",
 
@@ -305,12 +270,12 @@ export default function ReportPage() {
                         clamp(
                             base + 1
                         ),
+
+                    symbol:
+                        "❦",
                 },
 
                 {
-                    id:
-                        "home",
-
                     title:
                         "Быт",
 
@@ -321,224 +286,63 @@ export default function ReportPage() {
                         clamp(
                             base - 1
                         ),
+
+                    symbol:
+                        "⌂",
                 },
             ];
         }, [data]);
 
-    const sortedCategories =
-        useMemo(
-            () =>
-                [...categories].sort(
-                    (a, b) =>
-                        a.value -
-                        b.value
-                ),
-            [categories]
-        );
-
-    const risks =
-        sortedCategories.slice(
-            0,
-            3
-        );
-
-    const strongest =
-        useMemo(
-            () =>
-                [...categories].sort(
-                    (a, b) =>
-                        b.value -
-                        a.value
-                )[0],
-            [categories]
-        );
-
-    const differences =
+    const forecastYears =
         useMemo(() => {
-            const direct =
-                data
-                    ?.highlights
-                    ?.different ??
-                [];
+            const overall =
+                data?.scores
+                    ?.overall ??
+                0;
 
-            if (
-                direct.length >= 3
-            ) {
-                return direct.slice(
-                    0,
-                    3
-                );
+            if (overall >= 85) {
+                return 45;
             }
 
-            return (
-                data?.comparisons ??
-                []
-            )
-                .filter(
-                    (item) =>
-                        item.similarity !==
-                        "same"
-                )
-                .slice(
-                    0,
-                    3
-                );
+            if (overall >= 75) {
+                return 28;
+            }
+
+            if (overall >= 65) {
+                return 16;
+            }
+
+            if (overall >= 55) {
+                return 10;
+            }
+
+            if (overall >= 45) {
+                return 6;
+            }
+
+            if (overall >= 35) {
+                return 3;
+            }
+
+            return 1;
         }, [data]);
 
-    const plan =
-        useMemo<
-            MonthPlan[]
-        >(() => {
-            return [
-                {
-                    number: 1,
-
-                    eyebrow:
-                        "ПЕРВЫЙ МЕСЯЦ",
-
-                    title:
-                        "Ближе друг к другу",
-
-                    description:
-                        "Возвращаем больше лёгкости, внимания и времени только для вас двоих.",
-
-                    tasks: [
-                        "Проведите 3 свидания подряд без телефонов",
-
-                        "Каждый день задавайте друг другу один настоящий вопрос о прошедшем дне",
-
-                        getActionForCategory(
-                            risks[0]
-                                ?.id ??
-                            "friendship"
-                        ),
-                    ],
-                },
-
-                {
-                    number: 2,
-
-                    eyebrow:
-                        "ВТОРОЙ МЕСЯЦ",
-
-                    title:
-                        "Пройти сложные темы",
-
-                    description:
-                        "Не избегаем драконов — спокойно разбираем то, что может копить напряжение.",
-
-                    tasks: [
-                        getActionForCategory(
-                            risks[1]
-                                ?.id ??
-                            "money"
-                        ),
-
-                        "Обсудите интим: что нравится, сколько близости хочется и как комфортно проявлять инициативу",
-
-                        "Договоритесь о правиле ссоры: как брать паузу и когда обязательно возвращаться к разговору",
-                    ],
-                },
-
-                {
-                    number: 3,
-
-                    eyebrow:
-                        "ТРЕТИЙ МЕСЯЦ",
-
-                    title:
-                        "Общий ритм",
-
-                    description:
-                        "Собираем правила, которые останутся с вами и после этих трёх месяцев.",
-
-                    tasks: [
-                        getActionForCategory(
-                            risks[2]
-                                ?.id ??
-                            "home"
-                        ),
-
-                        "Выберите 3 общие цели на ближайший год",
-
-                        "Запланируйте одно новое совместное приключение: поездку, курс или проект",
-                    ],
-                },
-            ];
-        }, [risks]);
-
-    const nameA =
-        data?.couple
-            ?.partner_a_name ||
-        "Первый";
-
-    const nameB =
-        data?.couple
-            ?.partner_b_name ||
-        "Второй";
+    const forecastPosition =
+        Math.max(
+            4,
+            Math.min(
+                96,
+                forecastYears /
+                60 *
+                100
+            )
+        );
 
     if (loading) {
         return (
-            <main className="state">
-
-                <div className="brand">
-                    между нами.
-                </div>
-
-                <p>
-                    собираем ваш разбор
-                </p>
-
-                <style jsx>{`
-                    .state {
-                        min-height:
-                            100vh;
-
-                        display:
-                            grid;
-
-                        place-items:
-                            center;
-
-                        align-content:
-                            center;
-
-                        gap:
-                            12px;
-
-                        background:
-                            #f8f4f1;
-                    }
-
-                    .brand {
-                        font-family:
-                            Georgia,
-                            "Times New Roman",
-                            serif;
-
-                        font-size:
-                            24px;
-
-                        font-weight:
-                            700;
-                    }
-
-                    p {
-                        margin: 0;
-
-                        color:
-                            #958b8e;
-
-                        font-family:
-                            Arial,
-                            sans-serif;
-
-                        font-size:
-                            12px;
-                    }
-                `}</style>
-
-            </main>
+            <StateScreen
+                text="собираем ваши ответы"
+            />
         );
     }
 
@@ -547,186 +351,71 @@ export default function ReportPage() {
         !data
     ) {
         return (
-            <main className="state">
-
-                <div className="brand">
-                    между нами.
-                </div>
-
-                <p>
-                    {error ||
-                        "Не получилось загрузить разбор."}
-                </p>
-
-                <style jsx>{`
-                    .state {
-                        min-height:
-                            100vh;
-
-                        display:
-                            grid;
-
-                        place-items:
-                            center;
-
-                        align-content:
-                            center;
-
-                        gap:
-                            12px;
-
-                        padding:
-                            24px;
-
-                        background:
-                            #f8f4f1;
-                    }
-
-                    .brand {
-                        font-family:
-                            Georgia,
-                            "Times New Roman",
-                            serif;
-
-                        font-size:
-                            24px;
-
-                        font-weight:
-                            700;
-                    }
-
-                    p {
-                        margin: 0;
-
-                        color:
-                            #958b8e;
-
-                        font-family:
-                            Arial,
-                            sans-serif;
-
-                        font-size:
-                            13px;
-                    }
-                `}</style>
-
-            </main>
+            <StateScreen
+                text={
+                    error ||
+                    "Не получилось загрузить результат."
+                }
+            />
         );
     }
 
+    const nameA =
+        data.couple
+            ?.partner_a_name ||
+        "Первый";
+
+    const nameB =
+        data.couple
+            ?.partner_b_name ||
+        "Второй";
+
     return (
-        <main className="report-page">
+        <main className="page">
 
-            {/* HEADER */}
-
-            <header className="header report-shell">
+            <header className="header shell">
 
                 <div className="brand">
                     между нами.
                 </div>
 
-                <div className="couple-names">
-
-                    {nameA}
+                <div className="names">
 
                     <span>
-                        ×
+                        {nameA}
                     </span>
 
-                    {nameB}
+                    <b>
+                        ×
+                    </b>
+
+                    <span>
+                        {nameB}
+                    </span>
 
                 </div>
 
             </header>
 
-            {/* INTRO */}
+            <section className="results shell">
 
-            <section className="intro report-shell">
-
-                <div className="section-label">
-                    ВАШ ПОЛНЫЙ РАЗБОР
+                <div className="eyebrow">
+                    ВАША КАРТИНА
                 </div>
 
-                <div className="intro-grid">
+                <h1>
+                    Как вы совпали
+                    <br />
+                    в главном
+                </h1>
 
-                    <div className="intro-main">
+                <p className="intro">
+                    Не оценка ваших отношений —
+                    а шесть сторон совместной жизни,
+                    которые видно по вашим ответам.
+                </p>
 
-                        <h1>
-                            Подробный
-                            <br />
-                            разбор
-                        </h1>
-
-                        <p>
-                            Здесь — не оценка ваших
-                            отношений, а карта того,
-                            где вам легко, где вы
-                            смотрите на вещи по-разному
-                            и что можно попробовать
-                            изменить.
-                        </p>
-
-                    </div>
-
-                    <aside className="intro-insight">
-
-                        <div className="heart">
-                            ♥
-                        </div>
-
-                        <p>
-                            Сильнее всего сейчас
-                            выглядит{" "}
-
-                            <strong>
-                                {strongest.title.toLowerCase()}
-                            </strong>
-                            .
-                        </p>
-
-                        <p>
-                            Больше внимания требуют{" "}
-
-                            <strong>
-                                {risks
-                                    .slice(
-                                        0,
-                                        2
-                                    )
-                                    .map(
-                                        (item) =>
-                                            item.title.toLowerCase()
-                                    )
-                                    .join(
-                                        " и "
-                                    )}
-                            </strong>
-                            .
-                        </p>
-
-                    </aside>
-
-                </div>
-
-            </section>
-
-            {/* 6 AREAS */}
-
-            <section className="report-section report-shell">
-
-                <SectionHeading
-                    label="6 СФЕР"
-                    title={
-                        <>
-                            Как устроены ваши
-                            <br />
-                            отношения
-                        </>
-                    }
-                    description="Те же показатели, которые вы увидели в результате — теперь как основа для полного разбора."
-                />
-
-                <div className="score-list">
+                <div className="scores">
 
                     {categories.map(
                         (
@@ -734,7 +423,7 @@ export default function ReportPage() {
                         ) => (
                             <ScoreRow
                                 key={
-                                    category.id
+                                    category.title
                                 }
                                 category={
                                     category
@@ -747,189 +436,174 @@ export default function ReportPage() {
 
             </section>
 
-            {/* RISKS */}
+            <section className="forecast shell">
 
-            <section className="report-section report-shell">
+                <div className="forecast-copy">
 
-                <SectionHeading
-                    label="ГДЕ СЕЙЧАС СЛОЖНЕЕ"
-                    title={
-                        <>
-                            Три точки, которые
-                            <br />
-                            стоит пройти вместе
-                        </>
-                    }
-                    description="Это не «плохие» части отношений. Просто именно здесь ваши ответы расходятся сильнее всего."
-                />
+                    <div className="eyebrow">
+                        ПРОГНОЗ
+                    </div>
 
-                <div className="risk-grid">
+                    <h2>
+                        Ориентировочная
+                        <br />
+                        длительность отношений
+                    </h2>
 
-                    {risks.map(
-                        (
-                            risk,
-                            index
-                        ) => (
-                            <RiskCard
-                                key={
-                                    risk.id
-                                }
-                                category={
-                                    risk
-                                }
-                                number={
-                                    index + 1
-                                }
-                            />
-                        )
-                    )}
+                    <p>
+                        На основе ваших ответов
+                        мы оценили, сколько времени
+                        ваши отношения могут
+                        продлиться при текущем
+                        сценарии.
+                    </p>
 
                 </div>
 
-            </section>
+                <div className="forecast-result">
 
-            {/* BLIND SPOTS */}
+                    <div className="years">
 
-            <section className="report-section report-shell">
+                        <strong>
+                            {forecastYears}
+                        </strong>
 
-                <SectionHeading
-                    label="СЛЕПЫЕ ЗОНЫ"
-                    title={
-                        <>
-                            Где вы можете
-                            <br />
-                            неправильно понимать друг друга
-                        </>
-                    }
-                    description="Здесь интересно не то, кто «прав», а насколько по-разному вы воспринимаете одну и ту же ситуацию."
-                />
-
-                <div className="blind-list">
-
-                    {differences.length >
-                    0 ? (
-                        differences.map(
-                            (
-                                item,
-                                index
-                            ) => (
-                                <BlindSpot
-                                    key={
-                                        item.questionId
-                                    }
-                                    item={
-                                        item
-                                    }
-                                    index={
-                                        index
-                                    }
-                                    nameA={
-                                        nameA
-                                    }
-                                    nameB={
-                                        nameB
-                                    }
-                                />
-                            )
-                        )
-                    ) : (
-                        <div className="empty">
-                            Здесь ваши ответы
-                            оказались довольно близкими.
-                        </div>
-                    )}
-
-                </div>
-
-            </section>
-
-            {/* ROADMAP */}
-
-            <section className="report-section roadmap-section report-shell">
-
-                <SectionHeading
-                    label="ВАШ ПУТЬ ВМЕСТЕ"
-                    title="План на 3 месяца"
-                    description="Не «больше разговаривайте». Только конкретные вещи, которые можно поставить в календарь и сделать."
-                />
-
-                <div className="map">
-
-                    <img
-                        src={
-                            ROADMAP_IMAGE
-                        }
-                        alt="Путь пары на три месяца"
-                    />
-
-                </div>
-
-                <div className="month-grid">
-
-                    {plan.map(
-                        (
-                            month
-                        ) => (
-                            <MonthCard
-                                key={
-                                    month.number
-                                }
-                                month={
-                                    month
-                                }
-                            />
-                        )
-                    )}
-
-                </div>
-
-            </section>
-
-            {/* TODAY */}
-
-            <section className="report-section today report-shell">
-
-                <div className="section-label">
-                    НАЧНИТЕ СЕГОДНЯ
-                </div>
-
-                <div className="today-card">
-
-                    <div className="today-copy">
-
-                        <h2>
-                            Первый вечер:
-                            <br />
-                            без угадываний
-                        </h2>
-
-                        <p>
-                            Сядьте рядом
-                            на 20 минут
-                            и ответьте
-                            по очереди.
-                            Не спорьте
-                            с ответом партнёра.
-                        </p>
+                        <span>
+                            {yearWord(
+                                forecastYears
+                            )}
+                        </span>
 
                     </div>
 
-                    <div className="today-questions">
+                    <div className="scale">
 
-                        <QuestionCard
-                            number="01"
-                            text="Что сейчас делает тебя счастливее в наших отношениях?"
+                        <div className="track">
+
+                            <div
+                                className="fill"
+                                style={{
+                                    width:
+                                        `${forecastPosition}%`,
+                                }}
+                            />
+
+                            <div
+                                className="dot"
+                                style={{
+                                    left:
+                                        `${forecastPosition}%`,
+                                }}
+                            />
+
+                        </div>
+
+                        <div className="scale-labels">
+
+                            <span>
+                                1 месяц
+                            </span>
+
+                            <span>
+                                вся жизнь
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section className="paid-wrap">
+
+                <div className="paid-card">
+
+                    <div className="art">
+
+                        <img
+                            src={
+                                PAID_IMAGE
+                            }
+                            alt=""
+                            draggable={
+                                false
+                            }
                         />
 
-                        <QuestionCard
-                            number="02"
-                            text="Чего тебе сейчас не хватает от меня?"
-                        />
+                        <div className="art-fade" />
 
-                        <QuestionCard
-                            number="03"
-                            text="Что мы можем сделать уже на этой неделе?"
-                        />
+                    </div>
+
+                    <div className="paid-content">
+
+                        <div className="paid-label">
+                            ПОЛНЫЙ РАЗБОР
+                        </div>
+
+                        <h2>
+                            Чтобы вместе —
+                            <br />
+                            и надолго.
+                        </h2>
+
+                        <div className="benefits">
+
+                            <Benefit
+                                symbol="♥"
+                                text="Где вы можете не понимать друг друга"
+                            />
+
+                            <Benefit
+                                symbol="○"
+                                text="Что каждый ждёт от отношений"
+                            />
+
+                            <Benefit
+                                symbol="↯"
+                                text="Что может стать причиной ссор"
+                            />
+
+                            <Benefit
+                                symbol="↗"
+                                text="Как сделать вашу пару крепче"
+                            />
+
+                        </div>
+
+                        <button
+                            type="button"
+                            className="paid-button"
+                            onClick={() =>
+                                router.push(
+                                    `/report/${coupleId}`
+                                )
+                            }
+                        >
+
+                            <span>
+                                Открыть полный разбор
+                            </span>
+
+                            <span className="button-right">
+
+                                <b>
+                                    299 ₽
+                                </b>
+
+                                <i>
+                                    →
+                                </i>
+
+                            </span>
+
+                        </button>
+
+                        <div className="paid-note">
+                            один разбор · для вас двоих ·
+                            сразу после оплаты
+                        </div>
 
                     </div>
 
@@ -938,85 +612,58 @@ export default function ReportPage() {
             </section>
 
             <style jsx>{`
-
                 :global(*) {
                     box-sizing:
                         border-box;
                 }
 
-                :global(html) {
-                    background:
-                        #f8f4f1;
-                }
-
+                :global(html),
                 :global(body) {
                     margin: 0;
 
                     background:
                         #f8f4f1;
-
-                    color:
-                        #211d1f;
                 }
 
-                /*
-                 * ВАЖНО:
-                 *
-                 * Никаких .shell.
-                 * Это отдельная сетка страницы отчёта.
-                 */
+                button {
+                    font: inherit;
+                }
 
-                .report-page {
-                    width:
-                        100%;
-
+                .page {
                     min-height:
                         100vh;
 
-                    padding-bottom:
-                        64px;
+                    padding:
+                        0
+                        28px
+                        72px;
+
+                    overflow-x:
+                        hidden;
+
+                    color:
+                        #201c1e;
 
                     background:
                         #f8f4f1;
                 }
 
-                .report-shell {
+                .shell {
                     width:
                         min(
-                            1140px,
-                            calc(
-                                100% -
-                                48px
-                            )
+                            920px,
+                            100%
                         );
-
-                    max-width:
-                        none;
-
-                    min-height:
-                        0;
-
-                    height:
-                        auto;
 
                     margin:
                         0 auto;
-
-                    padding:
-                        0;
-
-                    display:
-                        block;
                 }
-
-                /* HEADER */
 
                 .header {
                     min-height:
-                        76px;
+                        78px;
 
-                    display:
-                        flex;
+                    display: flex;
 
                     align-items:
                         center;
@@ -1024,15 +671,12 @@ export default function ReportPage() {
                     justify-content:
                         space-between;
 
-                    gap:
-                        20px;
-
-                    border-bottom:
-                        1px solid
-                        #ddd5d2;
+                    gap: 24px;
                 }
 
                 .brand {
+                    flex-shrink: 0;
+
                     font-family:
                         Georgia,
                         "Times New Roman",
@@ -1041,6 +685,8 @@ export default function ReportPage() {
                     font-size:
                         24px;
 
+                    line-height: 1;
+
                     font-weight:
                         700;
 
@@ -1048,21 +694,18 @@ export default function ReportPage() {
                         -1.1px;
                 }
 
-                .couple-names {
-                    min-width:
-                        0;
+                .names {
+                    min-width: 0;
 
-                    display:
-                        flex;
+                    display: flex;
 
                     align-items:
                         center;
 
-                    gap:
-                        8px;
+                    gap: 9px;
 
                     color:
-                        #91878a;
+                        #8f8588;
 
                     font-family:
                         Arial,
@@ -1082,30 +725,32 @@ export default function ReportPage() {
                         uppercase;
                 }
 
-                .couple-names span {
+                .names span {
+                    overflow:
+                        hidden;
+
+                    text-overflow:
+                        ellipsis;
+
+                    white-space:
+                        nowrap;
+                }
+
+                .names b {
                     color:
                         #c51f59;
                 }
 
-                /* COMMON */
-
-                .report-section {
-                    min-height:
-                        0;
-
-                    height:
-                        auto;
-
-                    margin-top:
-                        64px;
-
+                .results {
                     padding:
-                        0;
+                        62px
+                        0
+                        55px;
                 }
 
-                .section-label {
+                .eyebrow {
                     margin-bottom:
-                        13px;
+                        15px;
 
                     color:
                         #c51f59;
@@ -1125,41 +770,7 @@ export default function ReportPage() {
                         2.2px;
                 }
 
-                /* INTRO */
-
-                .intro {
-                    min-height:
-                        0;
-
-                    height:
-                        auto;
-
-                    padding:
-                        46px 0 4px;
-                }
-
-                .intro-grid {
-                    display:
-                        grid;
-
-                    grid-template-columns:
-                        minmax(
-                            0,
-                            1.35fr
-                        )
-                        minmax(
-                            300px,
-                            .65fr
-                        );
-
-                    gap:
-                        54px;
-
-                    align-items:
-                        end;
-                }
-
-                .intro-main h1 {
+                .results h1 {
                     margin: 0;
 
                     font-family:
@@ -1169,32 +780,32 @@ export default function ReportPage() {
 
                     font-size:
                         clamp(
-                            60px,
+                            56px,
                             7vw,
-                            88px
+                            78px
                         );
 
                     line-height:
-                        .87;
+                        .9;
 
                     font-weight:
                         400;
 
                     letter-spacing:
-                        -4px;
+                        -3.7px;
                 }
 
-                .intro-main p {
+                .intro {
                     max-width:
-                        530px;
+                        520px;
 
                     margin:
-                        22px
+                        23px
                         0
-                        0;
+                        45px;
 
                     color:
-                        #7d7477;
+                        #81777a;
 
                     font-family:
                         Arial,
@@ -1208,215 +819,41 @@ export default function ReportPage() {
                         1.55;
                 }
 
-                .intro-insight {
-                    padding:
-                        25px;
-
-                    border-radius:
-                        23px;
-
-                    background:
-                        #f1dee4;
-                }
-
-                .heart {
-                    margin-bottom:
-                        15px;
-
-                    color:
-                        #cf3168;
-
-                    font-size:
-                        28px;
-                }
-
-                .intro-insight p {
-                    margin: 0;
-
-                    color:
-                        #655b5e;
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        13px;
-
-                    line-height:
-                        1.5;
-                }
-
-                .intro-insight p + p {
-                    margin-top:
-                        12px;
-                }
-
-                /* SCORES */
-
-                .score-list {
+                .scores {
                     border-top:
                         1px solid
                         #ded7d4;
                 }
 
-                /* RISKS */
-
-                .risk-grid {
-                    display:
-                        grid;
+                .forecast {
+                    display: grid;
 
                     grid-template-columns:
-                        repeat(
-                            3,
-                            minmax(
-                                0,
-                                1fr
-                            )
+                        minmax(
+                            0,
+                            1.15fr
+                        )
+                        minmax(
+                            280px,
+                            .85fr
                         );
 
-                    gap:
-                        14px;
+                    gap: 55px;
 
                     align-items:
-                        start;
-                }
+                        center;
 
-                /* BLIND */
-
-                .blind-list {
-                    display:
-                        grid;
-
-                    gap:
-                        13px;
-                }
-
-                .empty {
                     padding:
-                        26px;
+                        48px
+                        0
+                        54px;
 
-                    border:
+                    border-top:
                         1px solid
-                        #e5dcda;
-
-                    border-radius:
-                        21px;
-
-                    color:
-                        #81777a;
-
-                    font-family:
-                        Arial,
-                        sans-serif;
+                        #dcd4d1;
                 }
 
-                /* ROADMAP */
-
-                .roadmap-section {
-                    margin-top:
-                        68px;
-                }
-
-                .map {
-                    width:
-                        100%;
-
-                    overflow:
-                        hidden;
-
-                    border-radius:
-                        24px;
-
-                    background:
-                        #ecd9de;
-
-                    box-shadow:
-                        0 12px
-                        34px
-                        rgba(
-                            74,
-                            42,
-                            52,
-                            .07
-                        );
-                }
-
-                .map img {
-                    width:
-                        100%;
-
-                    height:
-                        auto;
-
-                    display:
-                        block;
-                }
-
-                .month-grid {
-                    display:
-                        grid;
-
-                    grid-template-columns:
-                        repeat(
-                            3,
-                            minmax(
-                                0,
-                                1fr
-                            )
-                        );
-
-                    gap:
-                        12px;
-
-                    margin-top:
-                        14px;
-
-                    align-items:
-                        start;
-                }
-
-                /* TODAY */
-
-                .today {
-                    margin-top:
-                        68px;
-                }
-
-                .today-card {
-                    padding:
-                        30px;
-
-                    border:
-                        1px solid
-                        #e4dad8;
-
-                    border-radius:
-                        26px;
-
-                    background:
-                        #fffaf8;
-                }
-
-                .today-copy {
-                    display:
-                        flex;
-
-                    align-items:
-                        flex-end;
-
-                    justify-content:
-                        space-between;
-
-                    gap:
-                        36px;
-
-                    margin-bottom:
-                        24px;
-                }
-
-                .today-copy h2 {
+                .forecast h2 {
                     margin: 0;
 
                     font-family:
@@ -1425,26 +862,28 @@ export default function ReportPage() {
                         serif;
 
                     font-size:
-                        42px;
+                        43px;
 
-                    line-height:
-                        .95;
+                    line-height: 1;
 
                     font-weight:
                         400;
 
                     letter-spacing:
-                        -1.9px;
+                        -2px;
                 }
 
-                .today-copy p {
+                .forecast-copy p {
                     max-width:
-                        340px;
+                        500px;
 
-                    margin: 0;
+                    margin:
+                        16px
+                        0
+                        0;
 
                     color:
-                        #82797c;
+                        #8d8587;
 
                     font-family:
                         Arial,
@@ -1452,70 +891,517 @@ export default function ReportPage() {
                         sans-serif;
 
                     font-size:
-                        12px;
+                        13px;
 
                     line-height:
-                        1.5;
+                        1.55;
                 }
 
-                .today-questions {
-                    display:
-                        grid;
+                .years {
+                    display: flex;
 
-                    grid-template-columns:
-                        repeat(
-                            3,
-                            minmax(
-                                0,
-                                1fr
-                            )
+                    align-items:
+                        baseline;
+
+                    color:
+                        #c21856;
+
+                    font-family:
+                        Georgia,
+                        "Times New Roman",
+                        serif;
+
+                    white-space:
+                        nowrap;
+                }
+
+                .years strong {
+                    font-size:
+                        76px;
+
+                    line-height:
+                        .88;
+
+                    font-weight:
+                        400;
+
+                    letter-spacing:
+                        -4px;
+                }
+
+                .years span {
+                    margin-left:
+                        9px;
+
+                    font-size:
+                        36px;
+
+                    letter-spacing:
+                        -1.4px;
+                }
+
+                .scale {
+                    margin-top:
+                        25px;
+                }
+
+                .track {
+                    position:
+                        relative;
+
+                    height: 8px;
+
+                    border-radius:
+                        999px;
+
+                    background:
+                        #e5dfe0;
+                }
+
+                .fill {
+                    position:
+                        absolute;
+
+                    inset:
+                        0
+                        auto
+                        0
+                        0;
+
+                    border-radius:
+                        inherit;
+
+                    background:
+                        #e99ab5;
+                }
+
+                .dot {
+                    position:
+                        absolute;
+
+                    top: 50%;
+
+                    width: 20px;
+                    height: 20px;
+
+                    border-radius:
+                        50%;
+
+                    background:
+                        #c21856;
+
+                    transform:
+                        translate(
+                            -50%,
+                            -50%
+                        );
+                }
+
+                .scale-labels {
+                    display: flex;
+
+                    justify-content:
+                        space-between;
+
+                    margin-top:
+                        12px;
+
+                    color:
+                        #8d8587;
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        10px;
+
+                    font-weight:
+                        600;
+                }
+
+                .paid-wrap {
+                    width:
+                        min(
+                            1180px,
+                            100%
                         );
 
+                    margin:
+                        12px
+                        auto
+                        0;
+                }
+
+                .paid-card {
+                    position:
+                        relative;
+
+                    min-height:
+                        640px;
+
+                    overflow:
+                        hidden;
+
+                    border-radius:
+                        28px;
+
+                    color: #fff;
+
+                    background:
+                        #ad194a;
+
+                    isolation:
+                        isolate;
+                }
+
+                .art {
+                    position:
+                        absolute;
+
+                    inset: 0;
+
+                    z-index: 0;
+
+                    overflow:
+                        hidden;
+                }
+
+                .art img {
+                    position:
+                        absolute;
+
+                    left: 0;
+                    top: 0;
+
+                    width: 69%;
+                    height: 100%;
+
+                    object-fit:
+                        cover;
+
+                    object-position:
+                        44% center;
+                }
+
+                .art-fade {
+                    position:
+                        absolute;
+
+                    inset:
+                        0
+                        24%
+                        0
+                        34%;
+
+                    background:
+                        linear-gradient(
+                            90deg,
+                            rgba(
+                                173,
+                                25,
+                                74,
+                                0
+                            ),
+                            rgba(
+                                173,
+                                25,
+                                74,
+                                .18
+                            )
+                            20%,
+                            rgba(
+                                173,
+                                25,
+                                74,
+                                .6
+                            )
+                            58%,
+                            #ad194a
+                            100%
+                        );
+                }
+
+                .paid-content {
+                    position:
+                        relative;
+
+                    z-index: 2;
+
+                    width: 47%;
+
+                    min-height:
+                        640px;
+
+                    margin-left:
+                        auto;
+
+                    display: flex;
+
+                    flex-direction:
+                        column;
+
+                    justify-content:
+                        center;
+
+                    padding:
+                        48px
+                        55px
+                        42px
+                        20px;
+                }
+
+                .paid-label {
+                    margin-bottom:
+                        13px;
+
+                    color:
+                        rgba(
+                            255,
+                            255,
+                            255,
+                            .72
+                        );
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        9px;
+
+                    font-weight:
+                        800;
+
+                    letter-spacing:
+                        2px;
+                }
+
+                .paid-content h2 {
+                    margin: 0;
+
+                    font-family:
+                        Georgia,
+                        "Times New Roman",
+                        serif;
+
+                    font-size:
+                        clamp(
+                            46px,
+                            4.5vw,
+                            62px
+                        );
+
+                    line-height:
+                        .92;
+
+                    font-weight:
+                        400;
+
+                    letter-spacing:
+                        -2.7px;
+                }
+
+                .benefits {
+                    display: grid;
+
+                    grid-template-columns:
+                        1fr
+                        1fr;
+
                     gap:
-                        10px;
+                        19px
+                        24px;
+
+                    margin-top:
+                        37px;
+                }
+
+                .paid-button {
+                    width: 100%;
+
+                    min-height:
+                        65px;
+
+                    display: flex;
+
+                    align-items:
+                        center;
+
+                    justify-content:
+                        space-between;
+
+                    gap: 20px;
+
+                    margin-top:
+                        36px;
+
+                    padding:
+                        0
+                        24px;
+
+                    border: 0;
+
+                    border-radius:
+                        999px;
+
+                    cursor:
+                        pointer;
+
+                    color:
+                        #8f123c;
+
+                    background:
+                        #fff8f4;
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        13px;
+
+                    font-weight:
+                        800;
+
+                    transition:
+                        transform
+                        .18s ease;
+                }
+
+                .paid-button:hover {
+                    transform:
+                        translateY(-2px);
+                }
+
+                .button-right {
+                    display: flex;
+
+                    align-items:
+                        center;
+
+                    gap: 13px;
+
+                    flex-shrink: 0;
+                }
+
+                .button-right b {
+                    font-size:
+                        15px;
+                }
+
+                .button-right i {
+                    font-family:
+                        Georgia,
+                        serif;
+
+                    font-size:
+                        22px;
+
+                    font-style:
+                        normal;
+
+                    font-weight:
+                        400;
+                }
+
+                .paid-note {
+                    margin-top:
+                        13px;
+
+                    color:
+                        rgba(
+                            255,
+                            255,
+                            255,
+                            .63
+                        );
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        9px;
+
+                    line-height:
+                        1.4;
+
+                    text-align:
+                        center;
                 }
 
                 @media (
                     max-width:
-                        900px
+                        760px
                 ) {
-
-                    .intro-grid {
+                    .forecast {
                         grid-template-columns:
                             1fr;
 
-                        gap:
-                            25px;
+                        gap: 34px;
                     }
 
-                    .intro-insight {
-                        max-width:
-                            500px;
+                    .paid-card {
+                        min-height:
+                            760px;
                     }
 
-                    .risk-grid {
-                        grid-template-columns:
-                            1fr;
+                    .art {
+                        height:
+                            430px;
                     }
 
-                    .month-grid {
-                        grid-template-columns:
-                            1fr;
+                    .art img {
+                        width: 100%;
+                        height: 100%;
+
+                        object-position:
+                            center;
                     }
 
-                    .today-copy {
-                        display:
-                            block;
+                    .art-fade {
+                        inset:
+                            auto
+                            0
+                            0
+                            0;
+
+                        height: 60%;
+
+                        background:
+                            linear-gradient(
+                                180deg,
+                                rgba(
+                                    173,
+                                    25,
+                                    74,
+                                    0
+                                ),
+                                #ad194a
+                                92%
+                            );
                     }
 
-                    .today-copy p {
-                        margin-top:
-                            15px;
-                    }
+                    .paid-content {
+                        width: 100%;
 
-                    .today-questions {
-                        grid-template-columns:
-                            1fr;
+                        min-height:
+                            760px;
+
+                        justify-content:
+                            flex-end;
+
+                        padding:
+                            300px
+                            26px
+                            28px;
+
+                        margin: 0;
                     }
                 }
 
@@ -1523,18 +1409,11 @@ export default function ReportPage() {
                     max-width:
                         640px
                 ) {
-
-                    .report-page {
-                        padding-bottom:
-                            44px;
-                    }
-
-                    .report-shell {
-                        width:
-                            calc(
-                                100% -
-                                28px
-                            );
+                    .page {
+                        padding:
+                            0
+                            14px
+                            42px;
                     }
 
                     .header {
@@ -1547,232 +1426,152 @@ export default function ReportPage() {
                             21px;
                     }
 
-                    .couple-names {
+                    .names {
                         max-width:
-                            48%;
+                            52%;
 
-                        overflow:
-                            hidden;
-
-                        white-space:
-                            nowrap;
-
-                        text-overflow:
-                            ellipsis;
+                        gap: 5px;
 
                         font-size:
                             8px;
+
+                        letter-spacing:
+                            .65px;
+                    }
+
+                    .results {
+                        padding:
+                            43px
+                            0
+                            40px;
+                    }
+
+                    .results h1 {
+                        font-size:
+                            52px;
+
+                        letter-spacing:
+                            -2.8px;
                     }
 
                     .intro {
-                        padding-top:
-                            34px;
-                    }
+                        margin:
+                            18px
+                            0
+                            31px;
 
-                    .intro-main h1 {
-                        font-size:
-                            53px;
-
-                        letter-spacing:
-                            -2.6px;
-                    }
-
-                    .intro-main p {
                         font-size:
                             12px;
                     }
 
-                    .report-section,
-                    .roadmap-section,
-                    .today {
-                        margin-top:
-                            48px;
-                    }
-
-                    .map {
-                        border-radius:
-                            18px;
-                    }
-
-                    .month-grid {
-                        margin-top:
-                            10px;
-                    }
-
-                    .today-card {
+                    .forecast {
                         padding:
-                            21px;
-
-                        border-radius:
-                            21px;
+                            37px
+                            0
+                            43px;
                     }
 
-                    .today-copy h2 {
+                    .forecast h2 {
                         font-size:
-                            33px;
+                            37px;
+
+                        letter-spacing:
+                            -1.6px;
+                    }
+
+                    .years strong {
+                        font-size:
+                            68px;
+                    }
+
+                    .years span {
+                        font-size:
+                            30px;
+                    }
+
+                    .paid-wrap {
+                        margin-top: 0;
+                    }
+
+                    .paid-card {
+                        min-height:
+                            720px;
+
+                        border-radius:
+                            23px;
+                    }
+
+                    .art {
+                        height:
+                            390px;
+                    }
+
+                    .paid-content {
+                        min-height:
+                            720px;
+
+                        padding:
+                            280px
+                            20px
+                            23px;
+                    }
+
+                    .paid-content h2 {
+                        font-size:
+                            45px;
+
+                        letter-spacing:
+                            -2px;
+                    }
+
+                    .benefits {
+                        gap:
+                            16px
+                            13px;
+
+                        margin-top:
+                            28px;
+                    }
+
+                    .paid-button {
+                        min-height:
+                            59px;
+
+                        margin-top:
+                            27px;
+
+                        padding:
+                            0
+                            18px;
+
+                        font-size:
+                            11px;
+                    }
+
+                    .button-right {
+                        gap: 8px;
                     }
                 }
-
             `}</style>
 
         </main>
     );
 }
 
-/* SECTION HEADING */
-
-function SectionHeading({
-                            label,
-                            title,
-                            description,
-                        }: {
-    label: string;
-    title: ReactNode;
-    description: string;
-}) {
-    return (
-        <div className="section-heading">
-
-            <div className="label">
-                {label}
-            </div>
-
-            <h2>
-                {title}
-            </h2>
-
-            <p>
-                {description}
-            </p>
-
-            <style jsx>{`
-
-                .section-heading {
-                    max-width:
-                        650px;
-
-                    margin-bottom:
-                        28px;
-                }
-
-                .label {
-                    margin-bottom:
-                        13px;
-
-                    color:
-                        #c51f59;
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        10px;
-
-                    font-weight:
-                        800;
-
-                    letter-spacing:
-                        2.2px;
-                }
-
-                h2 {
-                    margin: 0;
-
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
-
-                    font-size:
-                        clamp(
-                            42px,
-                            4.7vw,
-                            56px
-                        );
-
-                    line-height:
-                        .96;
-
-                    font-weight:
-                        400;
-
-                    letter-spacing:
-                        -2.2px;
-                }
-
-                p {
-                    max-width:
-                        520px;
-
-                    margin:
-                        15px
-                        0
-                        0;
-
-                    color:
-                        #8b8285;
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        13px;
-
-                    line-height:
-                        1.5;
-                }
-
-                @media (
-                    max-width:
-                        640px
-                ) {
-
-                    .section-heading {
-                        margin-bottom:
-                            22px;
-                    }
-
-                    h2 {
-                        font-size:
-                            36px;
-
-                        letter-spacing:
-                            -1.5px;
-                    }
-
-                    p {
-                        font-size:
-                            11px;
-                    }
-                }
-
-            `}</style>
-
-        </div>
-    );
-}
-
-/* SCORE ROW */
-
 function ScoreRow({
                       category,
                   }: {
-    category: CategoryScore;
+    category:
+        CategoryScore;
 }) {
     return (
-        <article className="score-row">
+        <article className="row">
 
-            <div className="score-symbol">
-                {getCategoryIcon(
-                    category.id
-                )}
+            <div className="symbol">
+                {category.symbol}
             </div>
 
-            <div className="score-main">
+            <div className="main">
 
                 <h3>
                     {category.title}
@@ -1812,13 +1611,11 @@ function ScoreRow({
             </div>
 
             <style jsx>{`
-
-                .score-row {
+                .row {
                     min-height:
                         98px;
 
-                    display:
-                        grid;
+                    display: grid;
 
                     grid-template-columns:
                         40px
@@ -1826,10 +1623,9 @@ function ScoreRow({
                             0,
                             1fr
                         )
-                        80px;
+                        84px;
 
-                    gap:
-                        18px;
+                    gap: 18px;
 
                     align-items:
                         center;
@@ -1839,15 +1635,11 @@ function ScoreRow({
                         #ded7d4;
                 }
 
-                .score-symbol {
-                    width:
-                        36px;
+                .symbol {
+                    width: 36px;
+                    height: 36px;
 
-                    height:
-                        36px;
-
-                    display:
-                        grid;
+                    display: grid;
 
                     place-items:
                         center;
@@ -1855,11 +1647,11 @@ function ScoreRow({
                     border-radius:
                         50%;
 
-                    background:
-                        #f2dfe4;
-
                     color:
                         #c9255c;
+
+                    background:
+                        #f2dfe4;
 
                     font-family:
                         Georgia,
@@ -1878,10 +1670,9 @@ function ScoreRow({
                         serif;
 
                     font-size:
-                        28px;
+                        29px;
 
-                    line-height:
-                        1;
+                    line-height: 1;
 
                     font-weight:
                         400;
@@ -1909,8 +1700,7 @@ function ScoreRow({
                 }
 
                 .track {
-                    height:
-                        5px;
+                    height: 5px;
 
                     overflow:
                         hidden;
@@ -1923,8 +1713,7 @@ function ScoreRow({
                 }
 
                 .fill {
-                    height:
-                        100%;
+                    height: 100%;
 
                     border-radius:
                         inherit;
@@ -1934,8 +1723,7 @@ function ScoreRow({
                 }
 
                 .score {
-                    display:
-                        flex;
+                    display: flex;
 
                     justify-content:
                         flex-end;
@@ -1953,10 +1741,9 @@ function ScoreRow({
                         #c51f59;
 
                     font-size:
-                        45px;
+                        46px;
 
-                    line-height:
-                        1;
+                    line-height: 1;
 
                     font-weight:
                         400;
@@ -1977,10 +1764,9 @@ function ScoreRow({
                     max-width:
                         640px
                 ) {
-
-                    .score-row {
+                    .row {
                         min-height:
-                            88px;
+                            87px;
 
                         grid-template-columns:
                             30px
@@ -1990,16 +1776,12 @@ function ScoreRow({
                             )
                             55px;
 
-                        gap:
-                            10px;
+                        gap: 10px;
                     }
 
-                    .score-symbol {
-                        width:
-                            29px;
-
-                        height:
-                            29px;
+                    .symbol {
+                        width: 29px;
+                        height: 29px;
 
                         font-size:
                             14px;
@@ -2025,867 +1807,89 @@ function ScoreRow({
                             12px;
                     }
                 }
-
             `}</style>
 
         </article>
     );
 }
 
-/* RISK CARD */
-
-function RiskCard({
-                      category,
-                      number,
-                  }: {
-    category: CategoryScore;
-    number: number;
+function Benefit({
+                     symbol,
+                     text,
+                 }: {
+    symbol: string;
+    text: string;
 }) {
     return (
-        <article className="risk-card">
+        <div className="benefit">
 
-            <div className="risk-top">
-
-                <div className="number">
-                    {number}
-                </div>
-
-                <div className="icon">
-                    {getCategoryIcon(
-                        category.id
-                    )}
-                </div>
-
+            <div className="symbol">
+                {symbol}
             </div>
 
-            <h3>
-                {category.title}
-            </h3>
-
-            <p>
-                {getRiskText(
-                    category.id
-                )}
-            </p>
-
-            <div className="score">
-                {category.value}
-
-                <span>
-                    /10
-                </span>
+            <div className="text">
+                {text}
             </div>
 
             <style jsx>{`
-
-                .risk-card {
-                    position:
-                        relative;
-
-                    min-height:
-                        250px;
-
-                    padding:
-                        23px;
-
-                    border:
-                        1px solid
-                        #e5dcda;
-
-                    border-radius:
-                        22px;
-
-                    background:
-                        #fffaf8;
-                }
-
-                .risk-top {
-                    display:
-                        flex;
-
-                    align-items:
-                        center;
-
-                    justify-content:
-                        space-between;
-                }
-
-                .number {
-                    width:
-                        34px;
-
-                    height:
-                        34px;
-
-                    display:
-                        grid;
-
-                    place-items:
-                        center;
-
-                    border-radius:
-                        50%;
-
-                    background:
-                        #f2dfe4;
-
-                    color:
-                        #c51f59;
-
-                    font-family:
-                        Georgia,
-                        serif;
-
-                    font-size:
-                        16px;
-                }
-
-                .icon {
-                    color:
-                        #c51f59;
-
-                    font-size:
-                        19px;
-                }
-
-                h3 {
-                    margin:
-                        24px
-                        0
-                        11px;
-
-                    font-family:
-                        Georgia,
-                        serif;
-
-                    font-size:
-                        28px;
-
-                    line-height:
-                        1;
-
-                    font-weight:
-                        400;
-                }
-
-                p {
-                    max-width:
-                        270px;
-
-                    margin:
-                        0
-                        0
-                        40px;
-
-                    color:
-                        #756d70;
-
-                    font-family:
-                        Arial,
-                        sans-serif;
-
-                    font-size:
-                        12px;
-
-                    line-height:
-                        1.5;
-                }
-
-                .score {
-                    position:
-                        absolute;
-
-                    right:
-                        21px;
-
-                    bottom:
-                        18px;
-
-                    color:
-                        #c51f59;
-
-                    font-family:
-                        Georgia,
-                        serif;
-
-                    font-size:
-                        28px;
-                }
-
-                .score span {
-                    margin-left:
-                        2px;
-
-                    color:
-                        #8a8284;
-
-                    font-size:
-                        12px;
-                }
-
-            `}</style>
-
-        </article>
-    );
-}
-
-/* BLIND SPOT */
-
-function BlindSpot({
-                       item,
-                       index,
-                       nameA,
-                       nameB,
-                   }: {
-    item: Comparison;
-    index: number;
-    nameA: string;
-    nameB: string;
-}) {
-    return (
-        <article className="blind-card">
-
-            <div className="blind-number">
-                0{index + 1}
-            </div>
-
-            <div className="blind-content">
-
-                <h3>
-                    {item.question}
-                </h3>
-
-                <div className="answers">
-
-                    <div className="answer">
-
-                        <span className="person">
-                            {nameA}
-                        </span>
-
-                        <strong>
-                            {item.labelA}
-                        </strong>
-
-                    </div>
-
-                    <div className="arrow">
-                        →
-                    </div>
-
-                    <div className="answer">
-
-                        <span className="person">
-                            {nameB}
-                        </span>
-
-                        <strong>
-                            {item.labelB}
-                        </strong>
-
-                    </div>
-
-                </div>
-
-                <p className="insight">
-                    {getBlindInsight(
-                        item
-                    )}
-                </p>
-
-            </div>
-
-            <style jsx>{`
-
-                .blind-card {
-                    width:
-                        100%;
-
-                    min-width:
-                        0;
-
-                    display:
-                        grid;
+                .benefit {
+                    display: grid;
 
                     grid-template-columns:
-                        42px
+                        28px
                         minmax(
                             0,
                             1fr
                         );
 
-                    gap:
-                        20px;
-
-                    padding:
-                        25px;
-
-                    overflow:
-                        hidden;
-
-                    border:
-                        1px solid
-                        #e5dcda;
-
-                    border-radius:
-                        22px;
-
-                    background:
-                        #fffaf8;
-                }
-
-                .blind-number {
-                    color:
-                        #ca275f;
-
-                    font-family:
-                        Georgia,
-                        serif;
-
-                    font-size:
-                        19px;
-                }
-
-                .blind-content {
-                    min-width:
-                        0;
-                }
-
-                h3 {
-                    max-width:
-                        780px;
-
-                    margin:
-                        0
-                        0
-                        18px;
-
-                    font-family:
-                        Georgia,
-                        serif;
-
-                    font-size:
-                        27px;
-
-                    line-height:
-                        1.08;
-
-                    font-weight:
-                        400;
-                }
-
-                .answers {
-                    min-width:
-                        0;
-
-                    display:
-                        grid;
-
-                    grid-template-columns:
-                        minmax(
-                            0,
-                            1fr
-                        )
-                        34px
-                        minmax(
-                            0,
-                            1fr
-                        );
-
-                    gap:
-                        10px;
-
-                    align-items:
-                        center;
-                }
-
-                .answer {
-                    min-width:
-                        0;
-
-                    min-height:
-                        86px;
-
-                    padding:
-                        15px;
-
-                    border-radius:
-                        15px;
-
-                    background:
-                        #f3e5e7;
-                }
-
-                .person {
-                    display:
-                        block;
-
-                    margin-bottom:
-                        7px;
-
-                    overflow:
-                        hidden;
-
-                    text-overflow:
-                        ellipsis;
-
-                    color:
-                        #a08f94;
-
-                    font-family:
-                        Arial,
-                        sans-serif;
-
-                    font-size:
-                        9px;
-
-                    font-weight:
-                        800;
-
-                    letter-spacing:
-                        .8px;
-
-                    text-transform:
-                        uppercase;
-
-                    white-space:
-                        nowrap;
-                }
-
-                strong {
-                    display:
-                        block;
-
-                    max-width:
-                        100%;
-
-                    color:
-                        #352e30;
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        12px;
-
-                    line-height:
-                        1.4;
-
-                    font-weight:
-                        500;
-
-                    overflow-wrap:
-                        break-word;
-                }
-
-                .arrow {
-                    color:
-                        #cc275f;
-
-                    font-family:
-                        Georgia,
-                        serif;
-
-                    font-size:
-                        25px;
-
-                    text-align:
-                        center;
-                }
-
-                .insight {
-                    margin:
-                        14px
-                        0
-                        0;
-
-                    color:
-                        #81777a;
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        11px;
-
-                    line-height:
-                        1.5;
-                }
-
-                @media (
-                    max-width:
-                        620px
-                ) {
-
-                    .blind-card {
-                        grid-template-columns:
-                            1fr;
-
-                        gap:
-                            10px;
-
-                        padding:
-                            19px;
-                    }
-
-                    h3 {
-                        font-size:
-                            22px;
-                    }
-
-                    .answers {
-                        grid-template-columns:
-                            1fr;
-                    }
-
-                    .arrow {
-                        height:
-                            20px;
-
-                        line-height:
-                            20px;
-
-                        transform:
-                            rotate(
-                                90deg
-                            );
-                    }
-                }
-
-            `}</style>
-
-        </article>
-    );
-}
-
-/* MONTH CARD */
-
-function MonthCard({
-                       month,
-                   }: {
-    month: MonthPlan;
-}) {
-    return (
-        <article className="month-card">
-
-            <div className="month-top">
-
-                <div className="number">
-                    {month.number}
-                </div>
-
-                <div className="eyebrow">
-                    {month.eyebrow}
-                </div>
-
-            </div>
-
-            <h3>
-                {month.title}
-            </h3>
-
-            <p className="description">
-                {month.description}
-            </p>
-
-            <div className="tasks">
-
-                {month.tasks.map(
-                    (
-                        task
-                    ) => (
-                        <div
-                            className="task"
-                            key={
-                                task
-                            }
-                        >
-
-                            <span className="checkbox" />
-
-                            <span className="task-text">
-                                {task}
-                            </span>
-
-                        </div>
-                    )
-                )}
-
-            </div>
-
-            <style jsx>{`
-
-                .month-card {
-                    min-width:
-                        0;
-
-                    padding:
-                        23px;
-
-                    border:
-                        1px solid
-                        #e5dcda;
-
-                    border-radius:
-                        22px;
-
-                    background:
-                        #fffaf8;
-                }
-
-                .month-top {
-                    min-height:
-                        40px;
-
-                    display:
-                        flex;
-
-                    align-items:
-                        center;
-
-                    gap:
-                        12px;
-
-                    margin-bottom:
-                        16px;
-                }
-
-                .number {
-                    flex:
-                        0 0 auto;
-
-                    width:
-                        38px;
-
-                    height:
-                        38px;
-
-                    display:
-                        grid;
-
-                    place-items:
-                        center;
-
-                    border-radius:
-                        50%;
-
-                    background:
-                        #c8245c;
-
-                    color:
-                        white;
-
-                    font-family:
-                        Georgia,
-                        serif;
-
-                    font-size:
-                        19px;
-                }
-
-                .eyebrow {
-                    color:
-                        #c8245c;
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        9px;
-
-                    line-height:
-                        1.2;
-
-                    font-weight:
-                        800;
-
-                    letter-spacing:
-                        1.3px;
-                }
-
-                h3 {
-                    max-width:
-                        100%;
-
-                    margin:
-                        0;
-
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
-
-                    font-size:
-                        29px;
-
-                    line-height:
-                        .98;
-
-                    font-weight:
-                        400;
-
-                    letter-spacing:
-                        -1px;
-                }
-
-                .description {
-                    margin:
-                        17px
-                        0
-                        21px;
-
-                    color:
-                        #82787b;
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        12px;
-
-                    line-height:
-                        1.45;
-                }
-
-                .tasks {
-                    display:
-                        grid;
-
-                    gap:
-                        13px;
-                }
-
-                .task {
-                    min-width:
-                        0;
-
-                    display:
-                        grid;
-
-                    grid-template-columns:
-                        18px
-                        minmax(
-                            0,
-                            1fr
-                        );
-
-                    gap:
-                        10px;
+                    gap: 9px;
 
                     align-items:
                         start;
                 }
 
-                .checkbox {
-                    width:
-                        18px;
+                .symbol {
+                    width: 28px;
+                    height: 28px;
 
-                    height:
-                        18px;
+                    display: grid;
 
-                    margin-top:
-                        1px;
+                    place-items:
+                        center;
 
                     border:
-                        1.5px solid
-                        #d44573;
+                        1px solid
+                        rgba(
+                            255,
+                            255,
+                            255,
+                            .4
+                        );
 
                     border-radius:
-                        5px;
-                }
+                        50%;
 
-                .task-text {
-                    min-width:
-                        0;
-
-                    color:
-                        #51484a;
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        12px;
-
-                    line-height:
-                        1.42;
-
-                    overflow-wrap:
-                        break-word;
-                }
-
-            `}</style>
-
-        </article>
-    );
-}
-
-/* QUESTION */
-
-function QuestionCard({
-                          number,
-                          text,
-                      }: {
-    number: string;
-    text: string;
-}) {
-    return (
-        <div className="question">
-
-            <span>
-                {number}
-            </span>
-
-            <p>
-                {text}
-            </p>
-
-            <style jsx>{`
-
-                .question {
-                    min-height:
-                        112px;
-
-                    padding:
-                        17px;
-
-                    border-radius:
-                        17px;
-
-                    background:
-                        #f2e3e7;
-                }
-
-                span {
-                    color:
-                        #c9245c;
+                    color: #fff;
 
                     font-family:
                         Georgia,
                         serif;
 
                     font-size:
-                        17px;
+                        13px;
                 }
 
-                p {
-                    margin:
-                        13px
-                        0
-                        0;
+                .text {
+                    padding-top:
+                        3px;
 
                     color:
-                        #393234;
+                        rgba(
+                            255,
+                            255,
+                            255,
+                            .91
+                        );
 
                     font-family:
                         Arial,
@@ -2893,108 +1897,148 @@ function QuestionCard({
                         sans-serif;
 
                     font-size:
-                        12px;
+                        11px;
 
                     line-height:
-                        1.42;
+                        1.4;
                 }
 
+                @media (
+                    max-width:
+                        640px
+                ) {
+                    .benefit {
+                        grid-template-columns:
+                            24px
+                            minmax(
+                                0,
+                                1fr
+                            );
+
+                        gap: 7px;
+                    }
+
+                    .symbol {
+                        width: 24px;
+                        height: 24px;
+
+                        font-size:
+                            11px;
+                    }
+
+                    .text {
+                        font-size:
+                            10px;
+                    }
+                }
             `}</style>
 
         </div>
     );
 }
 
-/* HELPERS */
+function StateScreen({
+                         text,
+                     }: {
+    text: string;
+}) {
+    return (
+        <main className="state">
 
-function getCategoryIcon(
-    id: CategoryId
-) {
-    switch (id) {
-        case "friendship":
-            return "♥";
+            <div className="brand">
+                между нами.
+            </div>
 
-        case "partnership":
-            return "×";
+            <p>
+                {text}
+            </p>
 
-        case "sex":
-            return "♡";
+            <style jsx>{`
+                :global(body) {
+                    margin: 0;
+                }
 
-        case "money":
-            return "₽";
+                .state {
+                    min-height:
+                        100vh;
 
-        case "care":
-            return "❦";
+                    display: grid;
 
-        case "home":
-            return "⌂";
-    }
+                    place-items:
+                        center;
+
+                    align-content:
+                        center;
+
+                    gap: 12px;
+
+                    background:
+                        #f8f4f1;
+
+                    color:
+                        #201c1e;
+                }
+
+                .brand {
+                    font-family:
+                        Georgia,
+                        "Times New Roman",
+                        serif;
+
+                    font-size:
+                        24px;
+
+                    font-weight:
+                        700;
+                }
+
+                p {
+                    margin: 0;
+
+                    color:
+                        #958b8e;
+
+                    font-family:
+                        Arial,
+                        sans-serif;
+
+                    font-size:
+                        12px;
+                }
+            `}</style>
+
+        </main>
+    );
 }
 
-function getRiskText(
-    id: CategoryId
+function yearWord(
+    years: number
 ) {
-    switch (id) {
-        case "friendship":
-            return "Вам может не хватать лёгкости, совместных впечатлений или ощущения, что вместе интересно даже без большой программы.";
+    const mod100 =
+        years % 100;
 
-        case "partnership":
-            return "В некоторых ситуациях вы можете по-разному понимать, что значит быть командой и как принимать решения вдвоём.";
+    const mod10 =
+        years % 10;
 
-        case "sex":
-            return "Ожидания от близости могут различаться: частота, инициатива и то, что помогает каждому чувствовать связь.";
-
-        case "money":
-            return "Ваш подход к тратам, безопасности и крупным решениям может создавать напряжение даже тогда, когда сумма сама по себе не главная.";
-
-        case "care":
-            return "Вы можете оба стараться заботиться, но показывать это способами, которые партнёр не всегда считывает как поддержку.";
-
-        case "home":
-            return "Повседневные обязанности, привычки и ожидания от быта могут незаметно накапливать раздражение.";
-    }
-}
-
-function getActionForCategory(
-    id: CategoryId
-) {
-    switch (id) {
-        case "friendship":
-            return "Выберите одно новое занятие и впервые попробуйте его вместе";
-
-        case "partnership":
-            return "Возьмите одну общую задачу и заранее договоритесь, кто за что отвечает";
-
-        case "sex":
-            return "Поговорите о комфортной близости: частоте, инициативе и том, что каждому нравится";
-
-        case "money":
-            return "Устройте финансовый вечер: обсудите траты, личные деньги, накопления и крупные покупки";
-
-        case "care":
-            return "Каждый назовите 3 действия партнёра, после которых вы особенно чувствуете заботу";
-
-        case "home":
-            return "Выпишите регулярные бытовые задачи и перераспределите хотя бы три из них";
-    }
-}
-
-function getBlindInsight(
-    item: Comparison
-) {
     if (
-        item.similarity ===
-        "different"
+        mod100 >= 11 &&
+        mod100 <= 14
     ) {
-        return "Здесь вы отвечаете заметно по-разному. В реальной ситуации каждый может считать свою реакцию очевидной — и не понимать, почему партнёр реагирует иначе.";
+        return "лет";
     }
 
     if (
-        item.similarity ===
-        "close"
+        mod10 === 1
     ) {
-        return "Ваши ответы близки, но не полностью совпадают. Обычно именно такие небольшие различия сложнее всего заметить заранее.";
+        return "год";
     }
 
-    return "Здесь вы смотрите на ситуацию довольно похоже.";
+    if (
+        mod10 >= 2 &&
+        mod10 <= 4
+    ) {
+        return "года";
+    }
+
+    return "лет";
 }
