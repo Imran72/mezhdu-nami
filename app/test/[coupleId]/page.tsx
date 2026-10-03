@@ -271,7 +271,6 @@ export default function TestPage() {
         value: string
     ) {
         if (
-            selectedValue !== null ||
             submitting ||
             showReaction ||
             showChapterIntro
@@ -664,10 +663,7 @@ export default function TestPage() {
                                         }
                                         type="button"
                                         disabled={
-                                            submitting ||
-                                            (selectedValue !==
-                                                null &&
-                                                !selected)
+                                            submitting
                                         }
                                         className={
                                             selected
@@ -687,13 +683,13 @@ export default function TestPage() {
                                         }
                                     >
 
-                    <span className="answer-text">
-                      {option.label}
-                    </span>
+    <span className="answer-text">
+        {option.label}
+    </span>
 
                                         <span className="answer-arrow">
-                      →
-                    </span>
+        →
+    </span>
 
                                     </button>
                                 );
