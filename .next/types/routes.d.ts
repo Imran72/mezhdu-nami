@@ -4,7 +4,7 @@
 type AppRoutes = "/" | "/invite/[token]" | "/report/[coupleId]" | "/result/[coupleId]" | "/start" | "/test/[coupleId]" | "/waiting/[coupleId]"
 type AppRouteHandlerRoutes = "/api/answers" | "/api/couples" | "/api/payment" | "/api/report" | "/api/webhook/yookassa"
 type PageRoutes = never
-type LayoutRoutes = "/"
+type LayoutRoutes = "/" | "/report"
 type RedirectRoutes = never
 type RewriteRoutes = never
 type Routes = AppRoutes | PageRoutes | LayoutRoutes | RedirectRoutes | RewriteRoutes | AppRouteHandlerRoutes
@@ -18,6 +18,7 @@ interface ParamMap {
   "/api/report": {}
   "/api/webhook/yookassa": {}
   "/invite/[token]": { "token": string; }
+  "/report": {}
   "/report/[coupleId]": { "coupleId": string; }
   "/result/[coupleId]": { "coupleId": string; }
   "/start": {}
@@ -30,6 +31,7 @@ export type ParamsOf<Route extends Routes> = ParamMap[Route]
 
 interface LayoutSlotMap {
   "/": never
+  "/report": never
 }
 
 

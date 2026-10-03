@@ -1,3 +1,3 @@
-module.exports=[33290,a=>{"use strict";var b=a.i(7997);a.s(["default",0,function({children:a}){return(0,b.jsx)("html",{lang:"ru",children:(0,b.jsx)("body",{children:a})})},"metadata",0,{title:"между нами",description:"Узнайте, насколько одинаково вы видите ваши отношения"}])},70864,function(a){a.n(a.i(33290))}];
+module.exports=[33290,a=>{"use strict";var b=a.i(7997);a.s(["default",0,function({children:a}){return(0,b.jsx)("html",{lang:"ru",children:(0,b.jsx)("body",{children:a})})},"metadata",0,{title:{default:"между нами.",template:"%s · между нами."},applicationName:"между нами.",description:"Узнайте, насколько одинаково вы видите ваши отношения"}])},70864,function(a){a.n(a.i(33290))}];
 
 //# sourceMappingURL=app_layout_tsx_2144vk_._.js.map
