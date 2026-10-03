@@ -13,10 +13,13 @@ import {
 
 type Couple = {
     id: string;
+
     partner_a_name?: string | null;
     partner_b_name?: string | null;
+
     partner_a_completed?: boolean;
     partner_b_completed?: boolean;
+
     invite_token?: string | null;
 };
 
@@ -70,6 +73,16 @@ export default function WaitingPage() {
         );
     }, []);
 
+    /*
+     * ВАЖНО:
+     *
+     * Ссылка для партнёра строится ТОЛЬКО
+     * через /invite/<invite_token>.
+     *
+     * Не используем текущий URL страницы.
+     * Не используем /result/.
+     * Не используем coupleId вместо token.
+     */
     const inviteUrl =
         useMemo(() => {
             if (
@@ -118,7 +131,9 @@ export default function WaitingPage() {
                 const result =
                     await response.json();
 
-                if (!response.ok) {
+                if (
+                    !response.ok
+                ) {
                     throw new Error(
                         result?.error ||
                         "Не удалось загрузить пару"
@@ -132,6 +147,11 @@ export default function WaitingPage() {
                 const currentCouple =
                     result as Couple;
 
+                /*
+                 * Когда оба закончили —
+                 * отправляем первого участника
+                 * на общий результат.
+                 */
                 if (
                     currentCouple
                         .partner_a_completed &&
@@ -150,19 +170,25 @@ export default function WaitingPage() {
                 );
 
                 setError("");
-            } catch (err) {
+            } catch (
+                err
+                ) {
                 console.error(
                     "Waiting couple load error:",
                     err
                 );
 
-                if (!cancelled) {
+                if (
+                    !cancelled
+                ) {
                     setError(
                         "Не получилось загрузить приглашение."
                     );
                 }
             } finally {
-                if (!cancelled) {
+                if (
+                    !cancelled
+                ) {
                     setLoading(
                         false
                     );
@@ -172,15 +198,18 @@ export default function WaitingPage() {
 
         loadCouple();
 
+        /*
+         * Первый человек ждёт.
+         * Проверяем, закончил ли второй.
+         */
         timer =
             setInterval(
                 loadCouple,
-                3000
+                4000
             );
 
         return () => {
-            cancelled =
-                true;
+            cancelled = true;
 
             if (timer) {
                 clearInterval(
@@ -193,7 +222,7 @@ export default function WaitingPage() {
         router,
     ]);
 
-    async function copyLink() {
+    async function copyInvite() {
         if (!inviteUrl) {
             return;
         }
@@ -213,8 +242,56 @@ export default function WaitingPage() {
                 },
                 1800
             );
-        } catch (err) {
-            console.error(err);
+        } catch (
+            error
+            ) {
+            console.error(
+                "Clipboard error:",
+                error
+            );
+
+            /*
+             * Fallback для браузеров,
+             * где clipboard API недоступен.
+             */
+            const textarea =
+                document.createElement(
+                    "textarea"
+                );
+
+            textarea.value =
+                inviteUrl;
+
+            textarea.style.position =
+                "fixed";
+
+            textarea.style.opacity =
+                "0";
+
+            document.body.appendChild(
+                textarea
+            );
+
+            textarea.select();
+
+            document.execCommand(
+                "copy"
+            );
+
+            document.body.removeChild(
+                textarea
+            );
+
+            setCopied(true);
+
+            window.setTimeout(
+                () => {
+                    setCopied(
+                        false
+                    );
+                },
+                1800
+            );
         }
     }
 
@@ -223,45 +300,95 @@ export default function WaitingPage() {
             return;
         }
 
-        const partnerName =
-            couple?.partner_b_name ||
-            "тебя";
-
-        try {
-            if (
-                navigator.share
-            ) {
+        /*
+         * ВАЖНО:
+         *
+         * navigator.share получает именно inviteUrl.
+         * Никогда не window.location.href.
+         */
+        if (
+            navigator.share
+        ) {
+            try {
                 await navigator.share({
                     title:
                         "между нами.",
                     text:
-                        `${partnerName}, теперь твоя очередь. Пройди свою часть — потом увидим общий результат.`,
+                        "Пройди свою часть — потом увидим общий результат.",
                     url:
                     inviteUrl,
                 });
 
                 return;
+            } catch (
+                error
+                ) {
+                /*
+                 * Если человек просто закрыл
+                 * системное окно share —
+                 * ничего страшного.
+                 */
+                console.log(
+                    "Share cancelled:",
+                    error
+                );
             }
-
-            await copyLink();
-        } catch (err) {
-            if (
-                err instanceof DOMException &&
-                err.name ===
-                "AbortError"
-            ) {
-                return;
-            }
-
-            console.error(err);
         }
+
+        await copyInvite();
     }
 
     if (loading) {
         return (
-            <StateScreen
-                text="секунду..."
-            />
+            <main className="state">
+
+                <div className="brand">
+                    между нами.
+                </div>
+
+                <p>
+                    готовим ссылку
+                </p>
+
+                <style jsx>{`
+                    .state {
+                        min-height: 100vh;
+
+                        display: grid;
+                        place-items: center;
+                        align-content: center;
+
+                        gap: 12px;
+
+                        background: #f8f4f1;
+
+                        color: #211d1f;
+                    }
+
+                    .brand {
+                        font-family:
+                            Georgia,
+                            "Times New Roman",
+                            serif;
+
+                        font-size: 26px;
+                        font-weight: 700;
+                    }
+
+                    p {
+                        margin: 0;
+
+                        color: #91878a;
+
+                        font-family:
+                            Arial,
+                            sans-serif;
+
+                        font-size: 12px;
+                    }
+                `}</style>
+
+            </main>
         );
     }
 
@@ -270,12 +397,120 @@ export default function WaitingPage() {
         !couple
     ) {
         return (
-            <StateScreen
-                text={
-                    error ||
-                    "Не получилось открыть приглашение."
-                }
-            />
+            <main className="state">
+
+                <div className="brand">
+                    между нами.
+                </div>
+
+                <p>
+                    {error ||
+                        "Пара не найдена."}
+                </p>
+
+                <style jsx>{`
+                    .state {
+                        min-height: 100vh;
+
+                        display: grid;
+                        place-items: center;
+                        align-content: center;
+
+                        gap: 12px;
+
+                        padding: 24px;
+
+                        text-align: center;
+
+                        background: #f8f4f1;
+
+                        color: #211d1f;
+                    }
+
+                    .brand {
+                        font-family:
+                            Georgia,
+                            "Times New Roman",
+                            serif;
+
+                        font-size: 26px;
+                        font-weight: 700;
+                    }
+
+                    p {
+                        margin: 0;
+
+                        color: #91878a;
+
+                        font-family:
+                            Arial,
+                            sans-serif;
+                    }
+                `}</style>
+
+            </main>
+        );
+    }
+
+    /*
+     * invite_token обязателен.
+     *
+     * Лучше явно показать ошибку,
+     * чем случайно отправить человеку
+     * неправильный URL.
+     */
+    if (
+        !couple.invite_token
+    ) {
+        return (
+            <main className="state">
+
+                <div className="brand">
+                    между нами.
+                </div>
+
+                <p>
+                    Не удалось создать
+                    ссылку для партнёра.
+                </p>
+
+                <style jsx>{`
+                    .state {
+                        min-height: 100vh;
+
+                        display: grid;
+                        place-items: center;
+                        align-content: center;
+
+                        gap: 12px;
+
+                        padding: 24px;
+
+                        text-align: center;
+
+                        background: #f8f4f1;
+                    }
+
+                    .brand {
+                        font-family:
+                            Georgia,
+                            "Times New Roman",
+                            serif;
+
+                        font-size: 26px;
+                        font-weight: 700;
+                    }
+
+                    p {
+                        font-family:
+                            Arial,
+                            sans-serif;
+
+                        color: #91878a;
+                    }
+                `}</style>
+
+            </main>
         );
     }
 
@@ -286,185 +521,130 @@ export default function WaitingPage() {
     return (
         <main className="page">
 
-            <header className="header">
+            <div className="shell">
 
-                <div className="brand">
-                    между нами.
-                </div>
+                <header className="header">
 
-            </header>
-
-            <section className="content">
-
-                <div className="done">
-                    <span>
-                        ✓
-                    </span>
-
-                    ТВОЯ ЧАСТЬ ГОТОВА
-                </div>
-
-                <h1>
-                    Теперь очередь:
-                    <br />
-
-                    <em>
-                        {partnerName}.
-                    </em>
-                </h1>
-
-                <p className="lead">
-                    После второго ответа
-                    вы увидите картину целиком.
-                </p>
-
-                <div className="invite-card">
-
-                    <div className="circles">
-                        <span className="circle circle-a" />
-                        <span className="circle circle-b" />
+                    <div className="brand">
+                        между нами.
                     </div>
 
-                    <div className="card-label">
-                        ОСТАЛСЯ ОДИН ШАГ
+                </header>
+
+                <section className="hero">
+
+                    <div className="eyebrow">
+                        ТВОЯ ЧАСТЬ ГОТОВА
                     </div>
 
-                    <h2>
-                        Передай ход
-                    </h2>
+                    <h1>
+                        Теперь очередь:
+                        <br />
 
-                    <p className="card-description">
-                        {partnerName} получит свою
-                        часть теста. Твои ответы
-                        останутся скрыты до общего
-                        результата.
+                        <span>
+                            {partnerName}
+                        </span>
+                        .
+                    </h1>
+
+                    <p className="lead">
+                        После второго ответа
+                        вы увидите картину целиком.
                     </p>
+
+                </section>
+
+                <section className="invite-card">
+
+                    <div className="invite-label">
+                        ССЫЛКА ДЛЯ ПАРТНЁРА
+                    </div>
+
+                    <div className="url-box">
+                        {inviteUrl}
+                    </div>
 
                     <button
                         type="button"
-                        className="share"
-                        disabled={
-                            !inviteUrl
-                        }
+                        className="primary"
                         onClick={
                             shareInvite
                         }
                     >
-                        <span>
-                            Отправить приглашение
-                        </span>
-
-                        <span className="arrow">
-                            →
-                        </span>
+                        Отправить приглашение
                     </button>
 
                     <button
                         type="button"
-                        className={
-                            copied
-                                ? "copy copied"
-                                : "copy"
-                        }
-                        disabled={
-                            !inviteUrl
-                        }
+                        className="copy"
                         onClick={
-                            copyLink
+                            copyInvite
                         }
                     >
                         {copied
-                            ? "Ссылка скопирована ✓"
+                            ? "Ссылка скопирована"
                             : "Скопировать ссылку"}
                     </button>
 
+                </section>
+
+                <div className="bottom-note">
+                    Результат откроется
+                    автоматически, когда
+                    вы оба закончите.
                 </div>
 
-                <div className="waiting">
-
-                    <div className="waiting-title">
-
-                        <span className="pulse" />
-
-                        Ждём второй ответ
-
-                    </div>
-
-                    <p>
-                        Ничего обновлять не нужно —
-                        результат откроется здесь
-                        автоматически.
-                    </p>
-
-                </div>
-
-            </section>
+            </div>
 
             <style jsx>{`
+
                 :global(*) {
                     box-sizing:
                         border-box;
                 }
 
-                :global(html),
                 :global(body) {
                     margin: 0;
 
                     background:
-                        #faf7f5;
-                }
+                        #f8f4f1;
 
-                button {
-                    font: inherit;
+                    color:
+                        #211d1f;
                 }
 
                 .page {
                     min-height:
-                        100svh;
+                        100vh;
 
                     padding:
-                        0
-                        28px
-                        60px;
-
-                    overflow-x:
-                        hidden;
-
-                    color:
-                        #201c1e;
+                        0 22px
+                        50px;
 
                     background:
-                        radial-gradient(
-                            circle
-                            at 78% 12%,
-                            rgba(
-                                205,
-                                92,
-                                132,
-                                .08
-                            ),
-                            transparent
-                            29%
-                        ),
-                        #faf7f5;
+                        #f8f4f1;
                 }
 
-                .header {
+                .shell {
                     width:
                         min(
-                            920px,
+                            620px,
                             100%
                         );
 
-                    height: 78px;
+                    margin:
+                        0 auto;
+                }
 
-                    display: flex;
+                .header {
+                    min-height:
+                        72px;
+
+                    display:
+                        flex;
 
                     align-items:
                         center;
-
-                    margin:
-                        0 auto;
                 }
 
                 .brand {
@@ -476,56 +656,33 @@ export default function WaitingPage() {
                     font-size:
                         24px;
 
-                    line-height: 1;
-
                     font-weight:
                         700;
 
                     letter-spacing:
-                        -1.1px;
+                        -1px;
                 }
 
-                .content {
-                    width:
-                        min(
-                            920px,
-                            100%
-                        );
-
-                    margin:
-                        0 auto;
-
-                    padding-top:
-                        clamp(
-                            46px,
-                            7vh,
-                            76px
-                        );
+                .hero {
+                    padding:
+                        62px
+                        0
+                        38px;
                 }
 
-                .done {
-                    display: flex;
-
-                    align-items:
-                        center;
-
-                    gap: 9px;
-
+                .eyebrow {
                     margin-bottom:
-                        19px;
+                        15px;
 
                     color:
-                        #c62059;
+                        #c51f59;
 
                     font-family:
                         Arial,
-                        Helvetica,
                         sans-serif;
 
                     font-size:
                         10px;
-
-                    line-height: 1;
 
                     font-weight:
                         800;
@@ -534,35 +691,9 @@ export default function WaitingPage() {
                         2px;
                 }
 
-                .done span {
-                    width: 21px;
-                    height: 21px;
-
-                    display: grid;
-
-                    place-items:
-                        center;
-
-                    border-radius:
-                        50%;
-
-                    color: #fff;
-
-                    background:
-                        #ca225c;
-
-                    font-size:
-                        11px;
-
-                    letter-spacing:
-                        0;
-                }
-
                 h1 {
-                    max-width:
-                        760px;
-
-                    margin: 0;
+                    margin:
+                        0;
 
                     font-family:
                         Georgia,
@@ -571,32 +702,29 @@ export default function WaitingPage() {
 
                     font-size:
                         clamp(
-                            58px,
-                            7vw,
-                            86px
+                            45px,
+                            8vw,
+                            64px
                         );
 
                     line-height:
-                        .9;
+                        .95;
 
                     font-weight:
                         400;
 
                     letter-spacing:
-                        -4px;
+                        -2.3px;
                 }
 
-                h1 em {
+                h1 span {
                     color:
-                        #ca205a;
-
-                    font-style:
-                        normal;
+                        #c51f59;
                 }
 
                 .lead {
                     max-width:
-                        500px;
+                        470px;
 
                     margin:
                         22px
@@ -604,117 +732,43 @@ export default function WaitingPage() {
                         0;
 
                     color:
-                        #837a7d;
+                        #7f7679;
 
                     font-family:
                         Arial,
-                        Helvetica,
                         sans-serif;
 
                     font-size:
                         14px;
 
                     line-height:
-                        1.5;
+                        1.55;
                 }
 
                 .invite-card {
-                    width:
-                        min(
-                            650px,
-                            100%
-                        );
-
-                    margin-top:
-                        40px;
-
                     padding:
-                        28px;
+                        25px;
 
                     border:
                         1px solid
                         #e3d9d7;
 
                     border-radius:
-                        28px;
-
-                    background:
-                        rgba(
-                            255,
-                            252,
-                            250,
-                            .82
-                        );
-
-                    box-shadow:
-                        0
-                        20px
-                        60px
-                        rgba(
-                            73,
-                            37,
-                            51,
-                            .045
-                        );
-                }
-
-                .circles {
-                    position:
-                        relative;
-
-                    width: 67px;
-                    height: 43px;
-
-                    margin-bottom:
                         23px;
-                }
-
-                .circle {
-                    position:
-                        absolute;
-
-                    top: 0;
-
-                    width: 43px;
-                    height: 43px;
-
-                    border-radius:
-                        50%;
-                }
-
-                .circle-a {
-                    left: 0;
 
                     background:
-                        #d5537f;
+                        #fffaf8;
                 }
 
-                .circle-b {
-                    left: 24px;
-
-                    border:
-                        1px solid
-                        #d5537f;
-
-                    background:
-                        rgba(
-                            250,
-                            247,
-                            245,
-                            .74
-                        );
-                }
-
-                .card-label {
+                .invite-label {
                     margin-bottom:
-                        9px;
+                        10px;
 
                     color:
-                        #b5a8ac;
+                        #a29398;
 
                     font-family:
                         Arial,
-                        Helvetica,
                         sans-serif;
 
                     font-size:
@@ -724,88 +778,73 @@ export default function WaitingPage() {
                         800;
 
                     letter-spacing:
-                        1.8px;
+                        1.4px;
                 }
 
-                h2 {
-                    margin: 0;
+                .url-box {
+                    width:
+                        100%;
 
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
+                    margin-bottom:
+                        18px;
 
-                    font-size:
-                        33px;
+                    padding:
+                        15px;
 
-                    line-height: 1;
+                    overflow:
+                        hidden;
 
-                    font-weight:
-                        400;
+                    border-radius:
+                        13px;
 
-                    letter-spacing:
-                        -1.3px;
-                }
-
-                .card-description {
-                    max-width:
-                        470px;
-
-                    margin:
-                        11px
-                        0
-                        0;
+                    background:
+                        #f2e4e7;
 
                     color:
-                        #8c8185;
+                        #665b5f;
 
                     font-family:
                         Arial,
-                        Helvetica,
                         sans-serif;
 
                     font-size:
                         12px;
 
                     line-height:
-                        1.55;
+                        1.4;
+
+                    text-overflow:
+                        ellipsis;
+
+                    white-space:
+                        nowrap;
                 }
 
-                .share {
-                    width: 100%;
-                    height: 62px;
-
-                    display: flex;
-
-                    align-items:
-                        center;
-
-                    justify-content:
-                        space-between;
-
-                    margin-top:
-                        24px;
-
-                    padding:
-                        0
-                        24px;
+                button {
+                    width:
+                        100%;
 
                     border: 0;
+
+                    cursor:
+                        pointer;
+                }
+
+                .primary {
+                    min-height:
+                        54px;
 
                     border-radius:
                         999px;
 
-                    cursor:
-                        pointer;
-
-                    color: #fff;
-
                     background:
-                        #cc205a;
+                        #c7245c;
+
+                    color:
+                        white;
 
                     font-family:
                         Arial,
-                        Helvetica,
                         sans-serif;
 
                     font-size:
@@ -813,201 +852,64 @@ export default function WaitingPage() {
 
                     font-weight:
                         700;
-
-                    transition:
-                        transform
-                        .18s ease,
-                        background
-                        .18s ease;
-                }
-
-                .share:hover:not(:disabled) {
-                    transform:
-                        translateY(-1px);
-
-                    background:
-                        #b91850;
-                }
-
-                .share:disabled,
-                .copy:disabled {
-                    opacity: .45;
-
-                    cursor:
-                        default;
-                }
-
-                .arrow {
-                    font-family:
-                        Georgia,
-                        serif;
-
-                    font-size:
-                        23px;
-
-                    font-weight:
-                        400;
                 }
 
                 .copy {
-                    width: 100%;
-
                     margin-top:
-                        7px;
+                        10px;
 
-                    padding: 11px;
-
-                    border: 0;
-
-                    cursor:
-                        pointer;
-
-                    color:
-                        #8f8488;
+                    padding:
+                        12px;
 
                     background:
                         transparent;
 
+                    color:
+                        #8d8084;
+
                     font-family:
                         Arial,
-                        Helvetica,
                         sans-serif;
 
                     font-size:
                         11px;
-
-                    font-weight:
-                        600;
                 }
 
-                .copy.copied {
-                    color:
-                        #bd285a;
-                }
-
-                .waiting {
-                    margin-top:
-                        25px;
-                }
-
-                .waiting-title {
-                    display: flex;
-
-                    align-items:
-                        center;
-
-                    gap: 8px;
+                .bottom-note {
+                    padding:
+                        23px
+                        5px;
 
                     color:
-                        #5f5659;
+                        #a09397;
 
                     font-family:
                         Arial,
-                        Helvetica,
                         sans-serif;
 
                     font-size:
                         11px;
-
-                    font-weight:
-                        700;
-                }
-
-                .pulse {
-                    width: 7px;
-                    height: 7px;
-
-                    border-radius:
-                        50%;
-
-                    background:
-                        #cc205a;
-
-                    animation:
-                        pulse
-                        1.8s
-                        infinite;
-                }
-
-                .waiting p {
-                    margin:
-                        7px
-                        0
-                        0
-                        15px;
-
-                    color:
-                        #a3979b;
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        10px;
 
                     line-height:
-                        1.5;
-                }
+                        1.45;
 
-                @keyframes pulse {
-                    0% {
-                        box-shadow:
-                            0
-                            0
-                            0
-                            0
-                            rgba(
-                                204,
-                                32,
-                                90,
-                                .32
-                            );
-                    }
-
-                    70% {
-                        box-shadow:
-                            0
-                            0
-                            0
-                            8px
-                            rgba(
-                                204,
-                                32,
-                                90,
-                                0
-                            );
-                    }
-
-                    100% {
-                        box-shadow:
-                            0
-                            0
-                            0
-                            0
-                            rgba(
-                                204,
-                                32,
-                                90,
-                                0
-                            );
-                    }
+                    text-align:
+                        center;
                 }
 
                 @media (
                     max-width:
                         640px
                 ) {
+
                     .page {
                         padding:
-                            0
-                            16px
-                            40px;
+                            0 14px
+                            34px;
                     }
 
                     .header {
-                        height:
+                        min-height:
                             64px;
                     }
 
@@ -1016,163 +918,17 @@ export default function WaitingPage() {
                             21px;
                     }
 
-                    .content {
+                    .hero {
                         padding-top:
-                            36px;
-                    }
-
-                    .done {
-                        margin-bottom:
-                            16px;
-
-                        font-size:
-                            9px;
-
-                        letter-spacing:
-                            1.6px;
-                    }
-
-                    h1 {
-                        font-size:
-                            52px;
-
-                        line-height:
-                            .91;
-
-                        letter-spacing:
-                            -2.8px;
-                    }
-
-                    .lead {
-                        margin-top:
-                            17px;
-
-                        font-size:
-                            13px;
+                            44px;
                     }
 
                     .invite-card {
-                        margin-top:
-                            31px;
-
                         padding:
-                            21px
-                            19px
-                            17px;
-
-                        border-radius:
-                            22px;
-                    }
-
-                    .circles {
-                        margin-bottom:
-                            18px;
-                    }
-
-                    h2 {
-                        font-size:
-                            28px;
-                    }
-
-                    .card-description {
-                        font-size:
-                            11px;
-                    }
-
-                    .share {
-                        height:
-                            58px;
-
-                        margin-top:
                             20px;
-
-                        padding:
-                            0
-                            20px;
-
-                        font-size:
-                            13px;
-                    }
-
-                    .waiting {
-                        margin-top:
-                            21px;
                     }
                 }
-            `}</style>
 
-        </main>
-    );
-}
-
-function StateScreen({
-                         text,
-                     }: {
-    text: string;
-}) {
-    return (
-        <main className="state">
-
-            <div className="brand">
-                между нами.
-            </div>
-
-            <p>
-                {text}
-            </p>
-
-            <style jsx>{`
-                :global(body) {
-                    margin: 0;
-                }
-
-                .state {
-                    min-height:
-                        100svh;
-
-                    display: grid;
-
-                    place-items:
-                        center;
-
-                    align-content:
-                        center;
-
-                    gap: 12px;
-
-                    background:
-                        #faf7f5;
-
-                    color:
-                        #201c1e;
-                }
-
-                .brand {
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
-
-                    font-size:
-                        24px;
-
-                    font-weight:
-                        700;
-                }
-
-                p {
-                    margin: 0;
-
-                    color:
-                        #958b8e;
-
-                    font-family:
-                        Arial,
-                        sans-serif;
-
-                    font-size:
-                        12px;
-                }
             `}</style>
 
         </main>

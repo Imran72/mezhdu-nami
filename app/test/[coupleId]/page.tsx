@@ -15,6 +15,7 @@ import {
 import {
     chapters,
     questions,
+    Question,
 } from '../../../lib/questions';
 
 type Answers = Record<string, string>;
@@ -57,35 +58,20 @@ export default function TestPage() {
             ? 'b'
             : 'a';
 
-    const [
-        currentIndex,
-        setCurrentIndex,
-    ] = useState(0);
+    const [currentIndex, setCurrentIndex] =
+        useState(0);
 
-    const [
-        answers,
-        setAnswers,
-    ] = useState<Answers>({});
+    const [answers, setAnswers] =
+        useState<Answers>({});
 
-    const [
-        checking,
-        setChecking,
-    ] = useState(true);
+    const [checking, setChecking] =
+        useState(true);
 
-    const [
-        submitting,
-        setSubmitting,
-    ] = useState(false);
+    const [submitting, setSubmitting] =
+        useState(false);
 
-    const [
-        moving,
-        setMoving,
-    ] = useState(false);
-
-    const [
-        error,
-        setError,
-    ] = useState('');
+    const [error, setError] =
+        useState('');
 
     const [
         selectedValue,
@@ -95,12 +81,16 @@ export default function TestPage() {
     const [
         transitionDirection,
         setTransitionDirection,
-    ] = useState<'next' | 'back'>('next');
+    ] = useState<'next' | 'back'>(
+        'next'
+    );
 
     const [
         showChapterIntro,
         setShowChapterIntro,
-    ] = useState<ChapterIntro | null>(null);
+    ] = useState<ChapterIntro | null>(
+        null
+    );
 
     const [
         showReaction,
@@ -117,7 +107,7 @@ export default function TestPage() {
             }
 
             return (
-                ((currentIndex + 1) /
+                (currentIndex /
                     questions.length) *
                 100
             );
@@ -126,7 +116,7 @@ export default function TestPage() {
     const progressText =
         useMemo(() => {
             const ratio =
-                (currentIndex + 1) /
+                currentIndex /
                 questions.length;
 
             if (ratio < 0.2) {
@@ -148,6 +138,9 @@ export default function TestPage() {
             return 'почти всё';
         }, [currentIndex]);
 
+    /*
+     * Проверяем состояние пары.
+     */
     useEffect(() => {
         async function checkCouple() {
             try {
@@ -170,6 +163,9 @@ export default function TestPage() {
                 const couple: Couple =
                     await response.json();
 
+                /*
+                 * Оба уже прошли.
+                 */
                 if (
                     couple.partner_a_completed &&
                     couple.partner_b_completed
@@ -181,6 +177,9 @@ export default function TestPage() {
                     return;
                 }
 
+                /*
+                 * Первый уже проходил.
+                 */
                 if (
                     role === 'a' &&
                     couple.partner_a_completed
@@ -192,6 +191,9 @@ export default function TestPage() {
                     return;
                 }
 
+                /*
+                 * Второй уже проходил.
+                 */
                 if (
                     role === 'b' &&
                     couple.partner_b_completed
@@ -224,6 +226,10 @@ export default function TestPage() {
         router,
     ]);
 
+    /*
+     * Если пользователь возвращается назад,
+     * подсвечиваем его предыдущий ответ.
+     */
     useEffect(() => {
         if (!currentQuestion) {
             return;
@@ -265,17 +271,18 @@ export default function TestPage() {
         value: string
     ) {
         if (
-            moving ||
+            selectedValue !== null ||
             submitting ||
             showReaction ||
-            showChapterIntro ||
-            !currentQuestion
+            showChapterIntro
         ) {
             return;
         }
 
-        setMoving(true);
-        setError('');
+        if (!currentQuestion) {
+            return;
+        }
+
         setSelectedValue(value);
 
         const newAnswers: Answers = {
@@ -285,7 +292,11 @@ export default function TestPage() {
 
         setAnswers(newAnswers);
 
-        await sleep(220);
+        /*
+         * Маленькая задержка,
+         * чтобы пользователь увидел выбор.
+         */
+        await sleep(260);
 
         const isLastQuestion =
             currentIndex ===
@@ -296,8 +307,6 @@ export default function TestPage() {
                 newAnswers
             );
 
-            setMoving(false);
-
             return;
         }
 
@@ -307,19 +316,29 @@ export default function TestPage() {
         const nextQuestion =
             questions[nextIndex];
 
+        /*
+         * Иногда показываем короткую
+         * реакцию между вопросами.
+         */
         const reaction =
-            microReactions[currentIndex];
+            microReactions[
+                currentIndex
+                ];
 
         if (reaction) {
             setShowReaction(
                 reaction
             );
 
-            await sleep(750);
+            await sleep(850);
 
             setShowReaction(null);
         }
 
+        /*
+         * Если начинается новая глава —
+         * показываем перебивку.
+         */
         if (
             nextQuestion &&
             nextQuestion.chapter !==
@@ -335,8 +354,6 @@ export default function TestPage() {
                     intro
                 );
 
-                setMoving(false);
-
                 return;
             }
         }
@@ -349,15 +366,11 @@ export default function TestPage() {
             nextIndex
         );
 
-        setMoving(false);
+        setSelectedValue(null);
     }
 
     function continueChapter() {
-        if (
-            !showChapterIntro ||
-            moving ||
-            submitting
-        ) {
+        if (!showChapterIntro) {
             return;
         }
 
@@ -368,19 +381,16 @@ export default function TestPage() {
         );
 
         setCurrentIndex(
-            (index) =>
-                Math.min(
-                    index + 1,
-                    questions.length - 1
-                )
+            (index) => index + 1
         );
+
+        setSelectedValue(null);
     }
 
     function goBack() {
         if (
             currentIndex === 0 ||
-            submitting ||
-            moving
+            submitting
         ) {
             return;
         }
@@ -391,14 +401,9 @@ export default function TestPage() {
 
         setShowChapterIntro(null);
         setShowReaction(null);
-        setError('');
 
         setCurrentIndex(
-            (index) =>
-                Math.max(
-                    index - 1,
-                    0
-                )
+            (index) => index - 1
         );
     }
 
@@ -448,6 +453,10 @@ export default function TestPage() {
                 );
             }
 
+            /*
+             * Второй человек завершил тест —
+             * сразу показываем результат.
+             */
             if (role === 'b') {
                 router.replace(
                     `/result/${coupleId}`
@@ -456,6 +465,9 @@ export default function TestPage() {
                 return;
             }
 
+            /*
+             * Первый человек ждёт партнёра.
+             */
             router.replace(
                 `/waiting/${coupleId}`
             );
@@ -467,6 +479,7 @@ export default function TestPage() {
             );
 
             setSubmitting(false);
+            setSelectedValue(null);
         }
     }
 
@@ -486,6 +499,9 @@ export default function TestPage() {
         );
     }
 
+    /*
+     * Короткая реакция между вопросами.
+     */
     if (showReaction) {
         return (
             <main className="reaction-page">
@@ -500,11 +516,13 @@ export default function TestPage() {
                 </div>
 
                 <style jsx>{styles}</style>
-
             </main>
         );
     }
 
+    /*
+     * Перебивка между главами.
+     */
     if (showChapterIntro) {
         return (
             <main className="chapter-page">
@@ -559,8 +577,7 @@ export default function TestPage() {
                         onClick={goBack}
                         disabled={
                             currentIndex === 0 ||
-                            submitting ||
-                            moving
+                            submitting
                         }
                         aria-label="Назад"
                     >
@@ -577,8 +594,7 @@ export default function TestPage() {
                             <div
                                 className="progress-value"
                                 style={{
-                                    width:
-                                        `${progress}%`,
+                                    width: `${progress}%`,
                                 }}
                             />
                         </div>
@@ -594,9 +610,7 @@ export default function TestPage() {
                 </header>
 
                 <section
-                    key={
-                        currentQuestion.id
-                    }
+                    key={currentQuestion.id}
                     className={
                         transitionDirection ===
                         'next'
@@ -651,7 +665,9 @@ export default function TestPage() {
                                         type="button"
                                         disabled={
                                             submitting ||
-                                            moving
+                                            (selectedValue !==
+                                                null &&
+                                                !selected)
                                         }
                                         className={
                                             selected
@@ -660,7 +676,9 @@ export default function TestPage() {
                                         }
                                         style={{
                                             animationDelay:
-                                                `${index * 45}ms`,
+                                                `${
+                                                    index * 45
+                                                }ms`,
                                         }}
                                         onClick={() =>
                                             chooseAnswer(
@@ -669,13 +687,13 @@ export default function TestPage() {
                                         }
                                     >
 
-                                        <span className="answer-text">
-                                            {option.label}
-                                        </span>
+                    <span className="answer-text">
+                      {option.label}
+                    </span>
 
                                         <span className="answer-arrow">
-                                            →
-                                        </span>
+                      →
+                    </span>
 
                                     </button>
                                 );
@@ -766,6 +784,10 @@ const styles = `
     font-family: inherit;
   }
 
+  /* ============================================================
+     TEST
+  ============================================================ */
+
   .test-page {
     min-height: 100svh;
 
@@ -780,65 +802,82 @@ const styles = `
     color: #171515;
 
     padding:
-      max(28px, env(safe-area-inset-top))
-      6vw
-      56px;
+      max(
+        26px,
+        env(safe-area-inset-top)
+      )
+      20px
+      max(
+        42px,
+        env(safe-area-inset-bottom)
+      );
   }
 
   .test-shell {
-    width: min(1120px, 100%);
+    width: 100%;
+    max-width: 760px;
+
     margin: 0 auto;
   }
 
+  /* ============================================================
+     HEADER
+  ============================================================ */
+
   .test-header {
     display: grid;
-    grid-template-columns:
-      64px
-      minmax(0, 1fr)
-      72px;
 
-    gap: 26px;
+    grid-template-columns:
+      46px
+      minmax(0, 1fr)
+      46px;
+
     align-items: center;
+
+    gap: 14px;
   }
 
   .back-button {
-    width: 56px;
-    height: 56px;
+    width: 42px;
+    height: 42px;
 
-    display: grid;
-    place-items: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    padding: 0;
-
-    border:
-      1px solid
-      #e4d9d6;
-
+    border: 1px solid #e9dfdc;
     border-radius: 50%;
+
+    background:
+      rgba(
+        255,
+        255,
+        255,
+        0.72
+      );
+
+    color: #554d4f;
+
+    font-size: 20px;
 
     cursor: pointer;
 
-    color: #4f4949;
-    background:
-      rgba(255,255,255,.55);
-
-    font-size: 31px;
-    font-weight: 300;
-
     transition:
-      transform .16s ease,
-      opacity .16s ease,
-      background .16s ease;
+      transform 150ms ease,
+      opacity 150ms ease,
+      background 150ms ease;
   }
 
   .back-button:hover:not(:disabled) {
-    transform: translateX(-2px);
-    background: #fff;
+    background: #ffffff;
+
+    transform:
+      translateX(-2px);
   }
 
   .back-button:disabled {
-    opacity: .25;
-    cursor: default;
+    opacity: 0;
+    pointer-events: none;
   }
 
   .progress-area {
@@ -846,32 +885,27 @@ const styles = `
   }
 
   .progress-copy {
-    margin-bottom: 12px;
+    margin-bottom: 8px;
 
-    color: #9c9293;
+    color: #9c9193;
 
-    font-family:
-      Arial,
-      Helvetica,
-      sans-serif;
+    font-size: 11px;
+    font-weight: 650;
 
-    font-size: 12px;
-    font-weight: 700;
-
-    letter-spacing: 1.2px;
+    letter-spacing: 0.04em;
 
     text-align: center;
   }
 
   .progress-track {
     width: 100%;
-    height: 6px;
+    height: 4px;
 
     overflow: hidden;
 
     border-radius: 999px;
 
-    background: #e9e1e0;
+    background: #ebe2e2;
   }
 
   .progress-value {
@@ -882,265 +916,344 @@ const styles = `
     background:
       linear-gradient(
         90deg,
-        #ae315f,
-        #db8ca8
+        #9e3f64,
+        #d28ba5
       );
 
     transition:
-      width .35s ease;
+      width 420ms
+      cubic-bezier(
+        0.22,
+        1,
+        0.36,
+        1
+      );
   }
 
   .question-position {
-    color: #8e8586;
+    color: #8f8587;
 
-    font-family:
-      Arial,
-      Helvetica,
-      sans-serif;
-
-    font-size: 16px;
-    font-weight: 700;
+    font-size: 12px;
+    font-weight: 650;
 
     text-align: right;
   }
 
   .question-position span {
-    margin: 0 3px;
-    color: #bbb1b2;
+    margin: 0 2px;
+
+    color: #c5babc;
   }
 
-  .question-screen {
-    width: min(1040px, 100%);
+  /* ============================================================
+     QUESTION
+  ============================================================ */
 
-    margin:
-      clamp(92px, 13vh, 150px)
-      auto
-      0;
+  .question-screen {
+    width: 100%;
+
+    padding-top: 84px;
   }
 
   .question-screen-next {
     animation:
       questionInNext
-      .34s
-      cubic-bezier(.22,.8,.32,1)
+      480ms
+      cubic-bezier(
+        0.22,
+        1,
+        0.36,
+        1
+      )
       both;
   }
 
   .question-screen-back {
     animation:
       questionInBack
-      .34s
-      cubic-bezier(.22,.8,.32,1)
+      420ms
+      cubic-bezier(
+        0.22,
+        1,
+        0.36,
+        1
+      )
       both;
+  }
+
+  @keyframes questionInNext {
+    from {
+      opacity: 0;
+      transform:
+        translateY(14px);
+    }
+
+    to {
+      opacity: 1;
+      transform:
+        translateY(0);
+    }
+  }
+
+  @keyframes questionInBack {
+    from {
+      opacity: 0;
+      transform:
+        translateY(-10px);
+    }
+
+    to {
+      opacity: 1;
+      transform:
+        translateY(0);
+    }
   }
 
   .question-meta {
     display: flex;
     align-items: center;
 
-    gap: 10px;
+    gap: 8px;
 
-    margin-bottom: 28px;
+    margin-bottom: 20px;
 
-    color: #ad3561;
+    color: #a5486b;
 
-    font-family:
-      Arial,
-      Helvetica,
-      sans-serif;
+    font-size: 11px;
+    font-weight: 750;
 
-    font-size: 12px;
-    line-height: 1;
-
-    font-weight: 800;
-
-    letter-spacing: 2.4px;
-
-    text-transform: uppercase;
+    letter-spacing: 0.13em;
   }
 
   .question-dot {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
 
     border-radius: 50%;
 
-    background: #d16388;
+    background: #c76f90;
   }
 
   .question-title {
-    max-width: 930px;
+    max-width: 720px;
 
     margin: 0;
 
+    color: #171515;
+
     font-family:
       Georgia,
-      "Times New Roman",
+      'Times New Roman',
       serif;
 
     font-size:
       clamp(
-        54px,
-        6.1vw,
-        86px
+        40px,
+        5.4vw,
+        62px
       );
 
-    line-height: .93;
+    line-height: 1.02;
 
-    font-weight: 400;
+    font-weight: 500;
 
-    letter-spacing: -4px;
+    letter-spacing: -0.04em;
+
+    text-wrap: balance;
   }
 
   .question-description {
-    max-width: 660px;
+    max-width: 610px;
 
     margin:
-      24px
+      20px
       0
       0;
 
-    color: #8d8384;
+    color: #8b8183;
 
-    font-family:
-      Arial,
-      Helvetica,
-      sans-serif;
-
-    font-size: 15px;
-    line-height: 1.55;
+    font-size: 16px;
+    line-height: 1.5;
   }
 
+  /* ============================================================
+     ANSWERS
+  ============================================================ */
+
   .answers {
+    width: 100%;
+
     display: flex;
     flex-direction: column;
 
-    gap: 14px;
+    gap: 11px;
 
-    margin-top: 56px;
+    margin-top: 38px;
   }
 
   .answer-card {
     width: 100%;
-    min-height: 86px;
+    min-height: 68px;
 
     display: flex;
     align-items: center;
     justify-content: space-between;
 
-    gap: 24px;
-
-    padding:
-      0
-      27px;
+    gap: 20px;
 
     border:
-      1px solid
-      #e8dfdd;
+      1px solid #e7ddda;
 
-    border-radius: 24px;
-
-    cursor: pointer;
-
-    color: #aaa3a3;
+    border-radius: 19px;
 
     background:
       rgba(
         255,
         255,
         255,
-        .34
+        0.78
       );
 
-    font-family:
-      Arial,
-      Helvetica,
-      sans-serif;
+    color: #262122;
 
-    font-size: 21px;
-    line-height: 1.3;
+    padding: 18px 20px;
 
     text-align: left;
+
+    font-size: 17px;
+    line-height: 1.35;
+
+    cursor: pointer;
 
     opacity: 0;
 
     animation:
-      answerIn
-      .35s
-      ease
+      cardIn
+      430ms
+      cubic-bezier(
+        0.22,
+        1,
+        0.36,
+        1
+      )
       forwards;
 
     transition:
-      border-color .18s ease,
-      color .18s ease,
-      background .18s ease,
-      transform .18s ease;
+      border-color 160ms ease,
+      background 160ms ease,
+      transform 160ms ease,
+      box-shadow 160ms ease,
+      opacity 160ms ease;
+  }
+
+  @keyframes cardIn {
+    from {
+      opacity: 0;
+
+      transform:
+        translateY(8px);
+    }
+
+    to {
+      opacity: 1;
+
+      transform:
+        translateY(0);
+    }
   }
 
   .answer-card:hover:not(:disabled) {
-    transform:
-      translateY(-1px);
-
-    color: #4b4144;
-
-    border-color: #d69aae;
-
-    background:
+    border-color:
       rgba(
-        255,
-        249,
-        251,
-        .82
+        171,
+        73,
+        109,
+        0.48
+      );
+
+    background: #ffffff;
+
+    transform:
+      translateY(-2px);
+
+    box-shadow:
+      0 10px 28px
+      rgba(
+        75,
+        44,
+        55,
+        0.06
       );
   }
 
-  .answer-card-selected {
-    color: #2b2325;
-
-    border-color:
-      #c93a6b;
-
-    background:
-      #f4e1e7;
-
-    box-shadow:
-      inset
-      0
-      0
-      0
-      1px
-      rgba(
-        201,
-        58,
-        107,
-        .12
-      );
+  .answer-card:active:not(:disabled) {
+    transform:
+      scale(0.992);
   }
 
   .answer-card:disabled {
     cursor: default;
   }
 
+  .answer-card:disabled:not(
+    .answer-card-selected
+  ) {
+    opacity: 0.38 !important;
+  }
+
+  .answer-card-selected {
+    border-color: #aa4b6e;
+
+    background: #f4e4ea;
+
+    transform:
+      scale(0.992);
+
+    box-shadow:
+      0 0 0 2px
+      rgba(
+        170,
+        75,
+        110,
+        0.08
+      );
+  }
+
   .answer-text {
-    min-width: 0;
+    flex: 1;
   }
 
   .answer-arrow {
     flex-shrink: 0;
 
-    color: #d7cecc;
+    color: #b9abad;
 
-    font-family:
-      Georgia,
-      serif;
+    font-size: 17px;
 
-    font-size: 27px;
+    transition:
+      transform 160ms ease,
+      color 160ms ease;
+  }
+
+  .answer-card:hover
+  .answer-arrow {
+    color: #a5486b;
+
+    transform:
+      translateX(3px);
   }
 
   .answer-card-selected
   .answer-arrow {
-    color: #b53664;
+    color: #a5486b;
+
+    transform:
+      translateX(4px);
   }
+
+  /* ============================================================
+     BIG BUTTON QUESTION
+  ============================================================ */
 
   .answers-big {
     display: grid;
@@ -1151,35 +1264,52 @@ const styles = `
         minmax(0, 1fr)
       );
 
-    gap: 16px;
+    gap: 12px;
   }
 
   .answers-big
   .answer-card {
-    min-height: 124px;
+    min-height: 112px;
+
+    justify-content: center;
+
+    padding: 22px;
+
+    text-align: center;
+
+    font-size: 14px;
+    font-weight: 750;
+
+    letter-spacing: 0.04em;
   }
+
+  .answers-big
+  .answer-arrow {
+    display: none;
+  }
+
+  /* ============================================================
+     SUBMIT
+  ============================================================ */
 
   .submitting {
     display: flex;
     align-items: center;
+    justify-content: center;
 
-    gap: 12px;
+    gap: 10px;
 
-    margin-top: 26px;
+    margin-top: 24px;
 
-    color: #8e8586;
+    color: #8d8284;
 
-    font-family:
-      Arial,
-      Helvetica,
-      sans-serif;
-
-    font-size: 12px;
+    font-size: 13px;
   }
 
   .submitting-dots {
     display: flex;
-    gap: 4px;
+
+    gap: 3px;
   }
 
   .submitting-dots span {
@@ -1188,167 +1318,140 @@ const styles = `
 
     border-radius: 50%;
 
-    background: #c63b6a;
+    background: #b45778;
 
     animation:
       loadingDot
-      1s
-      infinite;
+      900ms
+      infinite
+      alternate;
   }
 
   .submitting-dots span:nth-child(2) {
-    animation-delay: .12s;
+    animation-delay: 150ms;
   }
 
   .submitting-dots span:nth-child(3) {
-    animation-delay: .24s;
+    animation-delay: 300ms;
+  }
+
+  @keyframes loadingDot {
+    from {
+      opacity: 0.25;
+      transform:
+        translateY(1px);
+    }
+
+    to {
+      opacity: 1;
+      transform:
+        translateY(-2px);
+    }
   }
 
   .error {
     margin-top: 20px;
 
-    color: #b72e55;
-
-    font-family:
-      Arial,
-      Helvetica,
-      sans-serif;
-
-    font-size: 12px;
-  }
-
-  .reaction-page,
-  .chapter-page,
-  .loading-page {
-    min-height: 100svh;
-
-    display: grid;
-    place-items: center;
-
-    padding: 28px;
-
-    color: #201c1e;
-
-    background:
-      radial-gradient(
-        circle at 60% 35%,
-        rgba(210, 101, 139, .12),
-        transparent 28%
-      ),
-      #faf8f6;
-  }
-
-  .reaction-page {
-    align-content: center;
-    gap: 28px;
-  }
-
-  .reaction-orbit,
-  .loading-orbit {
-    position: relative;
-
-    width: 86px;
-    height: 58px;
-  }
-
-  .reaction-circle,
-  .loading-circle {
-    position: absolute;
-
-    top: 0;
-
-    width: 58px;
-    height: 58px;
-
-    border-radius: 50%;
-  }
-
-  .reaction-circle-a,
-  .loading-circle-a {
-    left: 0;
-
-    background:
-      rgba(
-        202,
-        50,
-        103,
-        .82
-      );
-  }
-
-  .reaction-circle-b,
-  .loading-circle-b {
-    left: 28px;
-
-    border:
-      1px solid
-      #c93267;
-
-    background:
-      rgba(
-        250,
-        248,
-        246,
-        .72
-      );
-  }
-
-  .reaction-text,
-  .loading-copy {
-    color: #766c6e;
-
-    font-family:
-      Arial,
-      Helvetica,
-      sans-serif;
+    color: #a5486b;
 
     font-size: 14px;
-    font-weight: 700;
-
-    letter-spacing: .3px;
-  }
-
-  .chapter-inner {
-    width: min(720px, 100%);
+    line-height: 1.45;
 
     text-align: center;
   }
 
+  /* ============================================================
+     CHAPTER
+  ============================================================ */
+
+  .chapter-page {
+    min-height: 100svh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: border-box;
+
+    background:
+      radial-gradient(
+        circle at 50% 35%,
+        rgba(
+          198,
+          111,
+          144,
+          0.14
+        ),
+        transparent 34%
+      ),
+      #faf8f6;
+
+    padding: 24px;
+  }
+
+  .chapter-inner {
+    width: 100%;
+    max-width: 680px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    text-align: center;
+
+    animation:
+      chapterIn
+      600ms
+      cubic-bezier(
+        0.22,
+        1,
+        0.36,
+        1
+      )
+      both;
+  }
+
+  @keyframes chapterIn {
+    from {
+      opacity: 0;
+
+      transform:
+        translateY(16px);
+    }
+
+    to {
+      opacity: 1;
+
+      transform:
+        translateY(0);
+    }
+  }
+
   .chapter-number {
-    margin-bottom: 25px;
+    margin-bottom: 28px;
 
-    color: #c02d60;
+    color: #b85b7d;
 
-    font-family:
-      Arial,
-      Helvetica,
-      sans-serif;
+    font-size: 11px;
+    font-weight: 750;
 
-    font-size: 10px;
-    font-weight: 800;
-
-    letter-spacing: 2.5px;
+    letter-spacing: 0.15em;
   }
 
   .chapter-orbit {
     position: relative;
 
-    width: 110px;
-    height: 72px;
+    width: 156px;
+    height: 90px;
 
-    margin:
-      0
-      auto
-      36px;
+    margin-bottom: 34px;
   }
 
   .chapter-circle {
     position: absolute;
 
-    top: 0;
-
-    width: 72px;
-    height: 72px;
+    width: 90px;
+    height: 90px;
 
     border-radius: 50%;
   }
@@ -1356,271 +1459,401 @@ const styles = `
   .chapter-circle-a {
     left: 0;
 
-    background: #cc3c6e;
+    background:
+      rgba(
+        163,
+        66,
+        102,
+        0.45
+      );
   }
 
   .chapter-circle-b {
-    left: 38px;
-
-    border:
-      1px solid
-      #cc3c6e;
+    right: 0;
 
     background:
       rgba(
-        250,
-        248,
-        246,
-        .72
+        221,
+        159,
+        181,
+        0.42
       );
   }
 
   .chapter-title {
     margin: 0;
 
+    color: #171515;
+
     font-family:
       Georgia,
-      "Times New Roman",
+      'Times New Roman',
       serif;
 
     font-size:
       clamp(
-        47px,
+        42px,
         6vw,
-        74px
+        66px
       );
 
-    line-height: .95;
+    line-height: 1;
 
-    font-weight: 400;
+    font-weight: 500;
 
-    letter-spacing: -3px;
+    letter-spacing: -0.045em;
+
+    text-wrap: balance;
   }
 
   .chapter-subtitle {
     max-width: 520px;
 
     margin:
-      21px
+      22px
       auto
       0;
 
-    color: #8b8183;
+    color: #8c8184;
 
-    font-family:
-      Arial,
-      Helvetica,
-      sans-serif;
-
-    font-size: 14px;
-    line-height: 1.55;
+    font-size: 18px;
+    line-height: 1.5;
   }
 
   .chapter-button {
-    min-width: 190px;
-    height: 58px;
-
-    margin-top: 36px;
-
-    padding: 0 26px;
+    margin-top: 38px;
 
     border: 0;
-    border-radius: 999px;
+
+    background: transparent;
+    color: #9f4567;
+
+    padding: 12px;
+
+    font-size: 15px;
+    font-weight: 700;
 
     cursor: pointer;
+  }
 
-    color: #fff;
+  .chapter-button:hover {
+    opacity: 0.7;
+  }
 
-    background: #c9265e;
+  /* ============================================================
+     REACTION
+  ============================================================ */
+
+  .reaction-page {
+    min-height: 100svh;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    background: #faf8f6;
+
+    padding: 24px;
+  }
+
+  .reaction-orbit {
+    position: relative;
+
+    width: 110px;
+    height: 64px;
+
+    margin-bottom: 28px;
+  }
+
+  .reaction-circle {
+    position: absolute;
+
+    width: 64px;
+    height: 64px;
+
+    border-radius: 50%;
+
+    animation:
+      reactionPulse
+      850ms
+      ease
+      both;
+  }
+
+  .reaction-circle-a {
+    left: 0;
+
+    background:
+      rgba(
+        164,
+        65,
+        101,
+        0.42
+      );
+  }
+
+  .reaction-circle-b {
+    right: 0;
+
+    background:
+      rgba(
+        221,
+        158,
+        180,
+        0.4
+      );
+  }
+
+  @keyframes reactionPulse {
+    0% {
+      transform:
+        scale(0.92);
+    }
+
+    50% {
+      transform:
+        scale(1.04);
+    }
+
+    100% {
+      transform:
+        scale(1);
+    }
+  }
+
+  .reaction-text {
+    color: #211d1e;
 
     font-family:
-      Arial,
-      Helvetica,
-      sans-serif;
+      Georgia,
+      'Times New Roman',
+      serif;
 
-    font-size: 13px;
-    font-weight: 700;
+    font-size: 30px;
+
+    animation:
+      reactionText
+      450ms
+      ease
+      both;
   }
 
-  @keyframes questionInNext {
+  @keyframes reactionText {
     from {
       opacity: 0;
+
       transform:
-        translateX(22px);
+        translateY(6px);
     }
 
     to {
       opacity: 1;
-      transform:
-        translateX(0);
-    }
-  }
 
-  @keyframes questionInBack {
-    from {
-      opacity: 0;
-      transform:
-        translateX(-22px);
-    }
-
-    to {
-      opacity: 1;
-      transform:
-        translateX(0);
-    }
-  }
-
-  @keyframes answerIn {
-    from {
-      opacity: 0;
-      transform:
-        translateY(8px);
-    }
-
-    to {
-      opacity: 1;
       transform:
         translateY(0);
     }
   }
 
-  @keyframes loadingDot {
-    0%,
-    60%,
-    100% {
-      transform: translateY(0);
-      opacity: .4;
+  /* ============================================================
+     LOADING
+  ============================================================ */
+
+  .loading-page {
+    min-height: 100svh;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    background: #faf8f6;
+
+    padding: 24px;
+  }
+
+  .loading-orbit {
+    position: relative;
+
+    width: 110px;
+    height: 64px;
+
+    margin-bottom: 24px;
+  }
+
+  .loading-circle {
+    position: absolute;
+
+    width: 64px;
+    height: 64px;
+
+    border-radius: 50%;
+
+    animation:
+      loadingPulse
+      1.2s
+      ease-in-out
+      infinite
+      alternate;
+  }
+
+  .loading-circle-a {
+    left: 0;
+
+    background:
+      rgba(
+        164,
+        65,
+        101,
+        0.42
+      );
+  }
+
+  .loading-circle-b {
+    right: 0;
+
+    background:
+      rgba(
+        221,
+        158,
+        180,
+        0.4
+      );
+
+    animation-delay:
+      180ms;
+  }
+
+  @keyframes loadingPulse {
+    from {
+      transform:
+        translateX(-2px);
     }
 
-    30% {
-      transform: translateY(-4px);
-      opacity: 1;
+    to {
+      transform:
+        translateX(4px);
     }
   }
 
-  @media (max-width: 720px) {
+  .loading-copy {
+    color: #8d8284;
+
+    font-size: 14px;
+  }
+
+  /* ============================================================
+     MOBILE
+  ============================================================ */
+
+  @media (
+    max-width: 600px
+  ) {
 
     .test-page {
-      padding:
-        max(
-          18px,
-          env(safe-area-inset-top)
-        )
-        16px
-        34px;
+      padding-left: 16px;
+      padding-right: 16px;
     }
 
     .test-header {
       grid-template-columns:
-        46px
+        40px
         minmax(0, 1fr)
-        52px;
+        40px;
 
-      gap: 12px;
+      gap: 10px;
     }
 
     .back-button {
-      width: 44px;
-      height: 44px;
+      width: 38px;
+      height: 38px;
 
-      font-size: 25px;
-    }
-
-    .progress-copy {
-      margin-bottom: 9px;
-
-      font-size: 9px;
-
-      letter-spacing: .8px;
-    }
-
-    .progress-track {
-      height: 5px;
-    }
-
-    .question-position {
-      font-size: 13px;
+      font-size: 18px;
     }
 
     .question-screen {
-      margin-top:
-        clamp(
-          60px,
-          9vh,
-          88px
-        );
+      padding-top: 54px;
     }
 
     .question-meta {
-      margin-bottom: 22px;
+      margin-bottom: 15px;
 
       font-size: 10px;
-
-      letter-spacing: 1.9px;
     }
 
     .question-title {
-      font-size:
-        clamp(
-          43px,
-          12.5vw,
-          62px
-        );
+      font-size: 38px;
 
-      line-height: .94;
-
-      letter-spacing: -2.6px;
+      line-height: 1.03;
     }
 
     .question-description {
-      margin-top: 17px;
+      margin-top: 15px;
 
-      font-size: 12px;
+      font-size: 14px;
     }
 
     .answers {
-      gap: 11px;
+      gap: 9px;
 
-      margin-top: 38px;
+      margin-top: 28px;
     }
 
     .answer-card {
-      min-height: 70px;
+      min-height: 61px;
 
-      padding:
-        0
-        18px;
+      padding: 15px 16px;
 
-      border-radius: 19px;
+      border-radius: 16px;
 
       font-size: 15px;
     }
 
-    .answer-arrow {
-      font-size: 22px;
-    }
-
     .answers-big {
       grid-template-columns: 1fr;
+
+      gap: 9px;
     }
 
     .answers-big
     .answer-card {
-      min-height: 78px;
-    }
+      min-height: 70px;
 
-    .chapter-page {
-      padding: 20px;
+      font-size: 13px;
     }
 
     .chapter-title {
-      font-size: 47px;
-
-      letter-spacing: -2px;
+      font-size: 44px;
     }
 
     .chapter-subtitle {
-      font-size: 12px;
+      font-size: 16px;
     }
+
   }
+
+  /* ============================================================
+     REDUCED MOTION
+  ============================================================ */
+
+  @media (
+    prefers-reduced-motion:
+    reduce
+  ) {
+
+    *,
+    *::before,
+    *::after {
+      animation-duration:
+        0.01ms !important;
+
+      animation-iteration-count:
+        1 !important;
+
+      transition-duration:
+        0.01ms !important;
+    }
+
+  }
+
 `;

@@ -11,10 +11,35 @@ import {
     useRouter,
 } from "next/navigation";
 
+import type {
+    ReactNode,
+} from "react";
+
 type Couple = {
     id: string;
     partner_a_name?: string | null;
     partner_b_name?: string | null;
+};
+
+type Comparison = {
+    questionId: string;
+    question: string;
+
+    answerA: string;
+    answerB: string;
+
+    labelA: string;
+    labelB: string;
+
+    traitsA: string[];
+    traitsB: string[];
+
+    sharedTraits: string[];
+
+    similarity:
+        | "same"
+        | "close"
+        | "different";
 };
 
 type ApiResponse = {
@@ -28,21 +53,45 @@ type ApiResponse = {
         closeAnswers?: number;
         differentAnswers?: number;
     };
+
+    comparisons?: Comparison[];
+
+    highlights?: {
+        same?: Comparison[];
+        close?: Comparison[];
+        different?: Comparison[];
+    };
 };
 
+type CategoryId =
+    | "friendship"
+    | "partnership"
+    | "sex"
+    | "money"
+    | "care"
+    | "home";
+
 type CategoryScore = {
+    id: CategoryId;
     title: string;
     subtitle: string;
     value: number;
-    symbol: string;
+};
+
+type MonthPlan = {
+    number: number;
+    eyebrow: string;
+    title: string;
+    description: string;
+    tasks: string[];
 };
 
 const MAX_SCORE = 10;
 
-const PAID_IMAGE =
-    "/images/full-report-couple.png";
+const ROADMAP_IMAGE =
+    "/images/relationship-roadmap.png";
 
-export default function ResultPage() {
+export default function ReportPage() {
     const params =
         useParams<{
             coupleId: string;
@@ -54,24 +103,15 @@ export default function ResultPage() {
     const coupleId =
         params.coupleId;
 
-    const [
-        data,
-        setData,
-    ] =
+    const [data, setData] =
         useState<ApiResponse | null>(
             null
         );
 
-    const [
-        loading,
-        setLoading,
-    ] =
+    const [loading, setLoading] =
         useState(true);
 
-    const [
-        error,
-        setError,
-    ] =
+    const [error, setError] =
         useState("");
 
     useEffect(() => {
@@ -93,7 +133,7 @@ export default function ResultPage() {
 
                 if (!response.ok) {
                     throw new Error(
-                        "Не удалось загрузить результат"
+                        "Не удалось загрузить полный разбор"
                     );
                 }
 
@@ -114,22 +154,18 @@ export default function ResultPage() {
                     return;
                 }
 
-                setData(
-                    result
-                );
+                setData(result);
             } catch (err) {
                 console.error(err);
 
                 if (!cancelled) {
                     setError(
-                        "Не получилось загрузить результат."
+                        "Не получилось загрузить разбор."
                     );
                 }
             } finally {
                 if (!cancelled) {
-                    setLoading(
-                        false
-                    );
+                    setLoading(false);
                 }
             }
         }
@@ -137,8 +173,7 @@ export default function ResultPage() {
         load();
 
         return () => {
-            cancelled =
-                true;
+            cancelled = true;
         };
     }, [
         coupleId,
@@ -176,7 +211,7 @@ export default function ResultPage() {
                 Math.round(
                     (
                         same +
-                        close * .5
+                        close * 0.5
                     ) /
                     total *
                     MAX_SCORE
@@ -195,6 +230,9 @@ export default function ResultPage() {
 
             return [
                 {
+                    id:
+                        "friendship",
+
                     title:
                         "Дружба",
 
@@ -205,12 +243,12 @@ export default function ResultPage() {
                         clamp(
                             base + 1
                         ),
-
-                    symbol:
-                        "♥",
                 },
 
                 {
+                    id:
+                        "partnership",
+
                     title:
                         "Партнёрство",
 
@@ -218,15 +256,13 @@ export default function ResultPage() {
                         "вы команда или каждый сам за себя",
 
                     value:
-                        clamp(
-                            base
-                        ),
-
-                    symbol:
-                        "×",
+                        clamp(base),
                 },
 
                 {
+                    id:
+                        "sex",
+
                     title:
                         "Секс",
 
@@ -237,12 +273,12 @@ export default function ResultPage() {
                         clamp(
                             base + 2
                         ),
-
-                    symbol:
-                        "♡",
                 },
 
                 {
+                    id:
+                        "money",
+
                     title:
                         "Деньги",
 
@@ -253,12 +289,12 @@ export default function ResultPage() {
                         clamp(
                             base - 2
                         ),
-
-                    symbol:
-                        "₽",
                 },
 
                 {
+                    id:
+                        "care",
+
                     title:
                         "Забота",
 
@@ -269,12 +305,12 @@ export default function ResultPage() {
                         clamp(
                             base + 1
                         ),
-
-                    symbol:
-                        "❦",
                 },
 
                 {
+                    id:
+                        "home",
+
                     title:
                         "Быт",
 
@@ -285,63 +321,224 @@ export default function ResultPage() {
                         clamp(
                             base - 1
                         ),
-
-                    symbol:
-                        "⌂",
                 },
             ];
         }, [data]);
 
-    const forecastYears =
+    const sortedCategories =
+        useMemo(
+            () =>
+                [...categories].sort(
+                    (a, b) =>
+                        a.value -
+                        b.value
+                ),
+            [categories]
+        );
+
+    const risks =
+        sortedCategories.slice(
+            0,
+            3
+        );
+
+    const strongest =
+        useMemo(
+            () =>
+                [...categories].sort(
+                    (a, b) =>
+                        b.value -
+                        a.value
+                )[0],
+            [categories]
+        );
+
+    const differences =
         useMemo(() => {
-            const overall =
-                data?.scores
-                    ?.overall ??
-                0;
+            const direct =
+                data
+                    ?.highlights
+                    ?.different ??
+                [];
 
-            if (overall >= 85) {
-                return 45;
+            if (
+                direct.length >= 3
+            ) {
+                return direct.slice(
+                    0,
+                    3
+                );
             }
 
-            if (overall >= 75) {
-                return 28;
-            }
-
-            if (overall >= 65) {
-                return 16;
-            }
-
-            if (overall >= 55) {
-                return 10;
-            }
-
-            if (overall >= 45) {
-                return 6;
-            }
-
-            if (overall >= 35) {
-                return 3;
-            }
-
-            return 1;
+            return (
+                data?.comparisons ??
+                []
+            )
+                .filter(
+                    (item) =>
+                        item.similarity !==
+                        "same"
+                )
+                .slice(
+                    0,
+                    3
+                );
         }, [data]);
 
-    const forecastPosition =
-        Math.max(
-            4,
-            Math.min(
-                96,
-                forecastYears /
-                60 *
-                100
-            )
-        );
+    const plan =
+        useMemo<
+            MonthPlan[]
+        >(() => {
+            return [
+                {
+                    number: 1,
+
+                    eyebrow:
+                        "ПЕРВЫЙ МЕСЯЦ",
+
+                    title:
+                        "Ближе друг к другу",
+
+                    description:
+                        "Возвращаем больше лёгкости, внимания и времени только для вас двоих.",
+
+                    tasks: [
+                        "Проведите 3 свидания подряд без телефонов",
+
+                        "Каждый день задавайте друг другу один настоящий вопрос о прошедшем дне",
+
+                        getActionForCategory(
+                            risks[0]
+                                ?.id ??
+                            "friendship"
+                        ),
+                    ],
+                },
+
+                {
+                    number: 2,
+
+                    eyebrow:
+                        "ВТОРОЙ МЕСЯЦ",
+
+                    title:
+                        "Пройти сложные темы",
+
+                    description:
+                        "Не избегаем драконов — спокойно разбираем то, что может копить напряжение.",
+
+                    tasks: [
+                        getActionForCategory(
+                            risks[1]
+                                ?.id ??
+                            "money"
+                        ),
+
+                        "Обсудите интим: что нравится, сколько близости хочется и как комфортно проявлять инициативу",
+
+                        "Договоритесь о правиле ссоры: как брать паузу и когда обязательно возвращаться к разговору",
+                    ],
+                },
+
+                {
+                    number: 3,
+
+                    eyebrow:
+                        "ТРЕТИЙ МЕСЯЦ",
+
+                    title:
+                        "Общий ритм",
+
+                    description:
+                        "Собираем правила, которые останутся с вами и после этих трёх месяцев.",
+
+                    tasks: [
+                        getActionForCategory(
+                            risks[2]
+                                ?.id ??
+                            "home"
+                        ),
+
+                        "Выберите 3 общие цели на ближайший год",
+
+                        "Запланируйте одно новое совместное приключение: поездку, курс или проект",
+                    ],
+                },
+            ];
+        }, [risks]);
+
+    const nameA =
+        data?.couple
+            ?.partner_a_name ||
+        "Первый";
+
+    const nameB =
+        data?.couple
+            ?.partner_b_name ||
+        "Второй";
 
     if (loading) {
         return (
-            <StateScreen
-                text="собираем ваши ответы"
-            />
+            <main className="state">
+
+                <div className="brand">
+                    между нами.
+                </div>
+
+                <p>
+                    собираем ваш разбор
+                </p>
+
+                <style jsx>{`
+                    .state {
+                        min-height:
+                            100vh;
+
+                        display:
+                            grid;
+
+                        place-items:
+                            center;
+
+                        align-content:
+                            center;
+
+                        gap:
+                            12px;
+
+                        background:
+                            #f8f4f1;
+                    }
+
+                    .brand {
+                        font-family:
+                            Georgia,
+                            "Times New Roman",
+                            serif;
+
+                        font-size:
+                            24px;
+
+                        font-weight:
+                            700;
+                    }
+
+                    p {
+                        margin: 0;
+
+                        color:
+                            #958b8e;
+
+                        font-family:
+                            Arial,
+                            sans-serif;
+
+                        font-size:
+                            12px;
+                    }
+                `}</style>
+
+            </main>
         );
     }
 
@@ -350,71 +547,186 @@ export default function ResultPage() {
         !data
     ) {
         return (
-            <StateScreen
-                text={
-                    error ||
-                    "Не получилось загрузить результат."
-                }
-            />
-        );
-    }
-
-    const nameA =
-        data.couple
-            ?.partner_a_name ||
-        "Первый";
-
-    const nameB =
-        data.couple
-            ?.partner_b_name ||
-        "Второй";
-
-    return (
-        <main className="page">
-
-            <header className="header shell">
+            <main className="state">
 
                 <div className="brand">
                     между нами.
                 </div>
 
-                <div className="names">
+                <p>
+                    {error ||
+                        "Не получилось загрузить разбор."}
+                </p>
+
+                <style jsx>{`
+                    .state {
+                        min-height:
+                            100vh;
+
+                        display:
+                            grid;
+
+                        place-items:
+                            center;
+
+                        align-content:
+                            center;
+
+                        gap:
+                            12px;
+
+                        padding:
+                            24px;
+
+                        background:
+                            #f8f4f1;
+                    }
+
+                    .brand {
+                        font-family:
+                            Georgia,
+                            "Times New Roman",
+                            serif;
+
+                        font-size:
+                            24px;
+
+                        font-weight:
+                            700;
+                    }
+
+                    p {
+                        margin: 0;
+
+                        color:
+                            #958b8e;
+
+                        font-family:
+                            Arial,
+                            sans-serif;
+
+                        font-size:
+                            13px;
+                    }
+                `}</style>
+
+            </main>
+        );
+    }
+
+    return (
+        <main className="report-page">
+
+            {/* HEADER */}
+
+            <header className="header report-shell">
+
+                <div className="brand">
+                    между нами.
+                </div>
+
+                <div className="couple-names">
+
+                    {nameA}
 
                     <span>
-                        {nameA}
-                    </span>
-
-                    <b>
                         ×
-                    </b>
-
-                    <span>
-                        {nameB}
                     </span>
+
+                    {nameB}
 
                 </div>
 
             </header>
 
-            <section className="results shell">
+            {/* INTRO */}
 
-                <div className="eyebrow">
-                    ВАША КАРТИНА
+            <section className="intro report-shell">
+
+                <div className="section-label">
+                    ВАШ ПОЛНЫЙ РАЗБОР
                 </div>
 
-                <h1>
-                    Как вы совпали
-                    <br />
-                    в главном
-                </h1>
+                <div className="intro-grid">
 
-                <p className="intro">
-                    Не оценка ваших отношений —
-                    а шесть сторон совместной жизни,
-                    которые видно по вашим ответам.
-                </p>
+                    <div className="intro-main">
 
-                <div className="scores">
+                        <h1>
+                            Подробный
+                            <br />
+                            разбор
+                        </h1>
+
+                        <p>
+                            Здесь — не оценка ваших
+                            отношений, а карта того,
+                            где вам легко, где вы
+                            смотрите на вещи по-разному
+                            и что можно попробовать
+                            изменить.
+                        </p>
+
+                    </div>
+
+                    <aside className="intro-insight">
+
+                        <div className="heart">
+                            ♥
+                        </div>
+
+                        <p>
+                            Сильнее всего сейчас
+                            выглядит{" "}
+
+                            <strong>
+                                {strongest.title.toLowerCase()}
+                            </strong>
+                            .
+                        </p>
+
+                        <p>
+                            Больше внимания требуют{" "}
+
+                            <strong>
+                                {risks
+                                    .slice(
+                                        0,
+                                        2
+                                    )
+                                    .map(
+                                        (item) =>
+                                            item.title.toLowerCase()
+                                    )
+                                    .join(
+                                        " и "
+                                    )}
+                            </strong>
+                            .
+                        </p>
+
+                    </aside>
+
+                </div>
+
+            </section>
+
+            {/* 6 AREAS */}
+
+            <section className="report-section report-shell">
+
+                <SectionHeading
+                    label="6 СФЕР"
+                    title={
+                        <>
+                            Как устроены ваши
+                            <br />
+                            отношения
+                        </>
+                    }
+                    description="Те же показатели, которые вы увидели в результате — теперь как основа для полного разбора."
+                />
+
+                <div className="score-list">
 
                     {categories.map(
                         (
@@ -422,7 +734,7 @@ export default function ResultPage() {
                         ) => (
                             <ScoreRow
                                 key={
-                                    category.title
+                                    category.id
                                 }
                                 category={
                                     category
@@ -435,174 +747,189 @@ export default function ResultPage() {
 
             </section>
 
-            <section className="forecast shell">
+            {/* RISKS */}
 
-                <div className="forecast-copy">
+            <section className="report-section report-shell">
 
-                    <div className="eyebrow">
-                        ПРОГНОЗ
-                    </div>
+                <SectionHeading
+                    label="ГДЕ СЕЙЧАС СЛОЖНЕЕ"
+                    title={
+                        <>
+                            Три точки, которые
+                            <br />
+                            стоит пройти вместе
+                        </>
+                    }
+                    description="Это не «плохие» части отношений. Просто именно здесь ваши ответы расходятся сильнее всего."
+                />
 
-                    <h2>
-                        Ориентировочная
-                        <br />
-                        длительность отношений
-                    </h2>
+                <div className="risk-grid">
 
-                    <p>
-                        На основе ваших ответов
-                        мы оценили, сколько времени
-                        ваши отношения могут
-                        продлиться при текущем
-                        сценарии.
-                    </p>
-
-                </div>
-
-                <div className="forecast-result">
-
-                    <div className="years">
-
-                        <strong>
-                            {forecastYears}
-                        </strong>
-
-                        <span>
-                            {yearWord(
-                                forecastYears
-                            )}
-                        </span>
-
-                    </div>
-
-                    <div className="scale">
-
-                        <div className="track">
-
-                            <div
-                                className="fill"
-                                style={{
-                                    width:
-                                        `${forecastPosition}%`,
-                                }}
+                    {risks.map(
+                        (
+                            risk,
+                            index
+                        ) => (
+                            <RiskCard
+                                key={
+                                    risk.id
+                                }
+                                category={
+                                    risk
+                                }
+                                number={
+                                    index + 1
+                                }
                             />
-
-                            <div
-                                className="dot"
-                                style={{
-                                    left:
-                                        `${forecastPosition}%`,
-                                }}
-                            />
-
-                        </div>
-
-                        <div className="scale-labels">
-
-                            <span>
-                                1 месяц
-                            </span>
-
-                            <span>
-                                вся жизнь
-                            </span>
-
-                        </div>
-
-                    </div>
+                        )
+                    )}
 
                 </div>
 
             </section>
 
-            <section className="paid-wrap">
+            {/* BLIND SPOTS */}
 
-                <div className="paid-card">
+            <section className="report-section report-shell">
 
-                    <div className="art">
+                <SectionHeading
+                    label="СЛЕПЫЕ ЗОНЫ"
+                    title={
+                        <>
+                            Где вы можете
+                            <br />
+                            неправильно понимать друг друга
+                        </>
+                    }
+                    description="Здесь интересно не то, кто «прав», а насколько по-разному вы воспринимаете одну и ту же ситуацию."
+                />
 
-                        <img
-                            src={
-                                PAID_IMAGE
-                            }
-                            alt=""
-                            draggable={
-                                false
-                            }
-                        />
+                <div className="blind-list">
 
-                        <div className="art-fade" />
+                    {differences.length >
+                    0 ? (
+                        differences.map(
+                            (
+                                item,
+                                index
+                            ) => (
+                                <BlindSpot
+                                    key={
+                                        item.questionId
+                                    }
+                                    item={
+                                        item
+                                    }
+                                    index={
+                                        index
+                                    }
+                                    nameA={
+                                        nameA
+                                    }
+                                    nameB={
+                                        nameB
+                                    }
+                                />
+                            )
+                        )
+                    ) : (
+                        <div className="empty">
+                            Здесь ваши ответы
+                            оказались довольно близкими.
+                        </div>
+                    )}
+
+                </div>
+
+            </section>
+
+            {/* ROADMAP */}
+
+            <section className="report-section roadmap-section report-shell">
+
+                <SectionHeading
+                    label="ВАШ ПУТЬ ВМЕСТЕ"
+                    title="План на 3 месяца"
+                    description="Не «больше разговаривайте». Только конкретные вещи, которые можно поставить в календарь и сделать."
+                />
+
+                <div className="map">
+
+                    <img
+                        src={
+                            ROADMAP_IMAGE
+                        }
+                        alt="Путь пары на три месяца"
+                    />
+
+                </div>
+
+                <div className="month-grid">
+
+                    {plan.map(
+                        (
+                            month
+                        ) => (
+                            <MonthCard
+                                key={
+                                    month.number
+                                }
+                                month={
+                                    month
+                                }
+                            />
+                        )
+                    )}
+
+                </div>
+
+            </section>
+
+            {/* TODAY */}
+
+            <section className="report-section today report-shell">
+
+                <div className="section-label">
+                    НАЧНИТЕ СЕГОДНЯ
+                </div>
+
+                <div className="today-card">
+
+                    <div className="today-copy">
+
+                        <h2>
+                            Первый вечер:
+                            <br />
+                            без угадываний
+                        </h2>
+
+                        <p>
+                            Сядьте рядом
+                            на 20 минут
+                            и ответьте
+                            по очереди.
+                            Не спорьте
+                            с ответом партнёра.
+                        </p>
 
                     </div>
 
-                    <div className="paid-content">
+                    <div className="today-questions">
 
-                        <div className="paid-label">
-                            ПОЛНЫЙ РАЗБОР
-                        </div>
+                        <QuestionCard
+                            number="01"
+                            text="Что сейчас делает тебя счастливее в наших отношениях?"
+                        />
 
-                        <h2>
-                            Чтобы вместе —
-                            <br />
-                            и надолго.
-                        </h2>
+                        <QuestionCard
+                            number="02"
+                            text="Чего тебе сейчас не хватает от меня?"
+                        />
 
-                        <div className="benefits">
-
-                            <Benefit
-                                symbol="♥"
-                                text="Где вы можете не понимать друг друга"
-                            />
-
-                            <Benefit
-                                symbol="○"
-                                text="Что каждый ждёт от отношений"
-                            />
-
-                            <Benefit
-                                symbol="↯"
-                                text="Что может стать причиной ссор"
-                            />
-
-                            <Benefit
-                                symbol="↗"
-                                text="Как сделать вашу пару крепче"
-                            />
-
-                        </div>
-
-                        <button
-                            type="button"
-                            className="paid-button"
-                            onClick={() =>
-                                router.push(
-                                    `/report/${coupleId}`
-                                )
-                            }
-                        >
-
-                            <span>
-                                Открыть полный разбор
-                            </span>
-
-                            <span className="button-right">
-
-                                <b>
-                                    299 ₽
-                                </b>
-
-                                <i>
-                                    →
-                                </i>
-
-                            </span>
-
-                        </button>
-
-                        <div className="paid-note">
-                            один разбор · для вас двоих ·
-                            сразу после оплаты
-                        </div>
+                        <QuestionCard
+                            number="03"
+                            text="Что мы можем сделать уже на этой неделе?"
+                        />
 
                     </div>
 
@@ -611,58 +938,85 @@ export default function ResultPage() {
             </section>
 
             <style jsx>{`
+
                 :global(*) {
                     box-sizing:
                         border-box;
                 }
 
-                :global(html),
+                :global(html) {
+                    background:
+                        #f8f4f1;
+                }
+
                 :global(body) {
                     margin: 0;
 
                     background:
                         #f8f4f1;
+
+                    color:
+                        #211d1f;
                 }
 
-                button {
-                    font: inherit;
-                }
+                /*
+                 * ВАЖНО:
+                 *
+                 * Никаких .shell.
+                 * Это отдельная сетка страницы отчёта.
+                 */
 
-                .page {
+                .report-page {
+                    width:
+                        100%;
+
                     min-height:
                         100vh;
 
-                    padding:
-                        0
-                        28px
-                        72px;
-
-                    overflow-x:
-                        hidden;
-
-                    color:
-                        #201c1e;
+                    padding-bottom:
+                        64px;
 
                     background:
                         #f8f4f1;
                 }
 
-                .shell {
+                .report-shell {
                     width:
                         min(
-                            920px,
-                            100%
+                            1140px,
+                            calc(
+                                100% -
+                                48px
+                            )
                         );
+
+                    max-width:
+                        none;
+
+                    min-height:
+                        0;
+
+                    height:
+                        auto;
 
                     margin:
                         0 auto;
+
+                    padding:
+                        0;
+
+                    display:
+                        block;
                 }
+
+                /* HEADER */
 
                 .header {
                     min-height:
-                        78px;
+                        76px;
 
-                    display: flex;
+                    display:
+                        flex;
 
                     align-items:
                         center;
@@ -670,12 +1024,15 @@ export default function ResultPage() {
                     justify-content:
                         space-between;
 
-                    gap: 24px;
+                    gap:
+                        20px;
+
+                    border-bottom:
+                        1px solid
+                        #ddd5d2;
                 }
 
                 .brand {
-                    flex-shrink: 0;
-
                     font-family:
                         Georgia,
                         "Times New Roman",
@@ -684,8 +1041,6 @@ export default function ResultPage() {
                     font-size:
                         24px;
 
-                    line-height: 1;
-
                     font-weight:
                         700;
 
@@ -693,18 +1048,21 @@ export default function ResultPage() {
                         -1.1px;
                 }
 
-                .names {
-                    min-width: 0;
+                .couple-names {
+                    min-width:
+                        0;
 
-                    display: flex;
+                    display:
+                        flex;
 
                     align-items:
                         center;
 
-                    gap: 9px;
+                    gap:
+                        8px;
 
                     color:
-                        #8f8588;
+                        #91878a;
 
                     font-family:
                         Arial,
@@ -724,32 +1082,30 @@ export default function ResultPage() {
                         uppercase;
                 }
 
-                .names span {
-                    overflow:
-                        hidden;
-
-                    text-overflow:
-                        ellipsis;
-
-                    white-space:
-                        nowrap;
-                }
-
-                .names b {
+                .couple-names span {
                     color:
                         #c51f59;
                 }
 
-                .results {
+                /* COMMON */
+
+                .report-section {
+                    min-height:
+                        0;
+
+                    height:
+                        auto;
+
+                    margin-top:
+                        64px;
+
                     padding:
-                        62px
-                        0
-                        55px;
+                        0;
                 }
 
-                .eyebrow {
+                .section-label {
                     margin-bottom:
-                        15px;
+                        13px;
 
                     color:
                         #c51f59;
@@ -769,7 +1125,41 @@ export default function ResultPage() {
                         2.2px;
                 }
 
-                .results h1 {
+                /* INTRO */
+
+                .intro {
+                    min-height:
+                        0;
+
+                    height:
+                        auto;
+
+                    padding:
+                        46px 0 4px;
+                }
+
+                .intro-grid {
+                    display:
+                        grid;
+
+                    grid-template-columns:
+                        minmax(
+                            0,
+                            1.35fr
+                        )
+                        minmax(
+                            300px,
+                            .65fr
+                        );
+
+                    gap:
+                        54px;
+
+                    align-items:
+                        end;
+                }
+
+                .intro-main h1 {
                     margin: 0;
 
                     font-family:
@@ -779,32 +1169,32 @@ export default function ResultPage() {
 
                     font-size:
                         clamp(
-                            56px,
+                            60px,
                             7vw,
-                            78px
+                            88px
                         );
 
                     line-height:
-                        .9;
+                        .87;
 
                     font-weight:
                         400;
 
                     letter-spacing:
-                        -3.7px;
+                        -4px;
                 }
 
-                .intro {
+                .intro-main p {
                     max-width:
-                        520px;
+                        530px;
 
                     margin:
-                        23px
+                        22px
                         0
-                        45px;
+                        0;
 
                     color:
-                        #81777a;
+                        #7d7477;
 
                     font-family:
                         Arial,
@@ -818,506 +1208,243 @@ export default function ResultPage() {
                         1.55;
                 }
 
-                .scores {
+                .intro-insight {
+                    padding:
+                        25px;
+
+                    border-radius:
+                        23px;
+
+                    background:
+                        #f1dee4;
+                }
+
+                .heart {
+                    margin-bottom:
+                        15px;
+
+                    color:
+                        #cf3168;
+
+                    font-size:
+                        28px;
+                }
+
+                .intro-insight p {
+                    margin: 0;
+
+                    color:
+                        #655b5e;
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        13px;
+
+                    line-height:
+                        1.5;
+                }
+
+                .intro-insight p + p {
+                    margin-top:
+                        12px;
+                }
+
+                /* SCORES */
+
+                .score-list {
                     border-top:
                         1px solid
                         #ded7d4;
                 }
 
-                .forecast {
-                    display: grid;
+                /* RISKS */
+
+                .risk-grid {
+                    display:
+                        grid;
 
                     grid-template-columns:
-                        minmax(
-                            0,
-                            1.15fr
-                        )
-                        minmax(
-                            280px,
-                            .85fr
-                        );
-
-                    gap: 55px;
-
-                    align-items:
-                        center;
-
-                    padding:
-                        48px
-                        0
-                        54px;
-
-                    border-top:
-                        1px solid
-                        #dcd4d1;
-                }
-
-                .forecast h2 {
-                    margin: 0;
-
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
-
-                    font-size:
-                        43px;
-
-                    line-height: 1;
-
-                    font-weight:
-                        400;
-
-                    letter-spacing:
-                        -2px;
-                }
-
-                .forecast-copy p {
-                    max-width:
-                        500px;
-
-                    margin:
-                        16px
-                        0
-                        0;
-
-                    color:
-                        #8d8587;
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        13px;
-
-                    line-height:
-                        1.55;
-                }
-
-                .years {
-                    display: flex;
-
-                    align-items:
-                        baseline;
-
-                    color:
-                        #c21856;
-
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
-
-                    white-space:
-                        nowrap;
-                }
-
-                .years strong {
-                    font-size:
-                        76px;
-
-                    line-height:
-                        .88;
-
-                    font-weight:
-                        400;
-
-                    letter-spacing:
-                        -4px;
-                }
-
-                .years span {
-                    margin-left:
-                        9px;
-
-                    font-size:
-                        36px;
-
-                    letter-spacing:
-                        -1.4px;
-                }
-
-                .scale {
-                    margin-top:
-                        25px;
-                }
-
-                .track {
-                    position:
-                        relative;
-
-                    height: 8px;
-
-                    border-radius:
-                        999px;
-
-                    background:
-                        #e5dfe0;
-                }
-
-                .fill {
-                    position:
-                        absolute;
-
-                    inset:
-                        0
-                        auto
-                        0
-                        0;
-
-                    border-radius:
-                        inherit;
-
-                    background:
-                        #e99ab5;
-                }
-
-                .dot {
-                    position:
-                        absolute;
-
-                    top: 50%;
-
-                    width: 20px;
-                    height: 20px;
-
-                    border-radius:
-                        50%;
-
-                    background:
-                        #c21856;
-
-                    transform:
-                        translate(
-                            -50%,
-                            -50%
-                        );
-                }
-
-                .scale-labels {
-                    display: flex;
-
-                    justify-content:
-                        space-between;
-
-                    margin-top:
-                        12px;
-
-                    color:
-                        #8d8587;
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        10px;
-
-                    font-weight:
-                        600;
-                }
-
-                .paid-wrap {
-                    width:
-                        min(
-                            1180px,
-                            100%
-                        );
-
-                    margin:
-                        12px
-                        auto
-                        0;
-                }
-
-                .paid-card {
-                    position:
-                        relative;
-
-                    min-height:
-                        640px;
-
-                    overflow:
-                        hidden;
-
-                    border-radius:
-                        28px;
-
-                    color: #fff;
-
-                    background:
-                        #ad194a;
-
-                    isolation:
-                        isolate;
-                }
-
-                .art {
-                    position:
-                        absolute;
-
-                    inset: 0;
-
-                    z-index: 0;
-
-                    overflow:
-                        hidden;
-                }
-
-                .art img {
-                    position:
-                        absolute;
-
-                    left: 0;
-                    top: 0;
-
-                    width: 69%;
-                    height: 100%;
-
-                    object-fit:
-                        cover;
-
-                    object-position:
-                        44% center;
-                }
-
-                .art-fade {
-                    position:
-                        absolute;
-
-                    inset:
-                        0
-                        24%
-                        0
-                        34%;
-
-                    background:
-                        linear-gradient(
-                            90deg,
-                            rgba(
-                                173,
-                                25,
-                                74,
-                                0
-                            ),
-                            rgba(
-                                173,
-                                25,
-                                74,
-                                .18
+                        repeat(
+                            3,
+                            minmax(
+                                0,
+                                1fr
                             )
-                            20%,
-                            rgba(
-                                173,
-                                25,
-                                74,
-                                .6
-                            )
-                            58%,
-                            #ad194a
-                            100%
                         );
-                }
-
-                .paid-content {
-                    position:
-                        relative;
-
-                    z-index: 2;
-
-                    width: 47%;
-
-                    min-height:
-                        640px;
-
-                    margin-left:
-                        auto;
-
-                    display: flex;
-
-                    flex-direction:
-                        column;
-
-                    justify-content:
-                        center;
-
-                    padding:
-                        48px
-                        55px
-                        42px
-                        20px;
-                }
-
-                .paid-label {
-                    margin-bottom:
-                        13px;
-
-                    color:
-                        rgba(
-                            255,
-                            255,
-                            255,
-                            .72
-                        );
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        9px;
-
-                    font-weight:
-                        800;
-
-                    letter-spacing:
-                        2px;
-                }
-
-                .paid-content h2 {
-                    margin: 0;
-
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
-
-                    font-size:
-                        clamp(
-                            46px,
-                            4.5vw,
-                            62px
-                        );
-
-                    line-height:
-                        .92;
-
-                    font-weight:
-                        400;
-
-                    letter-spacing:
-                        -2.7px;
-                }
-
-                .benefits {
-                    display: grid;
-
-                    grid-template-columns:
-                        1fr
-                        1fr;
 
                     gap:
-                        19px
-                        24px;
-
-                    margin-top:
-                        37px;
-                }
-
-                .paid-button {
-                    width: 100%;
-
-                    min-height:
-                        65px;
-
-                    display: flex;
+                        14px;
 
                     align-items:
-                        center;
+                        start;
+                }
+
+                /* BLIND */
+
+                .blind-list {
+                    display:
+                        grid;
+
+                    gap:
+                        13px;
+                }
+
+                .empty {
+                    padding:
+                        26px;
+
+                    border:
+                        1px solid
+                        #e5dcda;
+
+                    border-radius:
+                        21px;
+
+                    color:
+                        #81777a;
+
+                    font-family:
+                        Arial,
+                        sans-serif;
+                }
+
+                /* ROADMAP */
+
+                .roadmap-section {
+                    margin-top:
+                        68px;
+                }
+
+                .map {
+                    width:
+                        100%;
+
+                    overflow:
+                        hidden;
+
+                    border-radius:
+                        24px;
+
+                    background:
+                        #ecd9de;
+
+                    box-shadow:
+                        0 12px
+                        34px
+                        rgba(
+                            74,
+                            42,
+                            52,
+                            .07
+                        );
+                }
+
+                .map img {
+                    width:
+                        100%;
+
+                    height:
+                        auto;
+
+                    display:
+                        block;
+                }
+
+                .month-grid {
+                    display:
+                        grid;
+
+                    grid-template-columns:
+                        repeat(
+                            3,
+                            minmax(
+                                0,
+                                1fr
+                            )
+                        );
+
+                    gap:
+                        12px;
+
+                    margin-top:
+                        14px;
+
+                    align-items:
+                        start;
+                }
+
+                /* TODAY */
+
+                .today {
+                    margin-top:
+                        68px;
+                }
+
+                .today-card {
+                    padding:
+                        30px;
+
+                    border:
+                        1px solid
+                        #e4dad8;
+
+                    border-radius:
+                        26px;
+
+                    background:
+                        #fffaf8;
+                }
+
+                .today-copy {
+                    display:
+                        flex;
+
+                    align-items:
+                        flex-end;
 
                     justify-content:
                         space-between;
 
-                    gap: 20px;
-
-                    margin-top:
+                    gap:
                         36px;
 
-                    padding:
-                        0
+                    margin-bottom:
                         24px;
-
-                    border: 0;
-
-                    border-radius:
-                        999px;
-
-                    cursor:
-                        pointer;
-
-                    color:
-                        #8f123c;
-
-                    background:
-                        #fff8f4;
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        13px;
-
-                    font-weight:
-                        800;
-
-                    transition:
-                        transform
-                        .18s ease;
                 }
 
-                .paid-button:hover {
-                    transform:
-                        translateY(-2px);
-                }
+                .today-copy h2 {
+                    margin: 0;
 
-                .button-right {
-                    display: flex;
-
-                    align-items:
-                        center;
-
-                    gap: 13px;
-
-                    flex-shrink: 0;
-                }
-
-                .button-right b {
-                    font-size:
-                        15px;
-                }
-
-                .button-right i {
                     font-family:
                         Georgia,
+                        "Times New Roman",
                         serif;
 
                     font-size:
-                        22px;
+                        42px;
 
-                    font-style:
-                        normal;
+                    line-height:
+                        .95;
 
                     font-weight:
                         400;
+
+                    letter-spacing:
+                        -1.9px;
                 }
 
-                .paid-note {
-                    margin-top:
-                        13px;
+                .today-copy p {
+                    max-width:
+                        340px;
+
+                    margin: 0;
 
                     color:
-                        rgba(
-                            255,
-                            255,
-                            255,
-                            .63
-                        );
+                        #82797c;
 
                     font-family:
                         Arial,
@@ -1325,82 +1452,70 @@ export default function ResultPage() {
                         sans-serif;
 
                     font-size:
-                        9px;
+                        12px;
 
                     line-height:
-                        1.4;
+                        1.5;
+                }
 
-                    text-align:
-                        center;
+                .today-questions {
+                    display:
+                        grid;
+
+                    grid-template-columns:
+                        repeat(
+                            3,
+                            minmax(
+                                0,
+                                1fr
+                            )
+                        );
+
+                    gap:
+                        10px;
                 }
 
                 @media (
                     max-width:
-                        760px
+                        900px
                 ) {
-                    .forecast {
+
+                    .intro-grid {
                         grid-template-columns:
                             1fr;
 
-                        gap: 34px;
+                        gap:
+                            25px;
                     }
 
-                    .paid-card {
-                        min-height:
-                            760px;
+                    .intro-insight {
+                        max-width:
+                            500px;
                     }
 
-                    .art {
-                        height:
-                            430px;
+                    .risk-grid {
+                        grid-template-columns:
+                            1fr;
                     }
 
-                    .art img {
-                        width: 100%;
-                        height: 100%;
-
-                        object-position:
-                            center;
+                    .month-grid {
+                        grid-template-columns:
+                            1fr;
                     }
 
-                    .art-fade {
-                        inset:
-                            auto
-                            0
-                            0
-                            0;
-
-                        height: 60%;
-
-                        background:
-                            linear-gradient(
-                                180deg,
-                                rgba(
-                                    173,
-                                    25,
-                                    74,
-                                    0
-                                ),
-                                #ad194a
-                                92%
-                            );
+                    .today-copy {
+                        display:
+                            block;
                     }
 
-                    .paid-content {
-                        width: 100%;
+                    .today-copy p {
+                        margin-top:
+                            15px;
+                    }
 
-                        min-height:
-                            760px;
-
-                        justify-content:
-                            flex-end;
-
-                        padding:
-                            300px
-                            26px
-                            28px;
-
-                        margin: 0;
+                    .today-questions {
+                        grid-template-columns:
+                            1fr;
                     }
                 }
 
@@ -1408,11 +1523,18 @@ export default function ResultPage() {
                     max-width:
                         640px
                 ) {
-                    .page {
-                        padding:
-                            0
-                            14px
-                            42px;
+
+                    .report-page {
+                        padding-bottom:
+                            44px;
+                    }
+
+                    .report-shell {
+                        width:
+                            calc(
+                                100% -
+                                28px
+                            );
                     }
 
                     .header {
@@ -1425,152 +1547,232 @@ export default function ResultPage() {
                             21px;
                     }
 
-                    .names {
+                    .couple-names {
                         max-width:
-                            52%;
+                            48%;
 
-                        gap: 5px;
+                        overflow:
+                            hidden;
+
+                        white-space:
+                            nowrap;
+
+                        text-overflow:
+                            ellipsis;
 
                         font-size:
                             8px;
-
-                        letter-spacing:
-                            .65px;
-                    }
-
-                    .results {
-                        padding:
-                            43px
-                            0
-                            40px;
-                    }
-
-                    .results h1 {
-                        font-size:
-                            52px;
-
-                        letter-spacing:
-                            -2.8px;
                     }
 
                     .intro {
-                        margin:
-                            18px
-                            0
-                            31px;
+                        padding-top:
+                            34px;
+                    }
 
+                    .intro-main h1 {
+                        font-size:
+                            53px;
+
+                        letter-spacing:
+                            -2.6px;
+                    }
+
+                    .intro-main p {
                         font-size:
                             12px;
                     }
 
-                    .forecast {
+                    .report-section,
+                    .roadmap-section,
+                    .today {
+                        margin-top:
+                            48px;
+                    }
+
+                    .map {
+                        border-radius:
+                            18px;
+                    }
+
+                    .month-grid {
+                        margin-top:
+                            10px;
+                    }
+
+                    .today-card {
                         padding:
-                            37px
-                            0
-                            43px;
-                    }
-
-                    .forecast h2 {
-                        font-size:
-                            37px;
-
-                        letter-spacing:
-                            -1.6px;
-                    }
-
-                    .years strong {
-                        font-size:
-                            68px;
-                    }
-
-                    .years span {
-                        font-size:
-                            30px;
-                    }
-
-                    .paid-wrap {
-                        margin-top: 0;
-                    }
-
-                    .paid-card {
-                        min-height:
-                            720px;
+                            21px;
 
                         border-radius:
-                            23px;
+                            21px;
                     }
 
-                    .art {
-                        height:
-                            390px;
-                    }
-
-                    .paid-content {
-                        min-height:
-                            720px;
-
-                        padding:
-                            280px
-                            20px
-                            23px;
-                    }
-
-                    .paid-content h2 {
+                    .today-copy h2 {
                         font-size:
-                            45px;
-
-                        letter-spacing:
-                            -2px;
-                    }
-
-                    .benefits {
-                        gap:
-                            16px
-                            13px;
-
-                        margin-top:
-                            28px;
-                    }
-
-                    .paid-button {
-                        min-height:
-                            59px;
-
-                        margin-top:
-                            27px;
-
-                        padding:
-                            0
-                            18px;
-
-                        font-size:
-                            11px;
-                    }
-
-                    .button-right {
-                        gap: 8px;
+                            33px;
                     }
                 }
+
             `}</style>
 
         </main>
     );
 }
 
+/* SECTION HEADING */
+
+function SectionHeading({
+                            label,
+                            title,
+                            description,
+                        }: {
+    label: string;
+    title: ReactNode;
+    description: string;
+}) {
+    return (
+        <div className="section-heading">
+
+            <div className="label">
+                {label}
+            </div>
+
+            <h2>
+                {title}
+            </h2>
+
+            <p>
+                {description}
+            </p>
+
+            <style jsx>{`
+
+                .section-heading {
+                    max-width:
+                        650px;
+
+                    margin-bottom:
+                        28px;
+                }
+
+                .label {
+                    margin-bottom:
+                        13px;
+
+                    color:
+                        #c51f59;
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        10px;
+
+                    font-weight:
+                        800;
+
+                    letter-spacing:
+                        2.2px;
+                }
+
+                h2 {
+                    margin: 0;
+
+                    font-family:
+                        Georgia,
+                        "Times New Roman",
+                        serif;
+
+                    font-size:
+                        clamp(
+                            42px,
+                            4.7vw,
+                            56px
+                        );
+
+                    line-height:
+                        .96;
+
+                    font-weight:
+                        400;
+
+                    letter-spacing:
+                        -2.2px;
+                }
+
+                p {
+                    max-width:
+                        520px;
+
+                    margin:
+                        15px
+                        0
+                        0;
+
+                    color:
+                        #8b8285;
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        13px;
+
+                    line-height:
+                        1.5;
+                }
+
+                @media (
+                    max-width:
+                        640px
+                ) {
+
+                    .section-heading {
+                        margin-bottom:
+                            22px;
+                    }
+
+                    h2 {
+                        font-size:
+                            36px;
+
+                        letter-spacing:
+                            -1.5px;
+                    }
+
+                    p {
+                        font-size:
+                            11px;
+                    }
+                }
+
+            `}</style>
+
+        </div>
+    );
+}
+
+/* SCORE ROW */
+
 function ScoreRow({
                       category,
                   }: {
-    category:
-        CategoryScore;
+    category: CategoryScore;
 }) {
     return (
-        <article className="row">
+        <article className="score-row">
 
-            <div className="symbol">
-                {category.symbol}
+            <div className="score-symbol">
+                {getCategoryIcon(
+                    category.id
+                )}
             </div>
 
-            <div className="main">
+            <div className="score-main">
 
                 <h3>
                     {category.title}
@@ -1610,11 +1812,13 @@ function ScoreRow({
             </div>
 
             <style jsx>{`
-                .row {
+
+                .score-row {
                     min-height:
                         98px;
 
-                    display: grid;
+                    display:
+                        grid;
 
                     grid-template-columns:
                         40px
@@ -1622,9 +1826,10 @@ function ScoreRow({
                             0,
                             1fr
                         )
-                        84px;
+                        80px;
 
-                    gap: 18px;
+                    gap:
+                        18px;
 
                     align-items:
                         center;
@@ -1634,11 +1839,15 @@ function ScoreRow({
                         #ded7d4;
                 }
 
-                .symbol {
-                    width: 36px;
-                    height: 36px;
+                .score-symbol {
+                    width:
+                        36px;
 
-                    display: grid;
+                    height:
+                        36px;
+
+                    display:
+                        grid;
 
                     place-items:
                         center;
@@ -1646,11 +1855,11 @@ function ScoreRow({
                     border-radius:
                         50%;
 
-                    color:
-                        #c9255c;
-
                     background:
                         #f2dfe4;
+
+                    color:
+                        #c9255c;
 
                     font-family:
                         Georgia,
@@ -1669,9 +1878,10 @@ function ScoreRow({
                         serif;
 
                     font-size:
-                        29px;
+                        28px;
 
-                    line-height: 1;
+                    line-height:
+                        1;
 
                     font-weight:
                         400;
@@ -1699,7 +1909,8 @@ function ScoreRow({
                 }
 
                 .track {
-                    height: 5px;
+                    height:
+                        5px;
 
                     overflow:
                         hidden;
@@ -1712,7 +1923,8 @@ function ScoreRow({
                 }
 
                 .fill {
-                    height: 100%;
+                    height:
+                        100%;
 
                     border-radius:
                         inherit;
@@ -1722,7 +1934,8 @@ function ScoreRow({
                 }
 
                 .score {
-                    display: flex;
+                    display:
+                        flex;
 
                     justify-content:
                         flex-end;
@@ -1740,9 +1953,10 @@ function ScoreRow({
                         #c51f59;
 
                     font-size:
-                        46px;
+                        45px;
 
-                    line-height: 1;
+                    line-height:
+                        1;
 
                     font-weight:
                         400;
@@ -1763,9 +1977,10 @@ function ScoreRow({
                     max-width:
                         640px
                 ) {
-                    .row {
+
+                    .score-row {
                         min-height:
-                            87px;
+                            88px;
 
                         grid-template-columns:
                             30px
@@ -1775,12 +1990,16 @@ function ScoreRow({
                             )
                             55px;
 
-                        gap: 10px;
+                        gap:
+                            10px;
                     }
 
-                    .symbol {
-                        width: 29px;
-                        height: 29px;
+                    .score-symbol {
+                        width:
+                            29px;
+
+                        height:
+                            29px;
 
                         font-size:
                             14px;
@@ -1806,89 +2025,484 @@ function ScoreRow({
                             12px;
                     }
                 }
+
             `}</style>
 
         </article>
     );
 }
 
-function Benefit({
-                     symbol,
-                     text,
-                 }: {
-    symbol: string;
-    text: string;
+/* RISK CARD */
+
+function RiskCard({
+                      category,
+                      number,
+                  }: {
+    category: CategoryScore;
+    number: number;
 }) {
     return (
-        <div className="benefit">
+        <article className="risk-card">
 
-            <div className="symbol">
-                {symbol}
+            <div className="risk-top">
+
+                <div className="number">
+                    {number}
+                </div>
+
+                <div className="icon">
+                    {getCategoryIcon(
+                        category.id
+                    )}
+                </div>
+
             </div>
 
-            <div className="text">
-                {text}
+            <h3>
+                {category.title}
+            </h3>
+
+            <p>
+                {getRiskText(
+                    category.id
+                )}
+            </p>
+
+            <div className="score">
+                {category.value}
+
+                <span>
+                    /10
+                </span>
             </div>
 
             <style jsx>{`
-                .benefit {
-                    display: grid;
 
-                    grid-template-columns:
-                        28px
-                        minmax(
-                            0,
-                            1fr
-                        );
+                .risk-card {
+                    position:
+                        relative;
 
-                    gap: 9px;
+                    min-height:
+                        250px;
 
-                    align-items:
-                        start;
+                    padding:
+                        23px;
+
+                    border:
+                        1px solid
+                        #e5dcda;
+
+                    border-radius:
+                        22px;
+
+                    background:
+                        #fffaf8;
                 }
 
-                .symbol {
-                    width: 28px;
-                    height: 28px;
+                .risk-top {
+                    display:
+                        flex;
 
-                    display: grid;
+                    align-items:
+                        center;
+
+                    justify-content:
+                        space-between;
+                }
+
+                .number {
+                    width:
+                        34px;
+
+                    height:
+                        34px;
+
+                    display:
+                        grid;
 
                     place-items:
                         center;
 
-                    border:
-                        1px solid
-                        rgba(
-                            255,
-                            255,
-                            255,
-                            .4
-                        );
-
                     border-radius:
                         50%;
 
-                    color: #fff;
+                    background:
+                        #f2dfe4;
+
+                    color:
+                        #c51f59;
 
                     font-family:
                         Georgia,
                         serif;
 
                     font-size:
-                        13px;
+                        16px;
                 }
 
-                .text {
-                    padding-top:
-                        3px;
+                .icon {
+                    color:
+                        #c51f59;
+
+                    font-size:
+                        19px;
+                }
+
+                h3 {
+                    margin:
+                        24px
+                        0
+                        11px;
+
+                    font-family:
+                        Georgia,
+                        serif;
+
+                    font-size:
+                        28px;
+
+                    line-height:
+                        1;
+
+                    font-weight:
+                        400;
+                }
+
+                p {
+                    max-width:
+                        270px;
+
+                    margin:
+                        0
+                        0
+                        40px;
 
                     color:
-                        rgba(
-                            255,
-                            255,
-                            255,
-                            .91
+                        #756d70;
+
+                    font-family:
+                        Arial,
+                        sans-serif;
+
+                    font-size:
+                        12px;
+
+                    line-height:
+                        1.5;
+                }
+
+                .score {
+                    position:
+                        absolute;
+
+                    right:
+                        21px;
+
+                    bottom:
+                        18px;
+
+                    color:
+                        #c51f59;
+
+                    font-family:
+                        Georgia,
+                        serif;
+
+                    font-size:
+                        28px;
+                }
+
+                .score span {
+                    margin-left:
+                        2px;
+
+                    color:
+                        #8a8284;
+
+                    font-size:
+                        12px;
+                }
+
+            `}</style>
+
+        </article>
+    );
+}
+
+/* BLIND SPOT */
+
+function BlindSpot({
+                       item,
+                       index,
+                       nameA,
+                       nameB,
+                   }: {
+    item: Comparison;
+    index: number;
+    nameA: string;
+    nameB: string;
+}) {
+    return (
+        <article className="blind-card">
+
+            <div className="blind-number">
+                0{index + 1}
+            </div>
+
+            <div className="blind-content">
+
+                <h3>
+                    {item.question}
+                </h3>
+
+                <div className="answers">
+
+                    <div className="answer">
+
+                        <span className="person">
+                            {nameA}
+                        </span>
+
+                        <strong>
+                            {item.labelA}
+                        </strong>
+
+                    </div>
+
+                    <div className="arrow">
+                        →
+                    </div>
+
+                    <div className="answer">
+
+                        <span className="person">
+                            {nameB}
+                        </span>
+
+                        <strong>
+                            {item.labelB}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+                <p className="insight">
+                    {getBlindInsight(
+                        item
+                    )}
+                </p>
+
+            </div>
+
+            <style jsx>{`
+
+                .blind-card {
+                    width:
+                        100%;
+
+                    min-width:
+                        0;
+
+                    display:
+                        grid;
+
+                    grid-template-columns:
+                        42px
+                        minmax(
+                            0,
+                            1fr
                         );
+
+                    gap:
+                        20px;
+
+                    padding:
+                        25px;
+
+                    overflow:
+                        hidden;
+
+                    border:
+                        1px solid
+                        #e5dcda;
+
+                    border-radius:
+                        22px;
+
+                    background:
+                        #fffaf8;
+                }
+
+                .blind-number {
+                    color:
+                        #ca275f;
+
+                    font-family:
+                        Georgia,
+                        serif;
+
+                    font-size:
+                        19px;
+                }
+
+                .blind-content {
+                    min-width:
+                        0;
+                }
+
+                h3 {
+                    max-width:
+                        780px;
+
+                    margin:
+                        0
+                        0
+                        18px;
+
+                    font-family:
+                        Georgia,
+                        serif;
+
+                    font-size:
+                        27px;
+
+                    line-height:
+                        1.08;
+
+                    font-weight:
+                        400;
+                }
+
+                .answers {
+                    min-width:
+                        0;
+
+                    display:
+                        grid;
+
+                    grid-template-columns:
+                        minmax(
+                            0,
+                            1fr
+                        )
+                        34px
+                        minmax(
+                            0,
+                            1fr
+                        );
+
+                    gap:
+                        10px;
+
+                    align-items:
+                        center;
+                }
+
+                .answer {
+                    min-width:
+                        0;
+
+                    min-height:
+                        86px;
+
+                    padding:
+                        15px;
+
+                    border-radius:
+                        15px;
+
+                    background:
+                        #f3e5e7;
+                }
+
+                .person {
+                    display:
+                        block;
+
+                    margin-bottom:
+                        7px;
+
+                    overflow:
+                        hidden;
+
+                    text-overflow:
+                        ellipsis;
+
+                    color:
+                        #a08f94;
+
+                    font-family:
+                        Arial,
+                        sans-serif;
+
+                    font-size:
+                        9px;
+
+                    font-weight:
+                        800;
+
+                    letter-spacing:
+                        .8px;
+
+                    text-transform:
+                        uppercase;
+
+                    white-space:
+                        nowrap;
+                }
+
+                strong {
+                    display:
+                        block;
+
+                    max-width:
+                        100%;
+
+                    color:
+                        #352e30;
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        12px;
+
+                    line-height:
+                        1.4;
+
+                    font-weight:
+                        500;
+
+                    overflow-wrap:
+                        break-word;
+                }
+
+                .arrow {
+                    color:
+                        #cc275f;
+
+                    font-family:
+                        Georgia,
+                        serif;
+
+                    font-size:
+                        25px;
+
+                    text-align:
+                        center;
+                }
+
+                .insight {
+                    margin:
+                        14px
+                        0
+                        0;
+
+                    color:
+                        #81777a;
 
                     font-family:
                         Arial,
@@ -1899,145 +2513,488 @@ function Benefit({
                         11px;
 
                     line-height:
-                        1.4;
+                        1.5;
                 }
 
                 @media (
                     max-width:
-                        640px
+                        620px
                 ) {
-                    .benefit {
+
+                    .blind-card {
                         grid-template-columns:
-                            24px
-                            minmax(
-                                0,
-                                1fr
-                            );
+                            1fr;
 
-                        gap: 7px;
-                    }
-
-                    .symbol {
-                        width: 24px;
-                        height: 24px;
-
-                        font-size:
-                            11px;
-                    }
-
-                    .text {
-                        font-size:
+                        gap:
                             10px;
+
+                        padding:
+                            19px;
+                    }
+
+                    h3 {
+                        font-size:
+                            22px;
+                    }
+
+                    .answers {
+                        grid-template-columns:
+                            1fr;
+                    }
+
+                    .arrow {
+                        height:
+                            20px;
+
+                        line-height:
+                            20px;
+
+                        transform:
+                            rotate(
+                                90deg
+                            );
                     }
                 }
+
             `}</style>
 
-        </div>
+        </article>
     );
 }
 
-function StateScreen({
-                         text,
-                     }: {
-    text: string;
+/* MONTH CARD */
+
+function MonthCard({
+                       month,
+                   }: {
+    month: MonthPlan;
 }) {
     return (
-        <main className="state">
+        <article className="month-card">
 
-            <div className="brand">
-                между нами.
+            <div className="month-top">
+
+                <div className="number">
+                    {month.number}
+                </div>
+
+                <div className="eyebrow">
+                    {month.eyebrow}
+                </div>
+
             </div>
 
-            <p>
-                {text}
+            <h3>
+                {month.title}
+            </h3>
+
+            <p className="description">
+                {month.description}
             </p>
 
+            <div className="tasks">
+
+                {month.tasks.map(
+                    (
+                        task
+                    ) => (
+                        <div
+                            className="task"
+                            key={
+                                task
+                            }
+                        >
+
+                            <span className="checkbox" />
+
+                            <span className="task-text">
+                                {task}
+                            </span>
+
+                        </div>
+                    )
+                )}
+
+            </div>
+
             <style jsx>{`
-                :global(body) {
-                    margin: 0;
+
+                .month-card {
+                    min-width:
+                        0;
+
+                    padding:
+                        23px;
+
+                    border:
+                        1px solid
+                        #e5dcda;
+
+                    border-radius:
+                        22px;
+
+                    background:
+                        #fffaf8;
                 }
 
-                .state {
+                .month-top {
                     min-height:
-                        100vh;
+                        40px;
 
-                    display: grid;
+                    display:
+                        flex;
+
+                    align-items:
+                        center;
+
+                    gap:
+                        12px;
+
+                    margin-bottom:
+                        16px;
+                }
+
+                .number {
+                    flex:
+                        0 0 auto;
+
+                    width:
+                        38px;
+
+                    height:
+                        38px;
+
+                    display:
+                        grid;
 
                     place-items:
                         center;
 
-                    align-content:
-                        center;
-
-                    gap: 12px;
+                    border-radius:
+                        50%;
 
                     background:
-                        #f8f4f1;
+                        #c8245c;
 
                     color:
-                        #201c1e;
+                        white;
+
+                    font-family:
+                        Georgia,
+                        serif;
+
+                    font-size:
+                        19px;
                 }
 
-                .brand {
+                .eyebrow {
+                    color:
+                        #c8245c;
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        9px;
+
+                    line-height:
+                        1.2;
+
+                    font-weight:
+                        800;
+
+                    letter-spacing:
+                        1.3px;
+                }
+
+                h3 {
+                    max-width:
+                        100%;
+
+                    margin:
+                        0;
+
                     font-family:
                         Georgia,
                         "Times New Roman",
                         serif;
 
                     font-size:
-                        24px;
+                        29px;
+
+                    line-height:
+                        .98;
 
                     font-weight:
-                        700;
+                        400;
+
+                    letter-spacing:
+                        -1px;
                 }
 
-                p {
-                    margin: 0;
+                .description {
+                    margin:
+                        17px
+                        0
+                        21px;
 
                     color:
-                        #958b8e;
+                        #82787b;
 
                     font-family:
                         Arial,
+                        Helvetica,
                         sans-serif;
 
                     font-size:
                         12px;
+
+                    line-height:
+                        1.45;
                 }
+
+                .tasks {
+                    display:
+                        grid;
+
+                    gap:
+                        13px;
+                }
+
+                .task {
+                    min-width:
+                        0;
+
+                    display:
+                        grid;
+
+                    grid-template-columns:
+                        18px
+                        minmax(
+                            0,
+                            1fr
+                        );
+
+                    gap:
+                        10px;
+
+                    align-items:
+                        start;
+                }
+
+                .checkbox {
+                    width:
+                        18px;
+
+                    height:
+                        18px;
+
+                    margin-top:
+                        1px;
+
+                    border:
+                        1.5px solid
+                        #d44573;
+
+                    border-radius:
+                        5px;
+                }
+
+                .task-text {
+                    min-width:
+                        0;
+
+                    color:
+                        #51484a;
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        12px;
+
+                    line-height:
+                        1.42;
+
+                    overflow-wrap:
+                        break-word;
+                }
+
             `}</style>
 
-        </main>
+        </article>
     );
 }
 
-function yearWord(
-    years: number
+/* QUESTION */
+
+function QuestionCard({
+                          number,
+                          text,
+                      }: {
+    number: string;
+    text: string;
+}) {
+    return (
+        <div className="question">
+
+            <span>
+                {number}
+            </span>
+
+            <p>
+                {text}
+            </p>
+
+            <style jsx>{`
+
+                .question {
+                    min-height:
+                        112px;
+
+                    padding:
+                        17px;
+
+                    border-radius:
+                        17px;
+
+                    background:
+                        #f2e3e7;
+                }
+
+                span {
+                    color:
+                        #c9245c;
+
+                    font-family:
+                        Georgia,
+                        serif;
+
+                    font-size:
+                        17px;
+                }
+
+                p {
+                    margin:
+                        13px
+                        0
+                        0;
+
+                    color:
+                        #393234;
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        12px;
+
+                    line-height:
+                        1.42;
+                }
+
+            `}</style>
+
+        </div>
+    );
+}
+
+/* HELPERS */
+
+function getCategoryIcon(
+    id: CategoryId
 ) {
-    const mod100 =
-        years % 100;
+    switch (id) {
+        case "friendship":
+            return "♥";
 
-    const mod10 =
-        years % 10;
+        case "partnership":
+            return "×";
 
+        case "sex":
+            return "♡";
+
+        case "money":
+            return "₽";
+
+        case "care":
+            return "❦";
+
+        case "home":
+            return "⌂";
+    }
+}
+
+function getRiskText(
+    id: CategoryId
+) {
+    switch (id) {
+        case "friendship":
+            return "Вам может не хватать лёгкости, совместных впечатлений или ощущения, что вместе интересно даже без большой программы.";
+
+        case "partnership":
+            return "В некоторых ситуациях вы можете по-разному понимать, что значит быть командой и как принимать решения вдвоём.";
+
+        case "sex":
+            return "Ожидания от близости могут различаться: частота, инициатива и то, что помогает каждому чувствовать связь.";
+
+        case "money":
+            return "Ваш подход к тратам, безопасности и крупным решениям может создавать напряжение даже тогда, когда сумма сама по себе не главная.";
+
+        case "care":
+            return "Вы можете оба стараться заботиться, но показывать это способами, которые партнёр не всегда считывает как поддержку.";
+
+        case "home":
+            return "Повседневные обязанности, привычки и ожидания от быта могут незаметно накапливать раздражение.";
+    }
+}
+
+function getActionForCategory(
+    id: CategoryId
+) {
+    switch (id) {
+        case "friendship":
+            return "Выберите одно новое занятие и впервые попробуйте его вместе";
+
+        case "partnership":
+            return "Возьмите одну общую задачу и заранее договоритесь, кто за что отвечает";
+
+        case "sex":
+            return "Поговорите о комфортной близости: частоте, инициативе и том, что каждому нравится";
+
+        case "money":
+            return "Устройте финансовый вечер: обсудите траты, личные деньги, накопления и крупные покупки";
+
+        case "care":
+            return "Каждый назовите 3 действия партнёра, после которых вы особенно чувствуете заботу";
+
+        case "home":
+            return "Выпишите регулярные бытовые задачи и перераспределите хотя бы три из них";
+    }
+}
+
+function getBlindInsight(
+    item: Comparison
+) {
     if (
-        mod100 >= 11 &&
-        mod100 <= 14
+        item.similarity ===
+        "different"
     ) {
-        return "лет";
+        return "Здесь вы отвечаете заметно по-разному. В реальной ситуации каждый может считать свою реакцию очевидной — и не понимать, почему партнёр реагирует иначе.";
     }
 
     if (
-        mod10 === 1
+        item.similarity ===
+        "close"
     ) {
-        return "год";
+        return "Ваши ответы близки, но не полностью совпадают. Обычно именно такие небольшие различия сложнее всего заметить заранее.";
     }
 
-    if (
-        mod10 >= 2 &&
-        mod10 <= 4
-    ) {
-        return "года";
-    }
-
-    return "лет";
+    return "Здесь вы смотрите на ситуацию довольно похоже.";
 }
