@@ -73,10 +73,6 @@ export default function WaitingPage() {
         );
     }, []);
 
-    /*
-     * Ссылка для партнёра
-     * строится только через invite_token.
-     */
     const inviteUrl =
         useMemo(() => {
             if (
@@ -94,10 +90,6 @@ export default function WaitingPage() {
             couple?.invite_token,
         ]);
 
-    /*
-     * Проверяем,
-     * закончил ли второй человек.
-     */
     useEffect(() => {
         if (!coupleId) {
             return;
@@ -129,9 +121,7 @@ export default function WaitingPage() {
                 const result =
                     await response.json();
 
-                if (
-                    !response.ok
-                ) {
+                if (!response.ok) {
                     throw new Error(
                         result?.error ||
                         "Не удалось загрузить пару"
@@ -145,10 +135,6 @@ export default function WaitingPage() {
                 const currentCouple =
                     result as Couple;
 
-                /*
-                 * Когда оба закончили —
-                 * открываем бесплатный результат.
-                 */
                 if (
                     currentCouple
                         .partner_a_completed &&
@@ -353,13 +339,13 @@ export default function WaitingPage() {
         );
     }
 
-    const partnerName =
-        couple.partner_b_name ||
-        "партнёр";
-
     const firstName =
         couple.partner_a_name ||
         "Вы";
+
+    const partnerName =
+        couple.partner_b_name ||
+        "партнёр";
 
     return (
         <main className="page">
@@ -376,7 +362,7 @@ export default function WaitingPage() {
                         между нами.
                     </div>
 
-                    <div className="names">
+                    <div className="couple">
 
                         <span>
                             {firstName}
@@ -407,56 +393,77 @@ export default function WaitingPage() {
                         </div>
 
                         <h1>
-                            Осталось
+                            Теперь очередь
                             <br />
-                            совсем немного.
+
+                            <span>
+                                {partnerName}.
+                            </span>
                         </h1>
 
                         <p className="lead">
-                            Теперь очередь{" "}
-                            <strong>
-                                {partnerName}
-                            </strong>
-                            . Когда второй человек
-                            закончит тест, здесь
-                            автоматически откроется
+                            Когда второй человек
+                            закончит тест,
+                            <br className="desktop-break" />
+                            здесь автоматически
+                            откроется
+                            <br className="desktop-break" />
                             ваш общий результат.
                         </p>
 
                     </div>
 
-                    <div className="status-art">
+                    {/* =================================================
+                        TWO CIRCLES
+                    ================================================= */}
+
+                    <div className="status">
 
                         <div className="circles">
 
-                            <div className="circle circle-a">
+                            <div className="circle completed">
 
-                                <span className="check">
-                                    ✓
-                                </span>
+                                <svg
+                                    viewBox="0 0 48 48"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="M13 24.5L20.5 32L36 16"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="3.5"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    />
+                                </svg>
 
                             </div>
 
-                            <div className="circle circle-b">
+                            <div className="circle waiting">
 
-                                <span className="dots">
-                                    <i />
-                                    <i />
-                                    <i />
-                                </span>
+                                <div className="waiting-dots">
+
+                                    <span />
+
+                                    <span />
+
+                                    <span />
+
+                                </div>
 
                             </div>
 
                         </div>
 
-                        <div className="status-labels">
+                        <div className="circle-labels">
 
-                            <span>
-                                ты готов
+                            <span className="ready-label">
+                                ТЫ ГОТОВ
                             </span>
 
                             <span>
-                                ждём партнёра
+                                ЖДЁМ{" "}
+                                {partnerName.toUpperCase()}
                             </span>
 
                         </div>
@@ -466,95 +473,148 @@ export default function WaitingPage() {
                 </section>
 
                 {/* =====================================================
-                    INVITE
+                    INVITE CARD
                 ===================================================== */}
 
-                <section className="invite-section">
+                <section className="invite-card">
 
-                    <div className="invite-copy">
-
-                        <div className="section-label">
-                            ПРИГЛАШЕНИЕ
-                        </div>
-
-                        <h2>
-                            Отправь ссылку
-                            <br />
-                            партнёру
-                        </h2>
-
-                        <p>
-                            По ней откроется его часть
-                            теста. После завершения
-                            результат будет один
-                            для вас двоих.
-                        </p>
-
+                    <div className="invite-label">
+                        ССЫЛКА ДЛЯ ПАРТНЁРА
                     </div>
 
-                    <div className="invite-card">
+                    <div className="link-box">
 
-                        <div className="url-label">
-                            ССЫЛКА ДЛЯ ПАРТНЁРА
-                        </div>
-
-                        <div className="url-box">
+                        <div className="link-text">
                             {inviteUrl}
                         </div>
 
                         <button
                             type="button"
-                            className="primary"
-                            onClick={
-                                shareInvite
-                            }
-                        >
-                            <span>
-                                Отправить приглашение
-                            </span>
-
-                            <span className="arrow">
-                                →
-                            </span>
-                        </button>
-
-                        <button
-                            type="button"
-                            className={
-                                copied
-                                    ? "copy copied"
-                                    : "copy"
-                            }
+                            className="link-copy"
+                            aria-label="Скопировать ссылку"
                             onClick={
                                 copyInvite
                             }
                         >
-                            {copied
-                                ? "Ссылка скопирована ✓"
-                                : "Скопировать ссылку"}
+
+                            {copied ? (
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="M5 12.5L9.2 16.7L19 7"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    />
+                                </svg>
+                            ) : (
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    aria-hidden="true"
+                                >
+                                    <rect
+                                        x="8"
+                                        y="3"
+                                        width="12"
+                                        height="14"
+                                        rx="2"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.8"
+                                    />
+
+                                    <path
+                                        d="M16 17V19C16 20.1 15.1 21 14 21H6C4.9 21 4 20.1 4 19V8C4 6.9 4.9 6 6 6H8"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.8"
+                                        strokeLinecap="round"
+                                    />
+                                </svg>
+                            )}
+
                         </button>
 
                     </div>
 
+                    <button
+                        type="button"
+                        className="share-button"
+                        onClick={
+                            shareInvite
+                        }
+                    >
+
+                        <span>
+                            Отправить приглашение
+                        </span>
+
+                        <span className="share-arrow">
+                            →
+                        </span>
+
+                    </button>
+
+                    <button
+                        type="button"
+                        className={
+                            copied
+                                ? "copy-button copied"
+                                : "copy-button"
+                        }
+                        onClick={
+                            copyInvite
+                        }
+                    >
+                        {copied
+                            ? "Ссылка скопирована ✓"
+                            : "Скопировать ссылку"}
+                    </button>
+
                 </section>
 
                 {/* =====================================================
-                    FOOTER STATUS
+                    FOOTER
                 ===================================================== */}
 
-                <div className="bottom-status">
+                <footer className="footer">
 
-                    <span className="pulse" />
+                    <div className="heart">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M12 20.2C10.9 19.2 5.3 14.6 3.2 11.7C1.1 8.8 2 5.1 5.1 3.8C7.5 2.8 10.1 3.7 12 5.8C13.9 3.7 16.5 2.8 18.9 3.8C22 5.1 22.9 8.8 20.8 11.7C18.7 14.6 13.1 19.2 12 20.2Z"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.7"
+                                strokeLinejoin="round"
+                            />
+                        </svg>
+
+                    </div>
 
                     <span>
-                        ждём завершения второй части
+                        Результат откроется
+                        автоматически, когда вы
+                        оба закончите.
                     </span>
 
-                </div>
+                </footer>
 
             </div>
 
             <style jsx>{`
+
+                /* =====================================================
+                   GLOBAL
+                ===================================================== */
 
                 :global(*) {
                     box-sizing:
@@ -589,7 +649,7 @@ export default function WaitingPage() {
                     padding:
                         0
                         28px
-                        60px;
+                        46px;
 
                     background:
                         #f8f4f1;
@@ -598,7 +658,7 @@ export default function WaitingPage() {
                 .shell {
                     width:
                         min(
-                            920px,
+                            980px,
                             100%
                         );
 
@@ -612,7 +672,7 @@ export default function WaitingPage() {
 
                 .header {
                     min-height:
-                        78px;
+                        116px;
 
                     display:
                         flex;
@@ -628,7 +688,7 @@ export default function WaitingPage() {
 
                     border-bottom:
                         1px solid
-                        #ddd5d2;
+                        #ded7d4;
                 }
 
                 .brand {
@@ -641,7 +701,7 @@ export default function WaitingPage() {
                         serif;
 
                     font-size:
-                        24px;
+                        29px;
 
                     line-height:
                         1;
@@ -650,10 +710,10 @@ export default function WaitingPage() {
                         700;
 
                     letter-spacing:
-                        -1.1px;
+                        -1.4px;
                 }
 
-                .names {
+                .couple {
                     min-width:
                         0;
 
@@ -670,94 +730,10 @@ export default function WaitingPage() {
                         flex-end;
 
                     gap:
-                        8px;
-
-                    overflow:
-                        hidden;
+                        16px;
 
                     color:
-                        #91878a;
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        10px;
-
-                    line-height:
-                        1;
-
-                    font-weight:
-                        700;
-
-                    letter-spacing:
-                        1.1px;
-
-                    text-transform:
-                        uppercase;
-
-                    white-space:
-                        nowrap;
-                }
-
-                .names span {
-                    overflow:
-                        hidden;
-
-                    text-overflow:
-                        ellipsis;
-                }
-
-                .names b {
-                    flex-shrink:
-                        0;
-
-                    color:
-                        #c51f59;
-
-                    font-size:
-                        12px;
-                }
-
-                /* =====================================================
-                   HERO
-                ===================================================== */
-
-                .hero {
-                    padding:
-                        66px
-                        0
-                        72px;
-
-                    display:
-                        grid;
-
-                    grid-template-columns:
-                        minmax(
-                            0,
-                            1.15fr
-                        )
-                        minmax(
-                            280px,
-                            .85fr
-                        );
-
-                    gap:
-                        70px;
-
-                    align-items:
-                        center;
-                }
-
-                .eyebrow,
-                .section-label {
-                    margin-bottom:
-                        14px;
-
-                    color:
-                        #c51f59;
+                        #92888b;
 
                     font-family:
                         Arial,
@@ -774,7 +750,95 @@ export default function WaitingPage() {
                         800;
 
                     letter-spacing:
-                        2.2px;
+                        1.7px;
+
+                    text-transform:
+                        uppercase;
+
+                    white-space:
+                        nowrap;
+                }
+
+                .couple span {
+                    overflow:
+                        hidden;
+
+                    text-overflow:
+                        ellipsis;
+                }
+
+                .couple b {
+                    flex-shrink:
+                        0;
+
+                    color:
+                        #cb225c;
+
+                    font-size:
+                        14px;
+
+                    font-weight:
+                        700;
+                }
+
+                /* =====================================================
+                   HERO
+                ===================================================== */
+
+                .hero {
+                    padding:
+                        93px
+                        0
+                        66px;
+
+                    display:
+                        grid;
+
+                    grid-template-columns:
+                        minmax(
+                            0,
+                            1.35fr
+                        )
+                        minmax(
+                            290px,
+                            .65fr
+                        );
+
+                    gap:
+                        54px;
+
+                    align-items:
+                        center;
+                }
+
+                .hero-copy {
+                    min-width:
+                        0;
+                }
+
+                .eyebrow {
+                    margin-bottom:
+                        22px;
+
+                    color:
+                        #cc225d;
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        11px;
+
+                    line-height:
+                        1;
+
+                    font-weight:
+                        800;
+
+                    letter-spacing:
+                        2.7px;
                 }
 
                 h1 {
@@ -789,31 +853,33 @@ export default function WaitingPage() {
                     font-size:
                         clamp(
                             56px,
-                            7vw,
-                            78px
+                            6.5vw,
+                            82px
                         );
 
                     line-height:
-                        .91;
+                        .9;
 
                     font-weight:
                         400;
 
                     letter-spacing:
-                        -3.6px;
+                        -4.3px;
+                }
+
+                h1 span {
+                    color:
+                        #ca235d;
                 }
 
                 .lead {
-                    max-width:
-                        560px;
-
                     margin:
-                        24px
+                        31px
                         0
                         0;
 
                     color:
-                        #81777a;
+                        #8c8486;
 
                     font-family:
                         Arial,
@@ -821,33 +887,22 @@ export default function WaitingPage() {
                         sans-serif;
 
                     font-size:
-                        14px;
+                        16px;
 
                     line-height:
-                        1.55;
-                }
-
-                .lead strong {
-                    color:
-                        #c51f59;
+                        1.45;
 
                     font-weight:
-                        700;
+                        400;
                 }
 
                 /* =====================================================
-                   STATUS ART
+                   STATUS CIRCLES
                 ===================================================== */
 
-                .status-art {
-                    padding:
-                        34px;
-
-                    border-radius:
-                        28px;
-
-                    background:
-                        #f0dfe4;
+                .status {
+                    min-width:
+                        0;
                 }
 
                 .circles {
@@ -855,10 +910,10 @@ export default function WaitingPage() {
                         relative;
 
                     width:
-                        224px;
+                        268px;
 
                     height:
-                        132px;
+                        154px;
 
                     margin:
                         0 auto;
@@ -872,10 +927,10 @@ export default function WaitingPage() {
                         0;
 
                     width:
-                        132px;
+                        154px;
 
                     height:
-                        132px;
+                        154px;
 
                     display:
                         grid;
@@ -887,7 +942,7 @@ export default function WaitingPage() {
                         50%;
                 }
 
-                .circle-a {
+                .circle.completed {
                     left:
                         0;
 
@@ -895,10 +950,26 @@ export default function WaitingPage() {
                         2;
 
                     background:
-                        #b84b73;
+                        rgba(
+                            197,
+                            50,
+                            101,
+                            .82
+                        );
+
+                    color:
+                        white;
                 }
 
-                .circle-b {
+                .circle.completed svg {
+                    width:
+                        48px;
+
+                    height:
+                        48px;
+                }
+
+                .circle.waiting {
                     right:
                         0;
 
@@ -906,84 +977,66 @@ export default function WaitingPage() {
                         1;
 
                     background:
-                        #dfa7ba;
+                        #f0d9df;
                 }
 
-                .check {
-                    color:
-                        white;
-
-                    font-family:
-                        Arial,
-                        sans-serif;
-
-                    font-size:
-                        31px;
-
-                    line-height:
-                        1;
-
-                    font-weight:
-                        500;
-                }
-
-                .dots {
+                .waiting-dots {
                     display:
                         flex;
 
+                    align-items:
+                        center;
+
                     gap:
-                        5px;
+                        8px;
 
                     transform:
                         translateX(
-                            15px
+                            18px
                         );
                 }
 
-                .dots i {
+                .waiting-dots span {
                     width:
-                        6px;
+                        9px;
 
                     height:
-                        6px;
-
-                    display:
-                        block;
+                        9px;
 
                     border-radius:
                         50%;
 
                     background:
-                        rgba(
-                            255,
-                            255,
-                            255,
-                            .8
-                        );
+                        #d15c84;
 
                     animation:
-                        dotPulse
-                        1.2s
-                        infinite
-                        ease-in-out;
+                        waitingDot
+                        1.4s
+                        ease-in-out
+                        infinite;
                 }
 
-                .dots i:nth-child(2) {
+                .waiting-dots span:nth-child(
+                    2
+                ) {
                     animation-delay:
-                        150ms;
+                        .15s;
                 }
 
-                .dots i:nth-child(3) {
+                .waiting-dots span:nth-child(
+                    3
+                ) {
                     animation-delay:
-                        300ms;
+                        .3s;
                 }
 
-                @keyframes dotPulse {
+                @keyframes waitingDot {
+
                     0%,
                     60%,
                     100% {
                         opacity:
-                            .35;
+                            .4;
 
                         transform:
                             translateY(
@@ -1002,143 +1055,27 @@ export default function WaitingPage() {
                     }
                 }
 
-                .status-labels {
-                    display:
-                        flex;
+                .circle-labels {
+                    width:
+                        268px;
 
-                    justify-content:
-                        space-between;
-
-                    gap:
-                        15px;
-
-                    margin-top:
-                        24px;
-
-                    color:
-                        #85797d;
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        9px;
-
-                    line-height:
-                        1;
-
-                    font-weight:
-                        800;
-
-                    letter-spacing:
-                        1.2px;
-
-                    text-transform:
-                        uppercase;
-                }
-
-                /* =====================================================
-                   INVITE
-                ===================================================== */
-
-                .invite-section {
-                    padding:
-                        50px
+                    margin:
+                        18px
+                        auto
                         0;
 
                     display:
                         grid;
 
                     grid-template-columns:
-                        minmax(
-                            0,
-                            .85fr
-                        )
-                        minmax(
-                            360px,
-                            1.15fr
-                        );
+                        1fr
+                        1fr;
 
                     gap:
-                        65px;
-
-                    align-items:
-                        center;
-
-                    border-top:
-                        1px solid
-                        #ddd5d2;
-                }
-
-                .invite-copy h2 {
-                    margin:
-                        0;
-
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
-
-                    font-size:
-                        44px;
-
-                    line-height:
-                        .96;
-
-                    font-weight:
-                        400;
-
-                    letter-spacing:
-                        -2px;
-                }
-
-                .invite-copy p {
-                    max-width:
-                        330px;
-
-                    margin:
-                        17px
-                        0
-                        0;
+                        28px;
 
                     color:
-                        #8a8083;
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        12px;
-
-                    line-height:
-                        1.5;
-                }
-
-                .invite-card {
-                    padding:
-                        26px;
-
-                    border:
-                        1px solid
-                        #e2d8d6;
-
-                    border-radius:
-                        23px;
-
-                    background:
-                        #fffaf8;
-                }
-
-                .url-label {
-                    margin-bottom:
-                        10px;
-
-                    color:
-                        #a09095;
+                        #92888b;
 
                     font-family:
                         Arial,
@@ -1155,39 +1092,18 @@ export default function WaitingPage() {
                         800;
 
                     letter-spacing:
-                        1.4px;
+                        1.3px;
+
+                    text-align:
+                        center;
+
+                    text-transform:
+                        uppercase;
                 }
 
-                .url-box {
-                    width:
-                        100%;
-
-                    padding:
-                        15px
-                        16px;
-
+                .circle-labels span {
                     overflow:
                         hidden;
-
-                    border-radius:
-                        13px;
-
-                    background:
-                        #f2e4e7;
-
-                    color:
-                        #665b5f;
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        12px;
-
-                    line-height:
-                        1.4;
 
                     text-overflow:
                         ellipsis;
@@ -1196,19 +1112,207 @@ export default function WaitingPage() {
                         nowrap;
                 }
 
-                .primary {
+                .circle-labels
+                .ready-label {
+                    color:
+                        #ce3267;
+                }
+
+                /* =====================================================
+                   INVITE CARD
+                ===================================================== */
+
+                .invite-card {
+                    padding:
+                        34px
+                        44px
+                        28px;
+
+                    border:
+                        1px solid
+                        #ddd4d1;
+
+                    border-radius:
+                        28px;
+
+                    background:
+                        rgba(
+                            255,
+                            250,
+                            248,
+                            .42
+                        );
+                }
+
+                .invite-label {
+                    margin-bottom:
+                        17px;
+
+                    color:
+                        #9f9296;
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        10px;
+
+                    line-height:
+                        1;
+
+                    font-weight:
+                        800;
+
+                    letter-spacing:
+                        1.8px;
+                }
+
+                .link-box {
                     width:
                         100%;
 
-                    min-height:
-                        56px;
+                    min-width:
+                        0;
 
-                    margin-top:
-                        17px;
+                    height:
+                        58px;
 
                     padding:
                         0
+                        13px
+                        0
+                        20px;
+
+                    display:
+                        flex;
+
+                    align-items:
+                        center;
+
+                    gap:
+                        12px;
+
+                    border-radius:
+                        15px;
+
+                    background:
+                        #f1e4e7;
+                }
+
+                .link-text {
+                    min-width:
+                        0;
+
+                    flex:
+                        1;
+
+                    overflow:
+                        hidden;
+
+                    color:
+                        #62595c;
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        13px;
+
+                    line-height:
+                        1;
+
+                    text-overflow:
+                        ellipsis;
+
+                    white-space:
+                        nowrap;
+                }
+
+                .link-copy {
+                    width:
+                        40px;
+
+                    height:
+                        40px;
+
+                    flex-shrink:
+                        0;
+
+                    display:
+                        grid;
+
+                    place-items:
+                        center;
+
+                    padding:
+                        0;
+
+                    border:
+                        0;
+
+                    border-radius:
+                        50%;
+
+                    background:
+                        transparent;
+
+                    color:
+                        #887d80;
+
+                    cursor:
+                        pointer;
+
+                    transition:
+                        background
+                        150ms
+                        ease,
+                        color
+                        150ms
+                        ease;
+                }
+
+                .link-copy:hover {
+                    background:
+                        rgba(
+                            255,
+                            255,
+                            255,
+                            .7
+                        );
+
+                    color:
+                        #c9225b;
+                }
+
+                .link-copy svg {
+                    width:
                         22px;
+
+                    height:
+                        22px;
+                }
+
+                /* =====================================================
+                   SHARE
+                ===================================================== */
+
+                .share-button {
+                    width:
+                        100%;
+
+                    height:
+                        64px;
+
+                    margin-top:
+                        20px;
+
+                    padding:
+                        0
+                        25px;
 
                     display:
                         flex;
@@ -1217,10 +1321,10 @@ export default function WaitingPage() {
                         center;
 
                     justify-content:
-                        space-between;
+                        center;
 
-                    gap:
-                        20px;
+                    position:
+                        relative;
 
                     border:
                         0;
@@ -1229,7 +1333,7 @@ export default function WaitingPage() {
                         999px;
 
                     background:
-                        #c7245c;
+                        #cb225c;
 
                     color:
                         white;
@@ -1240,7 +1344,7 @@ export default function WaitingPage() {
                         sans-serif;
 
                     font-size:
-                        14px;
+                        15px;
 
                     line-height:
                         1;
@@ -1255,42 +1359,65 @@ export default function WaitingPage() {
                         transform
                         150ms
                         ease,
-                        opacity
+                        background
                         150ms
                         ease;
                 }
 
-                .primary:hover {
+                .share-button:hover {
+                    background:
+                        #bd1d54;
+
                     transform:
                         translateY(
                             -1px
                         );
                 }
 
-                .primary:active {
+                .share-button:active {
                     transform:
                         translateY(
                             0
                         );
                 }
 
-                .arrow {
+                .share-arrow {
+                    position:
+                        absolute;
+
+                    right:
+                        28px;
+
+                    top:
+                        50%;
+
+                    transform:
+                        translateY(
+                            -53%
+                        );
+
                     font-size:
-                        22px;
+                        27px;
+
+                    line-height:
+                        1;
 
                     font-weight:
-                        400;
+                        300;
                 }
 
-                .copy {
+                .copy-button {
                     width:
                         100%;
 
+                    min-height:
+                        44px;
+
                     margin-top:
-                        8px;
+                        10px;
 
                     padding:
-                        12px;
+                        8px;
 
                     border:
                         0;
@@ -1299,7 +1426,7 @@ export default function WaitingPage() {
                         transparent;
 
                     color:
-                        #8d8084;
+                        #8d8386;
 
                     font-family:
                         Arial,
@@ -1307,35 +1434,39 @@ export default function WaitingPage() {
                         sans-serif;
 
                     font-size:
-                        11px;
+                        12px;
+
+                    line-height:
+                        1;
 
                     cursor:
                         pointer;
-
-                    transition:
-                        color
-                        150ms
-                        ease;
                 }
 
-                .copy:hover {
+                .copy-button:hover {
                     color:
-                        #c51f59;
+                        #c9225b;
                 }
 
-                .copy.copied {
+                .copy-button.copied {
                     color:
-                        #a13d63;
+                        #c9225b;
 
                     font-weight:
                         700;
                 }
 
                 /* =====================================================
-                   BOTTOM
+                   FOOTER
                 ===================================================== */
 
-                .bottom-status {
+                .footer {
+                    margin-top:
+                        68px;
+
+                    padding-top:
+                        27px;
+
                     display:
                         flex;
 
@@ -1346,15 +1477,14 @@ export default function WaitingPage() {
                         center;
 
                     gap:
-                        8px;
+                        12px;
 
-                    padding:
-                        9px
-                        0
-                        0;
+                    border-top:
+                        1px solid
+                        #ded7d4;
 
                     color:
-                        #a09397;
+                        #948a8d;
 
                     font-family:
                         Arial,
@@ -1362,46 +1492,35 @@ export default function WaitingPage() {
                         sans-serif;
 
                     font-size:
-                        10px;
+                        11px;
 
                     line-height:
-                        1;
+                        1.4;
 
-                    letter-spacing:
-                        .3px;
+                    text-align:
+                        center;
                 }
 
-                .pulse {
+                .heart {
                     width:
-                        6px;
+                        23px;
 
                     height:
-                        6px;
+                        23px;
 
-                    border-radius:
-                        50%;
+                    flex-shrink:
+                        0;
 
-                    background:
-                        #c7245c;
-
-                    animation:
-                        pulse
-                        1.6s
-                        ease-in-out
-                        infinite;
+                    color:
+                        #d02961;
                 }
 
-                @keyframes pulse {
-                    0%,
-                    100% {
-                        opacity:
-                            .3;
-                    }
+                .heart svg {
+                    width:
+                        100%;
 
-                    50% {
-                        opacity:
-                            1;
-                    }
+                    height:
+                        100%;
                 }
 
                 /* =====================================================
@@ -1410,33 +1529,48 @@ export default function WaitingPage() {
 
                 @media (
                     max-width:
-                        800px
+                        820px
                 ) {
 
                     .hero {
                         grid-template-columns:
-                            1fr;
+                            minmax(
+                                0,
+                                1fr
+                            )
+                            250px;
 
                         gap:
-                            38px;
+                            24px;
                     }
 
-                    .status-art {
-                        max-width:
-                            420px;
+                    .circles {
+                        width:
+                            224px;
+
+                        height:
+                            130px;
                     }
 
-                    .invite-section {
-                        grid-template-columns:
-                            1fr;
+                    .circle {
+                        width:
+                            130px;
+
+                        height:
+                            130px;
+                    }
+
+                    .circle-labels {
+                        width:
+                            224px;
 
                         gap:
-                            28px;
+                            20px;
                     }
 
-                    .invite-copy p {
-                        max-width:
-                            460px;
+                    h1 {
+                        font-size:
+                            58px;
                     }
                 }
 
@@ -1453,12 +1587,12 @@ export default function WaitingPage() {
                         padding:
                             0
                             14px
-                            38px;
+                            30px;
                     }
 
                     .header {
                         min-height:
-                            64px;
+                            66px;
 
                         gap:
                             12px;
@@ -1467,141 +1601,221 @@ export default function WaitingPage() {
                     .brand {
                         font-size:
                             21px;
+
+                        letter-spacing:
+                            -1px;
                     }
 
-                    .names {
+                    .couple {
                         max-width:
                             48%;
 
                         gap:
-                            5px;
+                            6px;
 
                         font-size:
-                            8px;
+                            7px;
 
                         letter-spacing:
-                            .6px;
+                            .7px;
                     }
 
-                    .hero {
-                        padding:
-                            42px
-                            0
-                            46px;
-
-                        gap:
-                            32px;
-                    }
-
-                    .eyebrow,
-                    .section-label {
-                        font-size:
-                            9px;
-
-                        letter-spacing:
-                            1.8px;
-                    }
-
-                    h1 {
-                        font-size:
-                            48px;
-
-                        line-height:
-                            .94;
-
-                        letter-spacing:
-                            -2.5px;
-                    }
-
-                    .lead {
-                        margin-top:
-                            18px;
-
-                        font-size:
-                            12px;
-                    }
-
-                    .status-art {
-                        width:
-                            100%;
-
-                        padding:
-                            25px
-                            20px;
-
-                        border-radius:
-                            22px;
-                    }
-
-                    .circles {
-                        width:
-                            184px;
-
-                        height:
-                            108px;
-                    }
-
-                    .circle {
-                        width:
-                            108px;
-
-                        height:
-                            108px;
-                    }
-
-                    .check {
-                        font-size:
-                            27px;
-                    }
-
-                    .status-labels {
-                        margin-top:
-                            20px;
-
-                        font-size:
-                            8px;
-                    }
-
-                    .invite-section {
-                        padding:
-                            38px
-                            0;
-
-                        gap:
-                            24px;
-                    }
-
-                    .invite-copy h2 {
-                        font-size:
-                            36px;
-
-                        letter-spacing:
-                            -1.6px;
-                    }
-
-                    .invite-copy p {
-                        font-size:
-                            11px;
-                    }
-
-                    .invite-card {
-                        padding:
-                            20px;
-
-                        border-radius:
-                            20px;
-                    }
-
-                    .url-box {
+                    .couple b {
                         font-size:
                             10px;
                     }
 
-                    .primary {
-                        min-height:
-                            52px;
+                    /* ---------------------------------------------
+                       HERO
+                    --------------------------------------------- */
+
+                    .hero {
+                        padding:
+                            44px
+                            0
+                            38px;
+
+                        display:
+                            block;
+                    }
+
+                    .eyebrow {
+                        margin-bottom:
+                            17px;
+
+                        font-size:
+                            9px;
+
+                        letter-spacing:
+                            2px;
+                    }
+
+                    h1 {
+                        font-size:
+                            clamp(
+                                44px,
+                                13vw,
+                                57px
+                            );
+
+                        line-height:
+                            .92;
+
+                        letter-spacing:
+                            -2.8px;
+                    }
+
+                    .lead {
+                        margin-top:
+                            20px;
+
+                        font-size:
+                            12px;
+
+                        line-height:
+                            1.5;
+                    }
+
+                    .desktop-break {
+                        display:
+                            none;
+                    }
+
+                    /* ---------------------------------------------
+                       CIRCLES
+                    --------------------------------------------- */
+
+                    .status {
+                        margin-top:
+                            39px;
+                    }
+
+                    .circles {
+                        width:
+                            218px;
+
+                        height:
+                            126px;
+                    }
+
+                    .circle {
+                        width:
+                            126px;
+
+                        height:
+                            126px;
+                    }
+
+                    .circle.completed svg {
+                        width:
+                            40px;
+
+                        height:
+                            40px;
+                    }
+
+                    .waiting-dots {
+                        gap:
+                            6px;
+
+                        transform:
+                            translateX(
+                                14px
+                            );
+                    }
+
+                    .waiting-dots span {
+                        width:
+                            7px;
+
+                        height:
+                            7px;
+                    }
+
+                    .circle-labels {
+                        width:
+                            218px;
+
+                        margin-top:
+                            15px;
+
+                        gap:
+                            17px;
+
+                        font-size:
+                            7px;
+
+                        letter-spacing:
+                            .8px;
+                    }
+
+                    /* ---------------------------------------------
+                       INVITE
+                    --------------------------------------------- */
+
+                    .invite-card {
+                        padding:
+                            23px
+                            18px
+                            17px;
+
+                        border-radius:
+                            21px;
+                    }
+
+                    .invite-label {
+                        margin-bottom:
+                            13px;
+
+                        font-size:
+                            8px;
+
+                        letter-spacing:
+                            1.4px;
+                    }
+
+                    .link-box {
+                        height:
+                            54px;
+
+                        padding-left:
+                            15px;
+
+                        border-radius:
+                            13px;
+                    }
+
+                    .link-text {
+                        font-size:
+                            11px;
+                    }
+
+                    .link-copy {
+                        width:
+                            38px;
+
+                        height:
+                            38px;
+                    }
+
+                    .link-copy svg {
+                        width:
+                            20px;
+
+                        height:
+                            20px;
+                    }
+
+                    .share-button {
+                        height:
+                            56px;
+
+                        margin-top:
+                            15px;
 
                         padding:
+                            0
+                            50px
                             0
                             18px;
 
@@ -1609,9 +1823,110 @@ export default function WaitingPage() {
                             13px;
                     }
 
-                    .bottom-status {
+                    .share-arrow {
+                        right:
+                            21px;
+
+                        font-size:
+                            23px;
+                    }
+
+                    .copy-button {
+                        margin-top:
+                            6px;
+
+                        font-size:
+                            11px;
+                    }
+
+                    /* ---------------------------------------------
+                       FOOTER
+                    --------------------------------------------- */
+
+                    .footer {
+                        margin-top:
+                            39px;
+
+                        padding:
+                            22px
+                            16px
+                            0;
+
+                        gap:
+                            9px;
+
                         font-size:
                             9px;
+                    }
+
+                    .heart {
+                        width:
+                            19px;
+
+                        height:
+                            19px;
+                    }
+                }
+
+                /* =====================================================
+                   VERY SMALL MOBILE
+                ===================================================== */
+
+                @media (
+                    max-width:
+                        370px
+                ) {
+
+                    h1 {
+                        font-size:
+                            43px;
+                    }
+
+                    .circles {
+                        width:
+                            198px;
+
+                        height:
+                            114px;
+                    }
+
+                    .circle {
+                        width:
+                            114px;
+
+                        height:
+                            114px;
+                    }
+
+                    .circle-labels {
+                        width:
+                            198px;
+                    }
+
+                    .share-button {
+                        font-size:
+                            12px;
+                    }
+                }
+
+                /* =====================================================
+                   REDUCED MOTION
+                ===================================================== */
+
+                @media (
+                    prefers-reduced-motion:
+                        reduce
+                ) {
+
+                    .waiting-dots span {
+                        animation:
+                            none;
+                    }
+
+                    .share-button,
+                    .link-copy {
+                        transition:
+                            none;
                     }
                 }
 
@@ -1621,6 +1936,10 @@ export default function WaitingPage() {
     );
 }
 
+/* ============================================================
+   STATE SCREEN
+============================================================ */
+
 function StateScreen({
                          text,
                      }: {
@@ -1629,8 +1948,18 @@ function StateScreen({
     return (
         <main className="state">
 
-            <div className="brand">
+            <div className="state-brand">
                 между нами.
+            </div>
+
+            <div className="state-dots">
+
+                <span />
+
+                <span />
+
+                <span />
+
             </div>
 
             <p>
@@ -1639,43 +1968,54 @@ function StateScreen({
 
             <style jsx>{`
 
+                :global(body) {
+                    margin:
+                        0;
+
+                    background:
+                        #f8f4f1;
+                }
+
                 .state {
                     min-height:
                         100vh;
 
                     display:
-                        grid;
+                        flex;
 
-                    place-items:
+                    flex-direction:
+                        column;
+
+                    align-items:
                         center;
 
-                    align-content:
+                    justify-content:
                         center;
 
                     gap:
-                        11px;
+                        16px;
 
                     padding:
                         24px;
-
-                    text-align:
-                        center;
 
                     background:
                         #f8f4f1;
 
                     color:
                         #211d1f;
+
+                    text-align:
+                        center;
                 }
 
-                .brand {
+                .state-brand {
                     font-family:
                         Georgia,
                         "Times New Roman",
                         serif;
 
                     font-size:
-                        26px;
+                        28px;
 
                     line-height:
                         1;
@@ -1684,7 +2024,52 @@ function StateScreen({
                         700;
 
                     letter-spacing:
-                        -1px;
+                        -1.2px;
+                }
+
+                .state-dots {
+                    display:
+                        flex;
+
+                    gap:
+                        5px;
+
+                    margin-top:
+                        6px;
+                }
+
+                .state-dots span {
+                    width:
+                        6px;
+
+                    height:
+                        6px;
+
+                    border-radius:
+                        50%;
+
+                    background:
+                        #c9255e;
+
+                    animation:
+                        stateDot
+                        1.2s
+                        ease-in-out
+                        infinite;
+                }
+
+                .state-dots span:nth-child(
+                    2
+                ) {
+                    animation-delay:
+                        .15s;
+                }
+
+                .state-dots span:nth-child(
+                    3
+                ) {
+                    animation-delay:
+                        .3s;
                 }
 
                 p {
@@ -1692,7 +2077,7 @@ function StateScreen({
                         0;
 
                     color:
-                        #91878a;
+                        #92888b;
 
                     font-family:
                         Arial,
@@ -1701,6 +2086,42 @@ function StateScreen({
 
                     font-size:
                         12px;
+                }
+
+                @keyframes stateDot {
+
+                    0%,
+                    60%,
+                    100% {
+                        opacity:
+                            .3;
+
+                        transform:
+                            translateY(
+                                0
+                            );
+                    }
+
+                    30% {
+                        opacity:
+                            1;
+
+                        transform:
+                            translateY(
+                                -2px
+                            );
+                    }
+                }
+
+                @media (
+                    prefers-reduced-motion:
+                        reduce
+                ) {
+
+                    .state-dots span {
+                        animation:
+                            none;
+                    }
                 }
 
             `}</style>
