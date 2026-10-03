@@ -888,14 +888,14 @@ export default function ReportPage() {
                 .report-shell {
                     width:
                         min(
-                            1140px,
+                            920px,
                             calc(
                                 100% -
-                                48px
+                                56px
                             )
                         );
 
-                    max-width: 1140px;
+                    max-width: 920px;
 
                     min-height: 0;
 
@@ -1056,16 +1056,16 @@ export default function ReportPage() {
 
                     font-size:
                         clamp(
-                            64px,
-                            7.6vw,
-                            92px
+                            58px,
+                            6.2vw,
+                            76px
                         );
 
-                    line-height: .87;
+                    line-height: .96;
 
                     font-weight: 400;
 
-                    letter-spacing: -4px;
+                    letter-spacing: -2.6px;
                 }
 
                 .intro-main p {
@@ -1320,7 +1320,7 @@ export default function ReportPage() {
                         width:
                             calc(
                                 100% -
-                                28px
+                                24px
                             );
                     }
 
@@ -1361,9 +1361,11 @@ export default function ReportPage() {
                     }
 
                     .intro-main h1 {
-                        font-size: 54px;
+                        font-size: 46px;
 
-                        letter-spacing: -2.8px;
+                        line-height: .98;
+
+                        letter-spacing: -1.8px;
                     }
 
                     .intro-main p {
