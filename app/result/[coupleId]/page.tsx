@@ -41,6 +41,16 @@ const MAX_SCORE = 10;
 const PAID_IMAGE =
     "/images/full-report-couple.png";
 
+const FORECAST_MARKS = [
+    { label: "1", year: 1, position: 0 },
+    { label: "5", year: 5, position: 12 },
+    { label: "10", year: 10, position: 26 },
+    { label: "15", year: 15, position: 42 },
+    { label: "20", year: 20, position: 58 },
+    { label: "30", year: 30, position: 76 },
+    { label: "вся жизнь", year: 60, position: 100 },
+] as const;
+
 export default function ResultPage() {
     const params =
         useParams();
@@ -343,24 +353,10 @@ export default function ResultPage() {
         ]);
 
     const forecastPosition =
-        useMemo(() => {
-            const maxYears =
-                60;
-
-            return Math.max(
-                4,
-                Math.min(
-                    96,
-                    (
-                        yearsForecast /
-                        maxYears
-                    ) *
-                    100
-                )
-            );
-        }, [
-            yearsForecast,
-        ]);
+        useMemo(
+            () => getForecastScalePosition(yearsForecast),
+            [yearsForecast]
+        );
 
     const nameA =
         data
@@ -577,6 +573,16 @@ export default function ResultPage() {
                                     }}
                                 />
 
+                                {FORECAST_MARKS.map((mark) => (
+                                    <span
+                                        key={mark.label}
+                                        className="scale-tick"
+                                        style={{
+                                            left: `${mark.position}%`,
+                                        }}
+                                    />
+                                ))}
+
                                 <div
                                     className="scale-dot"
                                     style={{
@@ -589,13 +595,23 @@ export default function ResultPage() {
 
                             <div className="scale-labels">
 
-                                <span style={{ left: "1.7%" }}>1</span>
-                                <span style={{ left: "8.3%" }}>5</span>
-                                <span style={{ left: "16.7%" }}>10</span>
-                                <span style={{ left: "25%" }}>15</span>
-                                <span style={{ left: "33.3%" }}>20</span>
-                                <span style={{ left: "50%" }}>30</span>
-                                <span className="life-label">вся жизнь</span>
+                                {FORECAST_MARKS.map((mark, index) => (
+                                    <span
+                                        key={mark.label}
+                                        className={`scale-label ${
+                                            index === 0
+                                                ? "scale-label-start"
+                                                : index === FORECAST_MARKS.length - 1
+                                                    ? "scale-label-end"
+                                                    : ""
+                                        }`}
+                                        style={{
+                                            left: `${mark.position}%`,
+                                        }}
+                                    >
+                                        {mark.label}
+                                    </span>
+                                ))}
 
                             </div>
 
@@ -618,108 +634,50 @@ export default function ResultPage() {
 
                 <div className="paid-card">
 
-                    {/* =================================================
-                        ART
-                    ================================================= */}
-
-                    <div className="paid-art-layer">
+                    <div className="paid-art-panel">
 
                         <img
                             className="paid-art"
-                            src={
-                                PAID_IMAGE
-                            }
-                            alt=""
-                            draggable={
-                                false
-                            }
+                            src={PAID_IMAGE}
+                            alt="Пара смотрит на закат"
+                            draggable={false}
                         />
-
-                        <div className="desktop-art-fade" />
-
-                        <div className="mobile-art-fade" />
 
                     </div>
 
-                    {/* =================================================
-                        Общая лёгкая дымка
-                    ================================================= */}
+                    <div className="paid-panel">
 
-                    <div className="paid-vignette" />
-
-                    {/* =================================================
-                        CONTENT
-                    ================================================= */}
-
-                    <div className="paid-content">
-
-                        {/* TITLE */}
-
-                        <div className="paid-heading">
-
-                            <div className="paid-label">
-                                ПОЛНЫЙ РАЗБОР
-                            </div>
-
-                            <h2>
-                                План на 3 месяца,
-                                <br />
-                                как усилить ваши отношения
-                            </h2>
-
+                        <div className="paid-label">
+                            ПОЛНЫЙ РАЗБОР
                         </div>
 
-                        {/* BENEFITS */}
+                        <h2 className="paid-title">
+                            План на 3 месяца
+                        </h2>
 
                         <div className="paid-benefits">
 
                             <Benefit
                                 icon="heart"
-                                text={
-                                    <>
-                                        Где вы можете
-                                        <br />
-                                        не понимать друг друга
-                                    </>
-                                }
+                                text="Где вы можете не понимать друг друга"
                             />
 
                             <Benefit
                                 icon="message"
-                                text={
-                                    <>
-                                        Что каждый ждёт
-                                        <br />
-                                        от отношений
-                                    </>
-                                }
+                                text="Что каждый ждёт от отношений"
                             />
 
                             <Benefit
                                 icon="lightning"
-                                text={
-                                    <>
-                                        Что может стать
-                                        <br />
-                                        причиной ссор
-                                    </>
-                                }
+                                text="Что может стать причиной ссор"
                             />
 
                             <Benefit
                                 icon="chart"
-                                text={
-                                    <>
-                                        Как сделать вашу
-                                        <br />
-                                        пару крепче
-                                    </>
-                                }
+                                text="Как сделать вашу пару крепче"
                             />
 
                         </div>
-
-                        {/* CTA */}
 
                         <button
                             type="button"
@@ -748,11 +706,6 @@ export default function ResultPage() {
                             </span>
 
                         </button>
-
-                        <div className="paid-note">
-                            один разбор · для вас двоих ·
-                            сразу после оплаты
-                        </div>
 
                     </div>
 
@@ -1005,15 +958,15 @@ export default function ResultPage() {
                     grid-template-columns:
                         minmax(
                             0,
-                            1.15fr
+                            1.05fr
                         )
                         minmax(
-                            280px,
-                            .85fr
+                            340px,
+                            .95fr
                         );
 
                     gap:
-                        55px;
+                        64px;
 
                     align-items:
                         center;
@@ -1054,9 +1007,6 @@ export default function ResultPage() {
                 }
 
                 .forecast-description {
-                    max-width:
-                        520px;
-
                     margin:
                         15px
                         0
@@ -1081,8 +1031,17 @@ export default function ResultPage() {
                 }
 
                 .forecast-result {
+                    width:
+                        min(
+                            100%,
+                            440px
+                        );
+
                     min-width:
                         0;
+
+                    justify-self:
+                        end;
                 }
 
                 .years {
@@ -1137,7 +1096,7 @@ export default function ResultPage() {
                         100%;
 
                     margin-top:
-                        23px;
+                        24px;
                 }
 
                 .scale-track {
@@ -1145,7 +1104,7 @@ export default function ResultPage() {
                         relative;
 
                     height:
-                        9px;
+                        8px;
 
                     border-radius:
                         999px;
@@ -1164,6 +1123,9 @@ export default function ResultPage() {
                         0
                         0;
 
+                    z-index:
+                        1;
+
                     border-radius:
                         inherit;
 
@@ -1171,9 +1133,38 @@ export default function ResultPage() {
                         #e99ab5;
                 }
 
+                .scale-tick {
+                    position:
+                        absolute;
+
+                    z-index:
+                        2;
+
+                    top:
+                        50%;
+
+                    width:
+                        1px;
+
+                    height:
+                        18px;
+
+                    background:
+                        #cfc6c8;
+
+                    transform:
+                        translate(
+                            -50%,
+                            -22%
+                        );
+                }
+
                 .scale-dot {
                     position:
                         absolute;
+
+                    z-index:
+                        4;
 
                     top:
                         50%;
@@ -1184,11 +1175,26 @@ export default function ResultPage() {
                     height:
                         22px;
 
+                    border:
+                        2px solid
+                        #f8f4f1;
+
                     border-radius:
                         50%;
 
                     background:
                         #c21856;
+
+                    box-shadow:
+                        0
+                        3px
+                        10px
+                        rgba(
+                            91,
+                            16,
+                            48,
+                            .18
+                        );
 
                     transform:
                         translate(
@@ -1202,382 +1208,13 @@ export default function ResultPage() {
                         relative;
 
                     height:
-                        18px;
+                        24px;
 
                     margin-top:
-                        12px;
+                        10px;
 
                     color:
                         #8d8587;
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        10px;
-
-                    font-weight:
-                        600;
-                }
-
-                .scale-labels span {
-                    position:
-                        absolute;
-
-                    top:
-                        0;
-
-                    transform:
-                        translateX(-50%);
-
-                    white-space:
-                        nowrap;
-                }
-
-                .scale-labels span::before {
-                    content:
-                        "";
-
-                    position:
-                        absolute;
-
-                    left:
-                        50%;
-
-                    top:
-                        -17px;
-
-                    width:
-                        1px;
-
-                    height:
-                        7px;
-
-                    background:
-                        #cfc4c7;
-                }
-
-                .scale-labels .life-label {
-                    left:
-                        100%;
-
-                    transform:
-                        translateX(-100%);
-                }
-
-                .scale-labels .life-label::before {
-                    left:
-                        100%;
-                }
-
-                /* =====================================================
-                   PAID SHELL
-                ===================================================== */
-
-                .paid-shell {
-                    width:
-                        min(
-                            1180px,
-                            100%
-                        );
-
-                    margin:
-                        8px
-                        auto
-                        0;
-                }
-
-                /* =====================================================
-                   PAID CARD
-                ===================================================== */
-
-                .paid-card {
-                    position:
-                        relative;
-
-                    width:
-                        100%;
-
-                    min-height:
-                        500px;
-
-                    overflow:
-                        hidden;
-
-                    border-radius:
-                        24px;
-
-                    background:
-                        linear-gradient(
-                            90deg,
-                            #9c124c
-                            0%,
-                            #a70e4c
-                            48%,
-                            #a70f4d
-                            100%
-                        );
-
-                    isolation:
-                        isolate;
-                }
-
-                /* =====================================================
-                   ART LAYER
-                ===================================================== */
-
-                .paid-art-layer {
-                    position:
-                        absolute;
-
-                    inset:
-                        0;
-
-                    z-index:
-                        0;
-
-                    overflow:
-                        hidden;
-
-                    pointer-events:
-                        none;
-                }
-
-                .paid-art {
-                    position:
-                        absolute;
-
-                    left:
-                        0;
-
-                    top:
-                        0;
-
-                    width:
-                        73%;
-
-                    height:
-                        100%;
-
-                    display:
-                        block;
-
-                    object-fit:
-                        cover;
-
-                    object-position:
-                        43%
-                        center;
-
-                    user-select:
-                        none;
-
-                    pointer-events:
-                        none;
-                }
-
-                .desktop-art-fade {
-                    position:
-                        absolute;
-
-                    z-index:
-                        2;
-
-                    top:
-                        0;
-
-                    left:
-                        38%;
-
-                    width:
-                        38%;
-
-                    height:
-                        100%;
-
-                    pointer-events:
-                        none;
-
-                    background:
-                        linear-gradient(
-                            90deg,
-                            rgba(
-                                166,
-                                18,
-                                77,
-                                0
-                            )
-                            0%,
-
-                            rgba(
-                                166,
-                                18,
-                                77,
-                                .03
-                            )
-                            10%,
-
-                            rgba(
-                                166,
-                                18,
-                                77,
-                                .12
-                            )
-                            24%,
-
-                            rgba(
-                                166,
-                                18,
-                                77,
-                                .28
-                            )
-                            38%,
-
-                            rgba(
-                                166,
-                                18,
-                                77,
-                                .50
-                            )
-                            53%,
-
-                            rgba(
-                                166,
-                                18,
-                                77,
-                                .72
-                            )
-                            67%,
-
-                            rgba(
-                                166,
-                                18,
-                                77,
-                                .88
-                            )
-                            80%,
-
-                            rgba(
-                                166,
-                                18,
-                                77,
-                                .97
-                            )
-                            91%,
-
-                            #a6124d
-                            100%
-                        );
-                }
-
-                .mobile-art-fade {
-                    display:
-                        none;
-                }
-
-                /* =====================================================
-                   VIGNETTE
-                ===================================================== */
-
-                .paid-vignette {
-                    position:
-                        absolute;
-
-                    z-index:
-                        3;
-
-                    inset:
-                        0;
-
-                    pointer-events:
-                        none;
-
-                    background:
-                        linear-gradient(
-                            180deg,
-                            rgba(
-                                40,
-                                0,
-                                20,
-                                .05
-                            )
-                            0%,
-
-                            rgba(
-                                40,
-                                0,
-                                20,
-                                0
-                            )
-                            28%,
-
-                            rgba(
-                                40,
-                                0,
-                                20,
-                                0
-                            )
-                            74%,
-
-                            rgba(
-                                40,
-                                0,
-                                20,
-                                .08
-                            )
-                            100%
-                        );
-                }
-
-                /* =====================================================
-                   CONTENT
-                ===================================================== */
-
-                .paid-content {
-                    position:
-                        relative;
-
-                    z-index:
-                        10;
-
-                    min-height:
-                        500px;
-
-                    width:
-                        100%;
-                }
-
-                /* =====================================================
-                   TITLE
-                ===================================================== */
-
-                .paid-heading {
-                    position:
-                        absolute;
-
-                    top:
-                        38px;
-
-                    left:
-                        70px;
-
-                    width:
-                        490px;
-                }
-
-                .paid-label {
-                    margin-bottom:
-                        14px;
-
-                    color:
-                        rgba(
-                            255,
-                            244,
-                            247,
-                            .88
-                        );
 
                     font-family:
                         Arial,
@@ -1592,12 +1229,191 @@ export default function ResultPage() {
 
                     font-weight:
                         700;
-
-                    letter-spacing:
-                        2.1px;
                 }
 
-                .paid-heading h2 {
+                .scale-label {
+                    position:
+                        absolute;
+
+                    top:
+                        0;
+
+                    white-space:
+                        nowrap;
+
+                    transform:
+                        translateX(
+                            -50%
+                        );
+                }
+
+                .scale-label-start {
+                    transform:
+                        none;
+                }
+
+                .scale-label-end {
+                    transform:
+                        translateX(
+                            -100%
+                        );
+
+                    text-transform:
+                        lowercase;
+                }
+
+                /* =====================================================
+                   PAID SHELL
+                ===================================================== */
+
+                .paid-shell {
+                    width:
+                        min(
+                            920px,
+                            100%
+                        );
+
+                    margin:
+                        8px
+                        auto
+                        0;
+                }
+
+                .paid-card {
+                    width:
+                        100%;
+
+                    min-height:
+                        430px;
+
+                    display:
+                        grid;
+
+                    grid-template-columns:
+                        minmax(
+                            0,
+                            52%
+                        )
+                        minmax(
+                            0,
+                            48%
+                        );
+
+                    overflow:
+                        hidden;
+
+                    border-radius:
+                        24px;
+
+                    background:
+                        #b10f50;
+
+                    box-shadow:
+                        0
+                        12px
+                        34px
+                        rgba(
+                            74,
+                            42,
+                            52,
+                            .06
+                        );
+                }
+
+                .paid-art-panel {
+                    min-width:
+                        0;
+
+                    min-height:
+                        430px;
+
+                    overflow:
+                        hidden;
+
+                    background:
+                        #79103a;
+                }
+
+                .paid-art {
+                    width:
+                        100%;
+
+                    height:
+                        100%;
+
+                    display:
+                        block;
+
+                    object-fit:
+                        cover;
+
+                    object-position:
+                        46%
+                        center;
+
+                    user-select:
+                        none;
+                }
+
+                .paid-panel {
+                    min-width:
+                        0;
+
+                    min-height:
+                        430px;
+
+                    display:
+                        flex;
+
+                    flex-direction:
+                        column;
+
+                    padding:
+                        35px
+                        34px
+                        28px;
+
+                    background:
+                        linear-gradient(
+                            145deg,
+                            #b71155
+                            0%,
+                            #a70d49
+                            100%
+                        );
+                }
+
+                .paid-label {
+                    margin-bottom:
+                        12px;
+
+                    color:
+                        rgba(
+                            255,
+                            244,
+                            247,
+                            .82
+                        );
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    font-size:
+                        9px;
+
+                    line-height:
+                        1;
+
+                    font-weight:
+                        800;
+
+                    letter-spacing:
+                        2px;
+                }
+
+                .paid-title {
                     margin:
                         0;
 
@@ -1611,91 +1427,58 @@ export default function ResultPage() {
 
                     font-size:
                         clamp(
-                            44px,
-                            4.2vw,
-                            55px
+                            39px,
+                            4vw,
+                            49px
                         );
 
                     line-height:
-                        .95;
+                        .98;
 
                     font-weight:
                         400;
 
                     letter-spacing:
-                        -2.4px;
-
-                    text-shadow:
-                        0
-                        2px
-                        16px
-                        rgba(
-                            59,
-                            0,
-                            27,
-                            .1
-                        );
+                        -2px;
                 }
-
-                /* =====================================================
-                   BENEFITS
-                ===================================================== */
 
                 .paid-benefits {
-                    position:
-                        absolute;
-
-                    top:
-                        48px;
-
-                    right:
-                        68px;
-
-                    width:
-                        305px;
-
                     display:
-                        flex;
+                        grid;
 
-                    flex-direction:
-                        column;
-
-                    gap:
-                        25px;
-                }
-
-                /* =====================================================
-                   CTA
-                ===================================================== */
-
-                .paid-cta {
-                    position:
-                        absolute;
-
-                    right:
-                        36px;
-
-                    bottom:
-                        52px;
-
-                    width:
-                        min(
-                            638px,
-                            calc(
-                                100% -
-                                600px
+                    grid-template-columns:
+                        repeat(
+                            2,
+                            minmax(
+                                0,
+                                1fr
                             )
                         );
 
+                    gap:
+                        24px
+                        18px;
+
+                    margin-top:
+                        39px;
+                }
+
+                .paid-cta {
+                    width:
+                        100%;
+
                     min-width:
-                        500px;
+                        0;
 
                     height:
-                        72px;
+                        64px;
+
+                    margin-top:
+                        auto;
 
                     padding:
                         0
-                        26px;
+                        20px;
 
                     display:
                         flex;
@@ -1707,13 +1490,13 @@ export default function ResultPage() {
                         space-between;
 
                     gap:
-                        20px;
+                        18px;
 
                     border:
                         0;
 
                     border-radius:
-                        15px;
+                        14px;
 
                     background:
                         #fffaf7;
@@ -1727,12 +1510,12 @@ export default function ResultPage() {
                     box-shadow:
                         0
                         9px
-                        25px
+                        24px
                         rgba(
                             65,
                             0,
                             27,
-                            .13
+                            .11
                         );
 
                     transition:
@@ -1753,12 +1536,12 @@ export default function ResultPage() {
                     box-shadow:
                         0
                         13px
-                        30px
+                        28px
                         rgba(
                             65,
                             0,
                             27,
-                            .17
+                            .15
                         );
                 }
 
@@ -1770,28 +1553,28 @@ export default function ResultPage() {
                 }
 
                 .cta-title {
+                    min-width:
+                        0;
+
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
 
                     font-size:
-                        15px;
+                        14px;
 
                     line-height:
-                        1;
+                        1.15;
 
                     font-weight:
-                        600;
-
-                    letter-spacing:
-                        -.1px;
-
-                    white-space:
-                        nowrap;
+                        700;
                 }
 
                 .cta-right {
+                    flex-shrink:
+                        0;
+
                     display:
                         flex;
 
@@ -1799,7 +1582,7 @@ export default function ResultPage() {
                         center;
 
                     gap:
-                        22px;
+                        17px;
 
                     color:
                         #c51b58;
@@ -1812,7 +1595,7 @@ export default function ResultPage() {
                         serif;
 
                     font-size:
-                        29px;
+                        28px;
 
                     line-height:
                         1;
@@ -1831,61 +1614,13 @@ export default function ResultPage() {
                         sans-serif;
 
                     font-size:
-                        26px;
+                        24px;
 
                     line-height:
                         1;
 
                     font-weight:
                         300;
-                }
-
-                .paid-note {
-                    position:
-                        absolute;
-
-                    right:
-                        36px;
-
-                    bottom:
-                        22px;
-
-                    width:
-                        min(
-                            638px,
-                            calc(
-                                100% -
-                                600px
-                            )
-                        );
-
-                    min-width:
-                        500px;
-
-                    color:
-                        rgba(
-                            255,
-                            238,
-                            243,
-                            .68
-                        );
-
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
-
-                    font-size:
-                        9px;
-
-                    line-height:
-                        1;
-
-                    font-weight:
-                        400;
-
-                    text-align:
-                        center;
                 }
 
                 /* =====================================================
@@ -1905,69 +1640,69 @@ export default function ResultPage() {
                             );
                     }
 
-                    .paid-card {
-                        min-height:
-                            470px;
+                    .forecast {
+                        grid-template-columns:
+                            minmax(
+                                0,
+                                1fr
+                            )
+                            minmax(
+                                320px,
+                                .9fr
+                            );
+
+                        gap:
+                            42px;
                     }
 
-                    .paid-content {
-                        min-height:
-                            470px;
-                    }
-
-                    .paid-heading {
-                        left:
-                            48px;
-
-                        top:
-                            34px;
-
+                    .paid-shell {
                         width:
-                            430px;
+                            min(
+                                820px,
+                                100%
+                            );
                     }
 
-                    .paid-heading h2 {
+                    .paid-card {
+                        grid-template-columns:
+                            minmax(
+                                0,
+                                49%
+                            )
+                            minmax(
+                                0,
+                                51%
+                            );
+                    }
+
+                    .paid-panel {
+                        padding:
+                            32px
+                            28px
+                            25px;
+                    }
+
+                    .paid-title {
                         font-size:
-                            45px;
+                            40px;
                     }
 
                     .paid-benefits {
-                        right:
-                            38px;
-
-                        width:
-                            275px;
-
                         gap:
-                            21px;
+                            21px
+                            14px;
+
+                        margin-top:
+                            31px;
                     }
 
                     .paid-cta {
-                        right:
-                            28px;
+                        height:
+                            60px;
 
-                        bottom:
-                            43px;
-
-                        min-width:
-                            430px;
-
-                        width:
-                            52%;
-                    }
-
-                    .paid-note {
-                        right:
-                            28px;
-
-                        bottom:
+                        padding:
+                            0
                             18px;
-
-                        min-width:
-                            430px;
-
-                        width:
-                            52%;
                     }
                 }
 
@@ -2019,10 +1754,6 @@ export default function ResultPage() {
                             .65px;
                     }
 
-                    /* ---------------------------------------------
-                       RESULTS
-                    --------------------------------------------- */
-
                     .results {
                         padding:
                             29px
@@ -2055,10 +1786,6 @@ export default function ResultPage() {
                             -1.8px;
                     }
 
-                    /* ---------------------------------------------
-                       FORECAST
-                    --------------------------------------------- */
-
                     .forecast {
                         padding:
                             29px
@@ -2084,17 +1811,11 @@ export default function ResultPage() {
                     }
 
                     .forecast-description {
-                        max-width:
-                            100%;
-
                         margin-top:
-                            13px;
+                            11px;
 
                         font-size:
                             12px;
-
-                        line-height:
-                            1.45;
                     }
 
                     .desktop-break {
@@ -2106,8 +1827,14 @@ export default function ResultPage() {
                         width:
                             100%;
 
+                        max-width:
+                            430px;
+
                         margin-top:
-                            25px;
+                            27px;
+
+                        justify-self:
+                            auto;
                     }
 
                     .years strong {
@@ -2139,6 +1866,11 @@ export default function ResultPage() {
                             7px;
                     }
 
+                    .scale-tick {
+                        height:
+                            15px;
+                    }
+
                     .scale-dot {
                         width:
                             19px;
@@ -2148,16 +1880,15 @@ export default function ResultPage() {
                     }
 
                     .scale-labels {
+                        height:
+                            21px;
+
                         margin-top:
-                            10px;
+                            9px;
 
                         font-size:
-                            9px;
+                            8px;
                     }
-
-                    /* ---------------------------------------------
-                       PAID SHELL
-                    --------------------------------------------- */
 
                     .paid-shell {
                         width:
@@ -2167,242 +1898,81 @@ export default function ResultPage() {
                             0;
                     }
 
-                    /* ---------------------------------------------
-                       PAID CARD
-                    --------------------------------------------- */
-
                     .paid-card {
                         min-height:
-                            620px;
+                            0;
+
+                        grid-template-columns:
+                            1fr;
 
                         border-radius:
                             22px;
-
-                        background:
-                            linear-gradient(
-                                180deg,
-                                #a30e4d
-                                0%,
-                                #aa104f
-                                100%
-                            );
                     }
 
-                    .paid-content {
+                    .paid-art-panel {
                         min-height:
-                            620px;
-                    }
-
-                    /* ---------------------------------------------
-                       MOBILE ART
-                    --------------------------------------------- */
-
-                    .paid-art {
-                        left:
-                            -4%;
-
-                        top:
                             0;
 
-                        width:
-                            108%;
-
                         height:
-                            370px;
+                            300px;
+                    }
 
-                        object-fit:
-                            cover;
-
+                    .paid-art {
                         object-position:
-                            43%
+                            46%
                             center;
                     }
 
-                    .paid-art-layer {
-                        height:
-                            410px;
-                    }
-
-                    .desktop-art-fade {
-                        display:
-                            none;
-                    }
-
-                    .mobile-art-fade {
-                        display:
-                            block;
-
-                        position:
-                            absolute;
-
-                        left:
+                    .paid-panel {
+                        min-height:
                             0;
 
-                        right:
-                            0;
-
-                        bottom:
-                            0;
-
-                        height:
-                            190px;
-
-                        background:
-                            linear-gradient(
-                                180deg,
-
-                                rgba(
-                                    163,
-                                    14,
-                                    77,
-                                    0
-                                )
-                                0%,
-
-                                rgba(
-                                    163,
-                                    14,
-                                    77,
-                                    .08
-                                )
-                                18%,
-
-                                rgba(
-                                    163,
-                                    14,
-                                    77,
-                                    .28
-                                )
-                                38%,
-
-                                rgba(
-                                    163,
-                                    14,
-                                    77,
-                                    .52
-                                )
-                                58%,
-
-                                rgba(
-                                    163,
-                                    14,
-                                    77,
-                                    .78
-                                )
-                                76%,
-
-                                #a30e4d
-                                100%
-                            );
-                    }
-
-                    /* ---------------------------------------------
-                       MOBILE TITLE
-                    --------------------------------------------- */
-
-                    .paid-heading {
-                        top:
-                            31px;
-
-                        left:
-                            28px;
-
-                        width:
-                            calc(
-                                100% -
-                                56px
-                            );
+                        padding:
+                            27px
+                            24px
+                            24px;
                     }
 
                     .paid-label {
                         margin-bottom:
-                            13px;
+                            11px;
 
                         font-size:
-                            9px;
+                            8px;
 
                         letter-spacing:
-                            1.9px;
+                            1.8px;
                     }
 
-                    .paid-heading h2 {
+                    .paid-title {
                         font-size:
                             38px;
 
-                        line-height:
-                            .96;
-
                         letter-spacing:
-                            -1.8px;
-
-                        text-shadow:
-                            0
-                            2px
-                            14px
-                            rgba(
-                                49,
-                                0,
-                                25,
-                                .16
-                            );
+                            -1.7px;
                     }
-
-                    /* ---------------------------------------------
-                       MOBILE BENEFITS
-                    --------------------------------------------- */
 
                     .paid-benefits {
-                        top:
-                            385px;
-
-                        left:
-                            28px;
-
-                        right:
-                            28px;
-
-                        width:
-                            calc(
-                                100% -
-                                56px
-                            );
+                        grid-template-columns:
+                            1fr;
 
                         gap:
-                            18px;
+                            16px;
+
+                        margin-top:
+                            27px;
                     }
 
-                    /* ---------------------------------------------
-                       MOBILE CTA
-                    --------------------------------------------- */
-
                     .paid-cta {
-                        left:
-                            20px;
-
-                        right:
-                            20px;
-
-                        bottom:
-                            48px;
-
-                        width:
-                            calc(
-                                100% -
-                                40px
-                            );
-
-                        min-width:
-                            0;
-
                         height:
                             58px;
 
+                        margin-top:
+                            28px;
+
                         padding:
                             0
-                            18px;
-
-                        border-radius:
-                            14px;
+                            17px;
                     }
 
                     .cta-title {
@@ -2412,7 +1982,7 @@ export default function ResultPage() {
 
                     .cta-right {
                         gap:
-                            13px;
+                            12px;
                     }
 
                     .price {
@@ -2422,216 +1992,7 @@ export default function ResultPage() {
 
                     .arrow {
                         font-size:
-                            23px;
-                    }
-
-                    .paid-note {
-                        left:
-                            20px;
-
-                        right:
-                            20px;
-
-                        bottom:
-                            20px;
-
-                        width:
-                            calc(
-                                100% -
-                                40px
-                            );
-
-                        min-width:
-                            0;
-
-                        font-size:
-                            8px;
-                    }
-                }
-
-                /* =====================================================
-                   PAID BLOCK — TEXT ONLY ON THE RIGHT
-                ===================================================== */
-
-                @media (min-width: 641px) {
-                    .paid-art {
-                        width:
-                            52%;
-
-                        object-position:
-                            center center;
-                    }
-
-                    .desktop-art-fade {
-                        left:
-                            36%;
-
-                        width:
-                            20%;
-                    }
-
-                    .paid-heading {
-                        top:
-                            42px;
-
-                        left:
-                            auto;
-
-                        right:
-                            58px;
-
-                        width:
-                            43%;
-                    }
-
-                    .paid-heading h2 {
-                        font-size:
-                            clamp(34px, 3.2vw, 46px);
-
-                        line-height:
-                            .98;
-                    }
-
-                    .paid-benefits {
-                        top:
-                            185px;
-
-                        right:
-                            58px;
-
-                        width:
-                            43%;
-
-                        display:
-                            grid;
-
-                        grid-template-columns:
-                            1fr 1fr;
-
-                        gap:
-                            18px 24px;
-                    }
-
-                    .paid-cta {
-                        right:
-                            58px;
-
-                        width:
-                            43%;
-
-                        min-width:
-                            0;
-                    }
-
-                    .paid-note {
-                        right:
-                            58px;
-
-                        width:
-                            43%;
-
-                        min-width:
-                            0;
-                    }
-                }
-
-                @media (max-width: 640px) {
-                    .scale-labels {
-                        font-size:
-                            8px;
-                    }
-
-                    .scale-labels span::before {
-                        top:
-                            -15px;
-
-                        height:
-                            6px;
-                    }
-
-                    .paid-card,
-                    .paid-content {
-                        min-height:
-                            790px;
-                    }
-
-                    .paid-art {
-                        left:
-                            0;
-
-                        width:
-                            100%;
-
-                        height:
-                            300px;
-
-                        object-position:
-                            center center;
-                    }
-
-                    .paid-art-layer {
-                        height:
-                            335px;
-                    }
-
-                    .mobile-art-fade {
-                        height:
-                            150px;
-                    }
-
-                    .paid-heading {
-                        top:
-                            315px;
-
-                        left:
-                            24px;
-
-                        right:
-                            24px;
-
-                        width:
-                            auto;
-                    }
-
-                    .paid-heading h2 {
-                        font-size:
-                            34px;
-
-                        line-height:
-                            .98;
-                    }
-
-                    .paid-benefits {
-                        top:
-                            445px;
-
-                        left:
-                            24px;
-
-                        right:
-                            24px;
-
-                        width:
-                            auto;
-
-                        display:
-                            grid;
-
-                        grid-template-columns:
-                            1fr 1fr;
-
-                        gap:
-                            17px 14px;
-                    }
-
-                    .paid-cta {
-                        bottom:
-                            50px;
-                    }
-
-                    .paid-note {
-                        bottom:
-                            21px;
+                            22px;
                     }
                 }
 
@@ -2644,151 +2005,45 @@ export default function ResultPage() {
                         390px
                 ) {
 
-                    .paid-card {
-                        min-height:
-                            600px;
-                    }
-
-                    .paid-content {
-                        min-height:
-                            600px;
-                    }
-
-                    .paid-art {
+                    .paid-art-panel {
                         height:
-                            355px;
-
-                        object-position:
-                            43%
-                            center;
+                            265px;
                     }
 
-                    .paid-art-layer {
-                        height:
-                            395px;
+                    .paid-panel {
+                        padding:
+                            24px
+                            20px
+                            20px;
                     }
 
-                    .paid-heading {
-                        top:
-                            28px;
-
-                        left:
-                            24px;
-
-                        width:
-                            calc(
-                                100% -
-                                48px
-                            );
-                    }
-
-                    .paid-heading h2 {
+                    .paid-title {
                         font-size:
-                            35px;
+                            34px;
                     }
 
                     .paid-benefits {
-                        top:
-                            370px;
-
-                        left:
+                        margin-top:
                             24px;
-
-                        right:
-                            24px;
-
-                        width:
-                            calc(
-                                100% -
-                                48px
-                            );
-
-                        gap:
-                            16px;
                     }
 
                     .paid-cta {
-                        left:
-                            16px;
-
-                        right:
-                            16px;
-
-                        width:
-                            calc(
-                                100% -
-                                32px
-                            );
-
                         padding:
                             0
-                            16px;
+                            15px;
                     }
 
-                    .paid-note {
-                        left:
-                            16px;
+                    .cta-title {
+                        max-width:
+                            170px;
 
-                        right:
-                            16px;
-
-                        width:
-                            calc(
-                                100% -
-                                32px
-                            );
-                    }
-                }
-
-
-                @media (max-width: 390px) {
-                    .paid-card,
-                    .paid-content {
-                        min-height:
-                            780px;
-                    }
-
-                    .paid-art {
-                        height:
-                            285px;
-                    }
-
-                    .paid-art-layer {
-                        height:
-                            320px;
-                    }
-
-                    .paid-heading {
-                        top:
-                            300px;
-
-                        left:
-                            20px;
-
-                        right:
-                            20px;
-
-                        width:
-                            auto;
-                    }
-
-                    .paid-heading h2 {
                         font-size:
-                            31px;
+                            12px;
                     }
 
-                    .paid-benefits {
-                        top:
-                            425px;
-
-                        left:
-                            20px;
-
-                        right:
-                            20px;
-
-                        width:
-                            auto;
+                    .scale-labels {
+                        font-size:
+                            7.5px;
                     }
                 }
 
@@ -3322,6 +2577,51 @@ function BenefitSvg({
 
         </svg>
     );
+}
+
+/* ============================================================
+   FORECAST SCALE
+============================================================ */
+
+function getForecastScalePosition(
+    value: number
+) {
+    const points = FORECAST_MARKS;
+
+    if (value <= points[0].year) {
+        return points[0].position;
+    }
+
+    const last = points[points.length - 1];
+
+    if (value >= last.year) {
+        return last.position;
+    }
+
+    for (let index = 0; index < points.length - 1; index += 1) {
+        const left = points[index];
+        const right = points[index + 1];
+
+        if (
+            value >= left.year &&
+            value <= right.year
+        ) {
+            const progress =
+                (value - left.year) /
+                (right.year - left.year);
+
+            return (
+                left.position +
+                (
+                    right.position -
+                    left.position
+                ) *
+                progress
+            );
+        }
+    }
+
+    return 100;
 }
 
 /* ============================================================
