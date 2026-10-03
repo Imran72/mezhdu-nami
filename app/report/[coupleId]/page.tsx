@@ -503,23 +503,15 @@ export default function ReportPage() {
 
                 <style jsx>{`
                     .state {
-                        min-height:
-                            100vh;
+                        min-height: 100vh;
 
-                        display:
-                            grid;
+                        display: grid;
+                        place-items: center;
+                        align-content: center;
 
-                        place-items:
-                            center;
+                        gap: 12px;
 
-                        align-content:
-                            center;
-
-                        gap:
-                            12px;
-
-                        background:
-                            #f8f4f1;
+                        background: #f8f4f1;
                     }
 
                     .state-brand {
@@ -528,25 +520,21 @@ export default function ReportPage() {
                             "Times New Roman",
                             serif;
 
-                        font-size:
-                            24px;
+                        font-size: 24px;
 
-                        font-weight:
-                            700;
+                        font-weight: 700;
                     }
 
                     p {
                         margin: 0;
 
-                        color:
-                            #958b8e;
+                        color: #958b8e;
 
                         font-family:
                             Arial,
                             sans-serif;
 
-                        font-size:
-                            12px;
+                        font-size: 12px;
                     }
                 `}</style>
 
@@ -572,26 +560,17 @@ export default function ReportPage() {
 
                 <style jsx>{`
                     .state {
-                        min-height:
-                            100vh;
+                        min-height: 100vh;
 
-                        display:
-                            grid;
+                        display: grid;
+                        place-items: center;
+                        align-content: center;
 
-                        place-items:
-                            center;
+                        gap: 12px;
 
-                        align-content:
-                            center;
+                        padding: 24px;
 
-                        gap:
-                            12px;
-
-                        padding:
-                            24px;
-
-                        background:
-                            #f8f4f1;
+                        background: #f8f4f1;
                     }
 
                     .state-brand {
@@ -600,25 +579,21 @@ export default function ReportPage() {
                             "Times New Roman",
                             serif;
 
-                        font-size:
-                            24px;
+                        font-size: 24px;
 
-                        font-weight:
-                            700;
+                        font-weight: 700;
                     }
 
                     p {
                         margin: 0;
 
-                        color:
-                            #958b8e;
+                        color: #958b8e;
 
                         font-family:
                             Arial,
                             sans-serif;
 
-                        font-size:
-                            13px;
+                        font-size: 13px;
                     }
                 `}</style>
 
@@ -633,7 +608,7 @@ export default function ReportPage() {
                 HEADER
             ================================================= */}
 
-            <header className="report-header report-shell">
+            <header className="report-header result-header-shell">
 
                 <div className="brand">
                     между нами.
@@ -641,15 +616,15 @@ export default function ReportPage() {
 
                 <div className="couple-names">
 
-                    <span>
+                    <span className="person-name">
                         {nameA}
                     </span>
 
-                    <b>
+                    <span className="couple-cross">
                         ×
-                    </b>
+                    </span>
 
-                    <span>
+                    <span className="person-name">
                         {nameB}
                     </span>
 
@@ -881,38 +856,34 @@ export default function ReportPage() {
             <style jsx>{`
 
                 :global(*) {
-                    box-sizing:
-                        border-box;
+                    box-sizing: border-box;
                 }
 
                 :global(html) {
-                    background:
-                        #f8f4f1;
+                    background: #f8f4f1;
                 }
 
                 :global(body) {
                     margin: 0;
 
-                    background:
-                        #f8f4f1;
+                    background: #f8f4f1;
 
-                    color:
-                        #211d1f;
+                    color: #211d1f;
                 }
 
                 .report-page {
-                    width:
-                        100%;
+                    width: 100%;
 
-                    min-height:
-                        100vh;
+                    min-height: 100vh;
 
-                    padding-bottom:
-                        72px;
+                    padding-bottom: 72px;
 
-                    background:
-                        #f8f4f1;
+                    background: #f8f4f1;
                 }
+
+                /* =================================================
+                   ОСНОВНОЙ КОНТЕНТ ПЛАТНОГО ОТЧЁТА
+                ================================================= */
 
                 .report-shell {
                     width:
@@ -924,111 +895,126 @@ export default function ReportPage() {
                             )
                         );
 
-                    max-width:
-                        1140px;
+                    max-width: 1140px;
 
-                    min-height:
-                        0;
+                    min-height: 0;
 
-                    height:
-                        auto;
+                    height: auto;
 
                     margin:
                         0 auto;
 
-                    padding:
-                        0;
+                    padding: 0;
                 }
 
                 /* =================================================
                    HEADER
+
+                   ВАЖНО:
+                   геометрия такая же, как на странице результатов.
                 ================================================= */
 
+                .result-header-shell {
+                    width:
+                        min(
+                            920px,
+                            calc(
+                                100% -
+                                56px
+                            )
+                        );
+
+                    max-width: none;
+
+                    min-height: 0;
+
+                    height: auto;
+
+                    margin:
+                        0 auto;
+
+                    padding: 0;
+                }
+
                 .report-header {
-                    height:
-                        76px;
+                    min-height: 78px;
 
-                    min-height:
-                        0;
+                    display: flex;
 
-                    display:
-                        flex;
+                    align-items: center;
 
-                    align-items:
-                        center;
+                    justify-content: space-between;
 
-                    justify-content:
-                        space-between;
+                    gap: 24px;
 
-                    gap:
-                        24px;
+                    /*
+                     * Полоску специально убрали.
+                     */
+                    border-bottom: 0;
                 }
 
                 .brand {
-                    flex:
-                        0 0 auto;
+                    flex-shrink: 0;
 
                     font-family:
                         Georgia,
                         "Times New Roman",
                         serif;
 
-                    font-size:
-                        25px;
+                    font-size: 24px;
 
-                    line-height:
-                        1;
+                    line-height: 1;
 
-                    font-weight:
-                        700;
+                    font-weight: 700;
 
-                    letter-spacing:
-                        -1.2px;
+                    letter-spacing: -1.1px;
                 }
 
                 .couple-names {
-                    min-width:
-                        0;
+                    min-width: 0;
 
-                    display:
-                        flex;
+                    display: flex;
 
-                    align-items:
-                        center;
+                    align-items: center;
 
-                    justify-content:
-                        flex-end;
+                    justify-content: flex-end;
 
-                    gap:
-                        10px;
+                    gap: 9px;
 
-                    color:
-                        #93888c;
+                    color: #8f8588;
 
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
 
-                    font-size:
-                        10px;
+                    font-size: 10px;
 
-                    font-weight:
-                        800;
+                    font-weight: 700;
 
-                    letter-spacing:
-                        1.15px;
+                    letter-spacing: 1.2px;
 
-                    text-transform:
-                        uppercase;
+                    text-transform: uppercase;
                 }
 
-                .couple-names b {
-                    color:
-                        #c8235b;
+                .person-name {
+                    min-width: 0;
 
-                    font-size:
-                        13px;
+                    overflow: hidden;
+
+                    text-overflow: ellipsis;
+
+                    white-space: nowrap;
+                }
+
+                .couple-cross {
+                    flex-shrink: 0;
+
+                    color: #c51f59;
+
+                    font-size: 12px;
+
+                    font-weight: 700;
                 }
 
                 /* =================================================
@@ -1043,8 +1029,7 @@ export default function ReportPage() {
                 }
 
                 .intro-grid {
-                    display:
-                        grid;
+                    display: grid;
 
                     grid-template-columns:
                         minmax(
@@ -1056,16 +1041,13 @@ export default function ReportPage() {
                             .85fr
                         );
 
-                    gap:
-                        72px;
+                    gap: 72px;
 
-                    align-items:
-                        center;
+                    align-items: center;
                 }
 
                 .intro-main h1 {
-                    margin:
-                        0;
+                    margin: 0;
 
                     font-family:
                         Georgia,
@@ -1079,38 +1061,31 @@ export default function ReportPage() {
                             92px
                         );
 
-                    line-height:
-                        .87;
+                    line-height: .87;
 
-                    font-weight:
-                        400;
+                    font-weight: 400;
 
-                    letter-spacing:
-                        -4px;
+                    letter-spacing: -4px;
                 }
 
                 .intro-main p {
-                    max-width:
-                        590px;
+                    max-width: 590px;
 
                     margin:
                         25px
                         0
                         0;
 
-                    color:
-                        #7b7275;
+                    color: #7b7275;
 
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
 
-                    font-size:
-                        15px;
+                    font-size: 15px;
 
-                    line-height:
-                        1.55;
+                    line-height: 1.55;
                 }
 
                 .intro-insight {
@@ -1118,11 +1093,9 @@ export default function ReportPage() {
                         30px
                         34px;
 
-                    border-radius:
-                        27px;
+                    border-radius: 27px;
 
-                    background:
-                        #f0dce2;
+                    background: #f0dce2;
                 }
 
                 .intro-insight h2 {
@@ -1131,30 +1104,24 @@ export default function ReportPage() {
                         0
                         21px;
 
-                    color:
-                        #322a2d;
+                    color: #322a2d;
 
                     font-family:
                         Georgia,
                         "Times New Roman",
                         serif;
 
-                    font-size:
-                        27px;
+                    font-size: 27px;
 
-                    line-height:
-                        1;
+                    line-height: 1;
 
-                    font-weight:
-                        400;
+                    font-weight: 400;
 
-                    letter-spacing:
-                        -.8px;
+                    letter-spacing: -.8px;
                 }
 
                 .intro-point {
-                    display:
-                        grid;
+                    display: grid;
 
                     grid-template-columns:
                         18px
@@ -1163,69 +1130,55 @@ export default function ReportPage() {
                             1fr
                         );
 
-                    gap:
-                        7px;
+                    gap: 7px;
 
-                    align-items:
-                        start;
+                    align-items: start;
                 }
 
                 .intro-point +
                 .intro-point {
-                    margin-top:
-                        13px;
+                    margin-top: 13px;
                 }
 
                 .intro-point > span {
-                    color:
-                        #cb255d;
+                    color: #cb255d;
 
                     font-family:
                         Georgia,
                         serif;
 
-                    font-size:
-                        18px;
+                    font-size: 18px;
 
-                    line-height:
-                        1.4;
+                    line-height: 1.4;
                 }
 
                 .intro-point p {
-                    margin:
-                        0;
+                    margin: 0;
 
-                    color:
-                        #5e5458;
+                    color: #5e5458;
 
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
 
-                    font-size:
-                        15px;
+                    font-size: 15px;
 
-                    line-height:
-                        1.48;
+                    line-height: 1.48;
                 }
 
                 /* =================================================
-                   COMMON SECTIONS
+                   ОБЩИЕ СЕКЦИИ
                 ================================================= */
 
                 .report-section {
-                    min-height:
-                        0;
+                    min-height: 0;
 
-                    height:
-                        auto;
+                    height: auto;
 
-                    margin-top:
-                        70px;
+                    margin-top: 70px;
 
-                    padding:
-                        0;
+                    padding: 0;
                 }
 
                 .score-list {
@@ -1235,45 +1188,37 @@ export default function ReportPage() {
                 }
 
                 .desktop-only {
-                    display:
-                        inline;
+                    display: inline;
                 }
 
                 /* =================================================
-                   BLIND
+                   СЛЕПЫЕ ЗОНЫ
                 ================================================= */
 
                 .blind-list {
-                    display:
-                        grid;
+                    display: grid;
 
-                    gap:
-                        13px;
+                    gap: 13px;
                 }
 
                 .empty {
-                    padding:
-                        25px;
+                    padding: 25px;
 
                     border:
                         1px solid
                         #e3d9d7;
 
-                    border-radius:
-                        22px;
+                    border-radius: 22px;
 
-                    color:
-                        #7e7478;
+                    color: #7e7478;
 
-                    background:
-                        #fffaf8;
+                    background: #fffaf8;
 
                     font-family:
                         Arial,
                         sans-serif;
 
-                    font-size:
-                        14px;
+                    font-size: 14px;
                 }
 
                 /* =================================================
@@ -1281,22 +1226,17 @@ export default function ReportPage() {
                 ================================================= */
 
                 .roadmap-section {
-                    margin-top:
-                        76px;
+                    margin-top: 76px;
                 }
 
                 .map {
-                    width:
-                        100%;
+                    width: 100%;
 
-                    overflow:
-                        hidden;
+                    overflow: hidden;
 
-                    border-radius:
-                        25px;
+                    border-radius: 25px;
 
-                    background:
-                        #ecd9de;
+                    background: #ecd9de;
 
                     box-shadow:
                         0
@@ -1311,19 +1251,15 @@ export default function ReportPage() {
                 }
 
                 .map img {
-                    width:
-                        100%;
+                    width: 100%;
 
-                    height:
-                        auto;
+                    height: auto;
 
-                    display:
-                        block;
+                    display: block;
                 }
 
                 .month-grid {
-                    display:
-                        grid;
+                    display: grid;
 
                     grid-template-columns:
                         repeat(
@@ -1334,14 +1270,11 @@ export default function ReportPage() {
                             )
                         );
 
-                    gap:
-                        13px;
+                    gap: 13px;
 
-                    margin-top:
-                        14px;
+                    margin-top: 14px;
 
-                    align-items:
-                        start;
+                    align-items: start;
                 }
 
                 /* =================================================
@@ -1357,13 +1290,11 @@ export default function ReportPage() {
                         grid-template-columns:
                             1fr;
 
-                        gap:
-                            28px;
+                        gap: 28px;
                     }
 
                     .intro-insight {
-                        max-width:
-                            620px;
+                        max-width: 620px;
                     }
 
                     .month-grid {
@@ -1382,8 +1313,7 @@ export default function ReportPage() {
                 ) {
 
                     .report-page {
-                        padding-bottom:
-                            44px;
+                        padding-bottom: 44px;
                     }
 
                     .report-shell {
@@ -1394,99 +1324,83 @@ export default function ReportPage() {
                             );
                     }
 
-                    .report-header {
-                        height:
-                            63px;
+                    /*
+                     * Совпадает с mobile header
+                     * страницы результата.
+                     */
+                    .result-header-shell {
+                        width:
+                            calc(
+                                100% -
+                                24px
+                            );
+                    }
 
-                        gap:
-                            12px;
+                    .report-header {
+                        min-height: 64px;
+
+                        gap: 12px;
                     }
 
                     .brand {
-                        font-size:
-                            21px;
+                        font-size: 21px;
                     }
 
                     .couple-names {
-                        max-width:
-                            48%;
+                        max-width: 52%;
 
-                        overflow:
-                            hidden;
+                        gap: 5px;
 
-                        white-space:
-                            nowrap;
+                        font-size: 8px;
 
-                        font-size:
-                            8px;
-                    }
-
-                    .couple-names span {
-                        overflow:
-                            hidden;
-
-                        text-overflow:
-                            ellipsis;
+                        letter-spacing: .65px;
                     }
 
                     .intro {
-                        padding-top:
-                            30px;
+                        padding-top: 30px;
                     }
 
                     .intro-main h1 {
-                        font-size:
-                            54px;
+                        font-size: 54px;
 
-                        letter-spacing:
-                            -2.8px;
+                        letter-spacing: -2.8px;
                     }
 
                     .intro-main p {
-                        margin-top:
-                            18px;
+                        margin-top: 18px;
 
-                        font-size:
-                            12px;
+                        font-size: 12px;
                     }
 
                     .intro-insight {
-                        padding:
-                            23px;
+                        padding: 23px;
 
-                        border-radius:
-                            22px;
+                        border-radius: 22px;
                     }
 
                     .intro-insight h2 {
-                        font-size:
-                            23px;
+                        font-size: 23px;
                     }
 
                     .intro-point p {
-                        font-size:
-                            13px;
+                        font-size: 13px;
                     }
 
                     .report-section,
                     .roadmap-section {
-                        margin-top:
-                            52px;
+                        margin-top: 52px;
                     }
 
                     .desktop-only {
-                        display:
-                            none;
+                        display: none;
                     }
 
                     .map {
-                        border-radius:
-                            18px;
+                        border-radius: 18px;
                     }
 
                     .month-grid {
-                        margin-top:
-                            10px;
+                        margin-top: 10px;
                     }
                 }
 
@@ -1527,33 +1441,26 @@ function SectionHeading({
             <style jsx>{`
 
                 .section-heading {
-                    max-width:
-                        780px;
+                    max-width: 780px;
 
-                    margin-bottom:
-                        30px;
+                    margin-bottom: 30px;
                 }
 
                 .label {
-                    margin-bottom:
-                        13px;
+                    margin-bottom: 13px;
 
-                    color:
-                        #c51f59;
+                    color: #c51f59;
 
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
 
-                    font-size:
-                        10px;
+                    font-size: 10px;
 
-                    font-weight:
-                        800;
+                    font-weight: 800;
 
-                    letter-spacing:
-                        2.2px;
+                    letter-spacing: 2.2px;
                 }
 
                 h2 {
@@ -1571,38 +1478,31 @@ function SectionHeading({
                             58px
                         );
 
-                    line-height:
-                        .95;
+                    line-height: .95;
 
-                    font-weight:
-                        400;
+                    font-weight: 400;
 
-                    letter-spacing:
-                        -2.3px;
+                    letter-spacing: -2.3px;
                 }
 
                 p {
-                    max-width:
-                        630px;
+                    max-width: 630px;
 
                     margin:
                         16px
                         0
                         0;
 
-                    color:
-                        #898083;
+                    color: #898083;
 
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
 
-                    font-size:
-                        13px;
+                    font-size: 13px;
 
-                    line-height:
-                        1.5;
+                    line-height: 1.5;
                 }
 
                 @media (
@@ -1611,21 +1511,17 @@ function SectionHeading({
                 ) {
 
                     .section-heading {
-                        margin-bottom:
-                            22px;
+                        margin-bottom: 22px;
                     }
 
                     h2 {
-                        font-size:
-                            37px;
+                        font-size: 37px;
 
-                        letter-spacing:
-                            -1.6px;
+                        letter-spacing: -1.6px;
                     }
 
                     p {
-                        font-size:
-                            11px;
+                        font-size: 11px;
                     }
                 }
 
@@ -1695,11 +1591,9 @@ function ScoreRow({
             <style jsx>{`
 
                 .score-row {
-                    min-height:
-                        98px;
+                    min-height: 98px;
 
-                    display:
-                        grid;
+                    display: grid;
 
                     grid-template-columns:
                         40px
@@ -1709,11 +1603,9 @@ function ScoreRow({
                         )
                         84px;
 
-                    gap:
-                        18px;
+                    gap: 18px;
 
-                    align-items:
-                        center;
+                    align-items: center;
 
                     border-bottom:
                         1px solid
@@ -1721,33 +1613,25 @@ function ScoreRow({
                 }
 
                 .score-symbol {
-                    width:
-                        36px;
+                    width: 36px;
 
-                    height:
-                        36px;
+                    height: 36px;
 
-                    display:
-                        grid;
+                    display: grid;
 
-                    place-items:
-                        center;
+                    place-items: center;
 
-                    border-radius:
-                        50%;
+                    border-radius: 50%;
 
-                    background:
-                        #f2dfe4;
+                    background: #f2dfe4;
 
-                    color:
-                        #c9255c;
+                    color: #c9255c;
 
                     font-family:
                         Georgia,
                         serif;
 
-                    font-size:
-                        18px;
+                    font-size: 18px;
                 }
 
                 h3 {
@@ -1758,17 +1642,13 @@ function ScoreRow({
                         "Times New Roman",
                         serif;
 
-                    font-size:
-                        29px;
+                    font-size: 29px;
 
-                    line-height:
-                        1;
+                    line-height: 1;
 
-                    font-weight:
-                        400;
+                    font-weight: 400;
 
-                    letter-spacing:
-                        -1.1px;
+                    letter-spacing: -1.1px;
                 }
 
                 p {
@@ -1777,52 +1657,40 @@ function ScoreRow({
                         0
                         10px;
 
-                    color:
-                        #91888b;
+                    color: #91888b;
 
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
 
-                    font-size:
-                        10px;
+                    font-size: 10px;
                 }
 
                 .track {
-                    height:
-                        5px;
+                    height: 5px;
 
-                    overflow:
-                        hidden;
+                    overflow: hidden;
 
-                    border-radius:
-                        999px;
+                    border-radius: 999px;
 
-                    background:
-                        #e5dfe0;
+                    background: #e5dfe0;
                 }
 
                 .fill {
-                    height:
-                        100%;
+                    height: 100%;
 
-                    border-radius:
-                        inherit;
+                    border-radius: inherit;
 
-                    background:
-                        #ce3269;
+                    background: #ce3269;
                 }
 
                 .score {
-                    display:
-                        flex;
+                    display: flex;
 
-                    justify-content:
-                        flex-end;
+                    justify-content: flex-end;
 
-                    align-items:
-                        baseline;
+                    align-items: baseline;
 
                     font-family:
                         Georgia,
@@ -1830,28 +1698,21 @@ function ScoreRow({
                 }
 
                 .score strong {
-                    color:
-                        #c51f59;
+                    color: #c51f59;
 
-                    font-size:
-                        46px;
+                    font-size: 46px;
 
-                    line-height:
-                        1;
+                    line-height: 1;
 
-                    font-weight:
-                        400;
+                    font-weight: 400;
                 }
 
                 .score span {
-                    margin-left:
-                        3px;
+                    margin-left: 3px;
 
-                    color:
-                        #847c7e;
+                    color: #847c7e;
 
-                    font-size:
-                        17px;
+                    font-size: 17px;
                 }
 
                 @media (
@@ -1860,8 +1721,7 @@ function ScoreRow({
                 ) {
 
                     .score-row {
-                        min-height:
-                            87px;
+                        min-height: 87px;
 
                         grid-template-columns:
                             30px
@@ -1871,39 +1731,31 @@ function ScoreRow({
                             )
                             55px;
 
-                        gap:
-                            10px;
+                        gap: 10px;
                     }
 
                     .score-symbol {
-                        width:
-                            29px;
+                        width: 29px;
 
-                        height:
-                            29px;
+                        height: 29px;
 
-                        font-size:
-                            14px;
+                        font-size: 14px;
                     }
 
                     h3 {
-                        font-size:
-                            22px;
+                        font-size: 22px;
                     }
 
                     p {
-                        font-size:
-                            9px;
+                        font-size: 9px;
                     }
 
                     .score strong {
-                        font-size:
-                            34px;
+                        font-size: 34px;
                     }
 
                     .score span {
-                        font-size:
-                            12px;
+                        font-size: 12px;
                     }
                 }
 
@@ -1992,33 +1844,27 @@ function BlindSpot({
             <style jsx>{`
 
                 .blind-card {
-                    width:
-                        100%;
+                    width: 100%;
 
-                    min-width:
-                        0;
+                    min-width: 0;
 
                     padding:
                         25px
                         28px;
 
-                    overflow:
-                        hidden;
+                    overflow: hidden;
 
                     border:
                         1px solid
                         #e2d8d6;
 
-                    border-radius:
-                        23px;
+                    border-radius: 23px;
 
-                    background:
-                        #fffaf8;
+                    background: #fffaf8;
                 }
 
                 .blind-top {
-                    display:
-                        grid;
+                    display: grid;
 
                     grid-template-columns:
                         52px
@@ -2027,34 +1873,27 @@ function BlindSpot({
                             1fr
                         );
 
-                    gap:
-                        16px;
+                    gap: 16px;
 
-                    align-items:
-                        start;
+                    align-items: start;
                 }
 
                 .blind-number {
-                    padding-top:
-                        4px;
+                    padding-top: 4px;
 
-                    color:
-                        #ca275f;
+                    color: #ca275f;
 
                     font-family:
                         Georgia,
                         serif;
 
-                    font-size:
-                        20px;
+                    font-size: 20px;
 
-                    line-height:
-                        1;
+                    line-height: 1;
                 }
 
                 h3 {
-                    max-width:
-                        850px;
+                    max-width: 850px;
 
                     margin: 0;
 
@@ -2063,22 +1902,17 @@ function BlindSpot({
                         "Times New Roman",
                         serif;
 
-                    font-size:
-                        30px;
+                    font-size: 30px;
 
-                    line-height:
-                        1.08;
+                    line-height: 1.08;
 
-                    font-weight:
-                        400;
+                    font-weight: 400;
 
-                    letter-spacing:
-                        -.8px;
+                    letter-spacing: -.8px;
                 }
 
                 .answers {
-                    display:
-                        grid;
+                    display: grid;
 
                     grid-template-columns:
                         minmax(
@@ -2091,11 +1925,9 @@ function BlindSpot({
                             1fr
                         );
 
-                    gap:
-                        13px;
+                    gap: 13px;
 
-                    align-items:
-                        center;
+                    align-items: center;
 
                     margin:
                         23px
@@ -2105,110 +1937,83 @@ function BlindSpot({
                 }
 
                 .answer {
-                    min-width:
-                        0;
+                    min-width: 0;
 
-                    min-height:
-                        108px;
+                    min-height: 108px;
 
-                    display:
-                        flex;
+                    display: flex;
 
-                    flex-direction:
-                        column;
+                    flex-direction: column;
 
-                    justify-content:
-                        center;
+                    justify-content: center;
 
                     padding:
                         19px
                         21px;
 
-                    border-radius:
-                        18px;
+                    border-radius: 18px;
 
-                    background:
-                        #f1e1e4;
+                    background: #f1e1e4;
                 }
 
                 .person {
-                    display:
-                        block;
+                    display: block;
 
-                    margin-bottom:
-                        10px;
+                    margin-bottom: 10px;
 
-                    overflow:
-                        hidden;
+                    overflow: hidden;
 
-                    color:
-                        #9d8c91;
+                    color: #9d8c91;
 
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
 
-                    font-size:
-                        10px;
+                    font-size: 10px;
 
-                    line-height:
-                        1;
+                    line-height: 1;
 
-                    font-weight:
-                        800;
+                    font-weight: 800;
 
-                    letter-spacing:
-                        .8px;
+                    letter-spacing: .8px;
 
-                    text-overflow:
-                        ellipsis;
+                    text-overflow: ellipsis;
 
-                    text-transform:
-                        uppercase;
+                    text-transform: uppercase;
 
-                    white-space:
-                        nowrap;
+                    white-space: nowrap;
                 }
 
                 .answer strong {
-                    display:
-                        block;
+                    display: block;
 
-                    color:
-                        #30282b;
+                    color: #30282b;
 
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
 
-                    font-size:
-                        17px;
+                    font-size: 17px;
 
-                    line-height:
-                        1.38;
+                    line-height: 1.38;
 
-                    font-weight:
-                        500;
+                    font-weight: 500;
 
-                    overflow-wrap:
-                        break-word;
+                    overflow-wrap: break-word;
                 }
 
                 .arrow {
-                    color:
-                        #cc275f;
+                    color: #cc275f;
 
                     font-family:
                         Georgia,
                         serif;
 
-                    font-size:
-                        29px;
+                    font-size: 29px;
 
-                    text-align:
-                        center;
+                    text-align: center;
                 }
 
                 .meaning {
@@ -2218,8 +2023,7 @@ function BlindSpot({
                         0
                         68px;
 
-                    padding-top:
-                        17px;
+                    padding-top: 17px;
 
                     border-top:
                         1px solid
@@ -2227,49 +2031,39 @@ function BlindSpot({
                 }
 
                 .meaning span {
-                    display:
-                        block;
+                    display: block;
 
-                    margin-bottom:
-                        6px;
+                    margin-bottom: 6px;
 
-                    color:
-                        #c2275c;
+                    color: #c2275c;
 
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
 
-                    font-size:
-                        9px;
+                    font-size: 9px;
 
-                    font-weight:
-                        800;
+                    font-weight: 800;
 
-                    letter-spacing:
-                        1.4px;
+                    letter-spacing: 1.4px;
                 }
 
                 .meaning p {
-                    max-width:
-                        850px;
+                    max-width: 850px;
 
                     margin: 0;
 
-                    color:
-                        #655b5e;
+                    color: #655b5e;
 
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
 
-                    font-size:
-                        14px;
+                    font-size: 14px;
 
-                    line-height:
-                        1.5;
+                    line-height: 1.5;
                 }
 
                 @media (
@@ -2278,34 +2072,29 @@ function BlindSpot({
                 ) {
 
                     .blind-card {
-                        padding:
-                            20px;
+                        padding: 20px;
                     }
 
                     .blind-top {
                         grid-template-columns:
                             1fr;
 
-                        gap:
-                            8px;
+                        gap: 8px;
                     }
 
                     .blind-number {
-                        font-size:
-                            17px;
+                        font-size: 17px;
                     }
 
                     h3 {
-                        font-size:
-                            24px;
+                        font-size: 24px;
                     }
 
                     .answers {
                         grid-template-columns:
                             1fr;
 
-                        gap:
-                            8px;
+                        gap: 8px;
 
                         margin:
                             18px
@@ -2314,24 +2103,19 @@ function BlindSpot({
                     }
 
                     .answer {
-                        min-height:
-                            0;
+                        min-height: 0;
 
-                        padding:
-                            16px;
+                        padding: 16px;
                     }
 
                     .answer strong {
-                        font-size:
-                            15px;
+                        font-size: 15px;
                     }
 
                     .arrow {
-                        height:
-                            21px;
+                        height: 21px;
 
-                        line-height:
-                            21px;
+                        line-height: 21px;
 
                         transform:
                             rotate(
@@ -2345,13 +2129,11 @@ function BlindSpot({
                             0
                             0;
 
-                        padding-top:
-                            14px;
+                        padding-top: 14px;
                     }
 
                     .meaning p {
-                        font-size:
-                            12px;
+                        font-size: 12px;
                     }
                 }
 
@@ -2421,90 +2203,69 @@ function MonthCard({
             <style jsx>{`
 
                 .month-card {
-                    min-width:
-                        0;
+                    min-width: 0;
 
-                    padding:
-                        24px;
+                    padding: 24px;
 
                     border:
                         1px solid
                         #e3d9d7;
 
-                    border-radius:
-                        23px;
+                    border-radius: 23px;
 
-                    background:
-                        #fffaf8;
+                    background: #fffaf8;
                 }
 
                 .month-top {
-                    display:
-                        flex;
+                    display: flex;
 
-                    align-items:
-                        center;
+                    align-items: center;
 
-                    gap:
-                        12px;
+                    gap: 12px;
 
-                    margin-bottom:
-                        17px;
+                    margin-bottom: 17px;
                 }
 
                 .number {
                     flex:
                         0 0 auto;
 
-                    width:
-                        38px;
+                    width: 38px;
 
-                    height:
-                        38px;
+                    height: 38px;
 
-                    display:
-                        grid;
+                    display: grid;
 
-                    place-items:
-                        center;
+                    place-items: center;
 
-                    border-radius:
-                        50%;
+                    border-radius: 50%;
 
-                    background:
-                        #c8245c;
+                    background: #c8245c;
 
-                    color:
-                        white;
+                    color: white;
 
                     font-family:
                         Georgia,
                         serif;
 
-                    font-size:
-                        19px;
+                    font-size: 19px;
                 }
 
                 .eyebrow {
-                    color:
-                        #c8245c;
+                    color: #c8245c;
 
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
 
-                    font-size:
-                        9px;
+                    font-size: 9px;
 
-                    line-height:
-                        1.2;
+                    line-height: 1.2;
 
-                    font-weight:
-                        800;
+                    font-weight: 800;
 
-                    letter-spacing:
-                        1.3px;
+                    letter-spacing: 1.3px;
                 }
 
                 h3 {
@@ -2515,17 +2276,13 @@ function MonthCard({
                         "Times New Roman",
                         serif;
 
-                    font-size:
-                        30px;
+                    font-size: 30px;
 
-                    line-height:
-                        .98;
+                    line-height: .98;
 
-                    font-weight:
-                        400;
+                    font-weight: 400;
 
-                    letter-spacing:
-                        -1px;
+                    letter-spacing: -1px;
                 }
 
                 .description {
@@ -2534,32 +2291,26 @@ function MonthCard({
                         0
                         21px;
 
-                    color:
-                        #807679;
+                    color: #807679;
 
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
 
-                    font-size:
-                        12px;
+                    font-size: 12px;
 
-                    line-height:
-                        1.45;
+                    line-height: 1.45;
                 }
 
                 .tasks {
-                    display:
-                        grid;
+                    display: grid;
 
-                    gap:
-                        13px;
+                    gap: 13px;
                 }
 
                 .task {
-                    display:
-                        grid;
+                    display: grid;
 
                     grid-template-columns:
                         18px
@@ -2568,48 +2319,38 @@ function MonthCard({
                             1fr
                         );
 
-                    gap:
-                        10px;
+                    gap: 10px;
 
-                    align-items:
-                        start;
+                    align-items: start;
                 }
 
                 .checkbox {
-                    width:
-                        18px;
+                    width: 18px;
 
-                    height:
-                        18px;
+                    height: 18px;
 
-                    margin-top:
-                        1px;
+                    margin-top: 1px;
 
                     border:
                         1.5px solid
                         #d44573;
 
-                    border-radius:
-                        5px;
+                    border-radius: 5px;
                 }
 
                 .task-text {
-                    color:
-                        #4e4548;
+                    color: #4e4548;
 
                     font-family:
                         Arial,
                         Helvetica,
                         sans-serif;
 
-                    font-size:
-                        12px;
+                    font-size: 12px;
 
-                    line-height:
-                        1.42;
+                    line-height: 1.42;
 
-                    overflow-wrap:
-                        break-word;
+                    overflow-wrap: break-word;
                 }
 
             `}</style>
