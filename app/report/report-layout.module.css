@@ -1,0 +1,220 @@
+.root {
+    width: 100%;
+    min-height: 100vh;
+
+    margin: 0;
+    padding: 0;
+
+    background: #f8f4f1;
+    color: #211d1f;
+}
+
+
+/*
+ * ============================================================
+ * ГЛАВНЫЙ ФИКС
+ * ============================================================
+ *
+ * В старом globals.css есть:
+ *
+ * .shell {
+ *     min-height: 100svh;
+ *     ...
+ * }
+ *
+ * На странице отчёта полностью отключаем это поведение.
+ */
+
+.root :global(.shell) {
+    min-height: 0 !important;
+    height: auto !important;
+
+    max-width: none !important;
+
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+
+    display: block !important;
+}
+
+
+/*
+ * Даже если где-то внутри старого кода section
+ * получил min-height — здесь принудительно убираем.
+ */
+
+.root :global(section) {
+    min-height: 0 !important;
+    height: auto !important;
+
+    flex: none !important;
+}
+
+
+/*
+ * Наш новый контейнер страницы полного разбора.
+ *
+ * Эти свойства дополнительно защищены,
+ * чтобы globals.css больше не мог вмешиваться.
+ */
+
+.root :global(.report-shell) {
+    width:
+            min(
+                    1140px,
+                    calc(100% - 48px)
+            ) !important;
+
+    max-width:
+            1140px !important;
+
+    min-height:
+            0 !important;
+
+    height:
+            auto !important;
+
+    margin-left:
+            auto !important;
+
+    margin-right:
+            auto !important;
+
+    padding-left:
+            0 !important;
+
+    padding-right:
+            0 !important;
+
+    display:
+            block !important;
+}
+
+
+/*
+ * ============================================================
+ * РИТМ СТРАНИЦЫ
+ * ============================================================
+ *
+ * Даже если старые стили пытаются дать блокам
+ * огромный margin, здесь задаём нормальную дистанцию.
+ */
+
+.root :global(.report-section) {
+    min-height: 0 !important;
+    height: auto !important;
+
+    margin-top: 68px !important;
+    margin-bottom: 0 !important;
+
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+
+/*
+ * Первый экран чуть отдельно —
+ * ему вообще не нужен целый viewport.
+ */
+
+.root :global(.intro) {
+    min-height: 0 !important;
+    height: auto !important;
+
+    padding-top: 46px !important;
+    padding-bottom: 0 !important;
+
+    margin-bottom: 0 !important;
+}
+
+
+/*
+ * План не должен создавать дополнительную
+ * огромную дистанцию.
+ */
+
+.root :global(.roadmap-section) {
+    margin-top: 72px !important;
+}
+
+
+/*
+ * Финальный блок.
+ */
+
+.root :global(.today) {
+    margin-top: 72px !important;
+}
+
+
+/*
+ * Заодно гарантируем, что картинки
+ * никогда не создают странные inline gaps.
+ */
+
+.root :global(img) {
+    display: block;
+
+    max-width: 100%;
+}
+
+
+/*
+ * ============================================================
+ * TABLET
+ * ============================================================
+ */
+
+@media (max-width: 900px) {
+
+    .root :global(.report-shell) {
+        width:
+                calc(
+                        100% - 36px
+                ) !important;
+    }
+
+    .root :global(.report-section) {
+        margin-top:
+                58px !important;
+    }
+
+    .root :global(.roadmap-section),
+    .root :global(.today) {
+        margin-top:
+                60px !important;
+    }
+}
+
+
+/*
+ * ============================================================
+ * MOBILE
+ * ============================================================
+ */
+
+@media (max-width: 640px) {
+
+    .root :global(.report-shell) {
+        width:
+                calc(
+                        100% - 28px
+                ) !important;
+    }
+
+    .root :global(.intro) {
+        padding-top:
+                32px !important;
+    }
+
+    .root :global(.report-section) {
+        margin-top:
+                48px !important;
+    }
+
+    .root :global(.roadmap-section),
+    .root :global(.today) {
+        margin-top:
+                52px !important;
+    }
+}
