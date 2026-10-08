@@ -41,15 +41,8 @@ const MAX_SCORE = 10;
 const PAID_IMAGE =
     "/images/full-report-couple.png";
 
-const FORECAST_MARKS = [
-    { label: "1", year: 1, position: 0 },
-    { label: "5", year: 5, position: 12 },
-    { label: "10", year: 10, position: 26 },
-    { label: "15", year: 15, position: 42 },
-    { label: "20", year: 20, position: 58 },
-    { label: "30", year: 30, position: 76 },
-    { label: "вся жизнь", year: 60, position: 100 },
-] as const;
+const MIN_FORECAST_YEARS = 1;
+const MAX_FORECAST_YEARS = 45;
 
 export default function ResultPage() {
     const params =
@@ -297,60 +290,14 @@ export default function ResultPage() {
             data,
         ]);
 
-    const yearsForecast =
-        useMemo(() => {
-            const overall =
-                data
-                    ?.scores
-                    ?.overall ??
-                50;
-
-            if (
-                overall >=
-                85
-            ) {
-                return 45;
-            }
-
-            if (
-                overall >=
-                75
-            ) {
-                return 28;
-            }
-
-            if (
-                overall >=
-                65
-            ) {
-                return 16;
-            }
-
-            if (
-                overall >=
-                55
-            ) {
-                return 10;
-            }
-
-            if (
-                overall >=
-                45
-            ) {
-                return 6;
-            }
-
-            if (
-                overall >=
-                35
-            ) {
-                return 3;
-            }
-
-            return 1;
-        }, [
-            data,
-        ]);
+    const yearsForecast = useMemo(() => {
+        const overall = data?.scores?.overall ?? 50;
+        const normalizedScore = Math.max(0, Math.min(100, overall));
+        return Math.max(MIN_FORECAST_YEARS, Math.round(
+            (MIN_FORECAST_YEARS +
+            (MAX_FORECAST_YEARS - MIN_FORECAST_YEARS) * normalizedScore / 100) / 3
+        ));
+    }, [data]);
 
     const forecastPosition =
         useMemo(
@@ -397,10 +344,7 @@ export default function ResultPage() {
                     }
 
                     .loading-brand {
-                        font-family:
-                            Georgia,
-                            "Times New Roman",
-                            serif;
+                        font-family: inherit;
 
                         font-size:
                             30px;
@@ -440,10 +384,7 @@ export default function ResultPage() {
                         color:
                             #211d1f;
 
-                        font-family:
-                            Arial,
-                            Helvetica,
-                            sans-serif;
+                        font-family: inherit;
                     }
                 `}</style>
 
@@ -494,11 +435,6 @@ export default function ResultPage() {
                         ВАШ РЕЗУЛЬТАТ
                     </div>
 
-                    <h1 className="results-title">
-                        Вот что
-                        <br />
-                        получилось
-                    </h1>
 
                     <div className="category-list">
 
@@ -532,15 +468,11 @@ export default function ResultPage() {
                         </div>
 
                         <h2 className="forecast-title">
-                            Примерная
-                            <br />
-                            длительность
-                            <br className="desktop-break" />
-                            ваших отношений
+                            Примерная длительность ваших отношений
                         </h2>
 
                         <p className="forecast-description">
-                            На основе ИИ модели
+                            На основании ИИ модели
                         </p>
 
                     </div>
@@ -566,53 +498,18 @@ export default function ResultPage() {
                             <div className="scale-track">
 
                                 <div
-                                    className="scale-fill"
-                                    style={{
-                                        width:
-                                            `${forecastPosition}%`,
-                                    }}
-                                />
-
-                                {FORECAST_MARKS.map((mark) => (
-                                    <span
-                                        key={mark.label}
-                                        className="scale-tick"
-                                        style={{
-                                            left: `${mark.position}%`,
-                                        }}
-                                    />
-                                ))}
-
-                                <div
                                     className="scale-dot"
                                     style={{
                                         left:
-                                            `${forecastPosition}%`,
+                                            `${Math.max(1, Math.min(99, forecastPosition))}%`,
                                     }}
                                 />
 
                             </div>
 
-                            <div className="scale-labels">
-
-                                {FORECAST_MARKS.map((mark, index) => (
-                                    <span
-                                        key={mark.label}
-                                        className={`scale-label ${
-                                            index === 0
-                                                ? "scale-label-start"
-                                                : index === FORECAST_MARKS.length - 1
-                                                    ? "scale-label-end"
-                                                    : ""
-                                        }`}
-                                        style={{
-                                            left: `${mark.position}%`,
-                                        }}
-                                    >
-                                        {mark.label}
-                                    </span>
-                                ))}
-
+                            <div className="ribbon-labels">
+                                <span>Короткая история</span>
+                                <span>Надолго</span>
                             </div>
 
                         </div>
@@ -648,36 +545,17 @@ export default function ResultPage() {
                     <div className="paid-panel">
 
                         <div className="paid-label">
-                            ПОЛНЫЙ РАЗБОР
+                            ПЛАН НА 3 МЕСЯЦА
                         </div>
 
                         <h2 className="paid-title">
-                            План на 3 месяца
+                            Как превратить {yearsForecast}{" "}
+                            {getYearWord(yearsForecast)} в целую жизнь
                         </h2>
 
-                        <div className="paid-benefits">
-
-                            <Benefit
-                                icon="heart"
-                                text="Где вы можете не понимать друг друга"
-                            />
-
-                            <Benefit
-                                icon="message"
-                                text="Что каждый ждёт от отношений"
-                            />
-
-                            <Benefit
-                                icon="lightning"
-                                text="Что может стать причиной ссор"
-                            />
-
-                            <Benefit
-                                icon="chart"
-                                text="Как сделать вашу пару крепче"
-                            />
-
-                        </div>
+                        <p className="paid-description">
+                            План на 3 месяца: конкретные шаги, чтобы стать ближе.
+                        </p>
 
                         <button
                             type="button"
@@ -690,7 +568,7 @@ export default function ResultPage() {
                         >
 
                             <span className="cta-title">
-                                Открыть полный разбор
+                                Получить наш план
                             </span>
 
                             <span className="cta-right">
@@ -803,10 +681,7 @@ export default function ResultPage() {
                     flex-shrink:
                         0;
 
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
+                    font-family: inherit;
 
                     font-size:
                         24px;
@@ -837,10 +712,7 @@ export default function ResultPage() {
                     color:
                         #8f8588;
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size:
                         10px;
@@ -892,10 +764,7 @@ export default function ResultPage() {
                     color:
                         #c2215a;
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size:
                         10px;
@@ -916,10 +785,7 @@ export default function ResultPage() {
                         0
                         32px;
 
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
+                    font-family: inherit;
 
                     font-size:
                         48px;
@@ -933,6 +799,8 @@ export default function ResultPage() {
                     letter-spacing:
                         -2.5px;
                 }
+
+                .results > .section-label { margin-bottom: 24px; }
 
                 .category-list {
                     display:
@@ -988,10 +856,7 @@ export default function ResultPage() {
                     margin:
                         0;
 
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
+                    font-family: inherit;
 
                     font-size:
                         43px;
@@ -1015,10 +880,7 @@ export default function ResultPage() {
                     color:
                         #8d8587;
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size:
                         14px;
@@ -1054,10 +916,7 @@ export default function ResultPage() {
                     color:
                         #c21856;
 
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
+                    font-family: inherit;
 
                     white-space:
                         nowrap;
@@ -1216,10 +1075,7 @@ export default function ResultPage() {
                     color:
                         #8d8587;
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size:
                         10px;
@@ -1395,10 +1251,7 @@ export default function ResultPage() {
                             .82
                         );
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size:
                         9px;
@@ -1420,10 +1273,7 @@ export default function ResultPage() {
                     color:
                         #fff9f6;
 
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
+                    font-family: inherit;
 
                     font-size:
                         clamp(
@@ -1556,10 +1406,7 @@ export default function ResultPage() {
                     min-width:
                         0;
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size:
                         14px;
@@ -1589,10 +1436,7 @@ export default function ResultPage() {
                 }
 
                 .price {
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
+                    font-family: inherit;
 
                     font-size:
                         28px;
@@ -1608,10 +1452,7 @@ export default function ResultPage() {
                 }
 
                 .arrow {
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size:
                         24px;
@@ -2047,6 +1888,37 @@ export default function ResultPage() {
                     }
                 }
 
+                @media (max-width: 640px) {
+                    .paid-art-panel { height: 300px; min-height: 0; }
+                    .paid-art { object-position: 46% center; }
+                }
+                .page { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+                .results-title { font-size: clamp(36px, 5vw, 48px); font-weight: 500; line-height: 1.1; letter-spacing: -1.6px; }
+                .forecast-title, .paid-title { font-size: clamp(28px, 4vw, 38px); font-weight: 500; line-height: 1.15; letter-spacing: -1px; }
+                .forecast-description { font-size: 14px; line-height: 1.5; }
+                .section-label, .paid-label { font-size: 12px; letter-spacing: 1.4px; }
+                .years strong { font-size: 56px; font-weight: 500; line-height: 1; letter-spacing: -2px; }
+                .years span { font-size: 26px; letter-spacing: -0.6px; }
+                .forecast-scale { padding: 0 10px; margin-top: 24px; }
+                .scale-track { height: 10px; background: #e9e1e4; }
+                .scale-fill { background: linear-gradient(90deg, #dfa5b9, #cb225c); }
+                .scale-dot { width: 18px; height: 18px; border: 3px solid #f8f4f1; background: #cb225c; box-shadow: 0 0 0 1px #cb225c; }
+                .scale-labels { font-size: 12px; font-weight: 400; color: #746b6e; margin-top: 16px; height: 30px; }
+                @media (max-width: 380px) {
+                    .scale-labels { font-size: 11px; }
+                    .scale-label-end { max-width: 42px; white-space: normal; text-align: right; line-height: 1.2; }
+                }
+                .forecast-scale { padding: 0; }
+                .scale-track { height: 32px; border-radius: 12px; background: linear-gradient(90deg, #ebd7df, #cb225c); }
+                .scale-dot {
+                    top: 5px; bottom: 5px; width: 3px; height: auto;
+                    left: auto; border: 0; border-radius: 3px;
+                    background: #f8f4f1; box-shadow: none; transform: translateX(-50%);
+                }
+                .ribbon-labels { display: flex; justify-content: space-between; gap: 16px; margin-top: 12px; color: #746b6e; font-size: 12px; line-height: 1.4; }
+                .paid-description { margin: 18px 0 0; color: #fff; opacity: .88; font-size: 16px; line-height: 1.6; }
+                .paid-benefits { margin-top: 24px; }
+                .paid-cta .cta-title { font-size: 14px; line-height: 1.4; max-width: 220px; }
             `}</style>
 
         </main>
@@ -2127,6 +1999,8 @@ function CategoryRow({
                         #e0d9d6;
                 }
 
+                .category-row:last-child { border-bottom: 0; }
+
                 .category-row:first-child {
                     padding-top:
                         0;
@@ -2152,10 +2026,7 @@ function CategoryRow({
                 }
 
                 .category-title {
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
+                    font-family: inherit;
 
                     font-size:
                         29px;
@@ -2174,10 +2045,7 @@ function CategoryRow({
                     color:
                         #8e8688;
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size:
                         12px;
@@ -2202,10 +2070,7 @@ function CategoryRow({
                     color:
                         #7f7679;
 
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
+                    font-family: inherit;
                 }
 
                 .category-score strong {
@@ -2313,6 +2178,14 @@ function CategoryRow({
                     }
                 }
 
+                .category-title { font-size: 22px; font-weight: 500; line-height: 1.15; letter-spacing: -0.6px; }
+                .category-subtitle { font-size: 14px; line-height: 1.5; font-weight: 400; color: #746b6e; }
+                .category-score strong { font-size: 34px; font-weight: 500; line-height: 1; letter-spacing: -1px; }
+                .category-score span { font-size: 14px; }
+                @media (max-width: 380px) {
+                    .category-title { font-size: 22px; }
+                    .category-top { gap: 12px; }
+                }
             `}</style>
 
         </div>
@@ -2380,10 +2253,7 @@ function Benefit({
                 }
 
                 .benefit-text {
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size:
                         14px;
@@ -2440,6 +2310,9 @@ function Benefit({
                     }
                 }
 
+                .benefit-text { font-size: 15px; line-height: 1.6; }
+                .benefit { align-items: flex-start; }
+                .benefit-icon { margin-top: 3px; }
             `}</style>
 
         </div>
@@ -2583,45 +2456,11 @@ function BenefitSvg({
    FORECAST SCALE
 ============================================================ */
 
-function getForecastScalePosition(
-    value: number
-) {
-    const points = FORECAST_MARKS;
-
-    if (value <= points[0].year) {
-        return points[0].position;
-    }
-
-    const last = points[points.length - 1];
-
-    if (value >= last.year) {
-        return last.position;
-    }
-
-    for (let index = 0; index < points.length - 1; index += 1) {
-        const left = points[index];
-        const right = points[index + 1];
-
-        if (
-            value >= left.year &&
-            value <= right.year
-        ) {
-            const progress =
-                (value - left.year) /
-                (right.year - left.year);
-
-            return (
-                left.position +
-                (
-                    right.position -
-                    left.position
-                ) *
-                progress
-            );
-        }
-    }
-
-    return 100;
+function getForecastScalePosition(value: number) {
+    return Math.max(0, Math.min(100,
+        (value - MIN_FORECAST_YEARS) /
+        (MAX_FORECAST_YEARS - MIN_FORECAST_YEARS) * 100
+    ));
 }
 
 /* ============================================================
