@@ -676,6 +676,7 @@ export default function ReportPage() {
                                 month={
                                     month
                                 }
+                            coupleId={coupleId}
                             />
                         )
                     )}
@@ -1936,10 +1937,21 @@ function BlindSpot({
 ============================================================ */
 
 function MonthCard({
-                       month,
+                       month, coupleId,
                    }: {
     month: MonthPlan;
+    coupleId: string;
 }) {
+    const storageKey = `plan-tasks:${coupleId}:${month.number}`;
+    const [done, setDone] = useState<string[]>([]);
+    useEffect(() => {
+        try { const saved = JSON.parse(localStorage.getItem(storageKey) || "[]"); setDone(Array.isArray(saved) ? saved.filter(task => month.tasks.includes(task)) : []); } catch { setDone([]); }
+    }, [storageKey, month.tasks]);
+    function toggle(task: string) {
+        const next = done.includes(task) ? done.filter(t => t !== task) : [...done, task];
+        setDone(next);
+        try { localStorage.setItem(storageKey, JSON.stringify(next)); } catch {}
+    }
     return (
         <details className="month-card" open={month.number === 1}>
             <summary>
@@ -1968,20 +1980,20 @@ function MonthCard({
                     (
                         task
                     ) => (
-                        <div
+                        <label
                             className="task"
                             key={
                                 task
                             }
                         >
 
-                            <span className="checkbox" />
+                            <input type="checkbox" className="checkbox" checked={done.includes(task)} onChange={() => toggle(task)} />
 
                             <span className="task-text">
                                 {task}
                             </span>
 
-                        </div>
+                        </label>
                     )
                 )}
 
@@ -2126,6 +2138,9 @@ function MonthCard({
                     overflow-wrap: break-word;
                 }
 
+                .checkbox { margin: 3px 0 0; accent-color: #cb225c; appearance: auto; cursor: pointer; }
+                .task { cursor: pointer; }
+                .task:has(input:checked) .task-text { text-decoration: line-through; color: #81777a; }
                 .month-card { width: 100%; }
                 .month-card .tasks { margin-top: 20px; }
                 summary { cursor: pointer; list-style: none; }

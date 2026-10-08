@@ -64,6 +64,28 @@ export default function TestPage() {
     const [answers, setAnswers] =
         useState<Answers>({});
 
+    const draftKey = `test-draft:${coupleId}:${role}`;
+    const [loadedDraftKey, setLoadedDraftKey] = useState("");
+    useEffect(() => {
+        setAnswers({});
+        setCurrentIndex(0);
+        try {
+            const saved = JSON.parse(localStorage.getItem(draftKey) || "null");
+            if (saved && typeof saved.answers === "object") {
+                const restored: Answers = {};
+                for (const q of questions) if (q.options.some(o => o.value === saved.answers[q.id])) restored[q.id] = saved.answers[q.id];
+                setAnswers(restored);
+                const firstMissing = questions.findIndex(q => !restored[q.id]);
+                setCurrentIndex(firstMissing < 0 ? questions.length - 1 : firstMissing);
+            }
+        } catch { /* Unavailable or invalid storage must not block the test. */ }
+        setLoadedDraftKey(draftKey);
+    }, [draftKey]);
+    useEffect(() => {
+        if (loadedDraftKey !== draftKey) return;
+        try { localStorage.setItem(draftKey, JSON.stringify({ answers })); } catch {}
+    }, [answers, draftKey, loadedDraftKey]);
+
     const [checking, setChecking] =
         useState(true);
 
@@ -452,6 +474,8 @@ export default function TestPage() {
                 );
             }
 
+            try { localStorage.removeItem(draftKey); } catch {}
+
             /*
              * Второй человек завершил тест —
              * сразу показываем результат.
@@ -482,7 +506,7 @@ export default function TestPage() {
         }
     }
 
-    if (checking) {
+    if (checking || loadedDraftKey !== draftKey) {
         return (
             <LoadingScreen
                 text="секунду..."
