@@ -334,7 +334,7 @@ export default function InvitePage() {
                     </div>
 
                     <h1>
-                        {nameA} приглашает тебя пройти тест
+                        <span className="inviter-name">{nameA}</span>{" "}приглашает тебя пройти тест
                     </h1>
 
                     <p>
@@ -343,6 +343,11 @@ export default function InvitePage() {
                     </p>
 
                 </section>
+
+                <div className="test-details">
+                    <span>16 вопросов · около 7 минут</span>
+                    <span>Без правильных и неправильных ответов</span>
+                </div>
 
                 <button
                     type="button"
@@ -355,8 +360,7 @@ export default function InvitePage() {
                 </button>
 
                 <div className="note">
-                    Около 7 минут · ответы останутся скрыты
-                    до завершения теста обоими
+                    Ваши ответы скрыты друг от друга до завершения теста
                 </div>
 
             </div>
@@ -735,14 +739,17 @@ export default function InvitePage() {
                 }
 
                 .page { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-                .hero { margin: 0; padding: 40px 0 32px; }
+                .hero { margin: 0; padding: 40px 0 0; }
                 .hero h1 { font-family: inherit; font-size: clamp(38px, 6vw, 56px); font-weight: 600; line-height: 1.08; letter-spacing: -1.8px; overflow-wrap: anywhere; }
                 .hero p { font-family: inherit; font-size: 17px; line-height: 1.6; color: #746b6e; }
                 .eyebrow, .start, .note { font-family: inherit; }
                 .start { margin-top: 0; background: #cb225c; font-size: 15px; }
+                .inviter-name { color: #cb225c; }
+                .test-details { display: flex; flex-direction: column; gap: 5px; margin: 28px 0 24px; color: #746b6e; font-size: 13px; line-height: 1.6; }
+                .test-details span:first-child { color: #211d1f; font-weight: 500; }
                 .note { color: #74686d; font-size: 12px; line-height: 1.6; }
                 @media (max-width: 640px) {
-                    .hero { padding: 28px 0; }
+                    .hero { padding: 28px 0 0; }
                     .hero h1 { font-size: 40px; letter-spacing: -1.4px; }
                     .hero p { font-size: 16px; }
                 }
