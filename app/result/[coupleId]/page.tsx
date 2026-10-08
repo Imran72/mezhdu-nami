@@ -1,8 +1,9 @@
 "use client";
 
+import { PLAN_PRICE_LABEL } from "../../../lib/plan-price";
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import type { ReactNode } from "react";
+
 
 type Couple = {
     id: string;
@@ -29,12 +30,6 @@ type CategoryScore = {
     subtitle: string;
     value: number;
 };
-
-type BenefitIcon =
-    | "heart"
-    | "message"
-    | "lightning"
-    | "chart";
 
 const MAX_SCORE = 10;
 
@@ -69,6 +64,19 @@ export default function ResultPage() {
         setLoading,
     ] =
         useState(true);
+
+    const [paying, setPaying] = useState(false);
+    const [paymentError, setPaymentError] = useState("");
+    async function pay() {
+        if (paying) return;
+        setPaying(true); setPaymentError("");
+        try {
+            const response = await fetch("/api/payment", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({coupleId})});
+            const result = await response.json();
+            if (!response.ok || !result.confirmation_url) throw new Error(result.error || "Не удалось открыть оплату");
+            window.location.assign(result.confirmation_url);
+        } catch (error) { setPaymentError(error instanceof Error ? error.message : "Не удалось открыть оплату"); setPaying(false); }
+    }
 
     useEffect(() => {
         if (!coupleId) {
@@ -560,21 +568,18 @@ export default function ResultPage() {
                         <button
                             type="button"
                             className="paid-cta"
-                            onClick={() =>
-                                router.push(
-                                    `/report/${coupleId}`
-                                )
-                            }
+                            onClick={pay}
+                            disabled={paying}
                         >
 
                             <span className="cta-title">
-                                Получить наш план
+                                {paying ? "Открываем оплату…" : "Получить наш план"}
                             </span>
 
                             <span className="cta-right">
 
                                 <span className="price">
-                                    99 ₽
+                                    {PLAN_PRICE_LABEL}
                                 </span>
 
                                 <span className="arrow">
@@ -584,6 +589,7 @@ export default function ResultPage() {
                             </span>
 
                         </button>
+                        {paymentError && <p className="payment-error" role="alert">{paymentError}</p>}
 
                     </div>
 
@@ -779,27 +785,6 @@ export default function ResultPage() {
                         2.2px;
                 }
 
-                .results-title {
-                    margin:
-                        0
-                        0
-                        32px;
-
-                    font-family: inherit;
-
-                    font-size:
-                        48px;
-
-                    line-height:
-                        .98;
-
-                    font-weight:
-                        400;
-
-                    letter-spacing:
-                        -2.5px;
-                }
-
                 .results > .section-label { margin-bottom: 24px; }
 
                 .category-list {
@@ -882,12 +867,6 @@ export default function ResultPage() {
 
                     font-family: inherit;
 
-                    font-size:
-                        14px;
-
-                    line-height:
-                        1.5;
-
                     font-weight:
                         500;
                 }
@@ -922,100 +901,22 @@ export default function ResultPage() {
                         nowrap;
                 }
 
-                .years strong {
-                    font-size:
-                        76px;
-
-                    line-height:
-                        .88;
-
-                    font-weight:
-                        400;
-
-                    letter-spacing:
-                        -4px;
-                }
-
                 .years span {
                     margin-left:
                         9px;
 
-                    font-size:
-                        39px;
-
                     line-height:
                         1;
-
-                    letter-spacing:
-                        -1.5px;
                 }
 
                 .forecast-scale {
                     width:
                         100%;
-
-                    margin-top:
-                        24px;
                 }
 
                 .scale-track {
                     position:
                         relative;
-
-                    height:
-                        8px;
-
-                    border-radius:
-                        999px;
-
-                    background:
-                        #e5dfe0;
-                }
-
-                .scale-fill {
-                    position:
-                        absolute;
-
-                    inset:
-                        0
-                        auto
-                        0
-                        0;
-
-                    z-index:
-                        1;
-
-                    border-radius:
-                        inherit;
-
-                    background:
-                        #e99ab5;
-                }
-
-                .scale-tick {
-                    position:
-                        absolute;
-
-                    z-index:
-                        2;
-
-                    top:
-                        50%;
-
-                    width:
-                        1px;
-
-                    height:
-                        18px;
-
-                    background:
-                        #cfc6c8;
-
-                    transform:
-                        translate(
-                            -50%,
-                            -22%
-                        );
                 }
 
                 .scale-dot {
@@ -1024,98 +925,6 @@ export default function ResultPage() {
 
                     z-index:
                         4;
-
-                    top:
-                        50%;
-
-                    width:
-                        22px;
-
-                    height:
-                        22px;
-
-                    border:
-                        2px solid
-                        #f8f4f1;
-
-                    border-radius:
-                        50%;
-
-                    background:
-                        #c21856;
-
-                    box-shadow:
-                        0
-                        3px
-                        10px
-                        rgba(
-                            91,
-                            16,
-                            48,
-                            .18
-                        );
-
-                    transform:
-                        translate(
-                            -50%,
-                            -50%
-                        );
-                }
-
-                .scale-labels {
-                    position:
-                        relative;
-
-                    height:
-                        24px;
-
-                    margin-top:
-                        10px;
-
-                    color:
-                        #8d8587;
-
-                    font-family: inherit;
-
-                    font-size:
-                        10px;
-
-                    line-height:
-                        1;
-
-                    font-weight:
-                        700;
-                }
-
-                .scale-label {
-                    position:
-                        absolute;
-
-                    top:
-                        0;
-
-                    white-space:
-                        nowrap;
-
-                    transform:
-                        translateX(
-                            -50%
-                        );
-                }
-
-                .scale-label-start {
-                    transform:
-                        none;
-                }
-
-                .scale-label-end {
-                    transform:
-                        translateX(
-                            -100%
-                        );
-
-                    text-transform:
-                        lowercase;
                 }
 
                 /* =====================================================
@@ -1290,27 +1099,6 @@ export default function ResultPage() {
 
                     letter-spacing:
                         -2px;
-                }
-
-                .paid-benefits {
-                    display:
-                        grid;
-
-                    grid-template-columns:
-                        repeat(
-                            2,
-                            minmax(
-                                0,
-                                1fr
-                            )
-                        );
-
-                    gap:
-                        24px
-                        18px;
-
-                    margin-top:
-                        39px;
                 }
 
                 .paid-cta {
@@ -1528,15 +1316,6 @@ export default function ResultPage() {
                             40px;
                     }
 
-                    .paid-benefits {
-                        gap:
-                            21px
-                            14px;
-
-                        margin-top:
-                            31px;
-                    }
-
                     .paid-cta {
                         height:
                             60px;
@@ -1613,20 +1392,6 @@ export default function ResultPage() {
                             1.8px;
                     }
 
-                    .results-title {
-                        margin-bottom:
-                            24px;
-
-                        font-size:
-                            37px;
-
-                        line-height:
-                            1;
-
-                        letter-spacing:
-                            -1.8px;
-                    }
-
                     .forecast {
                         padding:
                             29px
@@ -1657,11 +1422,6 @@ export default function ResultPage() {
 
                         font-size:
                             12px;
-                    }
-
-                    .desktop-break {
-                        display:
-                            none;
                     }
 
                     .forecast-result {
@@ -1707,28 +1467,12 @@ export default function ResultPage() {
                             7px;
                     }
 
-                    .scale-tick {
-                        height:
-                            15px;
-                    }
-
                     .scale-dot {
                         width:
                             19px;
 
                         height:
                             19px;
-                    }
-
-                    .scale-labels {
-                        height:
-                            21px;
-
-                        margin-top:
-                            9px;
-
-                        font-size:
-                            8px;
                     }
 
                     .paid-shell {
@@ -1793,17 +1537,6 @@ export default function ResultPage() {
                             -1.7px;
                     }
 
-                    .paid-benefits {
-                        grid-template-columns:
-                            1fr;
-
-                        gap:
-                            16px;
-
-                        margin-top:
-                            27px;
-                    }
-
                     .paid-cta {
                         height:
                             58px;
@@ -1863,11 +1596,6 @@ export default function ResultPage() {
                             34px;
                     }
 
-                    .paid-benefits {
-                        margin-top:
-                            24px;
-                    }
-
                     .paid-cta {
                         padding:
                             0
@@ -1881,11 +1609,6 @@ export default function ResultPage() {
                         font-size:
                             12px;
                     }
-
-                    .scale-labels {
-                        font-size:
-                            7.5px;
-                    }
                 }
 
                 @media (max-width: 640px) {
@@ -1893,21 +1616,12 @@ export default function ResultPage() {
                     .paid-art { object-position: 46% center; }
                 }
                 .page { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-                .results-title { font-size: clamp(36px, 5vw, 48px); font-weight: 500; line-height: 1.1; letter-spacing: -1.6px; }
                 .forecast-title, .paid-title { font-size: clamp(28px, 4vw, 38px); font-weight: 500; line-height: 1.15; letter-spacing: -1px; }
                 .forecast-description { font-size: 14px; line-height: 1.5; }
                 .section-label, .paid-label { font-size: 12px; letter-spacing: 1.4px; }
                 .years strong { font-size: 56px; font-weight: 500; line-height: 1; letter-spacing: -2px; }
                 .years span { font-size: 26px; letter-spacing: -0.6px; }
-                .forecast-scale { padding: 0 10px; margin-top: 24px; }
-                .scale-track { height: 10px; background: #e9e1e4; }
-                .scale-fill { background: linear-gradient(90deg, #dfa5b9, #cb225c); }
-                .scale-dot { width: 18px; height: 18px; border: 3px solid #f8f4f1; background: #cb225c; box-shadow: 0 0 0 1px #cb225c; }
-                .scale-labels { font-size: 12px; font-weight: 400; color: #746b6e; margin-top: 16px; height: 30px; }
-                @media (max-width: 380px) {
-                    .scale-labels { font-size: 11px; }
-                    .scale-label-end { max-width: 42px; white-space: normal; text-align: right; line-height: 1.2; }
-                }
+                .forecast-scale { margin-top: 24px; }
                 .forecast-scale { padding: 0; }
                 .scale-track { height: 32px; border-radius: 12px; background: linear-gradient(90deg, #ebd7df, #cb225c); }
                 .scale-dot {
@@ -1916,8 +1630,9 @@ export default function ResultPage() {
                     background: #f8f4f1; box-shadow: none; transform: translateX(-50%);
                 }
                 .ribbon-labels { display: flex; justify-content: space-between; gap: 16px; margin-top: 12px; color: #746b6e; font-size: 12px; line-height: 1.4; }
+                .payment-error { color: #fff; font-size: 14px; line-height: 1.5; margin: 12px 0 0; }
+                .paid-cta:disabled { cursor: wait; opacity: .7; }
                 .paid-description { margin: 18px 0 0; color: #fff; opacity: .88; font-size: 16px; line-height: 1.6; }
-                .paid-benefits { margin-top: 24px; }
                 .paid-cta .cta-title { font-size: 14px; line-height: 1.4; max-width: 220px; }
             `}</style>
 
@@ -2027,34 +1742,13 @@ function CategoryRow({
 
                 .category-title {
                     font-family: inherit;
-
-                    font-size:
-                        29px;
-
-                    line-height:
-                        1;
-
-                    letter-spacing:
-                        -1.2px;
                 }
 
                 .category-subtitle {
                     margin-top:
                         5px;
 
-                    color:
-                        #8e8688;
-
                     font-family: inherit;
-
-                    font-size:
-                        12px;
-
-                    line-height:
-                        1.3;
-
-                    font-weight:
-                        500;
                 }
 
                 .category-score {
@@ -2076,26 +1770,11 @@ function CategoryRow({
                 .category-score strong {
                     color:
                         #c21856;
-
-                    font-size:
-                        42px;
-
-                    line-height:
-                        .8;
-
-                    font-weight:
-                        400;
-
-                    letter-spacing:
-                        -1.8px;
                 }
 
                 .category-score span {
                     margin-left:
                         3px;
-
-                    font-size:
-                        18px;
                 }
 
                 .category-track {
@@ -2194,266 +1873,6 @@ function CategoryRow({
 
 /* ============================================================
    BENEFIT
-============================================================ */
-
-function Benefit({
-                     icon,
-                     text,
-                 }: {
-    icon: BenefitIcon;
-    text: ReactNode;
-}) {
-    return (
-        <div className="benefit">
-
-            <div className="benefit-icon">
-                <BenefitSvg
-                    type={
-                        icon
-                    }
-                />
-            </div>
-
-            <div className="benefit-text">
-                {text}
-            </div>
-
-            <style jsx>{`
-
-                .benefit {
-                    display:
-                        grid;
-
-                    grid-template-columns:
-                        24px
-                        minmax(
-                            0,
-                            1fr
-                        );
-
-                    gap:
-                        12px;
-
-                    align-items:
-                        start;
-
-                    color:
-                        #fff8f6;
-                }
-
-                .benefit-icon {
-                    width:
-                        21px;
-
-                    padding-top:
-                        1px;
-
-                    color:
-                        #ffd8e1;
-                }
-
-                .benefit-text {
-                    font-family: inherit;
-
-                    font-size:
-                        14px;
-
-                    line-height:
-                        1.28;
-
-                    font-weight:
-                        500;
-
-                    letter-spacing:
-                        -.1px;
-
-                    text-shadow:
-                        0
-                        1px
-                        8px
-                        rgba(
-                            65,
-                            0,
-                            27,
-                            .08
-                        );
-                }
-
-                @media (
-                    max-width:
-                        640px
-                ) {
-
-                    .benefit {
-                        grid-template-columns:
-                            22px
-                            minmax(
-                                0,
-                                1fr
-                            );
-
-                        gap:
-                            10px;
-                    }
-
-                    .benefit-icon {
-                        width:
-                            19px;
-                    }
-
-                    .benefit-text {
-                        font-size:
-                            13px;
-
-                        line-height:
-                            1.25;
-                    }
-                }
-
-                .benefit-text { font-size: 15px; line-height: 1.6; }
-                .benefit { align-items: flex-start; }
-                .benefit-icon { margin-top: 3px; }
-            `}</style>
-
-        </div>
-    );
-}
-
-/* ============================================================
-   BENEFIT ICONS
-============================================================ */
-
-function BenefitSvg({
-                        type,
-                    }: {
-    type: BenefitIcon;
-}) {
-    if (
-        type ===
-        "heart"
-    ) {
-        return (
-            <svg
-                viewBox="0 0 24 24"
-                width="100%"
-                height="auto"
-                fill="currentColor"
-                aria-hidden="true"
-            >
-                <path
-                    d="
-                        M12 21
-                        C10.9 19.9 5.4 15.2 3.1 12.3
-                        C0.6 9.2 1.3 5.1 4.7 3.5
-                        C7.2 2.3 10.1 3.1 12 5.3
-                        C13.9 3.1 16.8 2.3 19.3 3.5
-                        C22.7 5.1 23.4 9.2 20.9 12.3
-                        C18.6 15.2 13.1 19.9 12 21
-                        Z
-                    "
-                />
-            </svg>
-        );
-    }
-
-    if (
-        type ===
-        "message"
-    ) {
-        return (
-            <svg
-                viewBox="0 0 24 24"
-                width="100%"
-                height="auto"
-                fill="currentColor"
-                aria-hidden="true"
-            >
-                <path
-                    d="
-                        M6 3
-                        H18
-                        C20.2 3 22 4.8 22 7
-                        V14
-                        C22 16.2 20.2 18 18 18
-                        H12
-                        L7 22
-                        L8 18
-                        H6
-                        C3.8 18 2 16.2 2 14
-                        V7
-                        C2 4.8 3.8 3 6 3
-                        Z
-                    "
-                />
-            </svg>
-        );
-    }
-
-    if (
-        type ===
-        "lightning"
-    ) {
-        return (
-            <svg
-                viewBox="0 0 24 24"
-                width="100%"
-                height="auto"
-                fill="currentColor"
-                aria-hidden="true"
-            >
-                <path
-                    d="
-                        M13.6 1.8
-                        L5.2 13
-                        H10.5
-                        L9.3 22.2
-                        L18.8 9.6
-                        H13.1
-                        Z
-                    "
-                />
-            </svg>
-        );
-    }
-
-    return (
-        <svg
-            viewBox="0 0 24 24"
-            width="100%"
-            height="auto"
-            fill="currentColor"
-            aria-hidden="true"
-        >
-            <rect
-                x="3"
-                y="13"
-                width="4"
-                height="8"
-                rx="1"
-            />
-
-            <rect
-                x="10"
-                y="8"
-                width="4"
-                height="13"
-                rx="1"
-            />
-
-            <rect
-                x="17"
-                y="3"
-                width="4"
-                height="18"
-                rx="1"
-            />
-
-        </svg>
-    );
-}
-
-/* ============================================================
-   FORECAST SCALE
 ============================================================ */
 
 function getForecastScalePosition(value: number) {

@@ -1,2 +1,9 @@
-import {NextResponse} from 'next/server';import { admin } from '../../../../lib/supabase';
-export async function POST(req:Request){const body=await req.json();const id=body?.object?.id;if(!id)return NextResponse.json({ok:true});const auth=Buffer.from(`${process.env.YOOKASSA_SHOP_ID}:${process.env.YOOKASSA_SECRET_KEY}`).toString('base64');const p=await fetch(`https://api.yookassa.ru/v3/payments/${id}`,{headers:{Authorization:`Basic ${auth}`}}).then(r=>r.json());if(p.status==='succeeded'&&p.paid&&p.metadata?.coupleId){await admin().from('couples').update({paid:true}).eq('id',p.metadata.coupleId);await admin().from('payments').upsert({payment_id:p.id,couple_id:p.metadata.coupleId,amount:p.amount.value,status:p.status},{onConflict:'payment_id'})}return NextResponse.json({ok:true})}
+import { NextResponse } from "next/server";
+import { confirmPayment } from "../../../../lib/payment";
+export async function POST(req: Request) {
+    let body;
+    try { body = await req.json(); } catch { return NextResponse.json({error: "Invalid JSON"}, {status: 400}); }
+    if (body?.event !== "payment.succeeded") return NextResponse.json({ok: true});
+    try { await confirmPayment(body?.object?.id); return NextResponse.json({ok: true}); }
+    catch { return NextResponse.json({error: "Payment confirmation failed"}, {status: 503}); }
+}

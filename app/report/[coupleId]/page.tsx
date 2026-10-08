@@ -11,9 +11,7 @@ import {
     useRouter,
 } from "next/navigation";
 
-import type {
-    ReactNode,
-} from "react";
+
 
 type Couple = {
     id: string;
@@ -88,9 +86,6 @@ type MonthPlan = {
 
 const MAX_SCORE = 10;
 
-const ROADMAP_IMAGE =
-    "/images/relationship-roadmap.png";
-
 export default function ReportPage() {
     const params =
         useParams<{
@@ -118,19 +113,31 @@ export default function ReportPage() {
         let cancelled =
             false;
 
+        let retryTimer: ReturnType<typeof setTimeout> | undefined;
+        let attempts = 0;
         async function load() {
+            retryTimer = undefined;
             try {
                 const response =
                     await fetch(
                         `/api/report?id=${encodeURIComponent(
                             coupleId
-                        )}`,
+                        )}&full=1`,
                         {
                             cache:
                                 "no-store",
                         }
                     );
 
+                if (response.status === 402) {
+                    const reason = await response.json();
+                    if (!cancelled && reason.error === "payment_pending" && attempts++ < 10) {
+                        retryTimer = setTimeout(load, 3000);
+                        return;
+                    }
+                    if (!cancelled) { setError("Оплата ещё не подтверждена. Если вы уже оплатили, попробуйте проверить снова через несколько секунд."); setLoading(false); }
+                    return;
+                }
                 if (!response.ok) {
                     throw new Error(
                         "Не удалось загрузить полный разбор"
@@ -164,7 +171,7 @@ export default function ReportPage() {
                     );
                 }
             } finally {
-                if (!cancelled) {
+                if (!cancelled && !retryTimer) {
                     setLoading(false);
                 }
             }
@@ -174,6 +181,7 @@ export default function ReportPage() {
 
         return () => {
             cancelled = true;
+            clearTimeout(retryTimer);
         };
     }, [
         coupleId,
@@ -357,38 +365,6 @@ export default function ReportPage() {
             [categories]
         );
 
-    const differences =
-        useMemo(() => {
-            const direct =
-                data
-                    ?.highlights
-                    ?.different ??
-                [];
-
-            if (
-                direct.length >= 3
-            ) {
-                return direct.slice(
-                    0,
-                    3
-                );
-            }
-
-            return (
-                data?.comparisons ??
-                []
-            )
-                .filter(
-                    (item) =>
-                        item.similarity !==
-                        "same"
-                )
-                .slice(
-                    0,
-                    3
-                );
-        }, [data]);
-
     const plan =
         useMemo<
             MonthPlan[]
@@ -552,6 +528,9 @@ export default function ReportPage() {
                     {error ||
                         "Не получилось загрузить разбор."}
                 </p>
+
+                <button type="button" onClick={() => window.location.reload()}>Проверить снова</button>
+                <a href={`/result/${coupleId}`}>Вернуться к результату и оплате</a>
 
                 <style jsx>{`
                     .state {
@@ -902,20 +881,6 @@ export default function ReportPage() {
                     color: #7b7275;
 
                     font-family: inherit;
-
-                    font-size: 15px;
-
-                    line-height: 1.55;
-                }
-
-                .intro-insight {
-                    padding:
-                        30px
-                        34px;
-
-                    border-radius: 27px;
-
-                    background: #f0dce2;
                 }
 
                 .intro-insight h2 {
@@ -928,55 +893,9 @@ export default function ReportPage() {
 
                     font-family: inherit;
 
-                    font-size: 27px;
-
                     line-height: 1;
 
-                    font-weight: 400;
-
                     letter-spacing: -.8px;
-                }
-
-                .intro-point {
-                    display: grid;
-
-                    grid-template-columns:
-                        18px
-                        minmax(
-                            0,
-                            1fr
-                        );
-
-                    gap: 7px;
-
-                    align-items: start;
-                }
-
-                .intro-point +
-                .intro-point {
-                    margin-top: 13px;
-                }
-
-                .intro-point > span {
-                    color: #cb255d;
-
-                    font-family: inherit;
-
-                    font-size: 18px;
-
-                    line-height: 1.4;
-                }
-
-                .intro-point p {
-                    margin: 0;
-
-                    color: #5e5458;
-
-                    font-family: inherit;
-
-                    font-size: 15px;
-
-                    line-height: 1.48;
                 }
 
                 /* =================================================
@@ -993,51 +912,13 @@ export default function ReportPage() {
                     padding: 0;
                 }
 
-                .score-list {
-                    border-top:
-                        1px solid
-                        #ded7d4;
-                }
-
-                .desktop-only {
-                    display: inline;
-                }
-
                 /* =================================================
                    СЛЕПЫЕ ЗОНЫ
                 ================================================= */
 
-                .blind-list {
-                    display: grid;
-
-                    gap: 13px;
-                }
-
-                .empty {
-                    padding: 25px;
-
-                    border:
-                        1px solid
-                        #e3d9d7;
-
-                    border-radius: 22px;
-
-                    color: #7e7478;
-
-                    background: #fffaf8;
-
-                    font-family: inherit;
-
-                    font-size: 14px;
-                }
-
                 /* =================================================
                    ROADMAP
                 ================================================= */
-
-                .roadmap-section {
-                    margin-top: 76px;
-                }
 
                 .map {
                     width: 100%;
@@ -1069,7 +950,6 @@ export default function ReportPage() {
                 }
 
                 .month-grid {
-                    display: grid;
 
                     grid-template-columns:
                         repeat(
@@ -1079,8 +959,6 @@ export default function ReportPage() {
                                 1fr
                             )
                         );
-
-                    gap: 13px;
 
                     margin-top: 14px;
 
@@ -1194,17 +1072,8 @@ export default function ReportPage() {
                         font-size: 23px;
                     }
 
-                    .intro-point p {
-                        font-size: 13px;
-                    }
-
-                    .report-section,
-                    .roadmap-section {
+                    .report-section, .roadmap-section {
                         margin-top: 52px;
-                    }
-
-                    .desktop-only {
-                        display: none;
                     }
 
                     .map {
@@ -1218,7 +1087,7 @@ export default function ReportPage() {
 
                 .report-page { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
                 .intro h1 { font-size: clamp(32px, 5vw, 46px); font-weight: 500; line-height: 1.15; letter-spacing: -1.2px; }
-                .intro-main p, .intro-point p { font-size: 15px; line-height: 1.6; }
+                .intro-main p { font-size: 15px; line-height: 1.6; }
                 .intro-insight h2 { font-size: 22px; font-weight: 500; }
                 .month-grid { display: flex; flex-direction: column; gap: 16px; }
                 .intro-insight { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px; border-radius: 16px; background: #eee7e4; }
@@ -1234,706 +1103,6 @@ export default function ReportPage() {
 
 /* ============================================================
    SECTION HEADING
-============================================================ */
-
-function SectionHeading({
-                            label,
-                            title,
-                            description,
-                        }: {
-    label: string;
-    title: ReactNode;
-    description: string;
-}) {
-    return (
-        <div className="section-heading">
-
-            <div className="label">
-                {label}
-            </div>
-
-            <h2>
-                {title}
-            </h2>
-
-            <p>
-                {description}
-            </p>
-
-            <style jsx>{`
-
-                .section-heading {
-                    max-width: 780px;
-
-                    margin-bottom: 30px;
-                }
-
-                .label {
-                    margin-bottom: 13px;
-
-                    color: #c51f59;
-
-                    font-family: inherit;
-
-                    font-size: 10px;
-
-                    font-weight: 800;
-
-                    letter-spacing: 2.2px;
-                }
-
-                h2 {
-                    margin: 0;
-
-                    font-family: inherit;
-
-                    font-size:
-                        clamp(
-                            43px,
-                            4.8vw,
-                            58px
-                        );
-
-                    line-height: .95;
-
-                    font-weight: 400;
-
-                    letter-spacing: -2.3px;
-                }
-
-                p {
-                    max-width: 630px;
-
-                    margin:
-                        16px
-                        0
-                        0;
-
-                    color: #898083;
-
-                    font-family: inherit;
-
-                    font-size: 13px;
-
-                    line-height: 1.5;
-                }
-
-                @media (
-                    max-width:
-                        640px
-                ) {
-
-                    .section-heading {
-                        margin-bottom: 22px;
-                    }
-
-                    h2 {
-                        font-size: 37px;
-
-                        letter-spacing: -1.6px;
-                    }
-
-                    p {
-                        font-size: 11px;
-                    }
-                }
-
-                .section-heading h2 { font-size: 28px; font-weight: 500; line-height: 1.2; letter-spacing: -.7px; }
-                .section-heading p { font-size: 15px; line-height: 1.6; }
-            `}</style>
-
-        </div>
-    );
-}
-
-/* ============================================================
-   SCORE
-============================================================ */
-
-function ScoreRow({
-                      category,
-                  }: {
-    category: CategoryScore;
-}) {
-    return (
-        <article className="score-row">
-
-            <div className="score-symbol">
-                {getCategoryIcon(
-                    category.id
-                )}
-            </div>
-
-            <div className="score-main">
-
-                <h3>
-                    {category.title}
-                </h3>
-
-                <p>
-                    {category.subtitle}
-                </p>
-
-                <div className="track">
-
-                    <div
-                        className="fill"
-                        style={{
-                            width:
-                                `${
-                                    category.value *
-                                    10
-                                }%`,
-                        }}
-                    />
-
-                </div>
-
-            </div>
-
-            <div className="score">
-
-                <strong>
-                    {category.value}
-                </strong>
-
-                <span>
-                    /10
-                </span>
-
-            </div>
-
-            <style jsx>{`
-
-                .score-row {
-                    min-height: 98px;
-
-                    display: grid;
-
-                    grid-template-columns:
-                        40px
-                        minmax(
-                            0,
-                            1fr
-                        )
-                        84px;
-
-                    gap: 18px;
-
-                    align-items: center;
-
-                    border-bottom:
-                        1px solid
-                        #ded7d4;
-                }
-
-                .score-symbol {
-                    width: 36px;
-
-                    height: 36px;
-
-                    display: grid;
-
-                    place-items: center;
-
-                    border-radius: 50%;
-
-                    background: #f2dfe4;
-
-                    color: #c9255c;
-
-                    font-family: inherit;
-
-                    font-size: 18px;
-                }
-
-                h3 {
-                    margin: 0;
-
-                    font-family: inherit;
-
-                    font-size: 29px;
-
-                    line-height: 1;
-
-                    font-weight: 400;
-
-                    letter-spacing: -1.1px;
-                }
-
-                p {
-                    margin:
-                        5px
-                        0
-                        10px;
-
-                    color: #91888b;
-
-                    font-family: inherit;
-
-                    font-size: 10px;
-                }
-
-                .track {
-                    height: 5px;
-
-                    overflow: hidden;
-
-                    border-radius: 999px;
-
-                    background: #e5dfe0;
-                }
-
-                .fill {
-                    height: 100%;
-
-                    border-radius: inherit;
-
-                    background: #ce3269;
-                }
-
-                .score {
-                    display: flex;
-
-                    justify-content: flex-end;
-
-                    align-items: baseline;
-
-                    font-family: inherit;
-                }
-
-                .score strong {
-                    color: #c51f59;
-
-                    font-size: 46px;
-
-                    line-height: 1;
-
-                    font-weight: 400;
-                }
-
-                .score span {
-                    margin-left: 3px;
-
-                    color: #847c7e;
-
-                    font-size: 17px;
-                }
-
-                @media (
-                    max-width:
-                        640px
-                ) {
-
-                    .score-row {
-                        min-height: 87px;
-
-                        grid-template-columns:
-                            30px
-                            minmax(
-                                0,
-                                1fr
-                            )
-                            55px;
-
-                        gap: 10px;
-                    }
-
-                    .score-symbol {
-                        width: 29px;
-
-                        height: 29px;
-
-                        font-size: 14px;
-                    }
-
-                    h3 {
-                        font-size: 22px;
-                    }
-
-                    p {
-                        font-size: 9px;
-                    }
-
-                    .score strong {
-                        font-size: 34px;
-                    }
-
-                    .score span {
-                        font-size: 12px;
-                    }
-                }
-
-            `}</style>
-
-        </article>
-    );
-}
-
-/* ============================================================
-   BLIND SPOT
-============================================================ */
-
-function BlindSpot({
-                       item,
-                       index,
-                       nameA,
-                       nameB,
-                   }: {
-    item: Comparison;
-    index: number;
-    nameA: string;
-    nameB: string;
-}) {
-    return (
-        <article className="blind-card">
-
-            <div className="blind-top">
-
-                <div className="blind-number">
-                    0{index + 1}
-                </div>
-
-                <h3>
-                    {item.question}
-                </h3>
-
-            </div>
-
-            <div className="answers">
-
-                <div className="answer">
-
-                    <span className="person">
-                        {nameA}
-                    </span>
-
-                    <strong>
-                        {item.labelA}
-                    </strong>
-
-                </div>
-
-                <div className="arrow">
-                    →
-                </div>
-
-                <div className="answer">
-
-                    <span className="person">
-                        {nameB}
-                    </span>
-
-                    <strong>
-                        {item.labelB}
-                    </strong>
-
-                </div>
-
-            </div>
-
-            <details className="meaning">
-
-                <summary>Что обсудить вместе</summary>
-
-                <p>
-                    {getBlindInsight(
-                        item
-                    )}
-                </p>
-
-            </details>
-
-            <style jsx>{`
-
-                .blind-card {
-                    width: 100%;
-
-                    min-width: 0;
-
-                    padding:
-                        25px
-                        28px;
-
-                    overflow: hidden;
-
-                    border:
-                        1px solid
-                        #e2d8d6;
-
-                    border-radius: 23px;
-
-                    background: #fffaf8;
-                }
-
-                .blind-top {
-                    display: grid;
-
-                    grid-template-columns:
-                        52px
-                        minmax(
-                            0,
-                            1fr
-                        );
-
-                    gap: 16px;
-
-                    align-items: start;
-                }
-
-                .blind-number {
-                    padding-top: 4px;
-
-                    color: #ca275f;
-
-                    font-family: inherit;
-
-                    font-size: 20px;
-
-                    line-height: 1;
-                }
-
-                h3 {
-                    max-width: 850px;
-
-                    margin: 0;
-
-                    font-family: inherit;
-
-                    font-size: 30px;
-
-                    line-height: 1.08;
-
-                    font-weight: 400;
-
-                    letter-spacing: -.8px;
-                }
-
-                .answers {
-                    display: grid;
-
-                    grid-template-columns:
-                        minmax(
-                            0,
-                            1fr
-                        )
-                        46px
-                        minmax(
-                            0,
-                            1fr
-                        );
-
-                    gap: 13px;
-
-                    align-items: center;
-
-                    margin:
-                        23px
-                        0
-                        0
-                        68px;
-                }
-
-                .answer {
-                    min-width: 0;
-
-                    min-height: 108px;
-
-                    display: flex;
-
-                    flex-direction: column;
-
-                    justify-content: center;
-
-                    padding:
-                        19px
-                        21px;
-
-                    border-radius: 18px;
-
-                    background: #f1e1e4;
-                }
-
-                .person {
-                    display: block;
-
-                    margin-bottom: 10px;
-
-                    overflow: hidden;
-
-                    color: #9d8c91;
-
-                    font-family: inherit;
-
-                    font-size: 10px;
-
-                    line-height: 1;
-
-                    font-weight: 800;
-
-                    letter-spacing: .8px;
-
-                    text-overflow: ellipsis;
-
-                    text-transform: uppercase;
-
-                    white-space: nowrap;
-                }
-
-                .answer strong {
-                    display: block;
-
-                    color: #30282b;
-
-                    font-family: inherit;
-
-                    font-size: 17px;
-
-                    line-height: 1.38;
-
-                    font-weight: 500;
-
-                    overflow-wrap: break-word;
-                }
-
-                .arrow {
-                    color: #cc275f;
-
-                    font-family: inherit;
-
-                    font-size: 29px;
-
-                    text-align: center;
-                }
-
-                .meaning {
-                    margin:
-                        19px
-                        0
-                        0
-                        68px;
-
-                    padding-top: 17px;
-
-                    border-top:
-                        1px solid
-                        #e9dfdd;
-                }
-
-                .meaning span {
-                    display: block;
-
-                    margin-bottom: 6px;
-
-                    color: #c2275c;
-
-                    font-family: inherit;
-
-                    font-size: 9px;
-
-                    font-weight: 800;
-
-                    letter-spacing: 1.4px;
-                }
-
-                .meaning p {
-                    max-width: 850px;
-
-                    margin: 0;
-
-                    color: #655b5e;
-
-                    font-family: inherit;
-
-                    font-size: 14px;
-
-                    line-height: 1.5;
-                }
-
-                @media (
-                    max-width:
-                        640px
-                ) {
-
-                    .blind-card {
-                        padding: 20px;
-                    }
-
-                    .blind-top {
-                        grid-template-columns:
-                            1fr;
-
-                        gap: 8px;
-                    }
-
-                    .blind-number {
-                        font-size: 17px;
-                    }
-
-                    h3 {
-                        font-size: 24px;
-                    }
-
-                    .answers {
-                        grid-template-columns:
-                            1fr;
-
-                        gap: 8px;
-
-                        margin:
-                            18px
-                            0
-                            0;
-                    }
-
-                    .answer {
-                        min-height: 0;
-
-                        padding: 16px;
-                    }
-
-                    .answer strong {
-                        font-size: 15px;
-                    }
-
-                    .arrow {
-                        height: 21px;
-
-                        line-height: 21px;
-
-                        transform:
-                            rotate(
-                                90deg
-                            );
-                    }
-
-                    .meaning {
-                        margin:
-                            16px
-                            0
-                            0;
-
-                        padding-top: 14px;
-                    }
-
-                    .meaning p {
-                        font-size: 12px;
-                    }
-                }
-
-                .blind-top h3 { font-size: 20px; font-weight: 500; line-height: 1.4; }
-                .answer strong { font-size: 15px; font-weight: 500; line-height: 1.5; }
-                .meaning p { font-size: 15px; line-height: 1.6; }
-                .meaning summary { color: #a02b54; cursor: pointer; font-size: 14px; line-height: 1.5; }
-                .meaning p { margin-top: 12px; }
-            `}</style>
-
-        </article>
-    );
-}
-
-/* ============================================================
-   MONTH CARD
 ============================================================ */
 
 function MonthCard({
@@ -2076,21 +1245,6 @@ function MonthCard({
                     letter-spacing: -1px;
                 }
 
-                .description {
-                    margin:
-                        17px
-                        0
-                        21px;
-
-                    color: #807679;
-
-                    font-family: inherit;
-
-                    font-size: 12px;
-
-                    line-height: 1.45;
-                }
-
                 .tasks {
                     display: grid;
 
@@ -2131,10 +1285,6 @@ function MonthCard({
 
                     font-family: inherit;
 
-                    font-size: 12px;
-
-                    line-height: 1.42;
-
                     overflow-wrap: break-word;
                 }
 
@@ -2148,7 +1298,7 @@ function MonthCard({
                 summary::after { content: "Показать задания +"; display: block; margin-top: 14px; color: #a02b54; font-size: 14px; }
                 .month-card[open] summary::after { content: "Свернуть −"; }
                 .month-card h3 { font-size: 25px; font-weight: 500; line-height: 1.2; letter-spacing: -.6px; }
-                .description, .task-text { font-size: 15px; line-height: 1.6; }
+                .task-text { font-size: 15px; line-height: 1.6; }
             `}</style>
 
         </details>
@@ -2158,30 +1308,6 @@ function MonthCard({
 /* ============================================================
    HELPERS
 ============================================================ */
-
-function getCategoryIcon(
-    id: CategoryId
-) {
-    switch (id) {
-        case "friendship":
-            return "♥";
-
-        case "partnership":
-            return "×";
-
-        case "sex":
-            return "♡";
-
-        case "money":
-            return "₽";
-
-        case "care":
-            return "❦";
-
-        case "home":
-            return "⌂";
-    }
-}
 
 function getActionForCategory(
     id: CategoryId
@@ -2204,22 +1330,5 @@ function getActionForCategory(
 
         case "home":
             return "Выпишите регулярные бытовые задачи и перераспределите хотя бы три из них";
-    }
-}
-
-function getBlindInsight(item: Comparison) {
-    switch (item.questionId) {
-        case "conflict_finished":
-            return "Вы по-разному понимаете, что ссора закончилась. Обсудите, какой сигнал помогает каждому почувствовать примирение.";
-        case "hard_day":
-            return "После тяжёлого дня вам нужна разная поддержка. Спросите друг друга: сейчас лучше выслушать, помочь или дать побыть в одиночестве?";
-        case "extra_hour":
-            return "Вы выбираете разные способы провести время вдвоём. Чередуйте ваши варианты, чтобы у обоих было место для любимого отдыха.";
-        case "free_saturday":
-            return "Ваши представления об отдыхе различаются. Заранее обсудите, сколько времени хочется провести вместе и сколько оставить себе.";
-        case "unexpected_money":
-            return "У вас разные приоритеты в тратах. Обсудите, какую часть денег каждый хочет потратить, а какую — сохранить.";
-        default:
-            return `Обсудите, почему один выбрал «${item.labelA}», а другой — «${item.labelB}». Что важно каждому в этой ситуации и как учесть оба желания?`;
     }
 }
