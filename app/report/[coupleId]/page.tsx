@@ -515,10 +515,7 @@ export default function ReportPage() {
                     }
 
                     .state-brand {
-                        font-family:
-                            Georgia,
-                            "Times New Roman",
-                            serif;
+                        font-family: inherit;
 
                         font-size: 24px;
 
@@ -530,9 +527,7 @@ export default function ReportPage() {
 
                         color: #958b8e;
 
-                        font-family:
-                            Arial,
-                            sans-serif;
+                        font-family: inherit;
 
                         font-size: 12px;
                     }
@@ -574,10 +569,7 @@ export default function ReportPage() {
                     }
 
                     .state-brand {
-                        font-family:
-                            Georgia,
-                            "Times New Roman",
-                            serif;
+                        font-family: inherit;
 
                         font-size: 24px;
 
@@ -589,9 +581,7 @@ export default function ReportPage() {
 
                         color: #958b8e;
 
-                        font-family:
-                            Arial,
-                            sans-serif;
+                        font-family: inherit;
 
                         font-size: 13px;
                     }
@@ -643,167 +633,25 @@ export default function ReportPage() {
                     <div className="intro-main">
 
                         <h1>
-                            Подробный
-                            <br />
-                            разбор
+                            Ваш план на 3 месяца
                         </h1>
 
                         <p>
-                            Здесь — не оценка ваших отношений,
-                            а карта того, где вам легко,
-                            где вы смотрите на вещи по-разному
-                            и что можно попробовать изменить.
+                            Три месяца. Девять шагов. В вашем темпе.
                         </p>
 
                     </div>
 
-                    <aside className="intro-insight">
-
-                        <h2>
-                            Главное про вас
-                        </h2>
-
-                        <div className="intro-point">
-
-                            <span>
-                                —
-                            </span>
-
-                            <p>
-                                Сильнее всего сейчас выглядит{" "}
-
-                                <strong>
-                                    {strongest.title.toLowerCase()}
-                                </strong>
-                                .
-                            </p>
-
+                    <aside className="intro-insight" aria-label="Главное про вас">
+                        <div className="insight-item">
+                            <span>ВАША ОПОРА</span>
+                            <strong>{strongest.title}</strong>
                         </div>
-
-                        <div className="intro-point">
-
-                            <span>
-                                —
-                            </span>
-
-                            <p>
-                                Больше внимания требуют{" "}
-
-                                <strong>
-                                    {weakest
-                                        .map(
-                                            (
-                                                item
-                                            ) =>
-                                                item.title.toLowerCase()
-                                        )
-                                        .join(
-                                            " и "
-                                        )}
-                                </strong>
-                                .
-                            </p>
-
+                        <div className="insight-item">
+                            <span>ЗОНА ВНИМАНИЯ</span>
+                            <strong>{weakest.map(item => item.title).join(" и ")}</strong>
                         </div>
-
                     </aside>
-
-                </div>
-
-            </section>
-
-            {/* =================================================
-                6 СФЕР
-            ================================================= */}
-
-            <section className="report-section report-shell">
-
-                <SectionHeading
-                    label="6 СФЕР"
-                    title={
-                        <>
-                            Как устроены ваши
-                            <br />
-                            отношения
-                        </>
-                    }
-                    description="Те же показатели, которые вы увидели в результате — теперь как основа для полного разбора."
-                />
-
-                <div className="score-list">
-
-                    {categories.map(
-                        (
-                            category
-                        ) => (
-                            <ScoreRow
-                                key={
-                                    category.id
-                                }
-                                category={
-                                    category
-                                }
-                            />
-                        )
-                    )}
-
-                </div>
-
-            </section>
-
-            {/* =================================================
-                СЛЕПЫЕ ЗОНЫ
-            ================================================= */}
-
-            <section className="report-section report-shell">
-
-                <SectionHeading
-                    label="СЛЕПЫЕ ЗОНЫ"
-                    title={
-                        <>
-                            Где вы можете
-                            <br />
-                            неправильно понимать
-                            <br className="desktop-only" />
-                            друг друга
-                        </>
-                    }
-                    description="Здесь интересно не то, кто «прав», а насколько по-разному вы воспринимаете одну и ту же ситуацию."
-                />
-
-                <div className="blind-list">
-
-                    {differences.length >
-                    0 ? (
-                        differences.map(
-                            (
-                                item,
-                                index
-                            ) => (
-                                <BlindSpot
-                                    key={
-                                        item.questionId
-                                    }
-                                    item={
-                                        item
-                                    }
-                                    index={
-                                        index
-                                    }
-                                    nameA={
-                                        nameA
-                                    }
-                                    nameB={
-                                        nameB
-                                    }
-                                />
-                            )
-                        )
-                    ) : (
-                        <div className="empty">
-                            Здесь ваши ответы оказались довольно близкими.
-                        </div>
-                    )}
 
                 </div>
 
@@ -814,23 +662,6 @@ export default function ReportPage() {
             ================================================= */}
 
             <section className="report-section roadmap-section report-shell">
-
-                <SectionHeading
-                    label="ВАШ ПУТЬ ВМЕСТЕ"
-                    title="План на 3 месяца"
-                    description="Не «больше разговаривайте». Только конкретные вещи, которые можно поставить в календарь и сделать."
-                />
-
-                <div className="map">
-
-                    <img
-                        src={
-                            ROADMAP_IMAGE
-                        }
-                        alt="Путь пары на три месяца"
-                    />
-
-                </div>
 
                 <div className="month-grid">
 
@@ -956,10 +787,7 @@ export default function ReportPage() {
                 .brand {
                     flex-shrink: 0;
 
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
+                    font-family: inherit;
 
                     font-size: 24px;
 
@@ -983,10 +811,7 @@ export default function ReportPage() {
 
                     color: #8f8588;
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size: 10px;
 
@@ -1049,10 +874,7 @@ export default function ReportPage() {
                 .intro-main h1 {
                     margin: 0;
 
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
+                    font-family: inherit;
 
                     font-size:
                         clamp(
@@ -1078,10 +900,7 @@ export default function ReportPage() {
 
                     color: #7b7275;
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size: 15px;
 
@@ -1106,10 +925,7 @@ export default function ReportPage() {
 
                     color: #322a2d;
 
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
+                    font-family: inherit;
 
                     font-size: 27px;
 
@@ -1143,9 +959,7 @@ export default function ReportPage() {
                 .intro-point > span {
                     color: #cb255d;
 
-                    font-family:
-                        Georgia,
-                        serif;
+                    font-family: inherit;
 
                     font-size: 18px;
 
@@ -1157,10 +971,7 @@ export default function ReportPage() {
 
                     color: #5e5458;
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size: 15px;
 
@@ -1214,9 +1025,7 @@ export default function ReportPage() {
 
                     background: #fffaf8;
 
-                    font-family:
-                        Arial,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size: 14px;
                 }
@@ -1406,6 +1215,16 @@ export default function ReportPage() {
                     }
                 }
 
+                .report-page { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+                .intro h1 { font-size: clamp(32px, 5vw, 46px); font-weight: 500; line-height: 1.15; letter-spacing: -1.2px; }
+                .intro-main p, .intro-point p { font-size: 15px; line-height: 1.6; }
+                .intro-insight h2 { font-size: 22px; font-weight: 500; }
+                .month-grid { display: flex; flex-direction: column; gap: 16px; }
+                .intro-insight { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px; border-radius: 16px; background: #eee7e4; }
+                .insight-item { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+                .insight-item span { color: #81777a; font-size: 11px; letter-spacing: 1px; }
+                .insight-item strong { font-size: 19px; font-weight: 500; line-height: 1.3; }
+                .roadmap-section { padding-top: 0; margin-top: 24px; }
             `}</style>
 
         </main>
@@ -1453,10 +1272,7 @@ function SectionHeading({
 
                     color: #c51f59;
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size: 10px;
 
@@ -1468,10 +1284,7 @@ function SectionHeading({
                 h2 {
                     margin: 0;
 
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
+                    font-family: inherit;
 
                     font-size:
                         clamp(
@@ -1497,10 +1310,7 @@ function SectionHeading({
 
                     color: #898083;
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size: 13px;
 
@@ -1527,6 +1337,8 @@ function SectionHeading({
                     }
                 }
 
+                .section-heading h2 { font-size: 28px; font-weight: 500; line-height: 1.2; letter-spacing: -.7px; }
+                .section-heading p { font-size: 15px; line-height: 1.6; }
             `}</style>
 
         </div>
@@ -1629,9 +1441,7 @@ function ScoreRow({
 
                     color: #c9255c;
 
-                    font-family:
-                        Georgia,
-                        serif;
+                    font-family: inherit;
 
                     font-size: 18px;
                 }
@@ -1639,10 +1449,7 @@ function ScoreRow({
                 h3 {
                     margin: 0;
 
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
+                    font-family: inherit;
 
                     font-size: 29px;
 
@@ -1661,10 +1468,7 @@ function ScoreRow({
 
                     color: #91888b;
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size: 10px;
                 }
@@ -1694,9 +1498,7 @@ function ScoreRow({
 
                     align-items: baseline;
 
-                    font-family:
-                        Georgia,
-                        serif;
+                    font-family: inherit;
                 }
 
                 .score strong {
@@ -1829,11 +1631,9 @@ function BlindSpot({
 
             </div>
 
-            <div className="meaning">
+            <details className="meaning">
 
-                <span>
-                    ЧТО ЭТО ЗНАЧИТ
-                </span>
+                <summary>Что обсудить вместе</summary>
 
                 <p>
                     {getBlindInsight(
@@ -1841,7 +1641,7 @@ function BlindSpot({
                     )}
                 </p>
 
-            </div>
+            </details>
 
             <style jsx>{`
 
@@ -1885,9 +1685,7 @@ function BlindSpot({
 
                     color: #ca275f;
 
-                    font-family:
-                        Georgia,
-                        serif;
+                    font-family: inherit;
 
                     font-size: 20px;
 
@@ -1899,10 +1697,7 @@ function BlindSpot({
 
                     margin: 0;
 
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
+                    font-family: inherit;
 
                     font-size: 30px;
 
@@ -1967,10 +1762,7 @@ function BlindSpot({
 
                     color: #9d8c91;
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size: 10px;
 
@@ -1992,10 +1784,7 @@ function BlindSpot({
 
                     color: #30282b;
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size: 17px;
 
@@ -2009,9 +1798,7 @@ function BlindSpot({
                 .arrow {
                     color: #cc275f;
 
-                    font-family:
-                        Georgia,
-                        serif;
+                    font-family: inherit;
 
                     font-size: 29px;
 
@@ -2039,10 +1826,7 @@ function BlindSpot({
 
                     color: #c2275c;
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size: 9px;
 
@@ -2058,10 +1842,7 @@ function BlindSpot({
 
                     color: #655b5e;
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size: 14px;
 
@@ -2139,6 +1920,11 @@ function BlindSpot({
                     }
                 }
 
+                .blind-top h3 { font-size: 20px; font-weight: 500; line-height: 1.4; }
+                .answer strong { font-size: 15px; font-weight: 500; line-height: 1.5; }
+                .meaning p { font-size: 15px; line-height: 1.6; }
+                .meaning summary { color: #a02b54; cursor: pointer; font-size: 14px; line-height: 1.5; }
+                .meaning p { margin-top: 12px; }
             `}</style>
 
         </article>
@@ -2155,7 +1941,8 @@ function MonthCard({
     month: MonthPlan;
 }) {
     return (
-        <article className="month-card">
+        <details className="month-card" open={month.number === 1}>
+            <summary>
 
             <div className="month-top">
 
@@ -2173,9 +1960,7 @@ function MonthCard({
                 {month.title}
             </h3>
 
-            <p className="description">
-                {month.description}
-            </p>
+            </summary>
 
             <div className="tasks">
 
@@ -2246,9 +2031,7 @@ function MonthCard({
 
                     color: white;
 
-                    font-family:
-                        Georgia,
-                        serif;
+                    font-family: inherit;
 
                     font-size: 19px;
                 }
@@ -2256,10 +2039,7 @@ function MonthCard({
                 .eyebrow {
                     color: #c8245c;
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size: 9px;
 
@@ -2273,10 +2053,7 @@ function MonthCard({
                 h3 {
                     margin: 0;
 
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
+                    font-family: inherit;
 
                     font-size: 30px;
 
@@ -2295,10 +2072,7 @@ function MonthCard({
 
                     color: #807679;
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size: 12px;
 
@@ -2343,10 +2117,7 @@ function MonthCard({
                 .task-text {
                     color: #4e4548;
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size: 12px;
 
@@ -2355,9 +2126,17 @@ function MonthCard({
                     overflow-wrap: break-word;
                 }
 
+                .month-card { width: 100%; }
+                .month-card .tasks { margin-top: 20px; }
+                summary { cursor: pointer; list-style: none; }
+                summary::-webkit-details-marker { display: none; }
+                summary::after { content: "Показать задания +"; display: block; margin-top: 14px; color: #a02b54; font-size: 14px; }
+                .month-card[open] summary::after { content: "Свернуть −"; }
+                .month-card h3 { font-size: 25px; font-weight: 500; line-height: 1.2; letter-spacing: -.6px; }
+                .description, .task-text { font-size: 15px; line-height: 1.6; }
             `}</style>
 
-        </article>
+        </details>
     );
 }
 
@@ -2413,22 +2192,19 @@ function getActionForCategory(
     }
 }
 
-function getBlindInsight(
-    item: Comparison
-) {
-    if (
-        item.similarity ===
-        "different"
-    ) {
-        return "Здесь вы смотрите на одну ситуацию заметно по-разному. Один из вас может считать свою реакцию очевидной, а второй в этот же момент ждать совсем другого сигнала.";
+function getBlindInsight(item: Comparison) {
+    switch (item.questionId) {
+        case "conflict_finished":
+            return "Вы по-разному понимаете, что ссора закончилась. Обсудите, какой сигнал помогает каждому почувствовать примирение.";
+        case "hard_day":
+            return "После тяжёлого дня вам нужна разная поддержка. Спросите друг друга: сейчас лучше выслушать, помочь или дать побыть в одиночестве?";
+        case "extra_hour":
+            return "Вы выбираете разные способы провести время вдвоём. Чередуйте ваши варианты, чтобы у обоих было место для любимого отдыха.";
+        case "free_saturday":
+            return "Ваши представления об отдыхе различаются. Заранее обсудите, сколько времени хочется провести вместе и сколько оставить себе.";
+        case "unexpected_money":
+            return "У вас разные приоритеты в тратах. Обсудите, какую часть денег каждый хочет потратить, а какую — сохранить.";
+        default:
+            return `Обсудите, почему один выбрал «${item.labelA}», а другой — «${item.labelB}». Что важно каждому в этой ситуации и как учесть оба желания?`;
     }
-
-    if (
-        item.similarity ===
-        "close"
-    ) {
-        return "В целом вы рядом, но детали различаются. Такие небольшие расхождения часто остаются незаметными, пока не возникает реальная ситуация.";
-    }
-
-    return "В этой ситуации вы воспринимаете происходящее довольно похоже.";
 }
