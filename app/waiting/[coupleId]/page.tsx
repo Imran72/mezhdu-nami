@@ -1565,11 +1565,7 @@ export default function WaitingPage() {
                         margin-top:
                             15px;
 
-                        padding:
-                            0
-                            50px
-                            0
-                            18px;
+                        padding: 0 18px;
 
                         font-size:
                             13px;
