@@ -446,3 +446,23 @@ max-width: 420px
         font-size: 30px;
     }
 }
+/* Shared brand header geometry across pages. */
+header:has(> .brand) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100px !important;
+    min-height: 100px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    border-bottom: 1px solid #ded7d4 !important;
+}
+.shell:has(> header > .brand) {
+    padding-top: 0 !important;
+}
+@media (max-width: 640px) {
+    header:has(> .brand) {
+        height: 80px !important;
+        min-height: 80px !important;
+    }
+}

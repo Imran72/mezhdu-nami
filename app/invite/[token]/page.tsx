@@ -334,50 +334,15 @@ export default function InvitePage() {
                     </div>
 
                     <h1>
-                        Первый ответ
-                        <br />
-                        уже готов.
+                        {nameA} приглашает тебя пройти тест
                     </h1>
 
                     <p>
-                        Теперь твоя очередь.
-                        Ответы первого человека
-                        тебе не показываются.
+                        Ответь на вопросы об отношениях — и вы вместе узнаете,
+                        где ваши взгляды совпадают.
                     </p>
 
                 </section>
-
-                <div className="couple-card">
-
-                    <div className="person">
-
-                        <span>
-                            {nameA}
-                        </span>
-
-                        <strong>
-                            готово
-                        </strong>
-
-                    </div>
-
-                    <div className="cross">
-                        ×
-                    </div>
-
-                    <div className="person active">
-
-                        <span>
-                            {nameB}
-                        </span>
-
-                        <strong>
-                            твоя очередь
-                        </strong>
-
-                    </div>
-
-                </div>
 
                 <button
                     type="button"
@@ -390,9 +355,8 @@ export default function InvitePage() {
                 </button>
 
                 <div className="note">
-                    Около 7 минут.
-                    Ответы партнёра увидишь
-                    только после завершения.
+                    Около 7 минут · ответы останутся скрыты
+                    до завершения теста обоими
                 </div>
 
             </div>
@@ -770,6 +734,18 @@ export default function InvitePage() {
                     }
                 }
 
+                .page { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+                .hero { margin: 0; padding: 40px 0 32px; }
+                .hero h1 { font-family: inherit; font-size: clamp(38px, 6vw, 56px); font-weight: 600; line-height: 1.08; letter-spacing: -1.8px; overflow-wrap: anywhere; }
+                .hero p { font-family: inherit; font-size: 17px; line-height: 1.6; color: #746b6e; }
+                .eyebrow, .start, .note { font-family: inherit; }
+                .start { margin-top: 0; background: #cb225c; font-size: 15px; }
+                .note { color: #74686d; font-size: 12px; line-height: 1.6; }
+                @media (max-width: 640px) {
+                    .hero { padding: 28px 0; }
+                    .hero h1 { font-size: 40px; letter-spacing: -1.4px; }
+                    .hero p { font-size: 16px; }
+                }
             `}</style>
 
         </main>
