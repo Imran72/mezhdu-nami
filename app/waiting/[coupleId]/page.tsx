@@ -273,40 +273,6 @@ export default function WaitingPage() {
         }
     }
 
-    async function shareInvite() {
-        if (!inviteUrl) {
-            return;
-        }
-
-        if (
-            navigator.share
-        ) {
-            try {
-                await navigator.share({
-                    title:
-                        "между нами.",
-
-                    text:
-                        "Пройди свою часть — потом увидим общий результат.",
-
-                    url:
-                    inviteUrl,
-                });
-
-                return;
-            } catch (
-                shareError
-                ) {
-                console.log(
-                    "Share cancelled:",
-                    shareError
-                );
-            }
-        }
-
-        await copyInvite();
-    }
-
     if (loading) {
         return (
             <StateScreen
@@ -348,7 +314,7 @@ export default function WaitingPage() {
         "партнёр";
 
     return (
-        <main className="page">
+        <main className="page waiting-page">
 
             <div className="shell">
 
@@ -393,8 +359,7 @@ export default function WaitingPage() {
                         </div>
 
                         <h1>
-                            Теперь очередь
-                            <br />
+                            Теперь очередь{" "}
 
                             <span>
                                 {partnerName}.
@@ -404,71 +369,15 @@ export default function WaitingPage() {
                         <p className="lead">
                             Когда второй человек
                             закончит тест,
-                            <br className="desktop-break" />
+                            {" "}
                             здесь автоматически
                             откроется
-                            <br className="desktop-break" />
+                            {" "}
                             ваш общий результат.
                         </p>
 
                     </div>
 
-                    {/* =================================================
-                        TWO CIRCLES
-                    ================================================= */}
-
-                    <div className="status">
-
-                        <div className="circles">
-
-                            <div className="circle completed">
-
-                                <svg
-                                    viewBox="0 0 48 48"
-                                    aria-hidden="true"
-                                >
-                                    <path
-                                        d="M13 24.5L20.5 32L36 16"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="3.5"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    />
-                                </svg>
-
-                            </div>
-
-                            <div className="circle waiting">
-
-                                <div className="waiting-dots">
-
-                                    <span />
-
-                                    <span />
-
-                                    <span />
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        <div className="circle-labels">
-
-                            <span className="ready-label">
-                                ТЫ ГОТОВ
-                            </span>
-
-                            <span>
-                                ЖДЁМ{" "}
-                                {partnerName.toUpperCase()}
-                            </span>
-
-                        </div>
-
-                    </div>
 
                 </section>
 
@@ -488,125 +397,21 @@ export default function WaitingPage() {
                             {inviteUrl}
                         </div>
 
-                        <button
-                            type="button"
-                            className="link-copy"
-                            aria-label="Скопировать ссылку"
-                            onClick={
-                                copyInvite
-                            }
-                        >
-
-                            {copied ? (
-                                <svg
-                                    viewBox="0 0 24 24"
-                                    aria-hidden="true"
-                                >
-                                    <path
-                                        d="M5 12.5L9.2 16.7L19 7"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    />
-                                </svg>
-                            ) : (
-                                <svg
-                                    viewBox="0 0 24 24"
-                                    aria-hidden="true"
-                                >
-                                    <rect
-                                        x="8"
-                                        y="3"
-                                        width="12"
-                                        height="14"
-                                        rx="2"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="1.8"
-                                    />
-
-                                    <path
-                                        d="M16 17V19C16 20.1 15.1 21 14 21H6C4.9 21 4 20.1 4 19V8C4 6.9 4.9 6 6 6H8"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="1.8"
-                                        strokeLinecap="round"
-                                    />
-                                </svg>
-                            )}
-
-                        </button>
-
                     </div>
 
                     <button
                         type="button"
                         className="share-button"
-                        onClick={
-                            shareInvite
-                        }
+                        onClick={copyInvite}
                     >
-
-                        <span>
-                            Отправить приглашение
+                        <span aria-live="polite">
+                            {copied ? "Ссылка скопирована ✓" : "Скопировать ссылку"}
                         </span>
-
-                        <span className="share-arrow">
-                            →
-                        </span>
-
-                    </button>
-
-                    <button
-                        type="button"
-                        className={
-                            copied
-                                ? "copy-button copied"
-                                : "copy-button"
-                        }
-                        onClick={
-                            copyInvite
-                        }
-                    >
-                        {copied
-                            ? "Ссылка скопирована ✓"
-                            : "Скопировать ссылку"}
                     </button>
 
                 </section>
 
-                {/* =====================================================
-                    FOOTER
-                ===================================================== */}
 
-                <footer className="footer">
-
-                    <div className="heart">
-
-                        <svg
-                            viewBox="0 0 24 24"
-                            aria-hidden="true"
-                        >
-                            <path
-                                d="M12 20.2C10.9 19.2 5.3 14.6 3.2 11.7C1.1 8.8 2 5.1 5.1 3.8C7.5 2.8 10.1 3.7 12 5.8C13.9 3.7 16.5 2.8 18.9 3.8C22 5.1 22.9 8.8 20.8 11.7C18.7 14.6 13.1 19.2 12 20.2Z"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="1.7"
-                                strokeLinejoin="round"
-                            />
-                        </svg>
-
-                    </div>
-
-                    <span>
-                        Результат откроется
-                        автоматически, когда вы
-                        оба закончите.
-                    </span>
-
-                </footer>
 
             </div>
 
@@ -695,10 +500,7 @@ export default function WaitingPage() {
                     flex-shrink:
                         0;
 
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
+                    font-family: inherit;
 
                     font-size:
                         29px;
@@ -735,10 +537,7 @@ export default function WaitingPage() {
                     color:
                         #92888b;
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size:
                         10px;
@@ -786,29 +585,9 @@ export default function WaitingPage() {
                 ===================================================== */
 
                 .hero {
-                    padding:
-                        93px
-                        0
-                        66px;
-
-                    display:
-                        grid;
-
-                    grid-template-columns:
-                        minmax(
-                            0,
-                            1.35fr
-                        )
-                        minmax(
-                            290px,
-                            .65fr
-                        );
-
-                    gap:
-                        54px;
-
-                    align-items:
-                        center;
+                    margin: 0;
+                    padding: 40px 0 32px;
+                    display: block;
                 }
 
                 .hero-copy {
@@ -823,10 +602,7 @@ export default function WaitingPage() {
                     color:
                         #cc225d;
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size:
                         11px;
@@ -845,10 +621,7 @@ export default function WaitingPage() {
                     margin:
                         0;
 
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
+                    font-family: inherit;
 
                     font-size:
                         clamp(
@@ -881,10 +654,7 @@ export default function WaitingPage() {
                     color:
                         #8c8486;
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size:
                         16px;
@@ -1077,10 +847,7 @@ export default function WaitingPage() {
                     color:
                         #92888b;
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size:
                         9px;
@@ -1149,12 +916,9 @@ export default function WaitingPage() {
                         17px;
 
                     color:
-                        #9f9296;
+                        #74686d;
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size:
                         10px;
@@ -1198,7 +962,7 @@ export default function WaitingPage() {
                         15px;
 
                     background:
-                        #f1e4e7;
+                        #eee9e5;
                 }
 
                 .link-text {
@@ -1214,10 +978,7 @@ export default function WaitingPage() {
                     color:
                         #62595c;
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size:
                         13px;
@@ -1338,10 +1099,7 @@ export default function WaitingPage() {
                     color:
                         white;
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size:
                         15px;
@@ -1426,12 +1184,9 @@ export default function WaitingPage() {
                         transparent;
 
                     color:
-                        #8d8386;
+                        #74686d;
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size:
                         12px;
@@ -1486,10 +1241,7 @@ export default function WaitingPage() {
                     color:
                         #948a8d;
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size:
                         11px;
@@ -1930,6 +1682,39 @@ export default function WaitingPage() {
                     }
                 }
 
+                .page {
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                }
+
+
+                .hero h1 {
+                    font-size: clamp(38px, 6vw, 64px);
+                    font-weight: 600;
+                    line-height: 1.08;
+                    letter-spacing: -2px;
+                }
+
+                .hero .lead {
+                    max-width: 520px;
+                    margin-top: 24px;
+                    font-size: 17px;
+                    line-height: 1.6;
+                    color: #746b6e;
+                }
+
+                .desktop-break { display: none; }
+
+                .hero .eyebrow {
+                    font-size: 12px;
+                    font-weight: 600;
+                    letter-spacing: 1.4px;
+                }
+
+                @media (max-width: 640px) {
+                    .hero { padding: 28px 0 28px; }
+                    .hero h1 { font-size: 40px; letter-spacing: -1.4px; }
+                    .hero .lead { font-size: 16px; }
+                }
             `}</style>
 
         </main>
@@ -2009,10 +1794,7 @@ function StateScreen({
                 }
 
                 .state-brand {
-                    font-family:
-                        Georgia,
-                        "Times New Roman",
-                        serif;
+                    font-family: inherit;
 
                     font-size:
                         28px;
@@ -2079,10 +1861,7 @@ function StateScreen({
                     color:
                         #92888b;
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
+                    font-family: inherit;
 
                     font-size:
                         12px;
