@@ -31,7 +31,7 @@ export function StoryHeading({ scene }: { scene: keyof typeof headings }) {
     return (
         <h1 className={`story-lettering story-lettering-${scene}`}>
             <span className="visually-hidden">{text}</span>
-            <Image alt="" src={`/images/${scene}-heading.webp`} width={width} height={height} unoptimized />
+            <Image alt="" src={`/images/${scene}-heading.svg`} width={width} height={height} unoptimized />
         </h1>
     );
 }
@@ -56,7 +56,7 @@ export function StoryHeader({ back, coral = false }: { back?: string | (() => vo
             {typeof back === "string" && <Link className="story-back" href={back} aria-label="Назад">←</Link>}
             {typeof back === "function" && <button className="story-back" type="button" onClick={back} aria-label="Назад">←</button>}
             <Link className={`story-brand${coral ? " story-brand-coral" : ""}`} href="/" aria-label="между нами.">
-                <Image alt="" src={coral ? "/images/brand-coral.webp" : "/images/brand-lilac.webp"}
+                <Image alt="" src={coral ? "/images/brand-coral.svg" : "/images/brand-lilac.svg"}
                     width={coral ? 174 : 217} height={coral ? 55 : 56} unoptimized />
             </Link>
         </header>
