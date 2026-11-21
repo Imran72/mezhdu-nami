@@ -12,7 +12,7 @@ import {
     useRouter,
 } from "next/navigation";
 
-import { StoryArt, StoryHeader, StoryState } from "../../story";
+import { StoryArt, StoryHeader, StoryHeading, StoryState } from "../../story";
 
 type Couple = {
     id: string;
@@ -243,9 +243,9 @@ export default function WaitingPage() {
     ];
 
     return (
-        <main className="story">
+        <main className="story story-waiting">
             <StoryHeader />
-            <h1 className="story-title story-rays">Твоя часть<br />готова!</h1>
+            <StoryHeading scene="waiting" />
             <StoryArt scene="waiting" />
             <ul className="story-status-list">
                 {participants.map(person => (
@@ -258,7 +258,7 @@ export default function WaitingPage() {
             <p className="story-lead">Отправь приглашение партнёру. Когда вы оба закончите, здесь появится результат.</p>
             <button className="story-button" type="button" disabled={!inviteUrl} onClick={shareInvite}>Отправить приглашение ↗</button>
             <button className="story-button story-button-outline" type="button" disabled={!inviteUrl} onClick={copyInvite}>
-                Скопировать ссылку
+                <span className="story-copy-icon" aria-hidden="true" /> Скопировать ссылку
             </button>
             <p className="story-note" aria-live="polite">{copied ? "Ссылка скопирована ✓" : "Результат обновится автоматически"}</p>
             <details className="story-details" ref={inviteDetails}>

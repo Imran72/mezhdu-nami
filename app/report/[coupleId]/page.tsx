@@ -15,7 +15,7 @@ import {
 
 import Link from "next/link";
 import type { QuestionComparison } from "../../../lib/scoring";
-import { StoryArt, StoryCard, StoryHeader, StoryState } from "../../story";
+import { StoryArt, StoryCard, StoryHeader, StoryHeading, StoryState } from "../../story";
 
 type Couple = {
     id: string;
@@ -92,6 +92,9 @@ export default function ReportPage() {
     const [error, setError] =
         useState("");
 
+    const [paymentPending, setPaymentPending] = useState(false);
+    const [attempt, setAttempt] = useState(0);
+
     useEffect(() => {
         let cancelled =
             false;
@@ -114,11 +117,14 @@ export default function ReportPage() {
 
                 if (response.status === 402) {
                     const reason = await response.json();
-                    if (!cancelled && reason.error === "payment_pending" && attempts++ < 10) {
-                        retryTimer = setTimeout(load, 3000);
+                    if (cancelled) return;
+                    if (reason.error === "payment_pending") {
+                        setPaymentPending(true);
+                        if (attempts++ < 10) retryTimer = setTimeout(load, 3000);
                         return;
                     }
-                    if (!cancelled) { setError("Оплата ещё не подтверждена. Если вы уже оплатили, попробуйте проверить снова через несколько секунд."); setLoading(false); }
+                    setPaymentPending(false);
+                    setError("Полный разбор открывается после оплаты.");
                     return;
                 }
                 if (!response.ok) {
@@ -144,11 +150,13 @@ export default function ReportPage() {
                     return;
                 }
 
+                setPaymentPending(false);
                 setData(result);
             } catch (err) {
                 console.error(err);
 
                 if (!cancelled) {
+                    setPaymentPending(false);
                     setError(
                         "Не получилось загрузить разбор."
                     );
@@ -169,6 +177,7 @@ export default function ReportPage() {
     }, [
         coupleId,
         router,
+        attempt,
     ]);
 
     const categories =
@@ -429,7 +438,22 @@ export default function ReportPage() {
             ?.partner_b_name ||
         "Второй";
 
-    if (loading) return <StoryState>Готовим ваш разбор…</StoryState>;
+    if (paymentPending) {
+        return (
+            <main className="story story-report">
+                <StoryHeader coral />
+                <span className="story-payment-status" aria-hidden="true">◷</span>
+                <StoryHeading scene="pending" />
+                <p className="story-lead" role="status">Это может занять несколько секунд</p>
+                <StoryArt scene="pending" />
+                <button type="button" className="story-button" onClick={() => setAttempt(value => value + 1)}>
+                    Проверить снова
+                </button>
+                <Link className="story-utility-link" href={`/result/${coupleId}`}>Вернуться к результату</Link>
+            </main>
+        );
+    }
+    if (loading && !data && !error) return <StoryState>Готовим ваш разбор…</StoryState>;
     if (error || !data) {
         return (
             <StoryState action={<Link className="story-button" href={`/result/${coupleId}`}>К результату →</Link>}>
@@ -449,10 +473,10 @@ export default function ReportPage() {
     ];
 
     return (
-        <main className="story">
-            <StoryHeader />
+        <main className="story story-report">
+            <StoryHeader coral />
             <p className="story-pill story-names">{nameA} + {nameB}</p>
-            <h1 className="story-title story-rays">Ваш разбор</h1>
+            <StoryHeading scene="report" />
             <StoryArt scene="report" />
             <StoryCard icon="♡" title="Ваша сильная сторона">
                 {match ? (

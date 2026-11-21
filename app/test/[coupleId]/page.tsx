@@ -16,7 +16,7 @@ import {
     questions,
 } from '../../../lib/questions';
 
-import { StoryArt, StoryHeader, StoryState } from "../../story";
+import { StoryArt, StoryHeader, StoryHeading, StoryState } from "../../story";
 
 type Answers = Record<string, string>;
 
@@ -337,7 +337,7 @@ export default function TestPage() {
             console.error(err);
 
             setError(
-                'Не получилось сохранить ответы. Попробуй ещё раз.'
+                'Ответы готовы к повторной отправке.'
             );
 
             setSubmitting(false);
@@ -346,6 +346,20 @@ export default function TestPage() {
 
     if (checking || loadedDraftKey !== draftKey) return <StoryState>Загружаем вопросы…</StoryState>;
     if (!currentQuestion) return <StoryState>Не удалось открыть вопрос.</StoryState>;
+    if (error) {
+        return (
+            <main className="story story-test-retry">
+                <StoryHeader back={() => setError("")} />
+                <p className="story-pill story-names">{questions.length} / {questions.length}</p>
+                <StoryHeading scene="retry" />
+                <StoryArt scene="retry" inset />
+                <p className="story-help" role="alert">{error}</p>
+                <button className="story-button" type="button" onClick={() => submitAnswers(answers)}>
+                    Попробовать снова
+                </button>
+            </main>
+        );
+    }
     if (showReaction) return <StoryState>{showReaction}</StoryState>;
     if (showChapterIntro) {
         return (
@@ -382,7 +396,6 @@ export default function TestPage() {
             </section>
             <StoryArt scene="question" inset />
             <p className="story-note">Отвечай за себя — здесь нет правильных ответов</p>
-            {error && <p className="story-error" role="alert">{error}</p>}
             <button className="story-button" type="button" disabled={!selectedValue || submitting} onClick={nextQuestion}>
                 {submitting ? "Сохраняем ответы…" : currentIndex === questions.length - 1 ? "Завершить тест →" : "Дальше →"}
             </button>

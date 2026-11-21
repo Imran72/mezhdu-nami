@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { StoryArt, StoryHeader } from "../story";
+import { StoryArt, StoryHeader, StoryHeading } from "../story";
 
 export default function Start() {
     const [a, setA] = useState("");
@@ -39,7 +39,7 @@ export default function Start() {
     return (
         <main className="story">
             <StoryHeader back="/" />
-            <h1 className="story-title story-rays">Начнём<br />с вас двоих</h1>
+            <StoryHeading scene="names" />
             <StoryArt scene="names" inset />
             <form className="story-form" onSubmit={start}>
                 <h2>Как к вам обращаться?</h2>

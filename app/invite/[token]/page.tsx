@@ -181,13 +181,12 @@ export default function InvitePage() {
     const nameA = couple.partner_a_name || "Твой партнёр";
     const nameB = couple.partner_b_name;
     return (
-        <main className="story">
-            <StoryHeader />
-            <h1 className="story-title story-rays">{nameB ? `${nameB}, тебя` : "Тебя"} зовёт {nameA}</h1>
+        <main className="story story-invite">
+            <StoryHeader coral />
+            <h1 className="story-title story-rays">{nameB ? `${nameB}, тебя` : "Тебя"}<br />зовёт {nameA}</h1>
             <StoryArt scene="invite" />
             <h2 className="story-subtitle">Узнайте, как каждый из вас видит ваши отношения</h2>
             {couple.partner_a_completed && <p className="story-pill story-status">✓ {nameA} · ответы готовы</p>}
-            <p className="story-lead">Ответь самостоятельно — потом сравните результат вместе</p>
             <button className="story-button" type="button" onClick={start}>Пройти свою часть →</button>
             <p className="story-note">Без регистрации · 16 вопросов</p>
         </main>
