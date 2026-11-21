@@ -284,15 +284,36 @@ p, h1, h2, ul, ol {
     border-radius: 3px;
 }
 
+.story-start {
+    --gutter: clamp(20px, 5.7vw, 28px);
+}
+
+.story-start .story-header {
+    min-height: clamp(60px, 16vw, 76px);
+    margin-bottom: 0;
+}
+
+.story-start .story-lettering {
+    width: min(90%, 316px);
+}
+
+.story-start .story-art-names {
+    width: min(88%, 300px);
+}
+
 .story-form {
     display: grid;
-    gap: 6px;
+    gap: 13px;
+}
+
+.story-field {
+    display: grid;
+    gap: 5px;
 }
 
 .story-form h2 {
     color: var(--plum);
     font-size: 23px;
-    margin-bottom: 4px;
 }
 
 .story-form label {
@@ -311,11 +332,27 @@ p, h1, h2, ul, ol {
 }
 
 .story-form input {
-    margin-bottom: 7px;
+    min-height: 48px;
+    background: #fffbf6;
+}
+
+.story-form input:focus-visible {
+    border-color: var(--lilac-deep);
+    outline: 2px solid #dec0dc;
+    outline-offset: 1px;
+}
+
+.story-form input[aria-invalid="true"] {
+    border-color: #a8274d;
+}
+
+.story-field-error {
+    color: #9e2046;
+    font-size: 14px;
 }
 
 .story-form .story-note {
-    margin: 4px 0 11px;
+    margin-block: 2px;
 }
 
 .story-error {
