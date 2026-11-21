@@ -1,2 +1,19 @@
-import Link from 'next/link';
-export default function Home(){return <main className="shell"><header className="site-header"><div className="brand">между нами</div></header><section className="hero"><div className="pair"><div className="orb"/><div className="orb"/></div><div className="eyebrow">тест для двоих</div><h1 className="h1">Насколько хорошо вы понимаете <span style={{color:'var(--berry)'}}>друг друга?</span></h1><p className="lead">Ответьте отдельно и узнайте, где вы смотрите на отношения одинаково, а где совершенно по-разному.</p><p className="tiny">7 минут · проходите отдельно · ответы приватны</p><Link href="/start"><button className="btn">Начать тест</button></Link></section></main>}
+import Link from "next/link";
+import { StoryArt, StoryHeader } from "./story";
+
+export default function Home() {
+    return (
+        <main className="story story-home">
+            <StoryHeader />
+            <h1 className="story-title story-home-title">Любите друг друга.<br />А понимаете?</h1>
+            <p className="story-lead">Ответьте отдельно и сравните ваши взгляды на отношения</p>
+            <StoryArt scene="home" />
+            <Link href="/start" className="story-button">Пройти тест вдвоём <span aria-hidden="true">→</span></Link>
+            <p className="story-note">Бесплатно · Каждый отвечает отдельно</p>
+            <section className="story-callout story-callout-lilac">
+                <h2>Знакомая ситуация?</h2>
+                <p>Один хочет поговорить, другому нужно немного тишины. Сравните ответы и узнайте, чего каждый ждёт в такие моменты.</p>
+            </section>
+        </main>
+    );
+}

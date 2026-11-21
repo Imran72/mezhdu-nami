@@ -1,20 +1,56 @@
 "use client";
-import { useState } from "react";
+
+import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { StoryArt, StoryHeader } from "../story";
+
 export default function Start() {
-    const [a,setA]=useState(""); const [b,setB]=useState("");
-    const [busy,setBusy]=useState(false); const [error,setError]=useState(""); const router=useRouter();
-    async function go() {
+    const [a, setA] = useState("");
+    const [b, setB] = useState("");
+    const [busy, setBusy] = useState(false);
+    const [error, setError] = useState("");
+    const router = useRouter();
+
+    async function start(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
         if (busy) return;
-        if (!a.trim() || !b.trim()) { setError("Введите оба имени"); return; }
-        setBusy(true); setError("");
+        if (!a.trim() || !b.trim()) {
+            setError("Введите оба имени");
+            return;
+        }
+
+        setBusy(true);
+        setError("");
         try {
-            const response=await fetch("/api/couples",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({a,b})});
-            const result=await response.json();
+            const response = await fetch("/api/couples", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ a, b }),
+            });
+            const result = await response.json();
             if (!response.ok || !result.id) throw new Error(result.error || "Не удалось создать пару");
             router.push(`/test/${result.id}`);
-        } catch (err) { setError(err instanceof Error ? err.message : "Не удалось создать пару. Попробуйте ещё раз"); }
-        finally { setBusy(false); }
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Не удалось создать пару. Попробуйте ещё раз");
+            setBusy(false);
+        }
     }
-    return <main className="shell"><header className="site-header"><div className="brand">между нами</div></header><section className="hero"><div className="eyebrow">знакомство</div><h1 className="h1" style={{fontSize:52}}>Кто проходит этот тест?</h1><label htmlFor="name-a">Как тебя зовут?</label><input id="name-a" className="input" value={a} maxLength={80} onChange={e=>setA(e.target.value)} placeholder="Например, Иван"/><label htmlFor="name-b">А партнёра?</label><input id="name-b" className="input" value={b} maxLength={80} onChange={e=>setB(e.target.value)} placeholder="Например, Алина"/>{error && <p role="alert">{error}</p>}<button className="btn" onClick={go} disabled={busy}>{busy?"Создаём пару…":"Продолжить"}</button></section></main>;
+
+    return (
+        <main className="story">
+            <StoryHeader back="/" />
+            <h1 className="story-title story-rays">Начнём<br />с вас двоих</h1>
+            <StoryArt scene="names" inset />
+            <form className="story-form" onSubmit={start}>
+                <h2>Как к вам обращаться?</h2>
+                <label htmlFor="name-a">Твоё имя</label>
+                <input id="name-a" autoComplete="given-name" required maxLength={80} value={a} onChange={event => setA(event.target.value)} placeholder="Например, Аня" />
+                <label htmlFor="name-b">Имя партнёра</label>
+                <input id="name-b" autoComplete="off" required maxLength={80} value={b} onChange={event => setB(event.target.value)} placeholder="Например, Саша" />
+                <p className="story-note">Сначала ответишь ты. Потом отправишь ссылку партнёру.</p>
+                {error && <p className="story-error" role="alert">{error}</p>}
+                <button className="story-button" disabled={busy}>{busy ? "Создаём пару…" : "Начать тест →"}</button>
+            </form>
+        </main>
+    );
 }
