@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { PLAN_PRICE_LABEL } from "../../../lib/plan-price";
 import type { ScoreResult } from "../../../lib/scoring";
-import { StoryArt, StoryCard, StoryHeader, StoryState } from "../../story";
+import { StoryArt, StoryCard, StoryHeader, StoryHeading, StoryState } from "../../story";
 
 type Result = Pick<ScoreResult, "scores" | "highlights"> & {
     waiting?: boolean;
@@ -85,9 +85,9 @@ export default function ResultPage() {
 
     if (checkout && !data.couple.paid) {
         return (
-            <main className="story">
-                <StoryHeader back={resultUrl} />
-                <h1 className="story-title story-title-compact story-rays">Больше понимания — меньше догадок</h1>
+            <main className="story story-checkout">
+                <StoryHeader back={resultUrl} coral />
+                <StoryHeading scene="checkout" />
                 <StoryArt scene="checkout" />
                 <ul className="story-checklist">
                     {reportContents.map(item => <li key={item}><span aria-hidden="true">✓</span>{item}</li>)}
@@ -100,7 +100,7 @@ export default function ResultPage() {
                     {paying ? "Открываем оплату…" : "Перейти к оплате →"}
                 </button>
                 {paymentError && <p className="story-error" role="alert">{paymentError}</p>}
-                <p className="story-note">Оплата на защищённой странице ЮKassa.</p>
+                <p className="story-note"><span aria-hidden="true">▣ </span>Оплата на защищённой странице ЮKassa.</p>
             </main>
         );
     }
@@ -109,21 +109,19 @@ export default function ResultPage() {
     const match = data.highlights.same[0];
     const difference = data.highlights.different[0] ?? data.highlights.close[0];
     return (
-        <main className="story">
-            <StoryHeader />
+        <main className="story story-result">
+            <StoryHeader coral />
             <p className="story-pill story-names">{nameA} + {nameB}</p>
-            <h1 className="story-title story-title-compact story-rays">Два взгляда на ваши отношения</h1>
+            <StoryHeading scene="result" />
             <StoryArt scene="result" />
-            <p className="story-lead">Посмотрите, где ваши ответы совпали, а где отличаются.</p>
             <div className="story-stats">
                 <span className="story-pill">✓ Совпали: {sameAnswers}</span>
-                <span className="story-pill story-pill-peach">Есть различия: {closeAnswers + differentAnswers}</span>
+                <span className="story-pill story-pill-peach"><span aria-hidden="true">ϟ </span>Есть различия: {closeAnswers + differentAnswers}</span>
             </div>
             {match && <StoryCard icon="♡" title="На одной волне" lilac><p>{match.question}</p><p>Оба выбрали «{match.labelA}».</p></StoryCard>}
             {difference && <StoryCard icon="☏" title="Есть что обсудить"><p>{difference.question}</p></StoryCard>}
             <section className="story-callout">
                 <h2>Хотите разобраться глубже?</h2>
-                <p>Подробный разбор ответов, идеи для диалога и эксперимент для двоих.</p>
                 <Link href={data.couple.paid ? reportUrl : `${resultUrl}?checkout=1`} className="story-button">
                     {data.couple.paid ? "Открыть полный разбор →" : `Полный разбор · ${PLAN_PRICE_LABEL} →`}
                 </Link>

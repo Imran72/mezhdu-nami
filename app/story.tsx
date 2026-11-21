@@ -3,15 +3,38 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 const artwork = {
-    home: [425, 299],
-    names: [325, 181],
-    question: [361, 161],
-    waiting: [424, 199],
-    invite: [409, 314],
-    result: [408, 180],
-    checkout: [407, 214],
-    report: [409, 200],
+    home: [429, 312],
+    names: [353, 188],
+    question: [366, 169],
+    waiting: [420, 194],
+    invite: [420, 316],
+    result: [424, 193],
+    checkout: [422, 214],
+    report: [422, 196],
+    retry: [396, 254],
+    pending: [410, 268],
 } as const;
+
+const headings = {
+    home: [379, 183, "Любите друг друга. А понимаете?"],
+    names: [354, 130, "Начнём с вас двоих"],
+    waiting: [344, 120, "Твоя часть готова!"],
+    result: [379, 91, "Два взгляда на ваши отношения"],
+    checkout: [368, 86, "Больше понимания — меньше догадок"],
+    report: [343, 57, "Ваш разбор"],
+    retry: [375, 155, "Не получилось сохранить ответы"],
+    pending: [297, 103, "Проверяем оплату"],
+} as const;
+
+export function StoryHeading({ scene }: { scene: keyof typeof headings }) {
+    const [width, height, text] = headings[scene];
+    return (
+        <h1 className={`story-lettering story-lettering-${scene}`}>
+            <span className="visually-hidden">{text}</span>
+            <Image alt="" src={`/images/${scene}-heading.webp`} width={width} height={height} unoptimized />
+        </h1>
+    );
+}
 
 export function StoryArt({ scene, inset = false }: { scene: keyof typeof artwork; inset?: boolean }) {
     const [width, height] = artwork[scene];
@@ -27,12 +50,15 @@ export function StoryArt({ scene, inset = false }: { scene: keyof typeof artwork
     );
 }
 
-export function StoryHeader({ back }: { back?: string | (() => void) }) {
+export function StoryHeader({ back, coral = false }: { back?: string | (() => void); coral?: boolean }) {
     return (
         <header className="story-header">
             {typeof back === "string" && <Link className="story-back" href={back} aria-label="Назад">←</Link>}
             {typeof back === "function" && <button className="story-back" type="button" onClick={back} aria-label="Назад">←</button>}
-            <Link className="story-brand" href="/">между нами.</Link>
+            <Link className={`story-brand${coral ? " story-brand-coral" : ""}`} href="/" aria-label="между нами.">
+                <Image alt="" src={coral ? "/images/brand-coral.webp" : "/images/brand-lilac.webp"}
+                    width={coral ? 174 : 217} height={coral ? 55 : 56} unoptimized />
+            </Link>
         </header>
     );
 }

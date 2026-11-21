@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { StoryArt, StoryHeader } from "./story";
+import { StoryArt, StoryHeader, StoryHeading } from "./story";
 
 export default function Home() {
     return (
         <main className="story story-home">
             <StoryHeader />
-            <h1 className="story-title story-home-title">Любите друг друга.<br />А понимаете?</h1>
+            <StoryHeading scene="home" />
             <p className="story-lead">Ответьте отдельно и сравните ваши взгляды на отношения</p>
             <StoryArt scene="home" />
             <Link href="/start" className="story-button">Пройти тест вдвоём <span aria-hidden="true">→</span></Link>
