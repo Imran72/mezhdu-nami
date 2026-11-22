@@ -1,351 +1,132 @@
-'use client';
+"use client";
 
-import {
-    useEffect,
-    useState,
-} from 'react';
-
-import {
-    useParams,
-    useRouter,
-    useSearchParams,
-} from 'next/navigation';
-
-import {
-    chapters,
-    questions,
-} from '../../../lib/questions';
-
+import { useEffect, useState } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { getQuizQuestions, type QuizVersion } from "../../../lib/questions";
 import { StoryArt, StoryHeader, StoryHeading, StoryState } from "../../story";
 
 type Answers = Record<string, string>;
-
 type Couple = {
-    id: string;
-    partner_a_name?: string;
-    partner_b_name?: string;
+    quizVersion?: QuizVersion;
     partner_a_completed?: boolean;
     partner_b_completed?: boolean;
 };
 
-type ChapterIntro = {
-    chapter: number;
-    intro: string;
-    subtitle: string;
-};
-
-const microReactions: Record<number, string> = {
-    2: 'интересно 👀',
-    6: 'запомним это',
-    10: 'вот это потом сравним',
-};
-
 export default function TestPage() {
-    const params =
-        useParams<{ coupleId: string }>();
+    const { coupleId } = useParams<{ coupleId: string }>();
+    const role = useSearchParams().get("role") === "b" ? "b" : "a";
+    return <Questionnaire key={`${coupleId}:${role}`} coupleId={coupleId} role={role} />;
+}
 
-    const searchParams =
-        useSearchParams();
-
-    const router =
-        useRouter();
-
-    const coupleId =
-        params.coupleId;
-
-    const role =
-        searchParams.get('role') === 'b'
-            ? 'b'
-            : 'a';
-
-    const [currentIndex, setCurrentIndex] =
-        useState(0);
-
-    const [answers, setAnswers] =
-        useState<Answers>({});
-
+function Questionnaire({ coupleId, role }: { coupleId: string; role: "a" | "b" }) {
+    const router = useRouter();
     const draftKey = `test-draft:${coupleId}:${role}`;
-    const [loadedDraftKey, setLoadedDraftKey] = useState("");
+    const [version, setVersion] = useState<QuizVersion>();
+    const [loadError, setLoadError] = useState(false);
+    const [loadAttempt, setLoadAttempt] = useState(0);
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [answers, setAnswers] = useState<Answers>({});
+    const [selection, setSelection] = useState<string>();
+    const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState("");
+    const questions = getQuizQuestions(version);
+    const currentQuestion = questions[currentIndex];
+    const selectedValue = selection ?? answers[currentQuestion.id];
+
     useEffect(() => {
-        setAnswers({});
-        setSelection(null);
-        setCurrentIndex(0);
-        try {
-            const saved = JSON.parse(localStorage.getItem(draftKey) || "null");
-            if (saved && typeof saved.answers === "object") {
-                const restored: Answers = {};
-                for (const q of questions) if (q.options.some(o => o.value === saved.answers[q.id])) restored[q.id] = saved.answers[q.id];
-                setAnswers(restored);
-                const firstMissing = questions.findIndex(q => !restored[q.id]);
-                setCurrentIndex(firstMissing < 0 ? questions.length - 1 : firstMissing);
-            }
-        } catch { /* Unavailable or invalid storage must not block the test. */ }
-        setLoadedDraftKey(draftKey);
-    }, [draftKey]);
-    useEffect(() => {
-        if (loadedDraftKey !== draftKey) return;
-        try { localStorage.setItem(draftKey, JSON.stringify({ answers })); } catch {}
-    }, [answers, draftKey, loadedDraftKey]);
+        const controller = new AbortController();
 
-    const [checking, setChecking] =
-        useState(true);
-
-    const [submitting, setSubmitting] =
-        useState(false);
-
-    const [error, setError] =
-        useState('');
-
-    const [selection, setSelection] = useState<{ questionId: string; value: string } | null>(null);
-
-    const [
-        showChapterIntro,
-        setShowChapterIntro,
-    ] = useState<ChapterIntro | null>(
-        null
-    );
-
-    const [
-        showReaction,
-        setShowReaction,
-    ] = useState<string | null>(null);
-
-    const currentQuestion =
-        questions[currentIndex];
-
-    /*
-     * Проверяем состояние пары.
-     */
-    useEffect(() => {
-        async function checkCouple() {
+        async function load() {
             try {
-                const response =
-                    await fetch(
-                        `/api/couples?id=${encodeURIComponent(
-                            coupleId
-                        )}`,
-                        {
-                            cache: 'no-store',
-                        }
-                    );
+                const response = await fetch(`/api/couples?id=${encodeURIComponent(coupleId)}`, {
+                    cache: "no-store",
+                    signal: controller.signal,
+                });
+                if (!response.ok) throw new Error("Couple unavailable");
+                const couple: Couple = await response.json();
+                if (controller.signal.aborted) return;
 
-                if (!response.ok) {
-                    throw new Error(
-                        'Не удалось загрузить пару'
-                    );
+                if (couple.partner_a_completed && couple.partner_b_completed) {
+                    router.replace(`/result/${coupleId}`);
+                    return;
                 }
-
-                const couple: Couple =
-                    await response.json();
-
-                /*
-                 * Оба уже прошли.
-                 */
-                if (
-                    couple.partner_a_completed &&
-                    couple.partner_b_completed
-                ) {
-                    router.replace(
-                        `/result/${coupleId}`
-                    );
-
+                if (role === "a" ? couple.partner_a_completed : couple.partner_b_completed) {
+                    router.replace(`/waiting/${coupleId}`);
                     return;
                 }
 
-                /*
-                 * Первый уже проходил.
-                 */
-                if (
-                    role === 'a' &&
-                    couple.partner_a_completed
-                ) {
-                    router.replace(
-                        `/waiting/${coupleId}`
-                    );
-
-                    return;
-                }
-
-                /*
-                 * Второй уже проходил.
-                 */
-                if (
-                    role === 'b' &&
-                    couple.partner_b_completed
-                ) {
-                    if (
-                        couple.partner_a_completed
-                    ) {
-                        router.replace(
-                            `/result/${coupleId}`
-                        );
-                    } else {
-                        router.replace(
-                            `/waiting/${coupleId}`
-                        );
+                const selectedVersion = couple.quizVersion ?? 1;
+                const quiz = getQuizQuestions(selectedVersion);
+                const restored: Answers = {};
+                try {
+                    const saved = JSON.parse(localStorage.getItem(draftKey) || "null");
+                    for (const question of quiz) {
+                        const value = saved?.answers?.[question.id];
+                        if (question.options.some(option => option.value === value)) restored[question.id] = value;
                     }
-
-                    return;
-                }
-            } catch (err) {
-                console.error(err);
-            } finally {
-                setChecking(false);
+                } catch { /* Unavailable storage does not block the quiz. */ }
+                const firstMissing = quiz.findIndex(question => !restored[question.id]);
+                setAnswers(restored);
+                setCurrentIndex(firstMissing < 0 ? quiz.length - 1 : firstMissing);
+                setVersion(selectedVersion);
+            } catch {
+                if (!controller.signal.aborted) setLoadError(true);
             }
         }
 
-        checkCouple();
-    }, [
-        coupleId,
-        role,
-        router,
-    ]);
-
-    const selectedValue = currentQuestion && (
-        selection?.questionId === currentQuestion.id ? selection.value : answers[currentQuestion.id]
-    );
-
-    function getChapterIntro(
-        chapterNumber: number
-    ): ChapterIntro | null {
-        const chapter =
-            chapters.find(
-                (item) =>
-                    item.id === chapterNumber
-            );
-
-        if (!chapter) {
-            return null;
-        }
-
-        return {
-            chapter: chapter.id,
-            intro: chapter.intro,
-            subtitle: chapter.subtitle,
-        };
-    }
+        load();
+        return () => controller.abort();
+    }, [coupleId, draftKey, role, router, loadAttempt]);
 
     async function nextQuestion() {
         if (!selectedValue || submitting) return;
-
         const updated = { ...answers, [currentQuestion.id]: selectedValue };
         setAnswers(updated);
-        setSelection(null);
+        setSelection(undefined);
+        try { localStorage.setItem(draftKey, JSON.stringify({ answers: updated })); } catch {}
         if (currentIndex === questions.length - 1) {
             await submitAnswers(updated);
             return;
         }
-
-        const next = questions[currentIndex + 1];
-        const intro = next.chapter !== currentQuestion.chapter ? getChapterIntro(next.chapter) : null;
-        const reaction = microReactions[currentIndex];
-        if (reaction) {
-            setShowReaction(reaction);
-            await sleep(650);
-            setShowReaction(null);
-        }
-
-        if (intro) {
-            setShowChapterIntro(intro);
-            return;
-        }
-
-        setError("");
-        setCurrentIndex(currentIndex + 1);
-    }
-
-    function continueChapter() {
-        setShowChapterIntro(null);
-        setError("");
         setCurrentIndex(currentIndex + 1);
     }
 
     function goBack() {
-        if (currentIndex === 0 || submitting) return;
-        setSelection(null);
-        setError("");
+        if (!currentIndex || submitting) return;
+        setSelection(undefined);
         setCurrentIndex(currentIndex - 1);
     }
 
-    async function submitAnswers(
-        finalAnswers: Answers
-    ) {
-        if (submitting) {
-            return;
-        }
-
+    async function submitAnswers(finalAnswers: Answers) {
+        if (submitting) return;
         setSubmitting(true);
-        setError('');
-
+        setError("");
         try {
-            const response =
-                await fetch(
-                    '/api/answers',
-                    {
-                        method: 'POST',
-
-                        headers: {
-                            'Content-Type':
-                                'application/json',
-                        },
-
-                        body: JSON.stringify({
-                            coupleId,
-                            role,
-                            answers:
-                            finalAnswers,
-                        }),
-                    }
-                );
-
-            if (!response.ok) {
-                const body =
-                    await response.text();
-
-                console.error(
-                    'Answers API:',
-                    response.status,
-                    body
-                );
-
-                throw new Error(
-                    'Не удалось сохранить ответы'
-                );
-            }
-
+            const response = await fetch("/api/answers", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ coupleId, role, answers: finalAnswers }),
+            });
+            if (!response.ok) throw new Error("Answers unavailable");
             try { localStorage.removeItem(draftKey); } catch {}
-
-            /*
-             * Второй человек завершил тест —
-             * сразу показываем результат.
-             */
-            if (role === 'b') {
-                router.replace(
-                    `/result/${coupleId}`
-                );
-
-                return;
-            }
-
-            /*
-             * Первый человек ждёт партнёра.
-             */
-            router.replace(
-                `/waiting/${coupleId}`
-            );
-        } catch (err) {
-            console.error(err);
-
-            setError(
-                'Ответы готовы к повторной отправке.'
-            );
-
+            router.replace(role === "b" ? `/result/${coupleId}` : `/waiting/${coupleId}`);
+        } catch {
+            setError("Ответы готовы к повторной отправке.");
             setSubmitting(false);
         }
     }
 
-    if (checking || loadedDraftKey !== draftKey) return <StoryState>Загружаем вопросы…</StoryState>;
-    if (!currentQuestion) return <StoryState>Не удалось открыть вопрос.</StoryState>;
+    if (loadError) {
+        return (
+            <StoryState action={<button className="story-button" onClick={() => {
+                setLoadError(false);
+                setLoadAttempt(attempt => attempt + 1);
+            }}>Попробовать снова</button>}>
+                Не удалось загрузить вопросы.
+            </StoryState>
+        );
+    }
+    if (!version) return <StoryState>Загружаем вопросы…</StoryState>;
     if (error) {
         return (
             <main className="story story-test-retry">
@@ -357,18 +138,6 @@ export default function TestPage() {
                 <button className="story-button" type="button" onClick={() => submitAnswers(answers)}>
                     Попробовать снова
                 </button>
-            </main>
-        );
-    }
-    if (showReaction) return <StoryState>{showReaction}</StoryState>;
-    if (showChapterIntro) {
-        return (
-            <main className="story">
-                <StoryHeader back={() => setShowChapterIntro(null)} />
-                <h1 className="story-title story-rays">{showChapterIntro.intro}</h1>
-                <StoryArt scene="question" inset />
-                <p className="story-lead">{showChapterIntro.subtitle}</p>
-                <button className="story-button" type="button" onClick={continueChapter}>Продолжить →</button>
             </main>
         );
     }
@@ -388,7 +157,7 @@ export default function TestPage() {
                     {currentQuestion.options.map(option => (
                         <label key={option.value}>
                             <input name={currentQuestion.id} type="radio" value={option.value}
-                                checked={selectedValue === option.value} onChange={() => setSelection({ questionId: currentQuestion.id, value: option.value })} />
+                                checked={selectedValue === option.value} onChange={() => setSelection(option.value)} />
                             {option.label}
                         </label>
                     ))}
@@ -401,8 +170,4 @@ export default function TestPage() {
             </button>
         </main>
     );
-}
-
-function sleep(ms: number) {
-    return new Promise<void>(resolve => setTimeout(resolve, ms));
 }
