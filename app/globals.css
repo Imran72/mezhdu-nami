@@ -548,7 +548,7 @@ p.story-status {
     text-align: center;
 }
 
-.story-card-lilac, .story-callout-lilac {
+.story-card-lilac {
     background: #f1e3f2;
     border-color: #e4cde7;
 }
@@ -559,11 +559,6 @@ p.story-status {
     padding: 13px 12px;
     border-radius: 17px;
     text-align: center;
-}
-
-.story-home .story-callout h2 {
-    color: var(--plum);
-    font: italic 700 29px/1.02 var(--display);
 }
 
 .story-checklist {

@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 const artwork = {
-    home: [429, 312],
+    home: [1448, 1086],
     names: [353, 188],
     question: [366, 169],
     waiting: [420, 194],
@@ -36,11 +36,11 @@ export function StoryHeading({ scene }: { scene: keyof typeof headings }) {
     );
 }
 
-export function StoryArt({ scene, inset = false }: { scene: keyof typeof artwork; inset?: boolean }) {
+export function StoryArt({ scene, inset = false, alt = "" }: { scene: keyof typeof artwork; inset?: boolean; alt?: string }) {
     const [width, height] = artwork[scene];
     return (
         <Image
-            alt=""
+            alt={alt}
             className={`story-art story-art-${scene}${inset ? " story-art-inset" : ""}`}
             src={`/images/${scene}-story.webp`}
             width={width}
