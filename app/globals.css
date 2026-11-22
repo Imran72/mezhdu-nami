@@ -735,6 +735,23 @@ p.story-status {
     padding: 5px 0;
 }
 
+@media (max-width: 539px) {
+    .story-test {
+        padding-bottom: 0;
+    }
+
+    .story-test-actions {
+        position: sticky;
+        z-index: 1;
+        bottom: 0;
+        margin-top: auto;
+        margin-inline: calc(-1 * var(--gutter));
+        padding: 9px var(--gutter) max(10px, env(safe-area-inset-bottom));
+        background: var(--cream);
+        box-shadow: 0 -5px 15px #5213350d;
+    }
+}
+
 @media (min-width: 540px) {
     .story {
         min-height: calc(100svh - 48px);

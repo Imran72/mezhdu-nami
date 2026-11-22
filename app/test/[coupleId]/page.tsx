@@ -169,9 +169,11 @@ function Questionnaire({ coupleId, role }: { coupleId: string; role: "a" | "b" }
             </section>
             <StoryArt scene="question" inset />
             <p className="story-note">Отвечай за себя — здесь нет правильных ответов</p>
-            <button className="story-button" type="button" disabled={!selectedValue || submitting} onClick={nextQuestion}>
-                {submitting ? "Сохраняем ответы…" : currentIndex === questions.length - 1 ? "Завершить тест →" : "Дальше →"}
-            </button>
+            <div className="story-test-actions">
+                <button className="story-button" type="button" disabled={!selectedValue || submitting} onClick={nextQuestion}>
+                    {submitting ? "Сохраняем ответы…" : currentIndex === questions.length - 1 ? "Завершить тест →" : "Дальше →"}
+                </button>
+            </div>
         </main>
     );
 }
