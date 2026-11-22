@@ -7,7 +7,7 @@ const artwork = {
     names: [353, 188],
     question: [366, 169],
     waiting: [420, 194],
-    invite: [420, 316],
+    invite: [1448, 1086],
     result: [424, 193],
     checkout: [422, 214],
     report: [422, 196],
