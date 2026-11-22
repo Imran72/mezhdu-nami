@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { getQuizQuestions, type QuizVersion } from "../../../lib/questions";
 import { StoryArt, StoryHeader, StoryHeading, StoryState } from "../../story";
@@ -32,6 +32,10 @@ function Questionnaire({ coupleId, role }: { coupleId: string; role: "a" | "b" }
     const questions = getQuizQuestions(version);
     const currentQuestion = questions[currentIndex];
     const selectedValue = selection ?? answers[currentQuestion.id];
+
+    useLayoutEffect(() => {
+        if (version) window.scrollTo({ top: 0, behavior: "instant" });
+    }, [currentIndex, error, version]);
 
     useEffect(() => {
         const controller = new AbortController();
