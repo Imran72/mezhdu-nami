@@ -36,36 +36,6 @@ export type Question = {
     options: QuestionOption[];
 };
 
-export const chapters = [
-    {
-        id: 1,
-        title: 'вы вдвоём',
-        intro: 'Начнём с простого.',
-        subtitle: 'Как выглядит ваш обычный кайф.',
-    },
-
-    {
-        id: 2,
-        title: 'когда что-то идёт не так',
-        intro: 'Окей, с базой разобрались.',
-        subtitle: 'Теперь чуть интереснее 👀',
-    },
-
-    {
-        id: 3,
-        title: 'ваш маленький мир',
-        intro: 'А теперь обычная жизнь.',
-        subtitle: 'Она почему-то рассказывает больше всего.',
-    },
-
-    {
-        id: 4,
-        title: 'куда всё это едет',
-        intro: 'Последняя глава.',
-        subtitle: 'Тут обычно находятся самые интересные совпадения.',
-    },
-] as const;
-
 export const questions: Question[] = [
     // ============================================================
     // ГЛАВА 1
@@ -993,6 +963,39 @@ export const questions: Question[] = [
         ],
     },
 ];
+
+export type QuizVersion = 1 | 2;
+
+// Keep the original question IDs and options so drafts and results still resolve.
+const shortQuestions = [
+    "free_saturday",
+    "care_signal",
+    "normal_evening",
+    "everything_fine",
+    "hard_day",
+    "weekend_plan",
+    "wrong_in_argument",
+    "conflict_finished",
+    "keep_in_year",
+    "want_more",
+].map(id => {
+    const question = getQuestionById(id);
+    if (!question) throw new Error(`Unknown quiz question: ${id}`);
+    return question;
+});
+
+export function getQuizQuestions(version: QuizVersion = 1): Question[] {
+    return version === 2 ? shortQuestions : questions;
+}
+
+// The opaque invite token already travels with the couple. A prefix versions new
+// pairs without changing the schema or the existing 36-character hex links.
+export const shortQuizInvitePrefix = "v2-";
+export const quizInvitePattern = /^(?:v2-)?[a-f0-9]{36}$/;
+
+export function getQuizVersion(inviteToken?: string | null): QuizVersion {
+    return inviteToken?.startsWith(shortQuizInvitePrefix) ? 2 : 1;
+}
 
 export function getQuestionById(
     id: string

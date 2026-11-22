@@ -10,10 +10,12 @@ import {
     useRouter,
 } from "next/navigation";
 
+import { getQuizQuestions, type QuizVersion } from "../../../lib/questions";
 import { StoryArt, StoryHeader, StoryState } from "../../story";
 
 type Couple = {
     id: string;
+    quizVersion?: QuizVersion;
 
     partner_a_name?: string | null;
     partner_b_name?: string | null;
@@ -188,7 +190,7 @@ export default function InvitePage() {
             <h2 className="story-subtitle">Узнайте, как каждый из вас видит ваши отношения</h2>
             {couple.partner_a_completed && <p className="story-pill story-status">✓ {nameA} · ответы готовы</p>}
             <button className="story-button" type="button" onClick={start}>Пройти свою часть →</button>
-            <p className="story-note">Без регистрации · 16 вопросов</p>
+            <p className="story-note">Без регистрации · {getQuizQuestions(couple.quizVersion).length} вопросов</p>
         </main>
     );
 }

@@ -1,18 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { admin } from "../../../lib/supabase";
 import { hasParticipant, validId } from "../../../lib/participant-auth";
-import { questions } from "../../../lib/questions";
+import { getQuizQuestions, getQuizVersion } from "../../../lib/questions";
 export async function POST(req: NextRequest) {
     let body;
     try { body = await req.json(); } catch { return NextResponse.json({ error: "Некорректные данные" }, { status: 400 }); }
     const { coupleId, role, answers } = body || {};
     if (!validId(coupleId) || (role !== "a" && role !== "b")) return NextResponse.json({ error: "Некорректный участник" }, { status: 400 });
     if (!hasParticipant(req, coupleId, role)) return NextResponse.json({ error: "Нет доступа к ответам этого участника" }, { status: 403 });
-    if (!answers || typeof answers !== "object" || Array.isArray(answers) || Object.keys(answers).length !== questions.length || questions.some(q => !q.options.some(o => o.value === answers[q.id])))
+    if (!answers || typeof answers !== "object" || Array.isArray(answers))
         return NextResponse.json({ error: "Ответьте на все вопросы, выбрав доступные варианты" }, { status: 400 });
     const db = admin();
-    const { data: couple, error: loadError } = await db.from("couples").select("partner_a_completed,partner_b_completed").eq("id", coupleId).single();
+    const { data: couple, error: loadError } = await db.from("couples").select("partner_a_completed,partner_b_completed,invite_token").eq("id", coupleId).single();
     if (loadError || !couple) return NextResponse.json({ error: "Пара не найдена" }, { status: 404 });
+    const questions = getQuizQuestions(getQuizVersion(couple.invite_token));
+    if (Object.keys(answers).length !== questions.length || questions.some(q => !q.options.some(o => o.value === answers[q.id])))
+        return NextResponse.json({ error: "Ответьте на все вопросы, выбрав доступные варианты" }, { status: 400 });
     const completed = role === "a" ? "partner_a_completed" : "partner_b_completed";
     if (couple[completed]) return NextResponse.json({ error: "Тест уже завершён" }, { status: 409 });
     // Insert rather than upsert: concurrent/repeated submissions cannot overwrite answers.
