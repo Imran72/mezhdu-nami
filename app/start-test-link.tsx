@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
+import { trackMetricaGoal } from "../lib/yandex-metrica";
 
 const visitorKey = "mezhdu-nami-visitor";
 let sessionVisitorId: string | undefined;
@@ -44,7 +45,10 @@ export default function StartTestLink() {
     }, []);
 
     return (
-        <Link href="/start" className="story-button" onClick={() => track("test_started")}>
+        <Link href="/start" className="story-button" onClick={() => {
+            trackMetricaGoal("test_started");
+            track("test_started");
+        }}>
             Пройти тест вдвоём <span aria-hidden="true">→</span>
         </Link>
     );
