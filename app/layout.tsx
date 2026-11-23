@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import TopMailCounter from "./top-mail-counter";
+import YandexMetrica from "./yandex-metrica";
 import { TOP_MAIL_COUNTER_ID } from "./top-mail-config";
 
 export const metadata: Metadata = {
@@ -27,6 +28,7 @@ export default function RootLayout({
             {children}
             <Suspense fallback={null}>
                 <TopMailCounter />
+                <YandexMetrica />
             </Suspense>
             <noscript>
                 <img

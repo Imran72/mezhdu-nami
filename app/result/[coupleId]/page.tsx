@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { PLAN_PRICE_LABEL } from "../../../lib/plan-price";
 import type { ScoreResult } from "../../../lib/scoring";
+import { trackMetricaGoal } from "../../../lib/yandex-metrica";
 import { StoryArt, StoryCard, StoryHeader, StoryHeading, StoryState } from "../../story";
 
 type Result = Pick<ScoreResult, "scores" | "highlights"> & {
@@ -127,6 +128,7 @@ export default function ResultPage() {
                     className="story-button"
                     onClick={() => {
                         if (data.couple.paid) return;
+                        trackMetricaGoal("full_report_clicked");
                         void fetch("/api/full-report-click", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },

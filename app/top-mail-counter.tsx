@@ -5,6 +5,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 
 import { TOP_MAIL_COUNTER_ID } from "./top-mail-config";
+import { analyticsUrl, initialReferrer } from "../lib/analytics-url";
 
 type PageView = {
     id: string;
@@ -13,32 +14,6 @@ type PageView = {
     url: string;
     referrer: string;
 };
-
-const privateRoute = /^\/(invite|test|waiting|result|report)(?:\/.*)?$/;
-const campaignParams = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "rb_clickid"];
-
-function analyticsUrl(url: URL) {
-    const page = new URL(url.origin);
-    const route = privateRoute.exec(url.pathname);
-    page.pathname = route ? `/${route[1]}` : url.pathname;
-    if (page.pathname === "/result" && url.searchParams.get("checkout") === "1") {
-        page.searchParams.set("checkout", "1");
-    }
-    for (const key of campaignParams) {
-        const value = url.searchParams.get(key);
-        if (value) page.searchParams.set(key, value);
-    }
-    return page.href;
-}
-
-function initialReferrer() {
-    try {
-        const referrer = new URL(document.referrer);
-        return referrer.origin === window.location.origin ? analyticsUrl(referrer) : referrer.origin;
-    } catch {
-        return "";
-    }
-}
 
 export default function TopMailCounter() {
     const pathname = usePathname();
