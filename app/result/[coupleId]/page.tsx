@@ -122,7 +122,19 @@ export default function ResultPage() {
             {difference && <StoryCard icon="☏" title="Есть что обсудить"><p>{difference.question}</p></StoryCard>}
             <section className="story-callout">
                 <h2>Хотите разобраться глубже?</h2>
-                <Link href={data.couple.paid ? reportUrl : `${resultUrl}?checkout=1`} className="story-button">
+                <Link
+                    href={data.couple.paid ? reportUrl : `${resultUrl}?checkout=1`}
+                    className="story-button"
+                    onClick={() => {
+                        if (data.couple.paid) return;
+                        void fetch("/api/full-report-click", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ coupleId }),
+                            keepalive: true,
+                        }).catch(() => {});
+                    }}
+                >
                     {data.couple.paid ? "Открыть полный разбор →" : `Полный разбор · ${PLAN_PRICE_LABEL} →`}
                 </Link>
             </section>
