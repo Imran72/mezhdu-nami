@@ -38,6 +38,7 @@ export function StoryHeading({ scene }: { scene: keyof typeof headings }) {
 
 export function StoryArt({ scene, inset = false, alt = "" }: { scene: keyof typeof artwork; inset?: boolean; alt?: string }) {
     const [width, height] = artwork[scene];
+    const isHome = scene === "home";
     return (
         <Image
             alt={alt}
@@ -45,7 +46,10 @@ export function StoryArt({ scene, inset = false, alt = "" }: { scene: keyof type
             src={`/images/${scene}-story.webp`}
             width={width}
             height={height}
-            unoptimized
+            unoptimized={!isHome}
+            sizes={isHome ? "(max-width: 460px) 100vw, 460px" : undefined}
+            loading={isHome ? "eager" : undefined}
+            fetchPriority={isHome ? "high" : undefined}
         />
     );
 }
