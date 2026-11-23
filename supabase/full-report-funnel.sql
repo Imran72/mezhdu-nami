@@ -7,6 +7,13 @@ bounds AS (
     (day + 1)::timestamp AT TIME ZONE 'Europe/Moscow' AS end_at
   FROM day
 ),
+home_counts AS (
+  SELECT
+    count(DISTINCT e.visitor_id) AS opened,
+    count(DISTINCT e.visitor_id) FILTER (WHERE e.event = 'test_started') AS clicked
+  FROM public.home_funnel_events e
+  JOIN day d ON d.day = e.day_moscow
+),
 progress AS (
   SELECT
     c.id,
@@ -34,7 +41,7 @@ progress AS (
 ),
 steps (step_no, threshold, stage, requires_click) AS (
   VALUES
-    (1, 0,  'Открыли (создали пару)', false),
+    (1, 0,  'Создали пару', false),
     (2, 1,  'Ответили на 1 вопрос', false),
     (3, 5,  'Ответили на 5 вопросов', false),
     (4, 10, 'Ответили на 10 вопросов', false),
@@ -65,14 +72,31 @@ counts AS (
     ON p.answered >= s.threshold
     AND (NOT s.requires_click OR p.first_click_at IS NOT NULL)
   GROUP BY s.step_no, s.stage, s.requires_click
+),
+report_rows AS (
+  SELECT 0 AS section, 1 AS step_no, 'Открыли главную' AS stage,
+    'Браузеры' AS unit, opened AS total,
+    CASE WHEN opened > 0 THEN 100.0 END AS from_start,
+    NULL::numeric AS from_previous, NULL::jsonb AS clicked_pairs
+  FROM home_counts
+  UNION ALL
+  SELECT 0, 2, 'Нажали «Пройти тест вдвоём»', 'Браузеры', clicked,
+    round(100.0 * clicked / nullif(opened, 0), 1),
+    round(100.0 * clicked / nullif(opened, 0), 1), NULL::jsonb
+  FROM home_counts
+  UNION ALL
+  SELECT 1, step_no, stage, 'Пары', pairs,
+    round(100.0 * pairs / nullif(first_value(pairs) OVER (ORDER BY step_no), 0), 1),
+    round(100.0 * pairs / nullif(lag(pairs) OVER (ORDER BY step_no), 0), 1),
+    clicked_pairs
+  FROM counts
 )
 SELECT
   stage AS "Этап",
-  pairs AS "Пар",
-  round(100.0 * pairs / nullif(first_value(pairs) OVER (ORDER BY step_no), 0), 1)
-    AS "% от открывших",
-  round(100.0 * pairs / nullif(lag(pairs) OVER (ORDER BY step_no), 0), 1)
-    AS "% от предыдущего этапа",
+  unit AS "Единица",
+  total AS "Количество",
+  from_start AS "% от первого этапа в группе",
+  from_previous AS "% от предыдущего этапа в группе",
   clicked_pairs AS "Кто нажал"
-FROM counts
-ORDER BY step_no;
+FROM report_rows
+ORDER BY section, step_no;
