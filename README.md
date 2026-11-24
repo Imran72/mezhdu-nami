@@ -91,3 +91,44 @@ Start command: `npm run start`
 
 ## 9. Важно для production
 Это MVP. Перед масштабированием нужны: нормальная авторизация доступа к конкретной паре (сейчас couple UUID фактически является секретом), rate limiting API, CAPTCHA/anti-abuse, логирование, полноценная обработка ошибок, privacy/delete flow, YooKassa receipt/налоговые настройки под вашу юр. схему, analytics events и юридические тексты.
+
+## 10. Серверный учёт переходов из VK Ads
+
+1. Выполните `supabase/add-ad-clicks.sql` в Supabase SQL Editor. Для новой базы сначала примените `schema.sql`, `add-home-funnel-events.sql` и `add-full-report-clicks.sql`.
+2. Сгенерируйте секрет командой `openssl rand -hex 32`. Задайте его как `AD_CLICK_SECRET` в Railway Variables и в `.env.local` для локальной проверки. Приложение также использует существующие `NEXT_PUBLIC_SUPABASE_URL` и серверный `SUPABASE_SERVICE_ROLE_KEY`. При отсутствии нового секрета переходы сохраняются без хеша IP и привязки к сессии.
+3. Разверните приложение и укажите в VK Ads конечный HTTPS-адрес главной, например `https://ВАШ-ДОМЕН/?utm_source=vk&utm_medium=cpc&utm_campaign=campaign&utm_content=creative&utm_term=audience`. Используйте домен, который уже отдаёт страницу напрямую. UTM и маркер `rb_clickid` остаются в исходном URL.
+
+Next.js Proxy запускает запись для каждого GET главной с хотя бы одной непустой UTM-меткой. Ответ помечается `Cache-Control: private, no-store`. Запись выполняется в фоне с тайм-аутом 350 мс. `click_id` передаётся через подписанную HttpOnly-cookie браузерной сессии. IP хешируется HMAC-SHA256 по заголовку `X-Real-IP` от публичного HTTP-прокси Railway. Если корректный IP недоступен, хеш равен `NULL`.
+
+Повторный GET, включая ручное обновление, создаёт новый UUID и обновляет атрибуцию браузера. По одинаковым UTM сервер не может различить обновление страницы и второй реальный клик. GET-предпросмотры, предзагрузки и запросы React Server Components помечаются и сохраняются без обновления cookie. HEAD-запросы пропускаются. Флаги определяются эвристически.
+
+### Проверка
+
+1. Запустите `node tests/ad-click-flow.cjs` после установки зависимостей, используя Node.js 22.13 или новее. Тест использует настоящие типы запросов Next.js и имитацию записи в Supabase.
+2. Откройте тестовую рекламную ссылку в новой браузерной сессии. В Network проверьте первый запрос документа: статус `200`, отсутствие `Location`, исходный URL с UTM и `Cache-Control: private, no-store`. В `Set-Cookie` найдите `mezhdu_nami_ad_click`. UUID — часть значения до точки. Нажмите «Пройти тест вдвоём» и создайте пару.
+3. Подставьте UUID в запросы Supabase SQL Editor. Ответы партнёра из другого браузера связываются с переходом через пару. Клик по «Полному разбору» появится после завершения теста обоими участниками и нажатия соответствующей кнопки.
+
+```sql
+select click_id, created_at, utm_source, utm_medium, utm_campaign,
+       utm_content, utm_term, ip_hash, is_preview, is_suspicious
+from public.ad_clicks where click_id = 'UUID';
+
+select visitor_id, day_moscow, event
+from public.home_funnel_ad_clicks where click_id = 'UUID';
+
+select id, created_at from public.couples where click_id = 'UUID';
+
+select a.couple_id, a.role, count(*) as answers
+from public.answers a join public.couples c on c.id = a.couple_id
+where c.click_id = 'UUID'
+group by a.couple_id, a.role;
+
+select r.couple_id, r.created_at, r.click_id as report_browser_click_id
+from public.full_report_clicks r join public.couples c on c.id = r.couple_id
+where c.click_id = 'UUID' or r.click_id = 'UUID';
+```
+
+4. Повторите переход из того же браузера. Для нового UUID появится отдельная запись; исходный отчёт по-прежнему считает уникальные браузеры за день. Для проверки предпросмотра выполните `curl -sS -D - -o /dev/null -H 'Sec-Purpose: prefetch' 'https://ВАШ-ДОМЕН/?utm_source=vk&utm_campaign=preview-check'`. Ожидаются `200`, отсутствие cookie атрибуции и строка с обоими флагами в `ad_clicks`.
+5. Проверьте с ролями `anon` и `authenticated`, что `ad_clicks`, `home_funnel_ad_clicks` и RPC атрибуции недоступны через API. При сбое вставки главная открывается штатно. У события воронки в таком случае может быть UUID без строки в `ad_clicks`.
+
+Сравнивайте отчёты за одинаковый период и по одинаковым UTM. `ad_clicks` считает запросы главной, включая отмеченные предпросмотры, а дневной отчёт считает браузеры.

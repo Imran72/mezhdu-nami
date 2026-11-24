@@ -1,8 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { sessionAdClick } from "../../../lib/ad-attribution";
 import { validId } from "../../../lib/participant-auth";
 import { admin } from "../../../lib/supabase";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
     const body = await request.json().catch(() => null);
     const coupleId = body?.coupleId;
     if (!validId(coupleId)) return new NextResponse(null, { status: 400 });
@@ -22,7 +23,7 @@ export async function POST(request: Request) {
 
         const { error } = await db
             .from("full_report_clicks")
-            .insert({ couple_id: couple.id });
+            .insert({ couple_id: couple.id, click_id: sessionAdClick(request) });
 
         if (error) {
             console.error("Could not record full report click", error.code);
